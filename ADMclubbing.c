@@ -1,5 +1,5 @@
 /*
- * $Id: ADMclubbing.c 347 2009-01-19 14:43:24Z x $
+ * $Id$
  * 
  * Below is the most awesome piece of C code created, ever.
  * Modified to fit despotify.

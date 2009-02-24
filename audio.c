@@ -1,5 +1,5 @@
 /*
- * $Id: audio.c 734 2009-02-23 18:27:54Z x $
+ * $Id$
  *
  * Generic audio output driver interface
  * ...or at least that was the idea before we went into

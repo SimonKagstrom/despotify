@@ -1,5 +1,5 @@
 /*
- * $Id: channel.c 731 2009-02-23 17:05:45Z x $
+ * $Id$
  *
  * Register and callbak interface for handling 
  * data channels inside a single connection to

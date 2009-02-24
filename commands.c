@@ -1,5 +1,5 @@
 /*
- * $Id: commands.c 734 2009-02-23 18:27:54Z x $
+ * $Id$
  *
  * This file contains a basic implementations of request
  * you may send to Spotify's service.

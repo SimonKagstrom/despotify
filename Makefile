@@ -1,5 +1,5 @@
 #
-# $Id: Makefile 761 2009-02-24 08:20:20Z x $
+# $Id$
 # 
 #
 CFLAGS = -Wall -ggdb -DGUI

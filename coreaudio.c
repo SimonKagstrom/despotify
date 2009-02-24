@@ -1,5 +1,5 @@
 /*
- * $Id: coreaudio.c 751 2009-02-24 02:06:40Z x $
+ * $Id$
  *
  * Mac OS X CoreAudio audio output driver for Despotify
  *

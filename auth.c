@@ -1,5 +1,5 @@
 /*
- * $Id: auth.c 769 2009-02-24 20:12:52Z a $
+ * $Id$
  *
  * Code for dealing with authentication against
  * the server.
