@@ -58,8 +58,9 @@ endif
 
 all: core despotify gateway
 
-include $(CORE_OBJS:.o=.d) $(DESPOTIFY_OBJS:.o=.d) $(GATEWAY_OBJS:.o=.d)
-deps: $(CORE_OBJS:.o=.d) $(DESPOTIFY_OBJS:.o=.d) $(GATEWAY_OBJS:.o=.d)
+D=$(CORE_OBJS:.o=.d) $(DESPOTIFY_OBJS:.o=.d) $(GATEWAY_OBJS:.o=.d)
+include $(D)
+deps: $(D)
 %.d: %.c
 	$(SHELL) -ec '$(CXX) -MM $(CFLAGS) $(DEFINES) $< \
 		| sed '\''s/$*\\.o[ :]*/& $@/g'\'' > $@'
@@ -69,7 +70,7 @@ gstapp/libgstapp.a:
 
 clean:
 	make -C gstapp clean
-	rm -f $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS) despotify gateway
+	rm -f $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS) $(D) despotify gateway
 
 core: $(CORE_OBJS)
 
