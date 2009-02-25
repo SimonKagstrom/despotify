@@ -16,24 +16,13 @@
 #include "gstreamer.h"
 #include "util.h"
 
-typedef struct gst_private
-{
-        int state;
-        GstElement *pipe;
-        GstElement *src;
-        GstElement *sink;
-        pthread_mutex_t lock;   /* Lock for this struct */
-        pthread_cond_t pause;   /* condition signal used for pausing */
-        pthread_cond_t end;     /* condition signal used when quiting */
-} gst_PRIVATE;
-
 static gboolean bus_call (GstBus *bus, GstMessage *msg, gpointer user_data)
 {
     switch (GST_MESSAGE_TYPE (msg))
     {
         case GST_MESSAGE_EOS:
             {
-                                DSFYDEBUG ("%s", "End-of-stream\n");
+                DSFYDEBUG ("%s", "End-of-stream\n");
                 break;
             }
         case GST_MESSAGE_ERROR:
@@ -44,7 +33,7 @@ static gboolean bus_call (GstBus *bus, GstMessage *msg, gpointer user_data)
                 gst_message_parse_error (msg, &err, &debug);
                 g_free (debug);
 
-                                DSFYDEBUG ("%s\n", err->message);
+                DSFYDEBUG ("%s\n", err->message);
                 g_error_free (err);
 
                 break;
@@ -70,24 +59,24 @@ static gboolean bus_call (GstBus *bus, GstMessage *msg, gpointer user_data)
                 gst_message_parse_warning (msg, &err, &debug);
                 g_free (debug);
 
-                                DSFYDEBUG ("%s\n", err->message);
+                DSFYDEBUG ("%s\n", err->message);
                 g_error_free (err);
 
                 break;
             }
-                case GST_MESSAGE_STATE_CHANGED:
-                        {
-                                GstState new;
-                                GstState old;
-                                GstState pending;
+        case GST_MESSAGE_STATE_CHANGED:
+            {
+                GstState new;
+                GstState old;
+                GstState pending;
 
-                                gst_message_parse_state_changed(msg, &new, &old, &pending);
-                                DSFYDEBUG ("state changed (%d,%d,%d)\n", new, old, pending);
+                gst_message_parse_state_changed(msg, &new, &old, &pending);
+                DSFYDEBUG ("state changed (%d,%d,%d)\n", new, old, pending);
 
                 break;
-                        }
+            }
         default:
-                        DSFYDEBUG ("%s %d\n", __FUNCTION__, GST_MESSAGE_TYPE(msg));
+            DSFYDEBUG ("%s %d\n", __FUNCTION__, GST_MESSAGE_TYPE(msg));
             break;
     }
 
@@ -98,13 +87,30 @@ static void gstaudio_free_buffer(void *buffer) {
         g_free(buffer);
 }
 
+static gboolean pause_cb (gpointer data)
+{
+        gst_PRIVATE *private = (gst_PRIVATE *)data;
+        DSFYDEBUG ("%s\n", __FUNCTION__);
+        gst_element_set_state (private->pipeline, GST_STATE_PAUSED);
+        return FALSE;
+}
+
+static gboolean resume_cb (gpointer data)
+{
+        gst_PRIVATE *private = (gst_PRIVATE *)data;
+        DSFYDEBUG ("%s\n", __FUNCTION__);
+        gst_element_set_state (private->pipeline, GST_STATE_PLAYING);
+        return FALSE;
+}
+
+
 static void need_data_cb (GstAppSrc * src, guint length, gpointer data) {
         ssize_t r;
         uint8_t * buffer;
-    GstBuffer *gstbuf;
+        GstBuffer *gstbuf;
         AUDIOCTX * actx = (AUDIOCTX*) data;
         gst_PRIVATE *priv = (gst_PRIVATE *) actx->driverprivate;
-        assert (priv != 0);
+        assert (priv != NULL);
 
         if(length == 0 || length > 1024)
                 length = 1024;
@@ -112,17 +118,16 @@ static void need_data_cb (GstAppSrc * src, guint length, gpointer data) {
         buffer = g_new(uint8_t,length);
         r = pcm_read (actx->pcmprivate, (char *) buffer, length, 0, 2, 1, NULL);
 
-        if (r <= 0) {
-                if (r == 0)     {
-                        gst_app_src_end_of_stream(GST_APP_SRC(priv->src));
-                        return;
-                }
-                DSFYDEBUG ("pcm_read() failed == %lu\n", r);
+        if (r == 0) {
+                gst_app_src_end_of_stream(GST_APP_SRC(priv->src));
+                return;
+        } else if (r < 0) {
+                DSFYDEBUG ("pcm_read() failed == %i\n", r);
                 exit (-1);
         }
 
         gstbuf = gst_app_buffer_new (buffer, r, gstaudio_free_buffer, buffer);
-    if(gst_app_src_push_buffer(GST_APP_SRC(priv->src), gstbuf) != GST_FLOW_OK)
+        if(gst_app_src_push_buffer(GST_APP_SRC(priv->src), gstbuf) != GST_FLOW_OK)
                 DSFYDEBUG ("%s> call to push_buffer failed\n", __FUNCTION__);
 }
 
@@ -146,63 +151,52 @@ int gstaudio_init_device (void *unused)
 int gstaudio_prepare_device (AUDIOCTX * actx)
 {
         gst_PRIVATE *priv;
+        GstElement *sink;
+
         DSFYDEBUG ("%s\n", __FUNCTION__);
 
+        assert (actx->driverprivate == NULL);
+
         priv = (void *) malloc (sizeof (gst_PRIVATE));
-        assert (priv != 0);
+        assert (priv != NULL);
         
-        priv->state = GST_IDLE;
-
-        if (pthread_mutex_init (&priv->lock, 0) != 0) {
-                perror ("pthread_mutex_init");
-                exit (-1);
-        }
-
-        if (pthread_cond_init (&priv->pause, 0) != 0) {
-                perror ("pthread_cond_init");
-                exit (-1);
-        }
-
-        if (pthread_cond_init (&priv->end, 0) != 0) {
-                perror ("pthread_cond_init");
-                exit (-1);
-        }
+        /* create a new gmainloop */
+        priv->loop = g_main_loop_new (NULL, FALSE);
         
         /* create a new gstreamer pipeline */
-        priv->pipe = gst_pipeline_new (NULL);
-        g_assert (priv->pipe);
+        priv->pipeline = gst_pipeline_new (NULL);
+        g_assert (priv->pipeline);
         
-        /* create a gstreamer AppSrc
-         * note im mostly guessing on the caps values */
+        /* create a gstreamer AppSrc, capab values taken from pulseaudio backend. */
         priv->src = gst_element_factory_make ("appsrc", NULL);
         g_assert (priv->src);
-        gst_app_src_set_stream_type(GST_APP_SRC(priv->src), GST_APP_STREAM_TYPE_STREAM);
-        gst_app_src_set_caps(GST_APP_SRC(priv->src),
-                gst_caps_new_simple("audio/x-raw-int",
-                                        "channels", G_TYPE_INT, actx->channels,
-                                        "rate", G_TYPE_INT, (int) actx->samplerate,
-                                        "signed", G_TYPE_BOOLEAN, TRUE,
-                                        "endianness", G_TYPE_INT, G_LITTLE_ENDIAN,
-                                        "width", G_TYPE_INT, 16,
-                                        "depth", G_TYPE_INT, 16,
+        gst_app_src_set_stream_type (GST_APP_SRC(priv->src), GST_APP_STREAM_TYPE_STREAM);
+        gst_app_src_set_caps (GST_APP_SRC(priv->src),
+                gst_caps_new_simple ("audio/x-raw-int",
+                                    "channels", G_TYPE_INT, actx->channels,
+                                    "rate", G_TYPE_INT, (int) actx->samplerate,
+                                    "signed", G_TYPE_BOOLEAN, TRUE,
+                                    "endianness", G_TYPE_INT, G_LITTLE_ENDIAN,
+                                    "width", G_TYPE_INT, 16,
+                                    "depth", G_TYPE_INT, 16,
                                      NULL)
         );
-        g_signal_connect(priv->src, "need-data", G_CALLBACK (need_data_cb), actx);
-        gst_bin_add (GST_BIN (priv->pipe), priv->src);
+        g_signal_connect (priv->src, "need-data", G_CALLBACK (need_data_cb), actx);
+        gst_bin_add (GST_BIN (priv->pipeline), priv->src);
 
-        priv->sink = gst_element_factory_make ("autoaudiosink", NULL);
-        g_assert (priv->sink);
-        gst_bin_add (GST_BIN (priv->pipe), priv->sink);
+        sink = gst_element_factory_make ("autoaudiosink", NULL);
+        g_assert (sink);
+        gst_bin_add (GST_BIN (priv->pipeline), sink);
 
-        if(!gst_element_link (priv->src, priv->sink)) {
-                fprintf(stderr,"failed to link gstreamer elements");
+        if(!gst_element_link (priv->src, sink)) {
+                fprintf(stderr, "failed to link gstreamer elements");
                 exit(-1);
         }
 
         GstBus *bus;
-        bus = gst_pipeline_get_bus(GST_PIPELINE (priv->pipe));
-        gst_bus_add_watch(bus, bus_call, NULL);
-        gst_object_unref(bus);
+        bus = gst_pipeline_get_bus (GST_PIPELINE (priv->pipeline));
+        gst_bus_add_watch (bus, bus_call, NULL);
+        gst_object_unref (bus);
 
         actx->driverprivate = (void *) priv;
         return 0;
@@ -210,73 +204,28 @@ int gstaudio_prepare_device (AUDIOCTX * actx)
 
 int gstaudio_pause (AUDIOCTX * actx)
 {
-        gst_PRIVATE *priv = (gst_PRIVATE *) actx->driverprivate;
-        assert (priv != 0);
         DSFYDEBUG ("%s\n", __FUNCTION__);
-
-        pthread_mutex_lock (&priv->lock);
-
-        priv->state = GST_PAUSED;
-        gst_element_set_state (priv->pipe, GST_STATE_PAUSED);
-
-        pthread_mutex_unlock (&priv->lock);
-
-        return (0);
+        g_idle_add(pause_cb, NULL);
+        return 0;
 }
 
 int gstaudio_resume (AUDIOCTX * actx)
 {
-
-        gst_PRIVATE *priv = (gst_PRIVATE *) actx->driverprivate;
-        assert (priv != 0);
         DSFYDEBUG ("%s\n", __FUNCTION__);
-
-        pthread_mutex_lock (&priv->lock);
-
-        priv->state = GST_PLAYING;
-        gst_element_set_state (priv->pipe, GST_STATE_PLAYING);
-
-        /* Signal player thread */
-        pthread_cond_signal (&priv->pause);
-        pthread_mutex_unlock (&priv->lock);
-
-        return (0);
+        g_idle_add(resume_cb, NULL);
+        return 0;
 }
-
 
 
 int gstaudio_play (AUDIOCTX * actx)
 {
-        GMainLoop *loop;
         gst_PRIVATE *priv = (gst_PRIVATE *) actx->driverprivate;
-        assert (priv != 0);
+        assert (priv != NULL);
+
         DSFYDEBUG ("%s\n", __FUNCTION__);
         
-        gst_element_set_state(GST_ELEMENT (priv->pipe), GST_STATE_PLAYING);
-        loop = g_main_loop_new(NULL, FALSE);
-        for (;;) {
-                pthread_mutex_lock (&priv->lock);
-                switch(priv->state) {
-                case GST_END:
-                        pthread_cond_signal (&priv->end);
-                        pthread_mutex_unlock (&priv->lock);
-                        return 0;       /* exit thread */
-                        break;
-
-                case GST_PAUSED:
-                        /* Wait for unpause signal */
-                        pthread_cond_wait (&priv->pause, &priv->lock);
-                        break;
-
-                case GST_PLAYING:
-                case GST_IDLE:
-                default:
-                        break;
-                }
-                pthread_mutex_unlock (&priv->lock);
-
-                g_main_context_iteration(g_main_loop_get_context(loop), 1);
-        }
+        gst_element_set_state (GST_ELEMENT (priv->pipeline), GST_STATE_PLAYING);
+        g_main_loop_run (priv->loop);
 
         /* This will kill the thread */
         return 0;
@@ -285,19 +234,19 @@ int gstaudio_play (AUDIOCTX * actx)
 int gstaudio_stop (AUDIOCTX * actx)
 {
         gst_PRIVATE *priv = (gst_PRIVATE *) actx->driverprivate;
-        assert (priv != 0);
+        assert (priv != NULL);
+
         DSFYDEBUG ("%s\n", __FUNCTION__);
 
         /* Tell loop thread to exit */
-        pthread_mutex_lock (&priv->lock);
-        priv->state = GST_END;
+        g_main_loop_quit (priv->loop);
 
-        /* Wait for the player thread to end */
-        pthread_cond_wait (&priv->end, &priv->lock);
-        pthread_mutex_unlock (&priv->lock);
+        gst_element_set_state (priv->pipeline, GST_STATE_NULL);
 
-        if (actx->driverprivate)
-                free (actx->driverprivate);
+        gst_object_unref (GST_OBJECT (priv->pipeline));
+
+        free (priv);
+        actx->driverprivate = NULL;
 
         return 0;
 }

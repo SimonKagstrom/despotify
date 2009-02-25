@@ -1,14 +1,16 @@
 #ifndef DESPOTIFY_GSTREAMER_H
 #define DESPOTIFY_GSTREAMER_H
 
+#include <gst/gst.h>
+
 #include "audio.h"
-enum
+
+typedef struct gst_private
 {
-        GST_IDLE = 0,
-        GST_PLAYING,
-        GST_PAUSED,
-        GST_END
-};
+        GstElement *pipeline;
+        GstElement *src;
+        GMainLoop *loop;
+} gst_PRIVATE;
 
 int gstaudio_init_device (void *);
 int gstaudio_free_device (void);
