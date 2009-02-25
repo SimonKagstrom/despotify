@@ -51,7 +51,7 @@ int libao_prepare_device (AUDIOCTX * actx) {
 
 	device = ao_open_live(default_driver, &format, NULL);
 	if (device == NULL) {
-		DSFYDEBUG ("ao_open_live() failed\n");
+		DSFYDEBUG ("%s\n", "ao_open_live() failed");
 		exit (-1);
 	}
 
@@ -156,7 +156,7 @@ int libao_play (AUDIOCTX * actx) {
 
 		/* ... and play it */
 		if (ao_play (device, (char *) buf, (int) r) == 0) {
-			DSFYDEBUG ("ao_play() failed\n");
+			DSFYDEBUG ("%s\n", "ao_play() failed");
 			exit (-1);
 		}
 	}
@@ -182,7 +182,7 @@ int libao_stop (AUDIOCTX * actx) {
 	pthread_mutex_unlock (&priv->lock);
 
 	if (ao_close (device) == 0) {
-		DSFYDEBUG ("ao_close() failed\n");
+		DSFYDEBUG ("%s\n", "ao_close() failed");
 		exit (-1);
 	}
 
