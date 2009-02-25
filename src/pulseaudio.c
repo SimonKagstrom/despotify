@@ -159,7 +159,7 @@ int pulseaudio_play(AUDIOCTX *actx) {
      if(r <= 0) {
        if (r == 0) /* EOF */
 	 break; 
-       DSFYDEBUG("pcm_read() failed == %lu\n", r);
+       DSFYDEBUG("pcm_read() failed == %zd\n", r);
        exit(-1);
      }
      
