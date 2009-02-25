@@ -39,7 +39,6 @@
 
 /* Internal */
 #define CMD_PRODINFO	0x50
-#define CMD_GETUSERDATA	0x57
 #define CMD_WELCOME	0x69
 
 
@@ -47,7 +46,6 @@ int cmd_send_cache_hash(SESSION *);
 int cmd_aeskey(SESSION *, unsigned char *, unsigned char *, channel_callback, void *);
 int cmd_search(SESSION *, char *, channel_callback, void *);
 int cmd_requestad(SESSION *, unsigned char);
-int cmd_getuserdata(SESSION *, char *, channel_callback, void *);
 int cmd_action(SESSION *, unsigned char *, unsigned char *);
 int cmd_getsubstreams(SESSION *, unsigned char *, unsigned int, unsigned int, unsigned int, channel_callback, void *);
 int cmd_browse(SESSION *, unsigned char, unsigned char *, int, channel_callback, void *);

@@ -62,39 +62,6 @@ int cmd_send_cache_hash(SESSION *session) {
 
 
 /*
- * Request data about a user
- * The response is a gzip-compressed XML-blob
- *
- */
-int cmd_getuserdata(SESSION *session, char *username, channel_callback callback, void *private) {
-	BUFFER *b;
-	CHANNEL *ch;
-	unsigned char username_length;
-	char buf[100];
-	int ret;
-
-	b = buffer_init();
-	snprintf(buf, sizeof(buf), "GetUserData-%s", username);
-	ch = channel_register(buf, callback, private);
-
-	DSFYDEBUG("cmd_getuserdata: allocated channel %d, retrieving user data for '%s'\n", ch->channel_id, username)
-
-	buffer_append_short(b, ch->channel_id);
-	username_length = (unsigned char)strlen(username);
-	buffer_append_raw(b, &username_length, 1);
-	buffer_append_raw(b, username, username_length);
-
-
-	ret = packet_write(session, CMD_GETUSERDATA, b->buf, b->buflen);
-	DSFYDEBUG("cmd_getuserdata: packet_write() returned %d\n", ret)
-
-	buffer_free(b);
-
-	return ret;
-}
-
-
-/*
  * Request ads
  * The response is plain XML
  *

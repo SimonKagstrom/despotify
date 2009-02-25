@@ -12,7 +12,7 @@ int gui_help(WINDOW *w, char *helpstring) {
 	werase(w);
 	box(w, 0, 0);
 
-	mvwprintw(w, 1, 2, "available commands: list, play, pause, stop, search, info, help\n");
+	mvwprintw(w, 1, 2, "available commands: list, play, pause, stop, search, help\n");
 
 	wattron(w, A_BOLD);
 	mvwprintw(w, 3, 2, "list [number]");
@@ -39,11 +39,6 @@ int gui_help(WINDOW *w, char *helpstring) {
 	wattroff(w, A_BOLD);
 	mvwprintw(w, 7, 20, "Search tracks");
 
-	wattron(w, A_BOLD);
-	mvwprintw(w, 8, 2, "info <username>");
-	wattroff(w, A_BOLD);
-	mvwprintw(w, 8, 20, "Display user info for 'username'");
-	
 	wrefresh(w);
 
 	return 0;

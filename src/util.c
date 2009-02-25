@@ -84,7 +84,8 @@ void logdata(char *prefix, int id, void *data, int datalen) {
 	printf("  -- Saving 0x%04x (%d) bytes file '%s'\n", datalen, datalen, filename);
 }
 
-ssize_t block_read(int fd, unsigned char *buf, size_t nbyte)
+
+ssize_t block_read(int fd, void *buf, size_t nbyte)
 {
   unsigned int idx;
   ssize_t n;
@@ -94,7 +95,7 @@ ssize_t block_read(int fd, unsigned char *buf, size_t nbyte)
   {
     if ((n = read(fd, buf + idx, nbyte - idx)) <= 0)
     {
-      if (errno == EINTR || errno == ERESTART) continue;
+      if (errno == EINTR) continue;
       return n;
     }
     idx += n;

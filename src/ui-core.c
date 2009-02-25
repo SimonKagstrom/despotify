@@ -24,7 +24,6 @@
 #include "ui-search.h"
 #include "ui-player.h"
 #include "ui-playlist.h"
-#include "ui-userdata.h"
 #include "xml.h"
 
 #define HEADER_H 4
@@ -430,8 +429,6 @@ static int gui_readline(int ch) {
 				return -1;
 			else if(!strncmp(c_input, "search ", 7))
 				gui_search(ctx, mainwin, c_input + 7);
-			else if(!strncmp(c_input, "info ", 5))
-				gui_userdata(ctx, mainwin, c_input + 5);
 			else if(!strcmp(c_input, "help"))
 				gui_help(mainwin, c_input + 4);
 			else if(!strncmp(c_input, "help", 5))
