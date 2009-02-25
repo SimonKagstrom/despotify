@@ -59,7 +59,7 @@ endif
 all: core despotify gateway
 
 D=$(CORE_OBJS:.o=.d) $(DESPOTIFY_OBJS:.o=.d) $(GATEWAY_OBJS:.o=.d)
--include $(D:%.d)
+-include $(D:.a=)
 deps: $(D)
 %.d: %.c
 	$(SHELL) -ec '$(CXX) -MM $(CFLAGS) $(DEFINES) $< \
