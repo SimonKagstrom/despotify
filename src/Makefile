@@ -2,16 +2,24 @@
 # $Id$
 # 
 #
-#CFLAGS = -Wall -ggdb -DGUI
-CFLAGS = -Wall -ggdb -DGUI -DDEBUG
+CFLAGS = -Wall
 LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile 
 
 CORE_OBJS = aes.o auth.o buffer.o channel.o commands.o dns.o event.o handlers.o keyexchange.o packet.o playlist.o puzzle.o session.o shn.o util.o xml.o
 DESPOTIFY_OBJS = ADMclubbing.o audio.o despotify.o ui-core.o ui-help.o ui-player.o ui-playlist.o ui-search.o sndqueue.o
 GATEWAY_OBJS = gw-core.o gw-browse.o gw-handlers.o gw-playlist.o gw-search.o gw-stream.o gw-http.o base64.o
 
-LINUX_BACKEND = pulse
-#LINUX_BACKEND = gstreamer
+LINUX_BACKEND = gstreamer
+
+include Makefile.local.mk
+
+ifdef DEBUG
+    CFLAGS += -DGUI -ggdb
+endif
+
+ifndef NOGUI
+    CFLAGS += -DGUI
+endif
 
 # Mac OS X specifics
 ifeq ($(shell uname -s),Darwin)
@@ -60,3 +68,7 @@ gateway: core $(GATEWAY_OBJS)
 
 privacy:
 	echo *.c *h|xargs -n1 -t indent -bacc -bc -nce  -br -di1 -eei -nip -npsl -sob -nbad -nbc -i8
+
+Makefile.local.mk:
+	@echo " **** No Makefile.local.mk found, copying dist."
+	cp Makefile.local.mk.dist Makefile.local.mk
