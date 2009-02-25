@@ -42,4 +42,8 @@ AUDIOCTX *audio_context_new(float, int, char *);
 int audio_context_free(AUDIOCTX *);
 int audio_pause(AUDIOCTX *a);
 int audio_resume(AUDIOCTX *a);
+
+
+/* Need to be exposed to audio.c, defined in coreaudio/pulseaudio/gstreamer.c */
+extern AUDIODRIVER *driver;
 #endif

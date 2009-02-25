@@ -31,7 +31,4 @@ int pulseaudio_prepare_device(AUDIOCTX *);
 int pulseaudio_play(AUDIOCTX *);
 int pulseaudio_stop(AUDIOCTX *);
 
-
-/* Need to be exposed to audio.c, declared in coreaudio.c */
-extern AUDIODRIVER *driver;
 #endif

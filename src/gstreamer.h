@@ -17,7 +17,4 @@ int gstaudio_free_device (void);
 int gstaudio_prepare_device (AUDIOCTX *);
 int gstaudio_play (AUDIOCTX *);
 int gstaudio_stop (AUDIOCTX *);
-
-/* Need to be exposed to audio.c, declared in coreaudio.c */
-extern AUDIODRIVER *driver;
 #endif

@@ -21,14 +21,6 @@
 #include "sndqueue.h"
 #include "util.h"
 
-#ifdef __APPLE__
-#include "coreaudio.h"
-#endif
-
-#if defined(__linux__) || defined(__FreeBSD__)
-#include "pulseaudio.h"
-#endif
-
 /* Initialize audio output device */
 int audio_init(void) {
 	int ret;
