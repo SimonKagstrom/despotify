@@ -278,7 +278,7 @@ static int despotify_packet_io(EVENT *ev, enum ev_flags ev_kind) {
 		/* Read packets */
 		if((err = packet_read(s, &hdr, &payload)) == 0) {
                         err = handle_packet(s, hdr.cmd, payload, hdr.len);
-                        free(payload); /* Allocated in packet_read() */
+                        DSFYfree(payload); /* Allocated in packet_read() */
 			payload = NULL;
                         if (err)
                                 break;

@@ -7,7 +7,7 @@
 #include <string.h>
 
 #include "xml.h"
-
+#include "util.h"
 
 GZXML *gzxml_init(void) {
 	GZXML *g;
@@ -22,14 +22,14 @@ GZXML *gzxml_init(void) {
 	g->z.avail_in = 0;
 	g->z.next_in = Z_NULL;
 	if(inflateInit2(&g->z, -MAX_WBITS) != Z_OK) {
-		free(g);
+		DSFYfree(g);
 		return NULL;
 	}
 
 	g->p = XML_ParserCreate(NULL);
 	if(g->p == NULL) {
 		inflateEnd(&g->z);
-		free(g);
+		DSFYfree(g);
 		return NULL;
 	}
 
@@ -79,7 +79,7 @@ void gzxml_free(GZXML *g) {
 	if(g->p)
 		XML_ParserFree(g->p);
 
-	free(g);
+	DSFYfree(g);
 }
 
 
@@ -103,8 +103,8 @@ void xml_pop_tag(struct tagstack **head) {
 	struct tagstack *e = *head;
 
 	if(e->next == NULL) {
-		free(e->name);
-		free(e);
+		DSFYfree(e->name);
+		DSFYfree(e);
 		*head = NULL;
 		return;
 	}
@@ -112,8 +112,8 @@ void xml_pop_tag(struct tagstack **head) {
 	while(e->next->next)
 		e = e->next;
 
-	free(e->next->name);
-	free(e->next);
+	DSFYfree(e->next->name);
+	DSFYfree(e->next);
 	e->next = NULL;
 }
 

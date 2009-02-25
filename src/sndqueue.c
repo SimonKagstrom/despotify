@@ -50,7 +50,7 @@ snd_SESSION *snd_init(void)
   session->audio_end = snd_stop; /* Default is to stop the snd thread */ 
   session->time_tell = NULL;
   if(pthread_mutex_init(&session->lock, NULL)) {
-  	free(session);
+  	DSFYfree(session);
 
 	return NULL;
   }
@@ -60,7 +60,7 @@ snd_SESSION *snd_init(void)
   session->fifo = (oggFIFO *)malloc(sizeof(oggFIFO));
   if(!session->fifo) {
 	pthread_mutex_destroy(&session->lock);
-  	free(session);
+  	DSFYfree(session);
 
 	return NULL;
   }
@@ -70,20 +70,20 @@ snd_SESSION *snd_init(void)
   session->fifo->end = NULL;
 
   if(pthread_mutex_init(&session->fifo->lock, NULL)) {
-	free(session->fifo);
+	DSFYfree(session->fifo);
 
 	pthread_mutex_destroy(&session->lock);
-  	free(session);
+  	DSFYfree(session);
 
 	return NULL;
   }
    
   if(pthread_cond_init(&session->fifo->cs, NULL) != 0) {
 	pthread_mutex_destroy(&session->fifo->lock);
-	free(session->fifo);
+	DSFYfree(session->fifo);
 
 	pthread_mutex_destroy(&session->lock);
-  	free(session);
+  	DSFYfree(session);
 
 	return NULL;
   }
@@ -112,14 +112,14 @@ void snd_destroy(snd_SESSION *session) {
     while(session->fifo->start) {
       b = session->fifo->start;
       session->fifo->start = session->fifo->start->next; 
-      free(b); 
+      DSFYfree(b); 
     }
   
-    free(session->fifo);
+    DSFYfree(session->fifo);
   }
   
   pthread_mutex_destroy(&session->lock);
-  free(session);
+  DSFYfree(session);
 
 }
 
@@ -201,7 +201,7 @@ int snd_stop(void *arg) {
   while(session->fifo->start) {
     b = session->fifo->start;
     session->fifo->start = session->fifo->start->next; 
-    free(b); 
+    DSFYfree(b); 
   }
 
   /* Reset the session */
@@ -349,7 +349,7 @@ static size_t snd_read_and_dequeue_callback(void *ptr, size_t size, size_t nmemb
     if(b == session->fifo->end)
       session->fifo->end = NULL;      
     
-    free(b);
+    DSFYfree(b);
 
     DSFYDEBUG("%s\n", "snd_read_and_dequeue_callback(): Releasing session->fifo->lock at end of song");
     pthread_mutex_unlock(&session->fifo->lock);
@@ -382,7 +382,7 @@ static size_t snd_read_and_dequeue_callback(void *ptr, size_t size, size_t nmemb
     if(b == session->fifo->end)
       session->fifo->end = NULL;      
     
-    free(b);
+    DSFYfree(b);
   }
   
   pthread_mutex_unlock(&session->fifo->lock);

@@ -148,7 +148,7 @@ int gui_playlists_download(EVENT *e, enum ev_flags ev_kind) {
 				playlist_create_from_xml((char *)r->response->buf, r->playlist);
 
 				buffer_free(r->response);
-				free(r);
+				DSFYfree(r);
 
 				event_mark_busy(e);
 				event_msg_post(MSG_CLASS_GUI, MSG_GUI_REFRESH, NULL);
@@ -158,7 +158,7 @@ int gui_playlists_download(EVENT *e, enum ev_flags ev_kind) {
 				r = *(struct reqcontext **)e->msg->data;
 
 				buffer_free(r->response);
-				free(r);
+				DSFYfree(r);
 
 				/* Retry fetch playlist in 15 seconds */
 				e->state = 1;
@@ -172,7 +172,7 @@ int gui_playlists_download(EVENT *e, enum ev_flags ev_kind) {
 				r->playlist->flags |= PLAYLIST_ERROR;
 
 				buffer_free(r->response);
-				free(r);
+				DSFYfree(r);
 
 				/* retry in 15 seconds */
 				event_mark_busy(e);
@@ -187,8 +187,8 @@ int gui_playlists_download(EVENT *e, enum ev_flags ev_kind) {
 				playlist_track_update_from_gzxml(r->playlist, r->response->buf, r->response->buflen);
 
 				buffer_free(r->response);
-				free(r->track_id_list);
-				free(r);
+				DSFYfree(r->track_id_list);
+				DSFYfree(r);
 
 				event_mark_busy(e);
 
@@ -200,8 +200,8 @@ int gui_playlists_download(EVENT *e, enum ev_flags ev_kind) {
 				r->playlist->flags |= PLAYLIST_TRACKS_ERROR;
 
 				buffer_free(r->response);
-				free(r->track_id_list);
-				free(r);
+				DSFYfree(r->track_id_list);
+				DSFYfree(r);
 
 				/* retry in 15 seconds */
 				event_mark_busy(e);
@@ -247,7 +247,7 @@ int gui_playlists_download(EVENT *e, enum ev_flags ev_kind) {
 		}
 		else {
 			buffer_free(r->response);
-			free(r);
+			DSFYfree(r);
 			event_msg_post(MSG_CLASS_APP, MSG_APP_NET_ERROR, NULL);
 			event_mark_done(e);
 			err = 0;
@@ -290,7 +290,7 @@ int gui_playlists_download(EVENT *e, enum ev_flags ev_kind) {
 		}
 		else {
 			buffer_free(r->response);
-			free(r);
+			DSFYfree(r);
 			event_msg_post(MSG_CLASS_APP, MSG_APP_NET_ERROR, NULL);
 
 			/* Hmm.. */
@@ -335,8 +335,8 @@ int gui_playlists_download(EVENT *e, enum ev_flags ev_kind) {
 		}
 		else {
 			buffer_free(r->response);
-			free(r->track_id_list);
-			free(r);
+			DSFYfree(r->track_id_list);
+			DSFYfree(r);
 			event_msg_post(MSG_CLASS_APP, MSG_APP_NET_ERROR, NULL);
 
 			/* Hmm.. */

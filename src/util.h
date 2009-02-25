@@ -13,6 +13,7 @@
 #define DSFYDEBUG(fmt,...)
 #endif
 
+#define DSFYfree(p) free(p); (p) = NULL
 
 unsigned char *hex_ascii_to_bytes(char *, unsigned char *, int);
 char *hex_bytes_to_ascii(unsigned char *, char *, int);
