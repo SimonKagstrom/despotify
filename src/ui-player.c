@@ -158,10 +158,10 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 				 * 2. ..or fix our broken audio system ;)
 				 *
 				 */
-				 assert(e->private && snd->actx == NULL /* can't be NULL with a playerctx */);
+				 assert(!e->private || (e->private && snd && snd->actx != NULL) /* can't be NULL with a playerctx */);
 
 
-				if(e->private && snd->actx != NULL && snd->actx->is_paused ) {
+				if(e->private && snd && snd->actx->is_paused ) {
 					DSFYDEBUG("%s\n", "MSG_GUI_PLAY: Resuming audio because private and actx->is_paused");
 					audio_resume(snd->actx);
 				}
