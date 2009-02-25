@@ -2,7 +2,7 @@
 # $Id$
 # 
 #
-CFLAGS = -Wall
+CFLAGS = -Wall -Wextra
 LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile 
 
 CORE_OBJS = aes.o auth.o buffer.o channel.o commands.o dns.o event.o handlers.o keyexchange.o packet.o playlist.o puzzle.o session.o shn.o util.o xml.o
@@ -58,12 +58,18 @@ endif
 
 all: core despotify gateway
 
+include $(CORE_OBJS:.o=.d) $(DESPOTIFY_OBJS:.o=.d) $(GATEWAY_OBJS:.o=.d)
+deps: $(CORE_OBJS:.o=.d) $(DESPOTIFY_OBJS:.o=.d) $(GATEWAY_OBJS:.o=.d)
+%.d: %.c
+	$(SHELL) -ec '$(CXX) -MM $(CFLAGS) $(DEFINES) $< \
+		| sed '\''s/$*\\.o[ :]*/& $@/g'\'' > $@'
+
 gstapp/libgstapp.a:
 	make -C gstapp
 
 clean:
 	make -C gstapp clean
-	rm -f $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS) despotify gatewa
+	rm -f $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS) despotify gateway
 
 core: $(CORE_OBJS)
 
