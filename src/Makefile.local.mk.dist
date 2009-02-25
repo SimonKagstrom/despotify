@@ -10,4 +10,4 @@
 ## Choose audio backend
 LINUX_BACKEND = gstreamer
 # LINUX_BACKEND = pulseaudio
-
+# LINUX_BACKEND = libao

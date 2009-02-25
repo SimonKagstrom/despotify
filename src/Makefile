@@ -34,7 +34,14 @@ ifeq ($(shell uname -s),Linux)
 	CFLAGS += `pkg-config --cflags gstreamer-base-0.10`
 	LDFLAGS += `pkg-config --libs gstreamer-base-0.10`
 	DESPOTIFY_OBJS += gstreamer.o gstapp/libgstapp.a
-    else
+	endif
+
+	ifeq ($(LINUX_BACKEND),libao)
+	LDFLAGS += -lao
+	DESPOTIFY_OBJS += libao.o
+	endif
+
+	ifeq ($(LINUX_BACKEND),pulseaudio)
 	LDFLAGS += -lpulse -lpulse-simple
 	DESPOTIFY_OBJS += pulseaudio.o
     endif
