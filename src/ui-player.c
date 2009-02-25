@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <assert.h>
+
 #include "aes.h"
 #include "buffer.h"
 #include "channel.h"
@@ -147,6 +149,18 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 
 			case MSG_GUI_PLAY:
 				DSFYDEBUG("%s\n", "gui_player_event_processor(): Got MSG_GUI_PLAY");
+
+				/*
+				 * This shouldn't happen. Really.
+				 * (except when someone requests play before we've received the song's key)
+				 *
+				 * 1. Fix your driver,
+				 * 2. ..or fix our broken audio system ;)
+				 *
+				 */
+				 assert(e->private && snd->actx == NULL /* can't be NULL with a playerctx */);
+
+
 				if(e->private && snd->actx != NULL && snd->actx->is_paused ) {
 					DSFYDEBUG("%s\n", "MSG_GUI_PLAY: Resuming audio because private and actx->is_paused");
 					audio_resume(snd->actx);
@@ -230,11 +244,8 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 		/* Idle until we explicitly mark ourself as busy */
 		event_mark_idle(e);
 
-		/* Shouldn't happen. Also, please don't delete the track while it's in there ;) */
-		if((playerctx = (struct playerctx *)e->private) == NULL) {
-			DSFYDEBUG("%s", "gui_player_event_processor(state=1): Got NULL e->private (shouldn't happen)\n");
-			break;
-		}
+		playerctx = (struct playerctx *)e->private;
+		assert(playerctx != NULL);
 
 		t = playerctx->track;
 		if(t->key == NULL) {
@@ -281,12 +292,10 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 		/* Idle until we explicitly mark ourself as busy */
 		event_mark_idle(e);
 
-		/* Shouldn't happen. Also, please don't delete the track while it's in there ;) */
-		if((playerctx = (struct playerctx *)e->private) == NULL) {
-			DSFYDEBUG("%s", "gui_player_event_processor(state=2): Got NULL e->private (shouldn't happen)\n");
-			break;
-		}
-		else if(playerctx->track->key == NULL) {
+		playerctx = (struct playerctx *)e->private;
+		assert(playerctx != NULL);
+
+		if(playerctx->track->key == NULL) {
 			DSFYDEBUG("%s\n", "In state 2, key is still NULL");
 			break;
 		}
