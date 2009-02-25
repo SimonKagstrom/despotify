@@ -47,7 +47,7 @@ SESSION *session_init_client(void) {
 	/* Spotify 0.3.11, r42849 on Windows */
 	session->client_OS = 0x00;	/* 0x00 == Windows, 0x01 == Mac OS X */
 	memcpy(session->client_id, "\x01\x09\x10\x01", 4);
-	session->client_revision = 42974;	/* 0.3.11 testing, r42849 */
+	session->client_revision = 43065;	/* 0.3.11 testing, r42849 */
 
 
 	/*
