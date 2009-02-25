@@ -10,6 +10,9 @@ CORE_OBJS = aes.o auth.o buffer.o channel.o commands.o dns.o event.o handlers.o 
 DESPOTIFY_OBJS = ADMclubbing.o audio.o despotify.o ui-core.o ui-help.o ui-player.o ui-playlist.o ui-search.o sndqueue.o
 GATEWAY_OBJS = gw-core.o gw-browse.o gw-handlers.o gw-playlist.o gw-search.o gw-stream.o gw-http.o base64.o
 
+LINUX_BACKEND = pulse
+#LINUX_BACKEND = gstreamer
+
 # Mac OS X specifics
 ifeq ($(shell uname -s),Darwin)
 	LDFLAGS += -lresolv -framework CoreAudio
@@ -18,8 +21,15 @@ endif
 
 # Linux specifics
 ifeq ($(shell uname -s),Linux)
-	LDFLAGS += -lpulse -lpulse-simple -lresolv
+    LDFLAGS += -lresolv
+    ifeq ($(LINUX_BACKEND),gstreamer)
+	CFLAGS += `pkg-config --cflags gstreamer-base-0.10`
+	LDFLAGS += `pkg-config --libs gstreamer-base-0.10`
+	DESPOTIFY_OBJS += gstreamer.o gstapp/libgstapp.a
+    else
+	LDFLAGS += -lpulse -lpulse-simple
 	DESPOTIFY_OBJS += pulseaudio.o
+    endif
 endif
 
 
@@ -33,9 +43,12 @@ endif
 
 all: core despotify gateway
 
+gstapp/libgstapp.a:
+	make -C gstapp
 
 clean:
-	rm -f $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS) despotify gateway
+	make -C gstapp clean
+	rm -f $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS) despotify gatewa
 
 core: $(CORE_OBJS)
 
