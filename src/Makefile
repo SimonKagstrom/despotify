@@ -14,7 +14,7 @@ LINUX_BACKEND = gstreamer
 include Makefile.local.mk
 
 ifdef DEBUG
-    CFLAGS += -DGUI -ggdb
+    CFLAGS += -DDEBUG -ggdb
 endif
 
 ifndef NOGUI

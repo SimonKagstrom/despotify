@@ -137,6 +137,10 @@ int gstaudio_init_device (void *unused)
 {
         DSFYDEBUG ("%s\n", __FUNCTION__);
         gst_init (0, NULL);
+        /* XXX: This needs to be changed. I think it'll crash and burn HORRIBLY 
+         * on a machine that has gstreamer-plugins-base-0.10 >= 0.10.22, since
+         * appsrc/gstapp is included as a part of that package.
+         */
         gst_element_register (NULL, "appsrc", GST_RANK_NONE, GST_TYPE_APP_SRC);
 
         return 0;
