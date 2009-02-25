@@ -86,3 +86,18 @@ privacy:
 Makefile.local.mk:
 	@echo " **** No Makefile.local.mk found, copying dist."
 	cp Makefile.local.mk.dist Makefile.local.mk
+
+install: despotify gateway
+	@echo "Copying Despotify binary to /usr/bin/despotify"
+	install despotify /usr/bin/despotify
+	@echo "Copying despotify gateway to /usr/bin/gateway"
+	install gateway /usr/bin/gateway
+	@echo "Done!"
+	@echo "You can run Despotify with the command 'despotify'."
+	@echo "And you can also run the despotify gateway with the command 'gateway'."
+
+uninstall:
+	@echo "Removing Despotify & gateway..."
+	rm -f /usr/bin/despotify /usr/bin/gateway
+	@echo "Done!"
+
