@@ -18,7 +18,7 @@ endif
 
 # Linux specifics
 ifeq ($(shell uname -s),Linux)
-	LDFLAGS += -lpulse -lpulse-simple
+	LDFLAGS += -lpulse -lpulse-simple -lresolv
 	DESPOTIFY_OBJS += pulseaudio.o
 endif
 
