@@ -110,8 +110,8 @@ static void need_data_cb (GstAppSrc * src, guint length, gpointer data) {
         GstBuffer *gstbuf;
         AUDIOCTX * actx = (AUDIOCTX*) data;
 
-        if(length == 0 || length > 1024)
-                length = 1024;
+        if(length == 0 || length > 4096)
+                length = 4096;
 
         buffer = g_new(uint8_t,length);
         r = pcm_read (actx->pcmprivate, (char *) buffer, length, 0, 2, 1, NULL);
