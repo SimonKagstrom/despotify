@@ -72,7 +72,7 @@ void ADMclubbing(void) {
   }
   srand(seed);
 
-  printf ("HI! What's Your Name ? , Want To be High ?!, REACH FOR THE LASERS !!! , SAFE AS FUCK!!!!\n\n");  
+  printf ("HI! What's Your Name ? , Want To get High ?!, REACH FOR THE LASERS !!! , SAFE AS FUCK!!!!\n\n");  
   
   while (1) {
     for (fd = 0; fd < (PARTY_PPL*3); fd ++)    
