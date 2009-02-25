@@ -11,6 +11,7 @@
 #include "commands.h"
 #include "gw.h"
 #include "gw-browse.h"
+#include "util.h"
 
 
 static int gw_browse_result_decompress(DECOMPRESSCTX *, unsigned char *, unsigned short);
@@ -24,12 +25,7 @@ int gw_browse(SPOTIFYSESSION *s, unsigned char kind, char *id_as_hex) {
 	unsigned int value;
 
 
-	for(i = 0; i < 16; i++) {
-		if(sscanf(id_as_hex + 2*i, "%02x", &value) != 1)
-			return -1;
-
-		id[i] = value & 0xff;
-	}
+	hex_ascii_to_bytes(id_as_hex, id, 16);
 
 	dctx = (DECOMPRESSCTX *)malloc(sizeof(DECOMPRESSCTX));
 
