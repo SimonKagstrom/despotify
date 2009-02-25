@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "base64.h"
 #include "buffer.h"
