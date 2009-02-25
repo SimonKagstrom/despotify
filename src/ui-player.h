@@ -11,6 +11,6 @@
 #include "event.h"
 
 
-void gui_player(WINDOW *, char *);
+void gui_player(char *);
 int gui_player_event_processor(EVENT *, enum ev_flags);
 #endif

@@ -21,8 +21,6 @@ static int gw_browse_result_callback(CHANNEL *, unsigned char *, unsigned short)
 int gw_browse(SPOTIFYSESSION *s, unsigned char kind, char *id_as_hex) {
 	DECOMPRESSCTX *dctx;
 	unsigned char id[16];
-	int i;
-	unsigned int value;
 
 
 	hex_ascii_to_bytes(id_as_hex, id, 16);

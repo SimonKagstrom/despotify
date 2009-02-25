@@ -54,7 +54,7 @@ static SESSION *session;
 static snd_SESSION *snd;
 
 
-void gui_player(WINDOW *w, char *input) {
+void gui_player(char *input) {
 	if(!strncasecmp(input, "play", 4)) {
 		input += 4;
 		while(*input && *input == ' ') input++;

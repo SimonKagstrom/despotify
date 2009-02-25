@@ -436,11 +436,11 @@ static int gui_readline(int ch) {
 			else if(!strncmp(c_input, "list", 4))
 				gui_playlist(mainwin, c_input + 4);
 			else if(!strncmp(c_input, "play", 4))
-				gui_player(mainwin, c_input);
+				gui_player(c_input);
 			else if(!strncmp(c_input, "stop", 4))
-				gui_player(mainwin, c_input);
+				gui_player(c_input);
 			else if(!strncmp(c_input, "pause", 5))
-				gui_player(mainwin, c_input);
+				gui_player(c_input);
 		}
 
 		/* Handle delete word */

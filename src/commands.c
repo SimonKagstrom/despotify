@@ -91,7 +91,6 @@ int cmd_requestad(SESSION *session, unsigned char ad_type) {
 
 
 /*
-/*
  * Request image using a 16 byte UUID
  * The response is a JPG
  *
@@ -176,8 +175,6 @@ int cmd_search(SESSION *session, char *searchtext, channel_callback callback, vo
 int cmd_token_notify(SESSION *session) {
 	int ret;
 	BUFFER *b;
-	unsigned short zero;
-	CHANNEL *ch;
 
 
 	/* Request the playing token before playing a song */

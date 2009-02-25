@@ -60,7 +60,7 @@ int coreaudio_init_device(void *unused) {
  */
 int coreaudio_prepare_device(AUDIOCTX *actx) {
 	size_t sz;
-	AudioStreamBasicDescription fmt = { 0 };
+	AudioStreamBasicDescription fmt;
 
 
 	sz = sizeof(fmt);

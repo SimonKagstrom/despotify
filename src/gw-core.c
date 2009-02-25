@@ -872,5 +872,5 @@ SPOTIFYSESSION *spotify_find_http_client(void) {
 }
 
 
-void app_packet_callback(SESSION* s, int cmd, unsigned char* payload, int len)
-{}
+void app_packet_callback(SESSION* s, int cmd, unsigned char* payload, int len) {
+}
