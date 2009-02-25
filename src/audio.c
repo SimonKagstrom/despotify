@@ -56,11 +56,13 @@ AUDIOCTX *audio_context_new(float samplerate, int channels, char *title) {
 	if((a = (AUDIOCTX *)malloc(sizeof(AUDIOCTX))) == NULL)
 		return NULL;
 
+        /* Initialize the whole structure to zero. */
+        memset(a, 0, sizeof (AUDIOCTX));
+
 	a->samplerate = samplerate;
 	a->channels = channels;
 
 	/* Originally intended for PA, not used */
-	a->title = NULL;
 	if(title)
 		a->title = strdup(title);
 
