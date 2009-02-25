@@ -111,7 +111,6 @@ SESSION *session_init_client(void) {
 	session->country[0] = 0;
 	session->server_host[0] = 0;
 	session->server_port = 0;
-	session->packet_handlers = NULL;
 
 	session->key_recv_IV = 0;
 	session->key_send_IV = 0;
@@ -195,20 +194,7 @@ void session_disconnect(SESSION *session) {
 
 
 void session_free(SESSION *session) {
-	PHANDLER *ph, *next;
-
 	session_disconnect(session);
-
-	ph = session->packet_handlers;
-	while(ph) {
-		next = ph->next;
-
-		packethandler_unregister(session, ph);
-		ph = next;
-	}
-
-	session->packet_handlers = NULL;
-
 
 	if(session->dh)
 		DH_free(session->dh);

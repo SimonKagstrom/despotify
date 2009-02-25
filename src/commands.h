@@ -17,6 +17,7 @@
 #define CMD_CHANNELERR	0x0a
 #define CMD_CHANNELABRT	0x0b
 #define CMD_AESKEY	0x0d
+#define CMD_SHAHASH     0x10
 
 /* Rights management */
 #define CMD_COUNTRYCODE	0x1b

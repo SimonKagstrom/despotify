@@ -9,5 +9,5 @@
 #include "packet.h"
 
 
-int gw_handle_countrycode(PHANDLER *, unsigned char *, unsigned short);
+int gw_handle_countrycode(void *, unsigned char *, unsigned short);
 #endif

@@ -2,8 +2,8 @@
 # $Id$
 # 
 #
-CFLAGS = -Wall -ggdb -DGUI
-#CFLAGS = -Wall -ggdb -DGUI -DDEBUG
+#CFLAGS = -Wall -ggdb -DGUI
+CFLAGS = -Wall -ggdb -DGUI -DDEBUG
 LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile 
 
 CORE_OBJS = aes.o auth.o buffer.o channel.o commands.o dns.o event.o handlers.o keyexchange.o packet.o playlist.o puzzle.o session.o shn.o util.o xml.o

@@ -11,7 +11,6 @@
 #include "shn.h"
 
 
-struct _packethandler;
 typedef struct {
 	/* connection to Spotify's service */
 	int ap_sock;
@@ -123,9 +122,6 @@ typedef struct {
 
 	/* Assigned country */
 	char country[4];
-
-
-	struct _packethandler *packet_handlers;
 
 } SESSION;
 

@@ -11,6 +11,9 @@
  * Snoop on country packets
  *
  */
+
+/* TODO
+
 int gw_handle_countrycode(PHANDLER *ph, unsigned char *payload, unsigned short len) {
         int ret;
         int i;
@@ -24,3 +27,4 @@ int gw_handle_countrycode(PHANDLER *ph, unsigned char *payload, unsigned short l
         return ret;
 }
 
+*/

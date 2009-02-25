@@ -16,7 +16,6 @@ void gui_update_view(void);
 void gui_finish(int);
 
 int gui_action_handler(EVENT *e, enum ev_flags ev_kind);
+void app_packet_callback(SESSION*, int, unsigned char*, int);
 
-int gui_handle_ping(PHANDLER *, unsigned char *, unsigned short);
-int gui_handle_countrycode(PHANDLER *, unsigned char *, unsigned short);
 #endif

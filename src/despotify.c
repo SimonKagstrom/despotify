@@ -60,23 +60,7 @@ int main(int argc, char **argv) {
 	/* Initialize client context */
 	c = session_init_client();
 
-
-	/* Initialize packet handlers */
-	packethandler_register(c, CMD_SECRETBLK, handle_secret_block, NULL);
-	packethandler_register(c, CMD_PING, handle_ping, NULL);
-	packethandler_register(c, CMD_CHANNELDATA, handle_channel, NULL);
-	packethandler_register(c, CMD_CHANNELERR, handle_channel, NULL);
-	packethandler_register(c, CMD_AESKEY, handle_aeskey, NULL);
-	packethandler_register(c, 0x10, handle_sha_hash, NULL);
-	packethandler_register(c, CMD_COUNTRYCODE, handle_countrycode, NULL);
-	packethandler_register(c, CMD_P2P_INITBLK, handle_p2p_initblock, NULL);
-	packethandler_register(c, CMD_NOTIFY, handle_notification, NULL);
-	packethandler_register(c, CMD_PRODINFO, handle_product_information, NULL);
-	packethandler_register(c, CMD_WELCOME, handle_welcome, NULL);
-
-
 	session_auth_set(c, argv[1], argv[2]);
-	
 
 	/* Register our login handler */	
 	e = event_register_action(NULL, 0, despotify_login, (void *)c);
@@ -84,10 +68,6 @@ int main(int argc, char **argv) {
 
 	
 #ifdef GUI
-	/* Let the GUI snoop on these packets */
-	packethandler_register(c, CMD_COUNTRYCODE, gui_handle_countrycode, NULL);
-	packethandler_register(c, CMD_PING, gui_handle_ping, NULL);
-
 	/* Register the GUI handler */
 	e = event_register_action(NULL, 0, gui_action_handler, NULL);
 	event_msg_subscription_class_set(e, MSG_CLASS_APP|MSG_CLASS_GUI);
@@ -257,7 +237,6 @@ static int despotify_login(EVENT *ev, enum ev_flags ev_kind) {
 static int despotify_packet_io(EVENT *ev, enum ev_flags ev_kind) {
 	SESSION *s = (SESSION *)ev->private;
 	int err = 0;
-	PHANDLER *ph;
 	PHEADER hdr;
 	unsigned char *payload;
 
@@ -298,18 +277,11 @@ static int despotify_packet_io(EVENT *ev, enum ev_flags ev_kind) {
 	case 0:
 		/* Read packets */
 		if((err = packet_read(s, &hdr, &payload)) == 0) {
-
-			/* Call each packethandler for this command */
-			ph = NULL;
-			while((ph = packethandler_by_cmd(s, hdr.cmd, ph)) != NULL) {
-				DSFYDEBUG("despotify_packet_io(): Found handler for cmd=0x%02x, entering callback\n", hdr.cmd)
-				if((err = ph->callback(ph, payload, hdr.len)) != 0)
-					break;
-			}
-
-			/* Allocated in packet_read() */
-			free(payload);
+                        err = handle_packet(s, hdr.cmd, payload, hdr.len);
+                        free(payload); /* Allocated in packet_read() */
 			payload = NULL;
+                        if (err)
+                                break;
 			event_mark_idle(ev);
 		}
 		else {

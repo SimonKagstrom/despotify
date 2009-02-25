@@ -463,13 +463,13 @@ int rest_fsm(RESTSESSION *r) {
 		}
 		else if(!strcmp(r->command, "id")) {
 			r->state = REST_STATE_LOAD_COMMAND;
-			sprintf(msg, "200 %ld OK The session id is shown below\n%s",
+			sprintf(msg, "200 %zd OK The session id is shown below\n%s",
 				strlen(r->client->client_id), r->client->client_id);
 			write(r->socket, msg, strlen(msg));
 		}
 		else if(!strcmp(r->command, "country")) {
 			r->state = REST_STATE_LOAD_COMMAND;
-			sprintf(msg, "200 %ld OK Assigned country below\n%s",
+			sprintf(msg, "200 %zd OK Assigned country below\n%s",
 				strlen(r->client->country), r->client->country);
 			write(r->socket, msg, strlen(msg));
 		}
@@ -682,7 +682,6 @@ int rest_fsm(RESTSESSION *r) {
 
 
 int spotify_fsm(SPOTIFYSESSION *s) {
-	PHANDLER *ph;
 	PHEADER hdr;
 	unsigned char *payload;
 	int ret;
@@ -701,23 +700,6 @@ int spotify_fsm(SPOTIFYSESSION *s) {
 			s->state = CLIENT_STATE_ERROR_CONNECT;
 			break;
 		}
-
-		/* Initialize default packet handlers */
-		packethandler_register(s->session, CMD_SECRETBLK, handle_secret_block, NULL);
-		packethandler_register(s->session, CMD_PING, handle_ping, NULL);
-		packethandler_register(s->session, CMD_CHANNELDATA, handle_channel, NULL);
-		packethandler_register(s->session, CMD_CHANNELERR, handle_channel, NULL);
-		packethandler_register(s->session, CMD_AESKEY, handle_aeskey, NULL);
-		packethandler_register(s->session, 0x10, handle_sha_hash, NULL);
-		packethandler_register(s->session, CMD_COUNTRYCODE, handle_countrycode, NULL);
-		packethandler_register(s->session, CMD_P2P_INITBLK, handle_p2p_initblock, NULL);
-		packethandler_register(s->session, CMD_NOTIFY, handle_notification, NULL);
-		packethandler_register(s->session, CMD_PRODINFO, handle_product_information, NULL);
-		packethandler_register(s->session, CMD_WELCOME, handle_welcome, NULL);
-
-		/* Snoop on packets */
-		packethandler_register(s->session, CMD_COUNTRYCODE, gw_handle_countrycode, s);
-
 
 		s->state = CLIENT_STATE_CONNECT;
 
@@ -753,21 +735,15 @@ int spotify_fsm(SPOTIFYSESSION *s) {
 				s->state = CLIENT_STATE_ERROR_PACKET;
 				break;
 			}
-
-			/* Call each packethandler for this command */
-			ph = NULL;
-			while((ph = packethandler_by_cmd(s->session, hdr.cmd, ph)) != NULL) {
-#ifdef DEBUG
-				printf("spotify_fsm(): Found handler for cmd=0x%02x, entering callback\n", hdr.cmd);
-#endif
-				ret = ph->callback(ph, payload, hdr.len);
-				if(ret != 0) {
-					s->state = CLIENT_STATE_ERROR_PACKET;
-					break;
-				}
+                        ret = handle_packet(s->session, hdr.cmd, payload, hdr.len);
+			free(payload); /* Allocated in packet_read() */
+                        payload = NULL;
+                        if(ret != 0) {
+                                s->state = CLIENT_STATE_ERROR_PACKET;
+                                break;
 			}
-			/* Allocated in packet_read() */
-			free(payload);
+			
+
 		}
 		break;
 
@@ -867,3 +843,7 @@ SPOTIFYSESSION *spotify_find_http_client(void) {
 
         return NULL;
 }
+
+
+void app_packet_callback(SESSION* s, int cmd, unsigned char* payload, int len)
+{}

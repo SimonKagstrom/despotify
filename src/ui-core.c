@@ -492,35 +492,31 @@ static int gui_readline(int ch) {
 }
 
 
-/*
- * Snoop on pings.
- * We don't respond to it because the generic ping handler will.
- *
- */
-int gui_handle_ping(PHANDLER *ph, unsigned char *payload, unsigned short len) {
-        time_t t;
+void app_packet_callback(SESSION* session, 
+                         int cmd, 
+                         unsigned char* payload, 
+                         int len)
+{
 
-        memcpy(&t, payload, 4);
-        last_ping = ntohl(t);
-        gui_update_view();
+        switch (cmd) {
+        case CMD_PING: {
+                time_t t;
 
-	return 0;
+                memcpy(&t, payload, 4);
+                last_ping = ntohl(t);
+                gui_update_view();
+                break;
+        }
+
+        case CMD_COUNTRYCODE: {
+                int i;
+
+                for(i = 0; i < len && i < sizeof(country) - 1; i ++)
+                        country[i] = payload[i];
+
+                country[i] = 0;
+                gui_update_view();
+                break;
+        }
+        }
 }
-
-
-/*
- * Snoop on country packets
- *
- */
-int gui_handle_countrycode(PHANDLER *ph, unsigned char *payload, unsigned short len) {
-        int i;
-
-        for(i = 0; i < len && i < sizeof(country) - 1; i ++)
-                country[i] = payload[i];
-
-        country[i] = 0;
-        gui_update_view();
-
-        return 0;
-}
-
