@@ -16,9 +16,11 @@
 #define CMD_CHANNELDATA	0x09
 #define CMD_CHANNELERR	0x0a
 #define CMD_CHANNELABRT	0x0b
+#define CMD_REQKEY	0x0d
 #define CMD_AESKEY	0x0d
 #define CMD_SHAHASH     0x10
 #define CMD_IMAGE	0x19
+#define CMD_TOKENNOTIFY	0x4f
 
 /* Rights management */
 #define CMD_COUNTRYCODE	0x1b
@@ -45,6 +47,7 @@
 
 
 int cmd_send_cache_hash(SESSION *);
+int cmd_token_notify(SESSION *);
 int cmd_aeskey(SESSION *, unsigned char *, unsigned char *, channel_callback, void *);
 int cmd_search(SESSION *, char *, channel_callback, void *);
 int cmd_requestad(SESSION *, unsigned char);

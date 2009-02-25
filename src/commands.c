@@ -169,6 +169,31 @@ int cmd_search(SESSION *session, char *searchtext, channel_callback callback, vo
 }
 
 
+/*
+ * Notify server we're going to play
+ *
+ */
+int cmd_token_notify(SESSION *session) {
+	int ret;
+	BUFFER *b;
+	unsigned short zero;
+	CHANNEL *ch;
+
+
+	/* Request the playing token before playing a song */
+	b = buffer_init();
+
+
+	ret = packet_write(session, CMD_TOKENNOTIFY, b->buf, b->buflen);
+	buffer_free(b);
+	if(ret != 0) {
+		DSFYDEBUG("cmd_token_notify(): packet_write(cmd=0x4f) returned %d, aborting!\n", ret)
+	}
+
+	return ret;
+}
+
+
 int cmd_aeskey(SESSION *session, unsigned char *file_id, unsigned char *track_id, channel_callback callback, void *private) {
 	int ret;
 	BUFFER *b;
@@ -196,7 +221,7 @@ int cmd_aeskey(SESSION *session, unsigned char *file_id, unsigned char *track_id
 	buffer_append_short(b, ch->channel_id);
 
 
-	ret = packet_write(session, 0x0c, b->buf, b->buflen);
+	ret = packet_write(session, CMD_REQKEY, b->buf, b->buflen);
 	buffer_free(b);
 	if(ret != 0) {
 		DSFYDEBUG("cmd_key(): packet_write(cmd=0x0c) returned %d, aborting!\n", ret)

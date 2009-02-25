@@ -255,6 +255,20 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 			break;
 		}
 
+		if(cmd_token_notify(session)) {
+			event_msg_post(MSG_CLASS_APP, MSG_APP_NET_ERROR, NULL);
+
+			DSFYDEBUG("cmd_token_notify() failed before attempting to play %s - %s\n", t->title, t->artist);
+
+			/*
+			 * XXX - Notify about failure?
+			 * Implement retrying when we're online again.
+			 *
+			 */
+
+			 break;
+		}
+
 		/* Expand key and set IV */
 		gui_player_aes_set_key(playerctx, t->key);
 
