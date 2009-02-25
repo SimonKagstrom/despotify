@@ -8,7 +8,6 @@
 typedef struct gst_private
 {
         GstElement *pipeline;
-        GstElement *src;
         GMainLoop *loop;
 } gst_PRIVATE;
 

@@ -109,8 +109,6 @@ static void need_data_cb (GstAppSrc * src, guint length, gpointer data) {
         uint8_t * buffer;
         GstBuffer *gstbuf;
         AUDIOCTX * actx = (AUDIOCTX*) data;
-        gst_PRIVATE *priv = (gst_PRIVATE *) actx->driverprivate;
-        assert (priv != NULL);
 
         if(length == 0 || length > 1024)
                 length = 1024;
@@ -119,7 +117,7 @@ static void need_data_cb (GstAppSrc * src, guint length, gpointer data) {
         r = pcm_read (actx->pcmprivate, (char *) buffer, length, 0, 2, 1, NULL);
 
         if (r == 0) {
-                gst_app_src_end_of_stream(GST_APP_SRC(priv->src));
+                gst_app_src_end_of_stream(GST_APP_SRC(src));
                 return;
         } else if (r < 0) {
                 DSFYDEBUG ("pcm_read() failed == %i\n", r);
@@ -127,7 +125,7 @@ static void need_data_cb (GstAppSrc * src, guint length, gpointer data) {
         }
 
         gstbuf = gst_app_buffer_new (buffer, r, gstaudio_free_buffer, buffer);
-        if(gst_app_src_push_buffer(GST_APP_SRC(priv->src), gstbuf) != GST_FLOW_OK)
+        if(gst_app_src_push_buffer(GST_APP_SRC(src), gstbuf) != GST_FLOW_OK)
                 DSFYDEBUG ("%s> call to push_buffer failed\n", __FUNCTION__);
 }
 
@@ -151,7 +149,7 @@ int gstaudio_init_device (void *unused)
 int gstaudio_prepare_device (AUDIOCTX * actx)
 {
         gst_PRIVATE *priv;
-        GstElement *sink;
+        GstElement *sink, *src;
 
         DSFYDEBUG ("%s\n", __FUNCTION__);
 
@@ -168,10 +166,10 @@ int gstaudio_prepare_device (AUDIOCTX * actx)
         g_assert (priv->pipeline);
         
         /* create a gstreamer AppSrc, capab values taken from pulseaudio backend. */
-        priv->src = gst_element_factory_make ("appsrc", NULL);
-        g_assert (priv->src);
-        gst_app_src_set_stream_type (GST_APP_SRC(priv->src), GST_APP_STREAM_TYPE_STREAM);
-        gst_app_src_set_caps (GST_APP_SRC(priv->src),
+        src = gst_element_factory_make ("appsrc", NULL);
+        g_assert (src);
+        gst_app_src_set_stream_type (GST_APP_SRC(src), GST_APP_STREAM_TYPE_STREAM);
+        gst_app_src_set_caps (GST_APP_SRC(src),
                 gst_caps_new_simple ("audio/x-raw-int",
                                     "channels", G_TYPE_INT, actx->channels,
                                     "rate", G_TYPE_INT, (int) actx->samplerate,
@@ -181,14 +179,14 @@ int gstaudio_prepare_device (AUDIOCTX * actx)
                                     "depth", G_TYPE_INT, 16,
                                      NULL)
         );
-        g_signal_connect (priv->src, "need-data", G_CALLBACK (need_data_cb), actx);
-        gst_bin_add (GST_BIN (priv->pipeline), priv->src);
+        g_signal_connect (src, "need-data", G_CALLBACK (need_data_cb), actx);
+        gst_bin_add (GST_BIN (priv->pipeline), src);
 
         sink = gst_element_factory_make ("autoaudiosink", NULL);
         g_assert (sink);
         gst_bin_add (GST_BIN (priv->pipeline), sink);
 
-        if(!gst_element_link (priv->src, sink)) {
+        if(!gst_element_link (src, sink)) {
                 fprintf(stderr, "failed to link gstreamer elements");
                 exit(-1);
         }
