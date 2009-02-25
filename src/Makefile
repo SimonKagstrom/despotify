@@ -7,7 +7,7 @@ LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile
 
 CORE_OBJS = aes.o auth.o buffer.o channel.o commands.o dns.o event.o handlers.o keyexchange.o packet.o playlist.o puzzle.o session.o shn.o util.o xml.o
 DESPOTIFY_OBJS = ADMclubbing.o audio.o despotify.o ui-core.o ui-help.o ui-player.o ui-playlist.o ui-search.o sndqueue.o
-GATEWAY_OBJS = gw-core.o gw-browse.o gw-handlers.o gw-playlist.o gw-search.o gw-stream.o gw-http.o base64.o
+GATEWAY_OBJS = gw-core.o gw-browse.o gw-handlers.o gw-image.o gw-playlist.o gw-search.o gw-stream.o gw-http.o base64.o
 
 LINUX_BACKEND = gstreamer
 

@@ -18,6 +18,7 @@
 #define CMD_CHANNELABRT	0x0b
 #define CMD_AESKEY	0x0d
 #define CMD_SHAHASH     0x10
+#define CMD_IMAGE	0x19
 
 /* Rights management */
 #define CMD_COUNTRYCODE	0x1b
@@ -47,6 +48,7 @@ int cmd_send_cache_hash(SESSION *);
 int cmd_aeskey(SESSION *, unsigned char *, unsigned char *, channel_callback, void *);
 int cmd_search(SESSION *, char *, channel_callback, void *);
 int cmd_requestad(SESSION *, unsigned char);
+int cmd_request_image(SESSION *, unsigned char *, channel_callback, void *);
 int cmd_action(SESSION *, unsigned char *, unsigned char *);
 int cmd_getsubstreams(SESSION *, unsigned char *, unsigned int, unsigned int, unsigned int, channel_callback, void *);
 int cmd_browse(SESSION *, unsigned char, unsigned char *, int, channel_callback, void *);

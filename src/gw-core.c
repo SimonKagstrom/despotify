@@ -19,6 +19,7 @@
  * - id					(dump Spotify client's session id)
  * - country				(dump Spotify client's assigned country)
  * - search <text>			(dump uncompressed XML from a search)
+ * - image <16 byte id in hex>		(dump image for ID)
  * - browsetrack <16 byte id in hex>	(dump track info for ID)
  * - browseartist <16 byte id in hex>	(dump artist info for ID)
  * - playlist <17 byte id in hex>	(dump XML for playlist with ID)
@@ -56,6 +57,7 @@
 #include "gw-browse.h"
 #include "gw-handlers.h"
 #include "gw-http.h"
+#include "gw-image.h"
 #include "gw-playlist.h"
 #include "gw-search.h"
 #include "gw-stream.h"
@@ -494,6 +496,18 @@ int rest_fsm(RESTSESSION *r) {
 			else {
 				r->state = REST_STATE_WAITING;
 				if((ret = gw_browse(r->client, 3, r->command + 12)) != 0)
+					r->state = REST_STATE_FREE_CLIENT;
+			}
+		}
+		else if(!strncmp(r->command, "image ", 6)) {
+			if(strlen(r->command) != 6+2*16) {
+				r->state = REST_STATE_LOAD_COMMAND;
+				sprintf(msg, "501 0 WARN Image ID must be provided in hex as 32 characters\n");
+				write(r->socket, msg, strlen(msg));
+			}
+			else {
+				r->state = REST_STATE_WAITING;
+				if((ret = gw_image(r->client, r->command + 6)) != 0)
 					r->state = REST_STATE_FREE_CLIENT;
 			}
 		}
