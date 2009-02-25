@@ -21,6 +21,7 @@
  * - search <text>			(dump uncompressed XML from a search)
  * - image <16 byte id in hex>		(dump image for ID)
  * - browsetrack <16 byte id in hex>	(dump track info for ID)
+ * - browsealbum <16 byte id in hex>	(dump album info for ID)
  * - browseartist <16 byte id in hex>	(dump artist info for ID)
  * - playlist <17 byte id in hex>	(dump XML for playlist with ID)
  * - logout				(logout Spotify client from server)
@@ -484,6 +485,18 @@ int rest_fsm(RESTSESSION *r) {
 			else {
 				r->state = REST_STATE_WAITING;
 				if((ret = gw_browse(r->client, 1, r->command + 13)) != 0)
+					r->state = REST_STATE_FREE_CLIENT;
+			}
+		}
+		else if(!strncmp(r->command, "browsealbum ", 12)) {
+			if(strlen(r->command) != 12+2*16) {
+				r->state = REST_STATE_LOAD_COMMAND;
+				sprintf(msg, "501 0 WARN Album ID must be provided in hex as 32 characters\n");
+				write(r->socket, msg, strlen(msg));
+			}
+			else {
+				r->state = REST_STATE_WAITING;
+				if((ret = gw_browse(r->client, 2, r->command + 12)) != 0)
 					r->state = REST_STATE_FREE_CLIENT;
 			}
 		}
