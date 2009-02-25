@@ -179,6 +179,7 @@ int gstaudio_prepare_device (AUDIOCTX * actx)
                                     "depth", G_TYPE_INT, 16,
                                      NULL)
         );
+        g_object_set (src, "format", GST_FORMAT_TIME, NULL);
         g_signal_connect (src, "need-data", G_CALLBACK (need_data_cb), actx);
         gst_bin_add (GST_BIN (priv->pipeline), src);
 
