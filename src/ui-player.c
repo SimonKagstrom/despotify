@@ -147,13 +147,13 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 
 			case MSG_GUI_PLAY:
 				DSFYDEBUG("%s\n", "gui_player_event_processor(): Got MSG_GUI_PLAY");
-				if(e->private && snd->actx->is_paused ) {
+				if(e->private && snd->actx != NULL && snd->actx->is_paused ) {
 					DSFYDEBUG("%s\n", "MSG_GUI_PLAY: Resuming audio because private and actx->is_paused");
 					audio_resume(snd->actx);
 				}
 				else {
 					DSFYDEBUG("%s\n", "gui_player_event_processor(MSG_GUI_PLAY): Playing a new song");
-					if(e->private) {
+					if(e->private && snd->actx != NULL) {
 					    DSFYDEBUG("%s\n", "gui_player_event_processor(MSG_GUI_PLAY): Killing playing song, calling snd_stop()");
 
 					    /* Kill playing song before starting new */
