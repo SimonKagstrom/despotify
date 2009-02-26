@@ -9,6 +9,7 @@
 #include "ui-help.h"
 
 int gui_help(WINDOW *w, char *helpstring) {
+        (void)helpstring; /* don't warn. */
 	werase(w);
 	box(w, 0, 0);
 

@@ -279,6 +279,8 @@ int playlist_track_update_from_gzxml(struct playlist *target, void *data, int le
 static void playlist_xml_handle_startelement(void *private, const XML_Char *name, const XML_Char **attr) {
 	struct parsingctx *ctx = (struct parsingctx *)private;
 
+        (void)attr; (void)name; /* don't warn */
+
 	xml_push_tag(&ctx->taglist, name);
 }
 
@@ -386,6 +388,8 @@ static void tracks_meta_xml_handle_startelement(void *private, const XML_Char *n
 static void tracks_meta_xml_handle_endelement(void *private, const XML_Char *name) {
 	struct parsingctx *ctx = (struct parsingctx *)private;
 	static unsigned char invalid_file_id[20];
+
+        (void)name; /* don't warn. */
 
 	if(xml_has_parent_path(ctx->taglist, "//tracks")) {
 		/* Remove unplayable tracks from playlist */

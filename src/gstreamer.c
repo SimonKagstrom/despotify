@@ -18,6 +18,7 @@
 
 static gboolean bus_call (GstBus *bus, GstMessage *msg, gpointer user_data)
 {
+    (void)bus; (void)user_data; /* don't warn. */
     switch (GST_MESSAGE_TYPE (msg))
     {
         case GST_MESSAGE_EOS:
@@ -136,6 +137,7 @@ static void need_data_cb (GstAppSrc * src, guint length, gpointer data) {
  */
 int gstaudio_init_device (void *unused)
 {
+        (void)unused; /* don't warn. */
         DSFYDEBUG ("%s\n", __FUNCTION__);
         gst_init (0, NULL);
         /* XXX: This needs to be changed. I think it'll crash and burn HORRIBLY 
@@ -208,6 +210,8 @@ int gstaudio_prepare_device (AUDIOCTX * actx)
 
 int gstaudio_pause (AUDIOCTX * actx)
 {
+        (void)actx; /* don't warn. */
+
         DSFYDEBUG ("%s\n", __FUNCTION__);
         g_idle_add(pause_cb, NULL);
         return 0;
@@ -215,6 +219,8 @@ int gstaudio_pause (AUDIOCTX * actx)
 
 int gstaudio_resume (AUDIOCTX * actx)
 {
+        (void)actx; /* don't warn. */
+
         DSFYDEBUG ("%s\n", __FUNCTION__);
         g_idle_add(resume_cb, NULL);
         return 0;

@@ -138,7 +138,7 @@ int gw_file_stream(SPOTIFYSESSION *s, unsigned char *file_id, unsigned int offse
 	 *       (there's never time to do it right, but always time to do it wrong..)
 	 *
 	 */
-	for(i = 0; i < offset / 16; i++) {
+	for(i = 0; i < (int)offset / 16; i++) {
 		for(j = 15; j >= 0; j--) {
 			sctx->IV[j] += 1;
 			if(sctx->IV[j] != 0)

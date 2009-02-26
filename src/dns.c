@@ -56,7 +56,7 @@ char *dns_srv_list(char *hostname) {
 
 
 	n_srv = 0;
-	while(h->ancount-- && n_srv < sizeof(svr)/sizeof(svr[0])) {
+	while(h->ancount-- && n_srv < (int)(sizeof(svr)/sizeof(svr[0]))) {
 		if((hlen = dn_expand(answer, answer+alen, p, host, sizeof(host))) < 0)
 			break;
 

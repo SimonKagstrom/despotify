@@ -401,7 +401,7 @@ int rest_fsm(RESTSESSION *r) {
 			if(r->client->state != CLIENT_STATE_ALLOCATE) {
 				r->state = REST_STATE_LOAD_COMMAND;
 				sprintf(msg, "200 0 OK Found previous session with this username and password\n");
-				if(write(r->socket, msg, strlen(msg)) != strlen(msg))
+				if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 					ret = -1;
 			}
 		}
@@ -420,13 +420,13 @@ int rest_fsm(RESTSESSION *r) {
 			else
 				sprintf(msg, "404 0 WARN Client with id '%.100s' NOT found\n", temp);
 
-			if(write(r->socket, msg, strlen(msg)) != strlen(msg))
+			if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 				ret = -1;
 		}
 		else {
 			r->state = REST_STATE_LOAD_COMMAND;
 			sprintf(msg, "501 0 WARN Invalid command '%.100s'\n", r->command);
-			if(write(r->socket, msg, strlen(msg)) != strlen(msg))
+			if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 				ret = -1;
 		}
 		break;
@@ -622,7 +622,7 @@ int rest_fsm(RESTSESSION *r) {
 				r->client->state = CLIENT_STATE_IDLE_CONNECTED;
 				if(!r->httpreq) {
 					sprintf(msg, "200 0 OK Login successful\n");
-					if(write(r->socket, msg, strlen(msg)) != strlen(msg))
+					if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 						ret = -1;
 				}
 				else
@@ -638,7 +638,7 @@ int rest_fsm(RESTSESSION *r) {
 				r->client->state = CLIENT_STATE_IDLE_DISCONNECTED;
 				if(!r->httpreq) {
 					sprintf(msg, "503 0 WARN Client failed to connect\n");
-					if(write(r->socket, msg, strlen(msg)) != strlen(msg))
+					if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 						ret = -1;
 				}
 				else
@@ -651,7 +651,7 @@ int rest_fsm(RESTSESSION *r) {
 				r->client->state = CLIENT_STATE_IDLE_DISCONNECTED;
 				if(!r->httpreq) {
 					sprintf(msg, "404 0 WARN Key exchange failed (bad username?)\n");
-					if(write(r->socket, msg, strlen(msg)) != strlen(msg))
+					if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 						ret = -1;
 				}
 				else
@@ -664,7 +664,7 @@ int rest_fsm(RESTSESSION *r) {
 				r->client->state = CLIENT_STATE_IDLE_DISCONNECTED;
 				if(!r->httpreq) {
 					sprintf(msg, "403 0 WARN Authentication failed (bad password?)\n");
-					if(write(r->socket, msg, strlen(msg)) != strlen(msg))
+					if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 						ret = -1;
 				}
 				else
@@ -873,4 +873,5 @@ SPOTIFYSESSION *spotify_find_http_client(void) {
 
 
 void app_packet_callback(SESSION* s, int cmd, unsigned char* payload, int len) {
+    (void)s; (void)cmd; (void)payload; (void)len; /* don't warn. */
 }

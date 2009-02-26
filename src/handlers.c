@@ -68,11 +68,13 @@ int handle_aeskey(unsigned char *payload, int len) {
 }
 
 int handle_welcome(SESSION* session, unsigned char *payload, int len) {
-        unsigned char buf[64*1024];
-	unsigned char hash[32+1];
-	int ret;
+	int ret = 0;
+
+        (void)payload; (void)len; /* don't warn */
 
 #if 0	/* Don't fuck shut up stats */
+        unsigned char buf[64*1024];
+	unsigned char hash[32+1];
 
 
 	len = sprintf((char *)buf, "ConnectionInfo\t%d\t%s:%u\t%s", 2, session->server_host, session->server_port, "127.0.0.1:1080@socks5");
@@ -98,8 +100,6 @@ int handle_welcome(SESSION* session, unsigned char *payload, int len) {
 	/* Request Ad with flag 1 */
 	if(ret == 0)
 		ret = cmd_requestad(session, 1);
-
-
 
 
 	return ret;

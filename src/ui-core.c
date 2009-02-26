@@ -209,7 +209,8 @@ void gui_update_view(void) {
  * Shutdown curses
  *
  */
-void gui_finish(int dummy) {
+void gui_finish(int unused) {
+        (void)unused; /* don't warn. */
 	endwin();
 }
 
@@ -219,8 +220,10 @@ void gui_finish(int dummy) {
  * XXX - Don't do this in the signal handler!
  *
  */
-void sig_winch_handler(int dummy) {
+void sig_winch_handler(int unused) {
 	struct winsize ws;
+
+        (void)unused; /* don't warn. */
 
 	ioctl(0, TIOCGWINSZ, &ws);
 	resizeterm(ws.ws_row, ws.ws_col);
@@ -480,7 +483,7 @@ static int gui_readline(int ch) {
 	else if(ch == 0x09 /* tab */) {
 
 	}
-	else if(c_input_len < sizeof(c_input) - 2) {
+	else if(c_input_len < (int)sizeof(c_input) - 2) {
 		c_input[c_input_len++] = ch;		
 		c_input[c_input_len] = 0;
 	}
@@ -498,6 +501,7 @@ void app_packet_callback(SESSION* session,
                          unsigned char* payload, 
                          int len)
 {
+        (void)session; /* don't warn. */
 
         switch (cmd) {
         case CMD_PING: {
@@ -512,7 +516,7 @@ void app_packet_callback(SESSION* session,
         case CMD_COUNTRYCODE: {
                 int i;
 
-                for(i = 0; i < len && i < sizeof(country) - 1; i ++)
+                for(i = 0; i < len && i < (int)sizeof(country) - 1; i ++)
                         country[i] = payload[i];
 
                 country[i] = 0;
