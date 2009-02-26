@@ -18,6 +18,7 @@
 unsigned char *hex_ascii_to_bytes(char *, unsigned char *, int);
 char *hex_bytes_to_ascii(unsigned char *, char *, int);
 void hexdump8x32(char *, void *, int);
+void fhexdump8x32(FILE *, char *, void *, int);
 void logdata(char *, int, void *, int);
 ssize_t block_read(int, void *, size_t);
 ssize_t block_write(int, void *, size_t);

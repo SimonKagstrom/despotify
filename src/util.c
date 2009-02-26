@@ -39,35 +39,40 @@ char *hex_bytes_to_ascii(unsigned char *bytes, char *ascii, int len) {
 }
 
 
+
 void hexdump8x32(char *prefix, void *data, int len) {
+	fhexdump8x32(stdout, prefix, data, len);
+}
+
+void fhexdump8x32(FILE * file ,char *prefix, void *data, int len) {
 	unsigned char *ptr = (unsigned char *)data;
 	int i, j;
 
-	printf("%s:%s", prefix, len >= 16? "\n": strlen(prefix) >= 8? "\t": "\t\t");
+	fprintf(file, "%s:%s", prefix, len >= 16? "\n": strlen(prefix) >= 8? "\t": "\t\t");
 	for(i = 0; i < len; i++) {
 		if(i % 32 == 0)
 			printf("\t");
-		printf("%02x", ptr[i]);
+		fprintf(file, "%02x", ptr[i]);
 		if(i % 32 == 31) {
-			printf(" [");
+			fprintf(file, " [");
 			for(j = i - 31; j <= i; j++)
-				printf("%c", isprint(ptr[j])? ptr[j]: '?');
-			printf("]\n");
+				fprintf(file, "%c", isprint(ptr[j])? ptr[j]: '?');
+			fprintf(file, "]\n");
 		}
 		else if(i % 8 == 7)
-			printf(" ");
+			fprintf(file, " ");
 	}
 	if(i % 32) {
 		for(j = i; j % 32; j++)
-			printf("  %s", j % 8 == 7? " ": "");
-		printf("%s[", j % 8 == 7? " ": "");
+			fprintf(file, "  %s", j % 8 == 7? " ": "");
+		fprintf(file, "%s[", j % 8 == 7? " ": "");
 		for(j = i - i%32; j < i; j++)
-			printf("%c", isprint(ptr[j])? ptr[j]: '?');
-		printf("]\n");
+			fprintf(file, "%c", isprint(ptr[j])? ptr[j]: '?');
+		fprintf(file, "]\n");
 	}
 
 	if(!len)
-		printf("<zero length input>\n");
+		fprintf(file, "<zero length input>\n");
 }
 
 
