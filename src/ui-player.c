@@ -536,23 +536,27 @@ static int gui_player_end_callback(void *arg) {
 
 	DSFYDEBUG("gui_player_end_callback(arg=%p)\n",arg);
 		
+	/* Stop sound processing and reset buffers and counters */
 	snd_stop(pctx->snd); 
 	snd_reset(pctx->snd);
 	
-	pctx->event->state = 1; 
-	
-	/* If at end of this playlist, pick next one */ 
+
+	/* Select the next available track in the playlist */
 	if((t = pctx->track->next) == NULL)
 	  t = pctx->playlist->tracks;
 	
 	pctx->track = t; 
 
+	/* ..and make the event handler fetch the key for this track */
+	pctx->event->state = 1; 
+	
 	/* Fulhack */
 	pctx->event->private = pctx;
 	pctx->offset = 0;
 
 	DSFYDEBUG("gui_player_end_callback() - pctx->track == %p\n",pctx->track);
 
+	/* Run the event handler as soon as possible */
 	event_mark_busy(pctx->event);
 
 	return 0;
