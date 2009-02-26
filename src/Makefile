@@ -9,7 +9,7 @@ CORE_OBJS = aes.o auth.o buffer.o channel.o commands.o dns.o event.o handlers.o 
 DESPOTIFY_OBJS = ADMclubbing.o audio.o despotify.o ui-core.o ui-help.o ui-player.o ui-playlist.o ui-search.o sndqueue.o
 GATEWAY_OBJS = gw-core.o gw-browse.o gw-handlers.o gw-image.o gw-playlist.o gw-search.o gw-stream.o gw-http.o base64.o
 
-LINUX_BACKEND = pulseaudio
+LINUX_BACKEND = gstreamer
 
 include Makefile.local.mk
 
