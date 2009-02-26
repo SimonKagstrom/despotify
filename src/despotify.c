@@ -265,7 +265,7 @@ static int despotify_packet_io(EVENT *ev, enum ev_flags ev_kind) {
 				event_msg_subscription_class_set(ev, MSG_CLASS_APP);
 				break;
 
-#ifndef CHEAPSKAPE
+#ifndef CHEAPSKATE
 			case MSG_APP_NOTFAIRGAME:
 				ev->state = 2;
 				event_mark_busy(ev);

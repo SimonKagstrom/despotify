@@ -17,6 +17,10 @@ ifdef DEBUG
     CFLAGS += -DDEBUG -ggdb
 endif
 
+ifdef CHEAPSKATE
+    CFLAGS += -DCHEAPSKATE
+endif
+
 ifndef NOGUI
     CFLAGS += -DGUI
 endif
