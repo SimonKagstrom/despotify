@@ -18,7 +18,6 @@
 
 extern void app_packet_callback(SESSION*, int, unsigned char*, int);
 
-/* See comment about "the_blob" in session.c */
 int handle_secret_block(SESSION *session, unsigned char *payload, int len) {
 	unsigned int *t;
 
@@ -37,9 +36,7 @@ int handle_secret_block(SESSION *session, unsigned char *payload, int len) {
 	t++;
 	DSFYDEBUG("handle_secret_block(): Next value is %u\n", ntohl(*t));
 
-	if(memcmp(session->my_pub_key_sign, payload + 16, 128)) {
-		DSFYDEBUG("%s", "handle_secret_block(): Hmm, the returned RSA signature differs from ours!\n");
-	}
+	assert(memcmp(session->rsa_pub_exp, payload + 16, 128) == 0);
 
 
 	/* At payload+16+128 is a  144 bytes (1536-bit) RSA signature */
