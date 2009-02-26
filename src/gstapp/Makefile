@@ -1,5 +1,5 @@
-CFLAGS = -Wall -ggdb `pkg-config --cflags gstreamer-0.10`
-LDFLAGS = `pkg-config --libs gstreamer-0.10`
+CFLAGS = -Wall -ggdb $(shell pkg-config --cflags gstreamer-0.10)
+LDFLAGS = $(shell pkg-config --libs gstreamer-0.10)
 
 glib_enum_prefix = gst_app
 
