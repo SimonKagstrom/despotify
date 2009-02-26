@@ -35,8 +35,8 @@ endif
 ifeq ($(shell uname -s),Linux)
     LDFLAGS += -lresolv
     ifeq ($(LINUX_BACKEND),gstreamer)
-	CFLAGS += `pkg-config --cflags gstreamer-base-0.10`
-	LDFLAGS += `pkg-config --libs gstreamer-base-0.10`
+	CFLAGS += $(shell pkg-config --cflags gstreamer-base-0.10)
+	LDFLAGS += $(shell pkg-config --libs gstreamer-base-0.10)
 	DESPOTIFY_OBJS += gstreamer.o gstapp/libgstapp.a
 	endif
 
@@ -60,28 +60,29 @@ ifeq ($(shell uname -s),FreeBSD)
 endif
 
 
-all: core despotify gateway
+all: despotify gateway
 
-D=$(CORE_OBJS:.o=.d) $(DESPOTIFY_OBJS:.o=.d) $(GATEWAY_OBJS:.o=.d)
--include $(D:.a=)
-deps: $(D)
-%.d: %.c
-	$(SHELL) -ec '$(CXX) -MM $(CFLAGS) $(DEFINES) $< \
-		| sed '\''s/$*\\.o[ :]*/& $@/g'\'' > $@'
+ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
+OFILES = $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS)
+CFILES = $(filter-out %.a,$(OFILES:.o=.c))
+
+Makefile.dep:
+	$(CC) $(CFLAGS) -MM $(CFILES) > $@
+
+-include Makefile.dep
+endif
 
 gstapp/libgstapp.a:
 	make -C gstapp
 
 clean:
 	make -C gstapp clean
-	rm -f $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS) $(D) despotify gateway
+	rm -f $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS) $(D) despotify gateway Makefile.dep
 
-core: $(CORE_OBJS)
-
-despotify: core $(DESPOTIFY_OBJS)
+despotify: $(CORE_OBJS) $(DESPOTIFY_OBJS)
 	gcc -o $@ $(LDFLAGS) -lncurses $(CORE_OBJS) $(DESPOTIFY_OBJS)
 
-gateway: core $(GATEWAY_OBJS)
+gateway: $(CORE_OBJS) $(GATEWAY_OBJS)
 	gcc -o $@ $(LDFLAGS) $(CORE_OBJS) $(GATEWAY_OBJS)
 
 privacy:
