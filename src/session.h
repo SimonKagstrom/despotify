@@ -39,17 +39,7 @@ typedef struct {
 	unsigned char client_random_16[16];
 	unsigned char server_random_16[16];
 
-	/*
-	 * The the_blob[128] is sent in the initial packet 
-	 * to the server and is received at offset 16 in the 
-	 * cmd=0x02 packet.
-	 *
-	 * The client sends a 128 byte blob and
-	 * the server sends a 256 byte blob.
-	 *
-	 */
-	unsigned char the_blob[128];
-	unsigned char my_pub_key_sign[128];
+	/* Heh */
 	unsigned char random_256[256];
 
 	/*
@@ -78,6 +68,7 @@ typedef struct {
 	RSA *rsa;
 	unsigned char my_priv_key[96];
 	unsigned char my_pub_key[96];
+	unsigned char rsa_pub_exp[128];
 	unsigned char remote_pub_key[96];
 	unsigned char shared_key[96];
 

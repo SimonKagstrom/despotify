@@ -93,11 +93,7 @@ void auth_generate_auth_hmac(SESSION *session, unsigned char *auth_hmac, unsigne
 	buffer_append_raw(b, session->server_random_16, sizeof(session->server_random_16));
 	buffer_append_raw(b, session->my_pub_key, 96);
 	buffer_append_raw(b, session->remote_pub_key, 96);
-#ifdef SIGNED_DH
-	buffer_append_raw(b, session->my_pub_key_sign, sizeof(session->my_pub_key_sign));
-#else
-	buffer_append_raw(b, session->the_blob, sizeof(session->the_blob));
-#endif
+	buffer_append_raw(b, session->rsa_pub_exp, sizeof(session->rsa_pub_exp));
 	buffer_append_raw(b, &session->username_len, 1);
 	buffer_append_raw(b, session->username, session->username_len);
 	buffer_append_raw(b, "\x01\x40", 2);

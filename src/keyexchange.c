@@ -48,7 +48,6 @@ int send_client_initial_packet(SESSION *session) {
 	unsigned short *len_ptr;
 	unsigned char num_random_bytes;
 	int ret;
-	unsigned int signature_len;
 
 	b = buffer_init();
 
@@ -68,19 +67,8 @@ int send_client_initial_packet(SESSION *session) {
 
 	buffer_append_raw(b, session->my_pub_key, 96);
 
-#ifdef SIGNED_DH
-	/*
-	 * Sign our DH public key using SHA-1 (we regognize
-	 * an ASN.1 designator prefix when we see one..)
-	 *
-	 */
-	ret = RSA_sign(NID_sha1, session->my_pub_key, 96, session->my_pub_key_sign, &signature_len, session->rsa);
-	DSFYDEBUG("send_client_initial_packet(): RSA_sign() returned %d, signature length is %u\n", ret, signature_len);
-	assert(signature_len == 128);
-	buffer_append_raw(b, session->my_pub_key_sign, signature_len);
-#else
-	buffer_append_raw(b, session->the_blob, 128);
-#endif
+	BN_bn2bin(session->rsa->n, session->rsa_pub_exp);
+	buffer_append_raw(b, session->rsa_pub_exp, sizeof(session->rsa_pub_exp));
 
 	buffer_append_raw(b, &session->username_len, 1);
 	buffer_append_raw(b, (unsigned char *)session->username, session->username_len);

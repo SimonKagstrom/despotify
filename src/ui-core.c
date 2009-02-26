@@ -529,6 +529,16 @@ void app_packet_callback(SESSION* session,
         }
 
 	case CMD_PRODINFO:
+                {
+                char *foo = malloc(len + 1);
+                memcpy(foo, payload, len);
+                foo[len] = 0;
+                DSFYDEBUG("Product info is: %s\n", foo);
+                if(strstr(foo, "<type>free</type>")) {
+                        event_msg_post(MSG_CLASS_APP, MSG_APP_NOTFAIRGAME, NULL);
+                }
+                free(foo);
+                }
 		break;
         }
 }
