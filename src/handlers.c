@@ -82,8 +82,9 @@ int handle_aeskey(unsigned char *payload, int len) {
 		ret = ch->callback(ch, payload + 4, len - 4);
 		channel_unregister(ch);
 	}
-	else
+	else {
 		DSFYDEBUG("Command 0x0d: Failed to find channel with ID %d\n", ntohs(*(unsigned short *)(payload + 2)));
+	}
 
 	return ret;
 }

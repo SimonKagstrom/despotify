@@ -57,10 +57,12 @@ SESSION *session_init_client(void) {
 	 */
 	RAND_bytes(session->client_random_16,16);
 
-	if((session->rsa = RSA_generate_key(1024, 65537, NULL, NULL)) == NULL)
+	if((session->rsa = RSA_generate_key(1024, 65537, NULL, NULL)) == NULL) {
 		DSFYDEBUG("RSA key generation failed with error %lu\n", ERR_get_error());
+	}
 	assert(session->rsa != NULL);
-	
+
+
 
 	/*
 	 * Create a private and public key.
