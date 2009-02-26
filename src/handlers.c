@@ -19,7 +19,31 @@
 extern void app_packet_callback(SESSION*, int, unsigned char*, int);
 
 /* See comment about "the_blob" in session.c */
-int handle_secret_block(SESSION *session) {
+int handle_secret_block(SESSION *session, unsigned char *payload, int len) {
+	unsigned int *t;
+
+	if(len != 336) {
+		DSFYDEBUG("Got cmd=0x02 with len %d, expected 336!\n", len);
+		return -1;
+	}
+
+	t = (unsigned int *)payload;
+	DSFYDEBUG("handle_secret_block(): Initial time %u (%ld seconds from now)\n", ntohl(*t), time(NULL) - ntohl(*t));
+	t++;
+	DSFYDEBUG("handle_secret_block(): Invalid at %u (%ld in the future)\n", ntohl(*t), ntohl(*t) - time(NULL));
+
+	t++;
+	DSFYDEBUG("handle_secret_block(): Next value is %u\n", ntohl(*t));
+	t++;
+	DSFYDEBUG("handle_secret_block(): Next value is %u\n", ntohl(*t));
+
+	if(memcmp(session->my_pub_key_sign, payload + 16, 128)) {
+		DSFYDEBUG("%s", "handle_secret_block(): Hmm, the returned RSA signature differs from ours!\n");
+	}
+
+
+	/* At payload+16+128 is a  144 bytes (1536-bit) RSA signature */
+
 
 	/*
 	 * Actually the cache hash is sent before the server has sent any
@@ -114,7 +138,7 @@ int handle_packet(SESSION* session,
 
         switch (cmd) {
         case CMD_SECRETBLK:
-                error = handle_secret_block(session);
+                error = handle_secret_block(session, payload, len);
                 break;
 
         case CMD_PING:

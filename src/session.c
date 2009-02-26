@@ -14,11 +14,13 @@
 #include <assert.h>
 
 #include <openssl/rand.h>
+#include <openssl/err.h>
 
 #include "dns.h"
 #include "keyexchange.h"
 #include "session.h"
 #include "packet.h"
+#include "util.h"
 
 
 static unsigned char DH_generator[1] = { 2 };
@@ -54,6 +56,11 @@ SESSION *session_init_client(void) {
 	 * Client and server generate 16 random bytes each.
 	 */
 	RAND_bytes(session->client_random_16,16);
+
+	if((session->rsa = RSA_generate_key(1024, 65537, NULL, NULL)) == NULL)
+		DSFYDEBUG("RSA key generation failed with error %lu\n", ERR_get_error());
+	assert(session->rsa != NULL);
+	
 
 	/*
 	 * We've have left this as a friendly backdoor to allow
@@ -144,6 +151,7 @@ int session_connect(SESSION *session) {
 			return -1;
 
 		service += strlen(host) + 7;
+		DSFYDEBUG("session_connect(): Connecting to %s:%d\n", host, port);
 
 
 		memset(&sin, 0, sizeof(sin));
@@ -199,6 +207,8 @@ void session_free(SESSION *session) {
 	if(session->dh)
 		DH_free(session->dh);
 
+	if(session->rsa)
+		RSA_free(session->rsa);
 
 	free(session);
 }

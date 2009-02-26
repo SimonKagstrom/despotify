@@ -48,6 +48,7 @@ int send_client_initial_packet(SESSION *session) {
 	unsigned short *len_ptr;
 	unsigned char num_random_bytes;
 	int ret;
+	unsigned int signature_len;
 
 	b = buffer_init();
 
@@ -67,7 +68,19 @@ int send_client_initial_packet(SESSION *session) {
 
 	buffer_append_raw(b, session->my_pub_key, 96);
 
+#ifdef SIGNED_DH
+	/*
+	 * Sign our DH public key using SHA-1 (we regognize
+	 * an ASN.1 designator prefix when we see one..)
+	 *
+	 */
+	ret = RSA_sign(NID_sha1, session->my_pub_key, 96, session->my_pub_key_sign, &signature_len, session->rsa);
+	DSFYDEBUG("send_client_initial_packet(): RSA_sign() returned %d, signature length is %u\n", ret, signature_len);
+	assert(signature_len == 128);
+	buffer_append_raw(b, session->my_pub_key_sign, signature_len);
+#else
 	buffer_append_raw(b, session->the_blob, 128);
+#endif
 
 	buffer_append_raw(b, &session->username_len, 1);
 	buffer_append_raw(b, (unsigned char *)session->username, session->username_len);
@@ -79,9 +92,8 @@ int send_client_initial_packet(SESSION *session) {
 	 * The first byte should be 1 + length
 	 *
 	 */
-	num_random_bytes = 10;
+	num_random_bytes = 1;
 	buffer_append_raw(b, &num_random_bytes, 1);
-	buffer_append_raw(b, "despotify", 9);
 
 
 	/*
@@ -118,10 +130,15 @@ int read_server_initial_packet(SESSION *session) {
 	unsigned char padlen;
 	int ret;
 
-	if((ret = block_read(session->ap_sock, session->server_random_16, 16)) <= 0) {
-		printf("read_server_initial_packet(): Failed to read 'server_random_16'\n");
+	DSFYDEBUG("%s", "read_server_initial_packet(): Reading 16 bytes..\n");
+	if((ret = read(session->ap_sock, session->server_random_16, 16)) < 16) {
+		DSFYDEBUG("%s", "read_server_initial_packet(): Failed to read 'server_random_16'\n");
+		DSFYDEBUG("read_server_initial_packet(): Remote host was %s:%d\n", session->server_host, session->server_port);
+		if(ret > 0)
+			hexdump8x32("read_server_initial_packet, server_random_16", session->server_random_16, ret);
 		return -1;
 	}
+	DSFYDEBUG("%s", "Done.. read_server_initial_packet(): Reading 16 bytes..\n");
 
 #ifdef DEBUG_LOGIN
 	hexdump8x32("read_server_initial_packet, server_random_16", session->server_random_16, ret);

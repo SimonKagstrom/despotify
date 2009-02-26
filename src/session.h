@@ -7,6 +7,7 @@
 #define DESPOTIFY_SESSION_H
 
 #include <openssl/dh.h>
+#include <openssl/rsa.h>
 
 #include "shn.h"
 
@@ -48,6 +49,7 @@ typedef struct {
 	 *
 	 */
 	unsigned char the_blob[128];
+	unsigned char my_pub_key_sign[128];
 	unsigned char random_256[256];
 
 	/*
@@ -73,6 +75,7 @@ typedef struct {
 
 
 	DH *dh;
+	RSA *rsa;
 	unsigned char my_priv_key[96];
 	unsigned char my_pub_key[96];
 	unsigned char remote_pub_key[96];
