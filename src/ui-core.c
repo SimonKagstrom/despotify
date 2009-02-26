@@ -503,6 +503,10 @@ void app_packet_callback(SESSION* session,
 {
         (void)session; /* don't warn. */
 
+#ifndef GUI
+	return;
+#endif
+
         switch (cmd) {
         case CMD_PING: {
                 time_t t;
