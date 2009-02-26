@@ -7,9 +7,6 @@
 ## Disable GUI stuff
 # NOGUI = 1
 
-## Usability fix: Allow people to ignore our intentions in a userfriendly way
-# CHEAPSKATE = 1
-
 ## Choose audio backend
 LINUX_BACKEND = gstreamer
 # LINUX_BACKEND = pulseaudio

@@ -11,7 +11,6 @@
 #include <ncurses.h>
 #include <pthread.h>
 
-
 #include "ADMclubbing.h"
 #include "audio.h"
 #include "auth.h"
@@ -30,7 +29,6 @@
 
 static int despotify_login(EVENT *, enum ev_flags);
 static int despotify_packet_io(EVENT *, enum ev_flags);
-static int despotify_no_support_for_introduction_accounts(EVENT *, enum ev_flags);
 
 
 int main(int argc, char **argv) {
@@ -265,13 +263,6 @@ static int despotify_packet_io(EVENT *ev, enum ev_flags ev_kind) {
 				event_msg_subscription_class_set(ev, MSG_CLASS_APP);
 				break;
 
-#ifndef CHEAPSKATE
-			case MSG_APP_NOTFAIRGAME:
-				ev->state = 2;
-				event_mark_busy(ev);
-				break;
-#endif
-				
 			default:
 				break;
 			}
@@ -308,12 +299,7 @@ static int despotify_packet_io(EVENT *ev, enum ev_flags ev_kind) {
 		event_mark_done(ev);
 		break;
 
-	case 2:
-		event_msg_post(MSG_CLASS_APP, MSG_APP_EXIT, NULL);
-		ev->state = 1;
-
-		ev = event_register_action(NULL, 0, despotify_no_support_for_introduction_accounts, NULL);
-		event_delay(ev, 1);
+	default:
 		break;
 
 	}
@@ -325,36 +311,4 @@ static int despotify_packet_io(EVENT *ev, enum ev_flags ev_kind) {
 	}
 	
 	return err;
-}
-
-
-#include <assert.h>
-static int despotify_no_support_for_introduction_accounts(EVENT *ev, enum ev_flags ev_kind) {
-	static int called;
-
-	if(ev_kind != EV_RUN)
-		return 0;
-
-	called++;
-	assert(called == 1);
-
-	printf(	"\n\nHi!\n"
-		"You appear to be using despotify with a 'free' account.\n"
-		"\n"
-		"We see a number of problems with providing an open source client for non-paying\n"
-		"users and hence this implementation does not support it out of the box. Sorry!\n"
-		"\n"
-		"Consider buying a daypass or upgrading to a premium account to support not\n"
-		"only Spotify, but also despotify's cause of opening up their service to\n"
-		"their paying (i.e, loyal) user base.\n"
-		"\n"
-		"  -- Love, the despotify team.\n"
-		"\n"
-		"\n"
-	);
-
-
-	event_mark_done(ev);
-
-	return 0;
 }
