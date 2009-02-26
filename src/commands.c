@@ -91,11 +91,11 @@ int cmd_requestad(SESSION *session, unsigned char ad_type) {
 
 
 /*
- * Request image using a 16 byte UUID
+ * Request image using a 20 byte hash
  * The response is a JPG
  *
  */
-int cmd_request_image(SESSION *session, unsigned char *uuid, channel_callback callback, void *private) {
+int cmd_request_image(SESSION *session, unsigned char *hash, channel_callback callback, void *private) {
 	BUFFER *b;
 	CHANNEL *ch;
 	int ret;
@@ -103,14 +103,14 @@ int cmd_request_image(SESSION *session, unsigned char *uuid, channel_callback ca
 
 	b = buffer_init();
 	strcpy(buf, "image-");
-	hex_bytes_to_ascii(uuid, buf + 6, 16);
+	hex_bytes_to_ascii(hash, buf + 6, 20);
 
 	ch = channel_register(buf, callback, private);
 	DSFYDEBUG("cmd_requestimg: allocated channel %d, retrieving img with UUID %s\n",
 			ch->channel_id, buf+6);
 
 	buffer_append_short(b, ch->channel_id);
-	buffer_append_raw(b, uuid, 16);
+	buffer_append_raw(b, hash, 20);
 
 	ret = packet_write(session, CMD_IMAGE, b->buf, b->buflen);
 	DSFYDEBUG("cmd_requestimg: packet_write() returned %d\n", ret)

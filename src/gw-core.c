@@ -19,7 +19,7 @@
  * - id					(dump Spotify client's session id)
  * - country				(dump Spotify client's assigned country)
  * - search <text>			(dump uncompressed XML from a search)
- * - image <16 byte id in hex>		(dump image for ID)
+ * - image <20 byte id in hex>		(dump image for ID)
  * - browsetrack <16 byte id in hex>	(dump track info for ID)
  * - browsealbum <16 byte id in hex>	(dump album info for ID)
  * - browseartist <16 byte id in hex>	(dump artist info for ID)
@@ -513,9 +513,9 @@ int rest_fsm(RESTSESSION *r) {
 			}
 		}
 		else if(!strncmp(r->command, "image ", 6)) {
-			if(strlen(r->command) != 6+2*16) {
+			if(strlen(r->command) != 6+2*20) {
 				r->state = REST_STATE_LOAD_COMMAND;
-				sprintf(msg, "501 0 WARN Image ID must be provided in hex as 32 characters\n");
+				sprintf(msg, "501 0 WARN Image ID must be provided in hex as 40 characters\n");
 				write(r->socket, msg, strlen(msg));
 			}
 			else {

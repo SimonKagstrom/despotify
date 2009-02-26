@@ -17,12 +17,12 @@ static int gw_image_result_callback(CHANNEL *, unsigned char *, unsigned short);
 
 
 int gw_image(SPOTIFYSESSION *s, char *id_as_hex) {
-	unsigned char id[16];
+	unsigned char id[20];
 
 	s->output = buffer_init();
 	s->output_len = 0;
 
-	hex_ascii_to_bytes(id_as_hex, id, 16);
+	hex_ascii_to_bytes(id_as_hex, id, 20);
 
 	return cmd_request_image(s->session, id, gw_image_result_callback, (void *)s);
 }
