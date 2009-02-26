@@ -157,7 +157,10 @@ long pcm_read(void *private, char *buffer, int length, int bigendianp, int word,
   /* Make sure we've always got 10 seconds of data buffered */
   if(session->fifo->totbytes < ov_raw_tell(session->vf) + 10*160*1024/8) {
    
-    DSFYDEBUG("%s\n", "pcm_read(): Locking session->fifo since we're low on data");
+    DSFYDEBUG("pcm_read(): Locking session->fifo since we're low on data (FIFO total %.3fkB, vorbis offset %.3fkB, want %.3fkB)\n", 
+		session->fifo->totbytes / 1024.0,
+		ov_raw_tell(session->vf) / 1024.0,
+		((int)ov_raw_tell(session->vf) + 10*160*1024/8 - session->fifo->totbytes) / 1024.0);
     pthread_mutex_lock(&session->lock);
     
     /* threshold level of the available buffer has been consumed, request more data */ 
