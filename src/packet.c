@@ -21,7 +21,6 @@
 
 int packet_read(SESSION *session, PHEADER *h, unsigned char **payload) {
 	int ret;
-	int nbytes_to_read;
 	int packet_len;
 	unsigned char nonce[4];
 	unsigned char *ptr;
@@ -53,22 +52,15 @@ int packet_read(SESSION *session, PHEADER *h, unsigned char **payload) {
 	/* Account for MAC */
 	packet_len += 4;
 
-	nbytes_to_read = packet_len;
-
 
 	ptr = (unsigned char *)malloc(packet_len);
 	if((*payload = ptr) == NULL)
 		return -1;
 
-	do {
-		if((ret = block_read(session->ap_sock, ptr, nbytes_to_read)) <= 0) {
-			printf("packet_read(cmd=0x%02x): read short count %d, expected %d (of total %d)\n", h->cmd, ret, nbytes_to_read, packet_len);
-			return -1;
-		}
-
-		ptr += ret;
-		nbytes_to_read -= ret;
-	} while(nbytes_to_read > 0);
+	if((ret = block_read(session->ap_sock, ptr, packet_len)) != packet_len) {
+		printf("packet_read(cmd=0x%02x): read short count %d, expected %d\n", h->cmd, ret, packet_len);
+		return -1;
+	}
 
 
 	shn_decrypt(&session->shn_recv, *payload, packet_len);
@@ -113,7 +105,7 @@ int packet_write(SESSION *session, unsigned char cmd, unsigned char *payload, un
 
 	shn_finish(&session->shn_send, ptr, 4);
 
-	if((ret = write(session->ap_sock, buf, 3 + len + 4)) != 3 + len + 4) {
+	if((ret = block_write(session->ap_sock, buf, 3 + len + 4)) != 3 + len + 4) {
 #ifdef DEBUG_PACKETS
 		printf("packet_write(): only wrote %d of %d bytes\n", ret, 3 + len + 4);
 #endif
