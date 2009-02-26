@@ -25,7 +25,7 @@
  *
  */
 int libao_init_device (void *unused) {
-
+        (void)unused; /* don't warn */
 	ao_initialize();
 
 	return 0;
@@ -147,10 +147,16 @@ int libao_play (AUDIOCTX * actx) {
 		r = pcm_read (actx->pcmprivate, (char *) buf, sizeof (buf), 0,
 			      2, 1, NULL);
 
+                if (r == OV_HOLE) /* vorbis got garbage */
+                {
+			DSFYDEBUG ("pcm_read() == %s\n","OV_HOLE");
+                        continue;
+                }
+
 		if (r <= 0) {
 			if (r == 0)	/* EOF */
 				break;
-			DSFYDEBUG ("pcm_read() failed == %lu\n", r);
+			DSFYDEBUG ("pcm_read() failed == %zd\n", r);
 			exit (-1);
 		}
 

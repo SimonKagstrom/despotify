@@ -156,6 +156,12 @@ int pulseaudio_play(AUDIOCTX *actx) {
      /* Read some data ... */
      r = pcm_read(actx->pcmprivate, (char *)buf, sizeof(buf), 0, 2, 1, NULL);
      
+     if (r == OV_HOLE) /* vorbis got garbage */
+     {
+       DSFYDEBUG ("pcm_read() == %s\n","OV_HOLE");
+       continue;
+     }
+
      if(r <= 0) {
        if (r == 0) /* EOF */
 	 break; 
