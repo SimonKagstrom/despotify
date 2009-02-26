@@ -24,6 +24,7 @@
 #include "ui-search.h"
 #include "ui-player.h"
 #include "ui-playlist.h"
+#include "util.h"
 #include "xml.h"
 
 #define HEADER_H 4
@@ -518,5 +519,18 @@ void app_packet_callback(SESSION* session,
                 gui_update_view();
                 break;
         }
+
+	case CMD_PRODINFO:
+                {
+                char *foo = malloc(len + 1);
+                memcpy(foo, payload, len);
+                foo[len] = 0;
+                DSFYDEBUG("Product info is: %s\n", foo);
+                if(strstr(foo, "<type>free</type>")) {
+			event_msg_post(MSG_CLASS_APP, MSG_APP_NOTFAIRGAME, NULL);
+                }
+                free(foo);
+                }
+		break;
         }
 }

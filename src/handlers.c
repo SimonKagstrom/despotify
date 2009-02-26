@@ -9,6 +9,7 @@
 #include <string.h>
 #include <time.h>
 #include <netinet/in.h>
+#include <assert.h>
 
 #include "channel.h"
 #include "commands.h"
@@ -71,6 +72,7 @@ int handle_welcome(SESSION* session, unsigned char *payload, int len) {
 	unsigned char hash[32+1];
 	int ret;
 
+	#if 0
 	len = sprintf((char *)buf, "ConnectionInfo\t%d\t%s:%u\t%s", 2, session->server_host, session->server_port, "127.0.0.1:1080@socks5");
 	if((ret = packet_write(session, 0x48, buf, len)))
 		return -ret;
@@ -94,6 +96,8 @@ int handle_welcome(SESSION* session, unsigned char *payload, int len) {
 	if(ret == 0)
 		ret = cmd_requestad(session, 1);
 
+
+	#endif
 
 	return ret;
 }
