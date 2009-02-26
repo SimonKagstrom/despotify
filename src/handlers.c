@@ -72,20 +72,23 @@ int handle_welcome(SESSION* session, unsigned char *payload, int len) {
 	unsigned char hash[32+1];
 	int ret;
 
-	#if 0
+#if 0	/* Don't fuck shut up stats */
+
+
 	len = sprintf((char *)buf, "ConnectionInfo\t%d\t%s:%u\t%s", 2, session->server_host, session->server_port, "127.0.0.1:1080@socks5");
-	if((ret = packet_write(session, 0x48, buf, len)))
+	if((ret = packet_write(session, CMD_LOG, buf, len)))
 		return -ret;
 
 	hex_bytes_to_ascii(session->cache_hash, (char *)hash, 16);
 	len = sprintf((char *)buf, "CacheReport\t%d\t%.16s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d",
 		2, hash, 0, 0, 0, 0, 0, 0, 0, 1024*1024, 0);
-	if((ret = packet_write(session, 0x48, buf, len)))
+	if((ret = packet_write(session, CMD_LOG, buf, len)))
 		return ret;
 
 	len = sprintf((char *)buf, "ComputerInfo\t%d\t%s\t%s\t%s\t%s", 1, "", "4096", "1920x1200", "");
-	ret = packet_write(session, 0x48, buf, len);
+	ret = packet_write(session, CMD_LOG, buf, len);
 
+#endif
 
 	/* Request Ad with flag 0 */
 	if(ret != -1)
@@ -97,7 +100,7 @@ int handle_welcome(SESSION* session, unsigned char *payload, int len) {
 		ret = cmd_requestad(session, 1);
 
 
-	#endif
+
 
 	return ret;
 }

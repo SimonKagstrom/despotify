@@ -79,8 +79,9 @@ int send_client_initial_packet(SESSION *session) {
 	 * The first byte should be 1 + length
 	 *
 	 */
-	num_random_bytes = 1;
+	num_random_bytes = 10;
 	buffer_append_raw(b, &num_random_bytes, 1);
+	buffer_append_raw(b, "despotify", 9);
 
 
 	/*

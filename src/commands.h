@@ -36,6 +36,7 @@
 
 /* Session management */
 #define CMD_NOTIFY	0x42
+#define CMD_LOG		0x48
 #define CMD_PONG	0x49
 #define CMD_PONGACK	0x4a
 #define CMD_REQUESTAD	0x4e
