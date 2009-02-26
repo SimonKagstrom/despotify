@@ -114,14 +114,8 @@ static void need_data_cb (GstAppSrc * src, guint length, gpointer data) {
                 length = 4096;
 
         buffer = g_new(uint8_t,length);
-        r = pcm_read (actx->pcmprivate, (char *) buffer, length, 0, 2, 1, NULL);
-
-        if (r == OV_HOLE) /* vorbis got garbage */
-        {
-                DSFYDEBUG ("pcm_read() == %s\n","OV_HOLE");
-                g_free(buffer);
-                return;
-        }
+        while ((r = pcm_read (actx->pcmprivate, (char *) buffer, length, 0, 2, 1, NULL)) == OV_HOLE)
+            DSFYDEBUG ("pcm_read() == %s, retrying.\n","OV_HOLE");
 
         if (r == 0) {
                 gst_app_src_end_of_stream(GST_APP_SRC(src));
