@@ -102,3 +102,22 @@ ssize_t block_read(int fd, void *buf, size_t nbyte)
   }
   return idx;
 }
+
+
+ssize_t block_write(int fd, void *buf, size_t nbyte)
+{
+  unsigned int idx;
+  ssize_t n;
+  
+  idx = 0;
+  while (idx < nbyte)
+  {
+    if ((n = write(fd, buf + idx, nbyte - idx)) <= 0)
+    {
+      if (errno == EINTR) continue;
+      return n;
+    }
+    idx += n;
+  }
+  return idx;
+}

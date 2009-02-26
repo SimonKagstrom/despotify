@@ -377,7 +377,7 @@ int rest_fsm(RESTSESSION *r) {
 		if(!strcmp(r->command, "quit")) {
 			ret = -1;
 			sprintf(msg, "200 0 OK Shutting down\n");
-			write(r->socket, msg, strlen(msg));
+			block_write(r->socket, msg, strlen(msg));
 		}
 		else if(sscanf(r->command, "GET %255s HTTP/1.", temp) == 1) {
 			ret = -1;
@@ -401,7 +401,7 @@ int rest_fsm(RESTSESSION *r) {
 			if(r->client->state != CLIENT_STATE_ALLOCATE) {
 				r->state = REST_STATE_LOAD_COMMAND;
 				sprintf(msg, "200 0 OK Found previous session with this username and password\n");
-				if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
+				if(block_write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 					ret = -1;
 			}
 		}
@@ -420,13 +420,13 @@ int rest_fsm(RESTSESSION *r) {
 			else
 				sprintf(msg, "404 0 WARN Client with id '%.100s' NOT found\n", temp);
 
-			if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
+			if(block_write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 				ret = -1;
 		}
 		else {
 			r->state = REST_STATE_LOAD_COMMAND;
 			sprintf(msg, "501 0 WARN Invalid command '%.100s'\n", r->command);
-			if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
+			if(block_write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 				ret = -1;
 		}
 		break;
@@ -456,31 +456,31 @@ int rest_fsm(RESTSESSION *r) {
 		if(!strcmp(r->command, "quit")) {
 			ret = -1;
 			sprintf(msg, "200 0 OK Shutting down\n");
-			write(r->socket, msg, strlen(msg));
+			block_write(r->socket, msg, strlen(msg));
 		}
 		else if(!strcmp(r->command, "logout")) {
 			r->state = REST_STATE_FREE_CLIENT;
 
 			sprintf(msg, "200 0 OK Disconnecting client\n");
-			write(r->socket, msg, strlen(msg));
+			block_write(r->socket, msg, strlen(msg));
 		}
 		else if(!strcmp(r->command, "id")) {
 			r->state = REST_STATE_LOAD_COMMAND;
 			sprintf(msg, "200 %zd OK The session id is shown below\n%s",
 				strlen(r->client->client_id), r->client->client_id);
-			write(r->socket, msg, strlen(msg));
+			block_write(r->socket, msg, strlen(msg));
 		}
 		else if(!strcmp(r->command, "country")) {
 			r->state = REST_STATE_LOAD_COMMAND;
 			sprintf(msg, "200 %zd OK Assigned country below\n%s",
 				strlen(r->client->country), r->client->country);
-			write(r->socket, msg, strlen(msg));
+			block_write(r->socket, msg, strlen(msg));
 		}
 		else if(!strncmp(r->command, "browseartist ", 13)) {
 			if(strlen(r->command) != 13+2*16) {
 				r->state = REST_STATE_LOAD_COMMAND;
 				sprintf(msg, "501 0 WARN Artist ID must be provided in hex as 32 characters\n");
-				write(r->socket, msg, strlen(msg));
+				block_write(r->socket, msg, strlen(msg));
 			}
 			else {
 				r->state = REST_STATE_WAITING;
@@ -492,7 +492,7 @@ int rest_fsm(RESTSESSION *r) {
 			if(strlen(r->command) != 12+2*16) {
 				r->state = REST_STATE_LOAD_COMMAND;
 				sprintf(msg, "501 0 WARN Album ID must be provided in hex as 32 characters\n");
-				write(r->socket, msg, strlen(msg));
+				block_write(r->socket, msg, strlen(msg));
 			}
 			else {
 				r->state = REST_STATE_WAITING;
@@ -504,7 +504,7 @@ int rest_fsm(RESTSESSION *r) {
 			if(strlen(r->command) != 12+2*16) {
 				r->state = REST_STATE_LOAD_COMMAND;
 				sprintf(msg, "501 0 WARN Track ID must be provided in hex as 32 characters\n");
-				write(r->socket, msg, strlen(msg));
+				block_write(r->socket, msg, strlen(msg));
 			}
 			else {
 				r->state = REST_STATE_WAITING;
@@ -516,7 +516,7 @@ int rest_fsm(RESTSESSION *r) {
 			if(strlen(r->command) != 6+2*20) {
 				r->state = REST_STATE_LOAD_COMMAND;
 				sprintf(msg, "501 0 WARN Image ID must be provided in hex as 40 characters\n");
-				write(r->socket, msg, strlen(msg));
+				block_write(r->socket, msg, strlen(msg));
 			}
 			else {
 				r->state = REST_STATE_WAITING;
@@ -535,7 +535,7 @@ int rest_fsm(RESTSESSION *r) {
 			if(strlen(temp) != 40 || strlen(temp2) != 32) {
 				r->state = REST_STATE_LOAD_COMMAND;
 				sprintf(msg, "501 0 WARN File ID must be provided in hex as 40 character and track ID must be provided in hex as 32 characters\n");
-				write(r->socket, msg, strlen(msg));
+				block_write(r->socket, msg, strlen(msg));
 			}
 			else {
 				hex_ascii_to_bytes(temp, file_id, 20);
@@ -552,7 +552,7 @@ int rest_fsm(RESTSESSION *r) {
 			if(strlen(temp) != 40 || (offset % 1024) != 0 || len == 0 || strlen(temp2) != 32) {
 				r->state = REST_STATE_LOAD_COMMAND;
 				sprintf(msg, "501 0 WARN File IDs must be provided in hex as 40 characters, offset must be in 1024 byte chunks, length mustn't be zero and key must be provided in hex as 32 characters.\n");
-				write(r->socket, msg, strlen(msg));
+				block_write(r->socket, msg, strlen(msg));
 			}
 			else {
 				hex_ascii_to_bytes(temp, file_id, 20);
@@ -567,7 +567,7 @@ int rest_fsm(RESTSESSION *r) {
 			if(strlen(r->command) != 9+2*17) {
 				r->state = REST_STATE_LOAD_COMMAND;
 				sprintf(msg, "501 0 WARN Playlist IDs must be in hex and need to be 34 characters long\n");
-				write(r->socket, msg, strlen(msg));
+				block_write(r->socket, msg, strlen(msg));
 			}
 			else {
 				r->state = REST_STATE_WAITING;
@@ -578,7 +578,7 @@ int rest_fsm(RESTSESSION *r) {
 		else {
 			r->state = REST_STATE_LOAD_COMMAND;
 			sprintf(msg, "501 0 WARN Unknown command or bad parameters; '%.100s'\n", r->command);
-			if(write(r->socket, msg, strlen(msg)) <= 0)
+			if(block_write(r->socket, msg, strlen(msg)) <= 0)
 				ret = -1;
 		}
 		break;
@@ -595,8 +595,8 @@ int rest_fsm(RESTSESSION *r) {
 					if(!r->httpreq) {
 						sprintf(msg, "200 %d OK Command completed successfully\n",
 							r->client->output_len);
-						write(r->socket, msg, strlen(msg));
-						if(write(r->socket, ((BUFFER *)r->client->output)->buf,
+						block_write(r->socket, msg, strlen(msg));
+						if(block_write(r->socket, ((BUFFER *)r->client->output)->buf,
 							((BUFFER *)r->client->output)->buflen) <= 0)
 							ret = -1;
 
@@ -609,7 +609,7 @@ int rest_fsm(RESTSESSION *r) {
 				else {
 					if(!r->httpreq) {
 						sprintf(msg, "500 0 ERROR Command failed to execute\n");
-						if(write(r->socket, msg, strlen(msg)) <= 0)
+						if(block_write(r->socket, msg, strlen(msg)) <= 0)
 							ret = -1;
 					}
 					else
@@ -622,7 +622,7 @@ int rest_fsm(RESTSESSION *r) {
 				r->client->state = CLIENT_STATE_IDLE_CONNECTED;
 				if(!r->httpreq) {
 					sprintf(msg, "200 0 OK Login successful\n");
-					if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
+					if(block_write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 						ret = -1;
 				}
 				else
@@ -638,7 +638,7 @@ int rest_fsm(RESTSESSION *r) {
 				r->client->state = CLIENT_STATE_IDLE_DISCONNECTED;
 				if(!r->httpreq) {
 					sprintf(msg, "503 0 WARN Client failed to connect\n");
-					if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
+					if(block_write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 						ret = -1;
 				}
 				else
@@ -651,7 +651,7 @@ int rest_fsm(RESTSESSION *r) {
 				r->client->state = CLIENT_STATE_IDLE_DISCONNECTED;
 				if(!r->httpreq) {
 					sprintf(msg, "404 0 WARN Key exchange failed (bad username?)\n");
-					if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
+					if(block_write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 						ret = -1;
 				}
 				else
@@ -664,7 +664,7 @@ int rest_fsm(RESTSESSION *r) {
 				r->client->state = CLIENT_STATE_IDLE_DISCONNECTED;
 				if(!r->httpreq) {
 					sprintf(msg, "403 0 WARN Authentication failed (bad password?)\n");
-					if(write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
+					if(block_write(r->socket, msg, strlen(msg)) != (int)strlen(msg))
 						ret = -1;
 				}
 				else

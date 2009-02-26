@@ -20,4 +20,5 @@ char *hex_bytes_to_ascii(unsigned char *, char *, int);
 void hexdump8x32(char *, void *, int);
 void logdata(char *, int, void *, int);
 ssize_t block_read(int, void *, size_t);
+ssize_t block_write(int, void *, size_t);
 #endif
