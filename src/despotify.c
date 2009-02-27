@@ -117,7 +117,7 @@ static int despotify_login(EVENT *ev, enum ev_flags ev_kind) {
 	switch(ev->state) {
 	case 0:
 		/* Connect */
-		DSFYDEBUG("%s", "despotify_login(): Connecting..\n");
+		DSFYDEBUG("despotify_login(): Connecting..\n");
 		if((err = session_connect(s)) == 0) {
 			ev->state++;
 			event_register_fd(ev, s->ap_sock);
@@ -251,7 +251,7 @@ static int despotify_packet_io(EVENT *ev, enum ev_flags ev_kind) {
 				break;
 
 			case MSG_APP_NET_ERROR:
-				DSFYDEBUG("%s", "despotify_packet_io(): MSG_APP_NET_ERROR, disconnecting..\n");
+				DSFYDEBUG("despotify_packet_io(): MSG_APP_NET_ERROR, disconnecting..\n");
 				/* Disconnect */
 				session_disconnect(s);
 				event_msg_post(MSG_CLASS_APP, MSG_APP_DISCONNECTED, NULL);

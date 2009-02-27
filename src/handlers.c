@@ -163,7 +163,7 @@ int handle_packet(SESSION* session,
                 break;
 
         case CMD_P2P_INITBLK:
-                DSFYDEBUG("%s", "Server said 0x21 (P2P initalization block)\n")
+                DSFYDEBUG("Server said 0x21 (P2P initalization block)\n")
                 break;
 
         case CMD_NOTIFY:

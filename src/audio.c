@@ -58,9 +58,9 @@ AUDIOCTX *audio_context_new(float samplerate, int channels, char *title) {
 	if(title)
 		a->title = strdup(title);
 
-	DSFYDEBUG("%s", "audio_context_new(): Calling the driver's prepare() function to setup samplerate and channels..\n")
+	DSFYDEBUG("audio_context_new(): Calling the driver's prepare() function to setup samplerate and channels..\n")
 	if((ret = driver->prepare(a)) != 0) {
-		DSFYDEBUG("%s", "audio_context_new(): the driver's prepare() failed :(\n")
+		DSFYDEBUG("audio_context_new(): the driver's prepare() failed :(\n")
 		if(a->title)
 			free(a->title);
 
@@ -100,7 +100,7 @@ int audio_play(AUDIOCTX *a) {
 			return ret;
 	}
 
-	DSFYDEBUG("%s", "audio_play(): calling driver's ->play() routine..\n")
+	DSFYDEBUG("audio_play(): calling driver's ->play() routine..\n")
 	a->is_playing = 1;
 
 	return driver->play(a);
@@ -111,7 +111,7 @@ int audio_stop(AUDIOCTX *a) {
 	int ret = 0;
 
 	if(a->is_playing) {
-		DSFYDEBUG("%s", "audio_stop(): now calling driver's ->stop() routine..\n")
+		DSFYDEBUG("audio_stop(): now calling driver's ->stop() routine..\n")
 
 		a->is_playing = 0;
 		ret = driver->stop(a);
@@ -124,7 +124,7 @@ int audio_stop(AUDIOCTX *a) {
 /* Pause audio */ 
 int audio_pause(AUDIOCTX *a) {
   
-	DSFYDEBUG("%s", "audio_pause(): calling driver's ->pause() routine..\n")
+	DSFYDEBUG("audio_pause(): calling driver's ->pause() routine..\n")
 
 	a->is_paused = 1; 
 
@@ -134,7 +134,7 @@ int audio_pause(AUDIOCTX *a) {
 /* resume playing */
 int audio_resume(AUDIOCTX *a) {
   
-	DSFYDEBUG("%s", "audio_resume(): now calling driver's ->resume() routine..\n")
+	DSFYDEBUG("audio_resume(): now calling driver's ->resume() routine..\n")
 
 	a->is_paused = 0; 
 

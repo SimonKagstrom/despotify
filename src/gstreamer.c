@@ -23,7 +23,7 @@ static gboolean bus_call (GstBus *bus, GstMessage *msg, gpointer user_data)
     {
         case GST_MESSAGE_EOS:
             {
-                DSFYDEBUG ("%s", "End-of-stream\n");
+                DSFYDEBUG ("End-of-stream\n");
                 break;
             }
         case GST_MESSAGE_ERROR:

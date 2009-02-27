@@ -52,7 +52,7 @@ int libao_prepare_device (AUDIOCTX * actx) {
 
 	device = ao_open_live(default_driver, &format, NULL);
 	if (device == NULL) {
-		DSFYDEBUG ("%s\n", "ao_open_live() failed");
+		DSFYDEBUG ("ao_open_live() failed\n");
 		exit (-1);
 	}
 
@@ -152,7 +152,7 @@ int libao_play (AUDIOCTX * actx) {
 
                 if (r == OV_HOLE) /* vorbis got garbage */
                 {
-			DSFYDEBUG ("pcm_read() == %s\n","OV_HOLE");
+			DSFYDEBUG ("pcm_read() == OV_HOLE\n");
                         continue;
                 }
 
@@ -165,13 +165,13 @@ int libao_play (AUDIOCTX * actx) {
 
 		/* ... and play it */
 		if (ao_play (device, (char *) buf, (int) r) == 0) {
-			DSFYDEBUG ("%s\n", "ao_play() failed");
+			DSFYDEBUG ("ao_play() failed\n");
 			exit (-1);
 		}
 	}
 
 	if (ao_close (device) == 0) {
-		DSFYDEBUG ("%s\n", "ao_close() failed");
+		DSFYDEBUG ("ao_close() failed\n");
 		exit (-1);
 	}
 
@@ -181,7 +181,7 @@ int libao_play (AUDIOCTX * actx) {
 	}
 
 	/* This will kill the thread */
-        DSFYDEBUG ("%s\n", "libao thread exiting");
+        DSFYDEBUG ("libao thread exiting\n");
 	return 0;
 }
 

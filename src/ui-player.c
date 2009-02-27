@@ -148,7 +148,7 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 				break;
 
 			case MSG_GUI_PLAY:
-				DSFYDEBUG("%s\n", "gui_player_event_processor(): Got MSG_GUI_PLAY");
+				DSFYDEBUG("gui_player_event_processor(): Got MSG_GUI_PLAY\n");
 
 				/*
 				 * This shouldn't happen. Really.
@@ -162,13 +162,13 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 
 
 				if(e->private && snd && snd->actx->is_paused ) {
-					DSFYDEBUG("%s\n", "MSG_GUI_PLAY: Resuming audio because private and actx->is_paused");
+					DSFYDEBUG("MSG_GUI_PLAY: Resuming audio because private and actx->is_paused\n");
 					audio_resume(snd->actx);
 				}
 				else {
-					DSFYDEBUG("%s\n", "gui_player_event_processor(MSG_GUI_PLAY): Playing a new song");
+					DSFYDEBUG("gui_player_event_processor(MSG_GUI_PLAY): Playing a new song\n");
 					if(e->private && snd->actx != NULL) {
-					    DSFYDEBUG("%s\n", "gui_player_event_processor(MSG_GUI_PLAY): Killing playing song, calling snd_stop()");
+					    DSFYDEBUG("gui_player_event_processor(MSG_GUI_PLAY): Killing playing song, calling snd_stop()\n");
 
 					    /* Kill playing song before starting new */
 					    snd_stop(snd);
@@ -195,7 +195,7 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 					/* Start processing.. */
 					e->state = 1;
 					event_mark_busy(e);
-					DSFYDEBUG("%s", "gui_player_event_processor(MSG_GUI_PLAY): Proceeding to state 1 (AES key)\n");
+					DSFYDEBUG("gui_player_event_processor(MSG_GUI_PLAY): Proceeding to state 1 (AES key)\n");
 				}
 
 				break;
@@ -213,7 +213,7 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 				if((playerctx = (struct playerctx *)e->private) == NULL)
 					break;
 
-				DSFYDEBUG("%s", "gui_player_event_processor(MSG_GUI_STOP): Calling snd_stop(), freeing playerctx and marking event as idle in state 1 with private=NULL\n");
+				DSFYDEBUG("gui_player_event_processor(MSG_GUI_STOP): Calling snd_stop(), freeing playerctx and marking event as idle in state 1 with private=NULL\n");
 				snd_stop(snd);
 
 				free(playerctx);
@@ -296,7 +296,7 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 		assert(playerctx != NULL);
 
 		if(playerctx->track->key == NULL) {
-			DSFYDEBUG("%s\n", "In state 2, key is still NULL");
+			DSFYDEBUG("In state 2, key is still NULL\n");
 			break;
 		}
 
@@ -343,7 +343,7 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 		event_mark_idle(e);
 
 		if((playerctx = (struct playerctx *)e->private) == NULL) {
-			DSFYDEBUG("%s", "gui_player_event_processor(state=3): Got NULL e->private (shouldn't happen)\n");
+			DSFYDEBUG("gui_player_event_processor(state=3): Got NULL e->private (shouldn't happen)\n");
 			break;
 		}
 
@@ -366,7 +366,7 @@ int gui_player_event_processor(EVENT *e, enum ev_flags ev_kind) {
 			/* Tell ogg-layer not to request more data untill we have finished downloading */
 			snd_mark_dlding(snd);
 #endif
-			DSFYDEBUG("%s\n", "cmd_getsubstreams() succeeded");
+			DSFYDEBUG("cmd_getsubstreams() succeeded\n");
 		}
 		
 		break;
@@ -400,7 +400,7 @@ static int gui_player_aes_callback(CHANNEL *ch, unsigned char *buf, unsigned sho
 		/* Start audio system */
 		p->event->state = 2;
 		event_mark_busy(p->event);
-		DSFYDEBUG("%s\n", "Got AES key");
+		DSFYDEBUG("Got AES key\n");
 		break;
 
 	default:
@@ -477,7 +477,7 @@ static int gui_player_data_callback(CHANNEL *ch, unsigned char *buf, unsigned sh
 		break;
 
 	case CHANNEL_ERROR:
-		DSFYDEBUG("%s\n", "gui_player_data_callback(): got CHANNEL_ERROR\n");
+		DSFYDEBUG("gui_player_data_callback(): got CHANNEL_ERROR\n");
 		/* XXX - handle cleanly */
 		exit(1);
 		break;

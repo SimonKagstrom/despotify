@@ -8,9 +8,9 @@
 
 
 #ifdef DEBUG
-#define DSFYDEBUG(fmt,...) { FILE *fd = fopen("/tmp/gui.log","at"); fprintf(fd, "%s:%d ", __FILE__, __LINE__); fprintf(fd, fmt, __VA_ARGS__); fclose(fd); }
+#define DSFYDEBUG(...) { FILE *fd = fopen("/tmp/gui.log","at"); fprintf(fd, "%s:%d ", __FILE__, __LINE__); fprintf(fd, __VA_ARGS__); fclose(fd); }
 #else
-#define DSFYDEBUG(fmt,...)
+#define DSFYDEBUG(...)
 #endif
 
 #define DSFYfree(p) free(p); (p) = NULL

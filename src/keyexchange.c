@@ -118,15 +118,15 @@ int read_server_initial_packet(SESSION *session) {
 	unsigned char padlen;
 	int ret;
 
-	DSFYDEBUG("%s", "read_server_initial_packet(): Reading 16 bytes..\n");
+	DSFYDEBUG("read_server_initial_packet(): Reading 16 bytes..\n");
 	if((ret = read(session->ap_sock, session->server_random_16, 16)) < 16) {
-		DSFYDEBUG("%s", "read_server_initial_packet(): Failed to read 'server_random_16'\n");
+		DSFYDEBUG("read_server_initial_packet(): Failed to read 'server_random_16'\n");
 		DSFYDEBUG("read_server_initial_packet(): Remote host was %s:%d\n", session->server_host, session->server_port);
 		if(ret > 0)
 			hexdump8x32("read_server_initial_packet, server_random_16", session->server_random_16, ret);
 		return -1;
 	}
-	DSFYDEBUG("%s", "Done.. read_server_initial_packet(): Reading 16 bytes..\n");
+	DSFYDEBUG("Done.. read_server_initial_packet(): Reading 16 bytes..\n");
 
 #ifdef DEBUG_LOGIN
 	hexdump8x32("read_server_initial_packet, server_random_16", session->server_random_16, ret);

@@ -65,7 +65,7 @@ int coreaudio_prepare_device(AUDIOCTX *actx) {
 
 	sz = sizeof(fmt);
 	if(AudioDeviceGetProperty(adev_id, 0, false, kAudioDevicePropertyStreamFormat, &sz, &fmt)) {
-		DSFYDEBUG("%s", "AudioDeviceGetProperty() failed\n");
+		DSFYDEBUG("AudioDeviceGetProperty() failed\n");
 		return -1;
 	}
 	fmt.mFormatID = kAudioFormatLinearPCM;
@@ -78,7 +78,7 @@ int coreaudio_prepare_device(AUDIOCTX *actx) {
 
 	sz = sizeof(fmt);
 	if(AudioDeviceSetProperty(adev_id, NULL, 0, false, kAudioDevicePropertyStreamFormat, sz, &fmt)) {
-		DSFYDEBUG("%s", "AudioDeviceSetProperty() failed\n");
+		DSFYDEBUG("AudioDeviceSetProperty() failed\n");
 		return -1;
 	}
 
@@ -100,7 +100,7 @@ int coreaudio_prepare_device(AUDIOCTX *actx) {
 
 
 	if(AudioDeviceCreateIOProcID(adev_id, audio_callback, (void *)actx, &adev_pid)) {
-		DSFYDEBUG("%s\n","AudioDeviceCreateIOProcID() returned FAIL!"); 
+		DSFYDEBUG("AudioDeviceCreateIOProcID() returned FAIL!\n");
 
 		return -1;
 	}
@@ -112,34 +112,34 @@ int coreaudio_prepare_device(AUDIOCTX *actx) {
 int coreaudio_free_device(void) {
 
 	/* Deallocate callback routine and release output device here */
-	DSFYDEBUG("%s", "coreaudio_free_device(): Doing nothing\n");
+	DSFYDEBUG("coreaudio_free_device(): Doing nothing\n");
 
 	return 0;
 }
 
 
 int coreaudio_play(AUDIOCTX *actx) {
-	DSFYDEBUG("%s\n", "coreaudio_play(): Calling AudioDeviceStart()!")
+	DSFYDEBUG("coreaudio_play(): Calling AudioDeviceStart()!\n")
 
 	if(AudioDeviceStart(adev_id, adev_pid)) {
-		DSFYDEBUG("%s", "coreaudio_play(): AudioDeviceStart() failed\n");
+		DSFYDEBUG("coreaudio_play(): AudioDeviceStart() failed\n");
 		return -1;
 	}
 
-	DSFYDEBUG("%s", "coreaudio_play(): AudioDeviceStart() succeeded\n");
+	DSFYDEBUG("coreaudio_play(): AudioDeviceStart() succeeded\n");
 
 	return 0;
 }
 
 
 int coreaudio_stop(AUDIOCTX *actx) {
-	DSFYDEBUG("%s", "coreaudio_stop(): Calling AudioDeviceStop()\n")
+	DSFYDEBUG("coreaudio_stop(): Calling AudioDeviceStop()\n")
 	if(AudioDeviceStop(adev_id, adev_pid)) {
-		DSFYDEBUG("%s", "coreaudio_stop(): AudioDeviceStop() failed\n");
+		DSFYDEBUG("coreaudio_stop(): AudioDeviceStop() failed\n");
 		return -1;
 	}
 
-	DSFYDEBUG("%s", "coreaudio_stop(): AudioDeviceStop() succeeded\n");
+	DSFYDEBUG("coreaudio_stop(): AudioDeviceStop() succeeded\n");
 
 	return 0;
 }
@@ -159,7 +159,7 @@ static OSStatus audio_callback(AudioDeviceID dev, const AudioTimeStamp *ts_now,
 
   AUDIOCTX *actx = (AUDIOCTX *)private;
 
-  DSFYDEBUG("%s\n","audio_callback()");
+  DSFYDEBUG("audio_callback()\n");
 
   /* Zero buffer */
   for(i = 0; i < samples_available * num_channels; i++)

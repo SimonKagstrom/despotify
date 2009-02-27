@@ -22,7 +22,7 @@ static size_t snd_read_and_dequeue_callback(void *ptr, size_t size, size_t nmemb
 /* Reset for new song */ 
 void snd_reset(snd_SESSION *session)
 {
-  DSFYDEBUG("%s", "snd_reset(): Setting state to DL_IDLE\n");
+  DSFYDEBUG("snd_reset(): Setting state to DL_IDLE\n");
   session->fifo->totbytes = 0;
   session->dlstate = DL_IDLE; 
   session->buffer_threshold = BUFFER_THRESHOLD;
@@ -34,7 +34,7 @@ snd_SESSION *snd_init(void)
 {
   snd_SESSION *session;
 
-  DSFYDEBUG("%s\n", "snd_init(): Entering..");
+  DSFYDEBUG("snd_init(): Entering..\n");
 
   /* Init session struct */
   session = (snd_SESSION *) malloc(sizeof(snd_SESSION));
@@ -176,7 +176,7 @@ long pcm_read(void *private, char *buffer, int length, int bigendianp, int word,
       session->audio_request(session->audio_request_arg);
 
       /* We can't call snd_mark_dlding() because it requires the lock to not be held so we do it inline */
-      DSFYDEBUG("%s", "pcm_read(): audio_request() has been called, setting snd state to DL_DOWNLOADING\n");
+      DSFYDEBUG("pcm_read(): audio_request() has been called, setting snd state to DL_DOWNLOADING\n");
       session->dlstate = DL_DOWNLOADING;
 
 #ifdef X_TEST
@@ -185,7 +185,7 @@ long pcm_read(void *private, char *buffer, int length, int bigendianp, int word,
 #endif
     }
     
-    DSFYDEBUG("%s\n", "pcm_read(): Unlocking session->fifo after being low on data");
+    DSFYDEBUG("pcm_read(): Unlocking session->fifo after being low on data\n");
     pthread_mutex_unlock(&session->lock);
   }
   
@@ -226,7 +226,7 @@ void snd_mark_dlding(snd_SESSION *session) {
 #ifndef X_TEST
   pthread_mutex_lock(&session->lock);
 #endif
-  DSFYDEBUG("%s", "snd_mark_dlding(): Setting state to DL_DOWNLOADING\n");
+  DSFYDEBUG("snd_mark_dlding(): Setting state to DL_DOWNLOADING\n");
   session->dlstate = DL_DOWNLOADING;
 #ifndef X_TEST
   pthread_mutex_unlock(&session->lock);
@@ -236,7 +236,7 @@ void snd_mark_dlding(snd_SESSION *session) {
 /* We have finished adding stuff to the queue */
 void snd_mark_idle(snd_SESSION *session) {
   pthread_mutex_lock(&session->lock);
-  DSFYDEBUG("%s", "snd_mark_idle(): Setting state to DL_IDLE\n");
+  DSFYDEBUG("snd_mark_idle(): Setting state to DL_IDLE\n");
   session->dlstate = DL_IDLE;
   pthread_mutex_unlock(&session->lock);
 }
@@ -244,7 +244,7 @@ void snd_mark_idle(snd_SESSION *session) {
 /* Tell soundlayer that the song has finished */
 void snd_mark_end(snd_SESSION *session) {
   pthread_mutex_lock(&session->lock);
-  DSFYDEBUG("%s", "snd_mark_end(): Setting state to DL_END\n");
+  DSFYDEBUG("snd_mark_end(): Setting state to DL_END\n");
   session->dlstate = DL_END;
   pthread_mutex_unlock(&session->lock);
 }
@@ -324,7 +324,7 @@ static size_t snd_read_and_dequeue_callback(void *ptr, size_t size, size_t nmemb
   if(session->fifo->start == NULL) {
     /* There is no data in the queue .. */
 
-    DSFYDEBUG("%s", "snd_read_and_dequeue_callback(): There is no data in the queue, requesting session->lock!\n");
+    DSFYDEBUG("snd_read_and_dequeue_callback(): There is no data in the queue, requesting session->lock!\n");
     pthread_mutex_lock(&session->lock);
 
     if(session->audio_request != NULL && 
@@ -334,15 +334,15 @@ static size_t snd_read_and_dequeue_callback(void *ptr, size_t size, size_t nmemb
       DSFYDEBUG("snd_read_and_dequeue_callback(): In DL_IDLE, calling session->audio_request(arg=%p)\n",
 		session->audio_request_arg);
       session->audio_request(session->audio_request_arg);  
-      DSFYDEBUG("%s", "snd_read_and_dequeue_callback(): Returned from ->audio_request()\n");
+      DSFYDEBUG("snd_read_and_dequeue_callback(): Returned from ->audio_request()\n");
     }
 
     pthread_mutex_unlock(&session->lock);
 
     /* pthread_cond_wait will lock the queue again as soon as we are signaled */ 
-    DSFYDEBUG("%s\n", "snd_read_and_dequeue_callback(): waiting for more data..");
+    DSFYDEBUG("snd_read_and_dequeue_callback(): waiting for more data..\n");
     pthread_cond_wait(&session->fifo->cs, &session->fifo->lock);
-    DSFYDEBUG("%s\n", "snd_read_and_dequeue_callback(): got signal about more data!\n");
+    DSFYDEBUG("snd_read_and_dequeue_callback(): got signal about more data!\n");
   }
 
   /* We have data .. process one buffer */
@@ -351,7 +351,7 @@ static size_t snd_read_and_dequeue_callback(void *ptr, size_t size, size_t nmemb
   /* Check if this is the last pkt */
   if(b->cmd == SND_CMD_END) {
     /* Call end callback and return 0 */
-    DSFYDEBUG("%s\n", "snd_read_and_dequeue_callback(): Got SND_CMD_END\n");
+    DSFYDEBUG("snd_read_and_dequeue_callback(): Got SND_CMD_END\n");
     
     /* Increment by one */
     session->fifo->start = session->fifo->start->next;
@@ -362,7 +362,7 @@ static size_t snd_read_and_dequeue_callback(void *ptr, size_t size, size_t nmemb
     
     DSFYfree(b);
 
-    DSFYDEBUG("%s\n", "snd_read_and_dequeue_callback(): Releasing session->fifo->lock at end of song");
+    DSFYDEBUG("snd_read_and_dequeue_callback(): Releasing session->fifo->lock at end of song\n");
     pthread_mutex_unlock(&session->fifo->lock);
     
     DSFYDEBUG("snd_read_and_dequeue_callback(): calling ->audio_end at %p with arg %p (default snd_stop==%p)\n", session->audio_end, session->audio_end_arg, snd_stop);
@@ -421,7 +421,7 @@ void snd_start(snd_SESSION *session)
 {
   pthread_attr_t atr;
 
-  DSFYDEBUG("%s\n", "snd_start(): Creating sound thread..");
+  DSFYDEBUG("snd_start(): Creating sound thread..\n");
 
   pthread_attr_init(&atr);
   pthread_attr_setdetachstate(&atr, PTHREAD_CREATE_DETACHED);
@@ -431,7 +431,7 @@ void snd_start(snd_SESSION *session)
       exit(-1); 
     }
   
-  DSFYDEBUG("%s\n", "snd_start(): leaving..");
+  DSFYDEBUG("snd_start(): leaving..\n");
 }
 
 
@@ -441,7 +441,7 @@ static void *snd_thread(void *arg) {
 	vorbis_info *vi;
 	int ret;
 
-	DSFYDEBUG("%s\n","snd_thread(): enter.."); 
+	DSFYDEBUG("snd_thread(): enter..\n"); 
 	
 	/* Allocate Vorbis struct */
 	if((s->vf = malloc(sizeof(OggVorbis_File))) == NULL)
@@ -455,14 +455,14 @@ static void *snd_thread(void *arg) {
 	
 
 	/* Now call ov_open_callbacks(). This will trigger the read callback */
-	DSFYDEBUG("%s\n","snd_thread(): Calling ov_open_callbacks()..");
+	DSFYDEBUG("snd_thread(): Calling ov_open_callbacks()..\n");
 
 	if((ret = ov_open_callbacks(s, s->vf, NULL, 0, snd_vorbisfile_callbacks))) {
 	  DSFYDEBUG("snd_thread(): ov_open_callbacks() said %d (OV_ENOTVORBIS=%d)\n", ret, OV_ENOTVORBIS)
 	  return NULL;
 	}
 
-	DSFYDEBUG("%s\n","snd_thread(): Returned from ov_open_callbacks()..");
+	DSFYDEBUG("snd_thread(): Returned from ov_open_callbacks()..\n");
 	
 	/* The ov_open_callbacks() read enough data for ov_info() .. */
 	vi = ov_info(s->vf, -1);
@@ -471,7 +471,7 @@ static void *snd_thread(void *arg) {
 	/* Prepare the audio output device for playing by telling it the samplerate and # of channels */
 	DSFYDEBUG("snd_thread(): calling audio_context_new(%ld, vi->channels, NULL)\n", vi->rate)
 	if((s->actx = audio_context_new((float)vi->rate, vi->channels, NULL)) == NULL) {
-		DSFYDEBUG("%s\n","snd_thread(): audio_context_new() failed, exiting sound thread..\n");
+		DSFYDEBUG("snd_thread(): audio_context_new() failed, exiting sound thread..\n");
 		return NULL;
 	}
 	
@@ -481,12 +481,12 @@ static void *snd_thread(void *arg) {
 		
 
 	/* On Macosx this function will return, on Linux it will not */ 
-	DSFYDEBUG("%s\n","snd_thread(): calling audio_play() on the audio context");
+	DSFYDEBUG("snd_thread(): calling audio_play() on the audio context\n");
 	audio_play(s->actx);
 
 	
 	/* Exit this thread */ 
-	DSFYDEBUG("%s","snd_thread(): audio_play() returned, exiting sound thread..\n");
+	DSFYDEBUG("snd_thread(): audio_play() returned, exiting sound thread..\n");
 
 	return NULL;
 }
