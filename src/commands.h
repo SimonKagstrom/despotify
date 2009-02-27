@@ -39,6 +39,7 @@
 #define CMD_LOG		0x48
 #define CMD_PONG	0x49
 #define CMD_PONGACK	0x4a
+#define CMD_PAUSE	0x4b
 #define CMD_REQUESTAD	0x4e
 #define CMD_REQUESTPLAY	0x4f
 
