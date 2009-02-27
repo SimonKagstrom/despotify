@@ -347,7 +347,7 @@ int event_loop(int loop_counter) {
 		/* Allow sleep in idle situations */
 		tv.tv_sec = tv.tv_usec = 0;
 		if(!busy && num_msgs == 0)
-			tv.tv_sec = 1;
+			tv.tv_usec = 200*1000;
 
 		/* Process network I/O */
 		FD_ZERO(&rfds);
