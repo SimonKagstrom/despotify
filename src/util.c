@@ -86,7 +86,7 @@ void logdata(char *prefix, int id, void *data, int datalen) {
 		fclose(fd);
 	}
 
-	printf("  -- Saving 0x%04x (%d) bytes file '%s'\n", datalen, datalen, filename);
+	DSFYDEBUG("  -- Saving 0x%04x (%d) bytes file '%s'\n", datalen, datalen, filename);
 }
 
 

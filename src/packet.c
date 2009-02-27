@@ -27,7 +27,7 @@ int packet_read(SESSION *session, PHEADER *h, unsigned char **payload) {
 
 	packet_len = 0;
 	if((ret = block_read(session->ap_sock, h, 3)) != 3) {
-		printf("packet_read(): read short count %d, expected 3 (header)\n", ret);
+		DSFYDEBUG("packet_read(): read short count %d, expected 3 (header)\n", ret);
 		return -1;
 	}
 
@@ -39,7 +39,7 @@ int packet_read(SESSION *session, PHEADER *h, unsigned char **payload) {
 
 	shn_decrypt(&session->shn_recv, (unsigned char *)h, 3);
 #ifdef DEBUG_PACKETS
-	printf("packet_read(): cmd=%d [0x%02x], len=%d [0x%04x]\n", h->cmd, h->cmd, ntohs(h->len), ntohs(h->len));
+	DSFYDEBUG("packet_read(): cmd=%d [0x%02x], len=%d [0x%04x]\n", h->cmd, h->cmd, ntohs(h->len), ntohs(h->len));
 	logdata("recv-hdr", session->key_recv_IV, (unsigned char *)h, 3);
 #endif
 
@@ -58,7 +58,7 @@ int packet_read(SESSION *session, PHEADER *h, unsigned char **payload) {
 		return -1;
 
 	if((ret = block_read(session->ap_sock, ptr, packet_len)) != packet_len) {
-		printf("packet_read(cmd=0x%02x): read short count %d, expected %d\n", h->cmd, ret, packet_len);
+		DSFYDEBUG("packet_read(cmd=0x%02x): read short count %d, expected %d\n", h->cmd, ret, packet_len);
 		return -1;
 	}
 
@@ -96,7 +96,7 @@ int packet_write(SESSION *session, unsigned char cmd, unsigned char *payload, un
 
 
 #ifdef DEBUG_PACKETS
-	printf("packet_write(): Sending packet with command 0x%02x, length %d\n", h->cmd, ntohs(h->len));
+	DSFYDEBUG("packet_write(): Sending packet with command 0x%02x, length %d\n", h->cmd, ntohs(h->len));
 	logdata("send-hdr", session->key_send_IV, (unsigned char *)h, 3);
 	logdata("send-payload", session->key_send_IV, payload, len);
 #endif
@@ -107,7 +107,7 @@ int packet_write(SESSION *session, unsigned char cmd, unsigned char *payload, un
 
 	if((ret = block_write(session->ap_sock, buf, 3 + len + 4)) != 3 + len + 4) {
 #ifdef DEBUG_PACKETS
-		printf("packet_write(): only wrote %d of %d bytes\n", ret, 3 + len + 4);
+		DSFYDEBUG("packet_write(): only wrote %d of %d bytes\n", ret, 3 + len + 4);
 #endif
 		return -1;
 	}
