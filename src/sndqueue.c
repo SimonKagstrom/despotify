@@ -169,8 +169,14 @@ long pcm_read(void *private, char *buffer, int length, int bigendianp, int word,
      /* Call audio request function */ 
       DSFYDEBUG("pcm_read(): Low on data, calling session->audio_request(session=%p)\n",
 		session->audio_request_arg);
+
+
+      
       session->audio_request(session->audio_request_arg);
 
+      /* We can't call snd_mark_dlding() because it requires the lock to not be held so we do it inline */
+      DSFYDEBUG("%s", "pcm_read(): audio_request() has been called, setting snd state to DL_DOWNLOADING\n");
+      session->dlstate = DL_DOWNLOADING;
 
 #ifdef X_TEST
       /* Hopefully the audio_request() callback is fetching more data for us now */
