@@ -201,11 +201,12 @@ int snd_stop(void *arg) {
   oggBUFF *b; 
   int ret;
 
-  DSFYDEBUG("snd_stop(): Entering with arg %p\n", arg);
-  DSFYDEBUG("snd_stop(): audio context is %p, dl state is %d\n", session->actx, session->dlstate);
+  DSFYDEBUG("%s: Entering with arg %p\n", __FUNCTION__, arg);
+  DSFYDEBUG("%s: audio context is %p, dl state is %d\n", __FUNCTION__, session->actx, session->dlstate);
 
   /* Stop the audio thread */ 
-  ret = audio_stop(session->actx);
+  if(session->actx)
+	  ret = audio_stop(session->actx);
   
   /* Empty the ogg-buffer if there is anything left */ 
   while(session->fifo->start) {
@@ -435,7 +436,7 @@ void snd_start(snd_SESSION *session)
 
 
 static void *snd_thread(void *arg) {
-        snd_SESSION *s = (snd_SESSION *)arg;
+	snd_SESSION *s = (snd_SESSION *)arg;
 	ov_callbacks snd_vorbisfile_callbacks;
 	vorbis_info *vi;
 	int ret;
