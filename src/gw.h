@@ -45,8 +45,6 @@ typedef struct {
 	char username[256];
 	char password[256];
 
-	char country[4];
-
 	void *output;
 	int output_len;
 

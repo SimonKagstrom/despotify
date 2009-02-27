@@ -473,7 +473,7 @@ int rest_fsm(RESTSESSION *r) {
 		else if(!strcmp(r->command, "country")) {
 			r->state = REST_STATE_LOAD_COMMAND;
 			sprintf(msg, "200 %zd OK Assigned country below\n%s",
-				strlen(r->client->country), r->client->country);
+				strlen(r->client->session->country), r->client->session->country);
 			block_write(r->socket, msg, strlen(msg));
 		}
 		else if(!strncmp(r->command, "browseartist ", 13)) {
