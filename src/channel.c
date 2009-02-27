@@ -155,8 +155,12 @@ int channel_process(unsigned char *buf, unsigned short len, int error) {
 
 			if(header_len == 0)
 				break;
-
-			assert(consumed_len + header_len <= len);
+			
+			if(consumed_len + header_len > len) {
+				DSFYDEBUG("not enough data! channel %d, header_len %d, len %d\n", ch->channel_id, header_len, len);
+				fhexdump8x32(stderr, "payload:", ptr, len);
+				return 0;
+			}
 			ch->header_id++;
 			DSFYDEBUG("channel %d: Entering callback (header %d) for channel '%s', %d bytes data\n",
 				ch->channel_id, ch->header_id, ch->name, header_len);
