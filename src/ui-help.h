@@ -10,6 +10,5 @@
 
 #include "xml.h"
 
-
-int gui_help(WINDOW *, char *);
+int gui_help (WINDOW *, char *);
 #endif

@@ -31,7 +31,6 @@ int libao_prepare_device (AUDIOCTX *);
 int libao_play (AUDIOCTX *);
 int libao_stop (AUDIOCTX *);
 
-
 /* Need to be exposed to audio.c, declared in libao.c */
 extern AUDIODRIVER *driver;
 #endif

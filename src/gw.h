@@ -13,8 +13,8 @@
 #include "buffer.h"
 #include "session.h"
 
-
-enum client_state_t {
+enum client_state_t
+{
 	CLIENT_STATE_IDLE_DISCONNECTED,
 	CLIENT_STATE_ALLOCATE,
 	CLIENT_STATE_CONNECT,
@@ -29,12 +29,12 @@ enum client_state_t {
 	CLIENT_STATE_ERROR_PACKET
 };
 
-
 /*
  * Holds a connection to Spotify
  *
  */
-typedef struct {
+typedef struct
+{
 	char client_id[41];
 
 	enum client_state_t state;
@@ -56,28 +56,28 @@ typedef struct {
 	int is_http_client;
 } SPOTIFYSESSION;
 
-
-typedef struct {
+typedef struct
+{
 	BUFFER *b;
 	z_stream z;
 	int decompression_done;
 } DECOMPRESSCTX;
-
 
 /*
  * For keeping track of HTTP requests
  *
  */
 struct _RESTSESSION;
-typedef struct {
+typedef struct
+{
 	char *url;
 	char *authheader;
-	int (*callback)(struct _RESTSESSION *);
+	int (*callback) (struct _RESTSESSION *);
 	int state;
 } HTTPREQUEST;
 
-
-enum rest_state_t {
+enum rest_state_t
+{
 	REST_STATE_READING,
 	REST_STATE_LOAD_COMMAND,
 	REST_STATE_PROCESS_INIT_COMMAND,
@@ -87,13 +87,13 @@ enum rest_state_t {
 	REST_STATE_FREE_CLIENT
 };
 
-
 /*
  * An incoming connection to be used as a 
  * gateway to the Spotify service
  *
  */
-struct _RESTSESSION {
+struct _RESTSESSION
+{
 	enum rest_state_t state;
 	int socket;
 	int socket_has_data;
@@ -113,10 +113,9 @@ struct _RESTSESSION {
 };
 typedef struct _RESTSESSION RESTSESSION;
 
-
-int rest_fsm(RESTSESSION *);
-int spotify_fsm(SPOTIFYSESSION *);
-int spotify_client_allocate(RESTSESSION *);
-int spotify_client_mark_for_http(SPOTIFYSESSION *);
-SPOTIFYSESSION *spotify_find_http_client(void);
+int rest_fsm (RESTSESSION *);
+int spotify_fsm (SPOTIFYSESSION *);
+int spotify_client_allocate (RESTSESSION *);
+int spotify_client_mark_for_http (SPOTIFYSESSION *);
+SPOTIFYSESSION *spotify_find_http_client (void);
 #endif

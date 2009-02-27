@@ -1,6 +1,6 @@
 /* $Id: shn.c 558 2009-02-11 15:04:33Z x $ */
 /* Shannon: Shannon stream cipher and MAC -- reference implementation */
- 
+
 /*
 THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -27,9 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * on where they are combined into the register. Making it same as the
  * register length is a safe and conservative choice.
  */
-#define FOLD N		/* how many iterations of folding to do */
-#define INITKONST 0x6996c53a /* value of KONST to use during key loading */
-#define KEYP 13		/* where to insert key/MAC/counter words */
+#define FOLD N			/* how many iterations of folding to do */
+#define INITKONST 0x6996c53a	/* value of KONST to use during key loading */
+#define KEYP 13			/* where to insert key/MAC/counter words */
 
 /* some useful macros -- machine independent little-endian */
 #define Byte(x,i) ((UCHAR)(((x) >> (8*(i))) & 0xFF))
@@ -55,40 +55,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Nonlinear transform (sbox) of a word.
  * There are two slightly different combinations.
  */
-static WORD
-sbox1(WORD w)
+static WORD sbox1 (WORD w)
 {
-    w ^= ROTL(w, 5)  | ROTL(w, 7);
-    w ^= ROTL(w, 19) | ROTL(w, 22);
-    return w;
+	w ^= ROTL (w, 5) | ROTL (w, 7);
+	w ^= ROTL (w, 19) | ROTL (w, 22);
+	return w;
 }
 
-static WORD
-sbox2(WORD w)
+static WORD sbox2 (WORD w)
 {
-    w ^= ROTL(w, 7)  | ROTL(w, 22);
-    w ^= ROTL(w, 5) | ROTL(w, 19);
-    return w;
+	w ^= ROTL (w, 7) | ROTL (w, 22);
+	w ^= ROTL (w, 5) | ROTL (w, 19);
+	return w;
 }
 
 /* cycle the contents of the register and calculate output word in c->sbuf.
  */
-static void
-cycle(shn_ctx *c)
+static void cycle (shn_ctx * c)
 {
-    WORD	t;
-    int		i;
+	WORD t;
+	int i;
 
-    /* nonlinear feedback function */
-    t = c->R[12] ^ c->R[13] ^ c->konst;
-    t = sbox1(t) ^ ROTL(c->R[0], 1);
-    /* shift register */
-    for (i = 1; i < N; ++i)
-	c->R[i-1] = c->R[i];
-    c->R[N-1] = t;
-    t = sbox2(c->R[2] ^ c->R[15]);
-    c->R[0] ^= t;
-    c->sbuf = t ^ c->R[8] ^ c->R[12];
+	/* nonlinear feedback function */
+	t = c->R[12] ^ c->R[13] ^ c->konst;
+	t = sbox1 (t) ^ ROTL (c->R[0], 1);
+	/* shift register */
+	for (i = 1; i < N; ++i)
+		c->R[i - 1] = c->R[i];
+	c->R[N - 1] = t;
+	t = sbox2 (c->R[2] ^ c->R[15]);
+	c->R[0] ^= t;
+	c->sbuf = t ^ c->R[8] ^ c->R[12];
 }
 
 /* The Shannon MAC function is modelled after the concepts of Phelix and SHA.
@@ -104,72 +101,65 @@ cycle(shn_ctx *c)
  * This is actually 32 parallel CRC-16s, using the IBM CRC-16
  * polynomial x^16 + x^15 + x^2 + 1.
  */
-static void
-crcfunc(shn_ctx *c, WORD i)
+static void crcfunc (shn_ctx * c, WORD i)
 {
-    WORD	t;
-    int		j;
+	WORD t;
+	int j;
 
-    /* Accumulate CRC of input */
-    t = c->CRC[0] ^ c->CRC[2] ^ c->CRC[15] ^ i;
-    for (j = 1; j < N; ++j)
-	c->CRC[j-1] = c->CRC[j];
-    c->CRC[N-1] = t;
+	/* Accumulate CRC of input */
+	t = c->CRC[0] ^ c->CRC[2] ^ c->CRC[15] ^ i;
+	for (j = 1; j < N; ++j)
+		c->CRC[j - 1] = c->CRC[j];
+	c->CRC[N - 1] = t;
 }
 
 /* Normal MAC word processing: do both stream register and CRC.
  */
-static void
-macfunc(shn_ctx *c, WORD i)
+static void macfunc (shn_ctx * c, WORD i)
 {
-    crcfunc(c, i);
-    c->R[KEYP] ^= i;
+	crcfunc (c, i);
+	c->R[KEYP] ^= i;
 }
-
 
 /* initialise to known state
  */
-static void
-shn_initstate(shn_ctx *c)
+static void shn_initstate (shn_ctx * c)
 {
-    int		i;
+	int i;
 
-    /* Register initialised to Fibonacci numbers; Counter zeroed. */
-    c->R[0] = 1;
-    c->R[1] = 1;
-    for (i = 2; i < N; ++i)
-	c->R[i] = c->R[i-1] + c->R[i-2];
-    c->konst = INITKONST;
+	/* Register initialised to Fibonacci numbers; Counter zeroed. */
+	c->R[0] = 1;
+	c->R[1] = 1;
+	for (i = 2; i < N; ++i)
+		c->R[i] = c->R[i - 1] + c->R[i - 2];
+	c->konst = INITKONST;
 }
 
 /* Save the current register state
  */
-static void
-shn_savestate(shn_ctx *c)
+static void shn_savestate (shn_ctx * c)
 {
-    int		i;
+	int i;
 
-    for (i = 0; i < N; ++i)
-	c->initR[i] = c->R[i];
+	for (i = 0; i < N; ++i)
+		c->initR[i] = c->R[i];
 }
 
 /* initialise to previously saved register state
  */
-static void
-shn_reloadstate(shn_ctx *c)
+static void shn_reloadstate (shn_ctx * c)
 {
-    int		i;
+	int i;
 
-    for (i = 0; i < N; ++i)
-	c->R[i] = c->initR[i];
+	for (i = 0; i < N; ++i)
+		c->R[i] = c->initR[i];
 }
 
 /* Initialise "konst"
  */
-static void
-shn_genkonst(shn_ctx *c)
+static void shn_genkonst (shn_ctx * c)
 {
-    c->konst = c->R[0];
+	c->konst = c->R[0];
 }
 
 /* Load key material into the register
@@ -178,312 +168,298 @@ shn_genkonst(shn_ctx *c)
 	c->R[KEYP] ^= (k);
 
 /* extra nonlinear diffusion of register for key and MAC */
-static void
-shn_diffuse(shn_ctx *c)
+static void shn_diffuse (shn_ctx * c)
 {
-    int		i;
+	int i;
 
-    for (i = 0; i < FOLD; ++i)
-	cycle(c);
+	for (i = 0; i < FOLD; ++i)
+		cycle (c);
 }
 
 /* Common actions for loading key material
  * Allow non-word-multiple key and nonce material.
  * Note also initializes the CRC register as a side effect.
  */
-static void
-shn_loadkey(shn_ctx *c, UCHAR key[], int keylen)
+static void shn_loadkey (shn_ctx * c, UCHAR key[], int keylen)
 {
-    int		i, j;
-    WORD	k;
-    UCHAR	xtra[4];
+	int i, j;
+	WORD k;
+	UCHAR xtra[4];
 
-    /* start folding in key */
-    for (i = 0; i < (keylen & ~0x3); i += 4)
-    {
-	k = BYTE2WORD(&key[i]);
-	ADDKEY(k);
-        cycle(c);
-    }
+	/* start folding in key */
+	for (i = 0; i < (keylen & ~0x3); i += 4) {
+		k = BYTE2WORD (&key[i]);
+		ADDKEY (k);
+		cycle (c);
+	}
 
-    /* if there were any extra key bytes, zero pad to a word */
-    if (i < keylen) {
-	for (j = 0 /* i unchanged */; i < keylen; ++i)
-	    xtra[j++] = key[i];
-	for (/* j unchanged */; j < 4; ++j)
-	    xtra[j] = 0;
-	k = BYTE2WORD(xtra);
-	ADDKEY(k);
-        cycle(c);
-    }
+	/* if there were any extra key bytes, zero pad to a word */
+	if (i < keylen) {
+		for (j = 0 /* i unchanged */ ; i < keylen; ++i)
+			xtra[j++] = key[i];
+		for ( /* j unchanged */ ; j < 4; ++j)
+			xtra[j] = 0;
+		k = BYTE2WORD (xtra);
+		ADDKEY (k);
+		cycle (c);
+	}
 
-    /* also fold in the length of the key */
-    ADDKEY(keylen);
-    cycle(c);
+	/* also fold in the length of the key */
+	ADDKEY (keylen);
+	cycle (c);
 
-    /* save a copy of the register */
-    for (i = 0; i < N; ++i)
-	c->CRC[i] = c->R[i];
+	/* save a copy of the register */
+	for (i = 0; i < N; ++i)
+		c->CRC[i] = c->R[i];
 
-    /* now diffuse */
-    shn_diffuse(c);
+	/* now diffuse */
+	shn_diffuse (c);
 
-    /* now xor the copy back -- makes key loading irreversible */
-    for (i = 0; i < N; ++i)
-	c->R[i] ^= c->CRC[i];
+	/* now xor the copy back -- makes key loading irreversible */
+	for (i = 0; i < N; ++i)
+		c->R[i] ^= c->CRC[i];
 }
 
 /* Published "key" interface
  */
-void
-shn_key(shn_ctx *c, UCHAR key[], int keylen)
+void shn_key (shn_ctx * c, UCHAR key[], int keylen)
 {
-    shn_initstate(c);
-    shn_loadkey(c, key, keylen);
-    shn_genkonst(c); /* in case we proceed to stream generation */
-    shn_savestate(c);
-    c->nbuf = 0;
+	shn_initstate (c);
+	shn_loadkey (c, key, keylen);
+	shn_genkonst (c);	/* in case we proceed to stream generation */
+	shn_savestate (c);
+	c->nbuf = 0;
 }
 
 /* Published "IV" interface
  */
-void
-shn_nonce(shn_ctx *c, UCHAR nonce[], int noncelen)
+void shn_nonce (shn_ctx * c, UCHAR nonce[], int noncelen)
 {
-    shn_reloadstate(c);
-    c->konst = INITKONST;
-    shn_loadkey(c, nonce, noncelen);
-    shn_genkonst(c);
-    c->nbuf = 0;
+	shn_reloadstate (c);
+	c->konst = INITKONST;
+	shn_loadkey (c, nonce, noncelen);
+	shn_genkonst (c);
+	c->nbuf = 0;
 }
 
 /* XOR pseudo-random bytes into buffer
  * Note: doesn't play well with MAC functions.
  */
-void
-shn_stream(shn_ctx *c, UCHAR *buf, int nbytes)
+void shn_stream (shn_ctx * c, UCHAR * buf, int nbytes)
 {
-    UCHAR       *endbuf;
+	UCHAR *endbuf;
 
-    /* handle any previously buffered bytes */
-    while (c->nbuf != 0 && nbytes != 0) {
-	*buf++ ^= c->sbuf & 0xFF;
-	c->sbuf >>= 8;
-	c->nbuf -= 8;
-	--nbytes;
-    }
-
-    /* handle whole words */
-    endbuf = &buf[nbytes & ~((WORD)0x03)];
-    while (buf < endbuf)
-    {
-	cycle(c);
-	XORWORD(c->sbuf, buf);
-	buf += 4;
-    }
-
-    /* handle any trailing bytes */
-    nbytes &= 0x03;
-    if (nbytes != 0) {
-	cycle(c);
-	c->nbuf = 32;
+	/* handle any previously buffered bytes */
 	while (c->nbuf != 0 && nbytes != 0) {
-	    *buf++ ^= c->sbuf & 0xFF;
-	    c->sbuf >>= 8;
-	    c->nbuf -= 8;
-	    --nbytes;
+		*buf++ ^= c->sbuf & 0xFF;
+		c->sbuf >>= 8;
+		c->nbuf -= 8;
+		--nbytes;
 	}
-    }
+
+	/* handle whole words */
+	endbuf = &buf[nbytes & ~((WORD) 0x03)];
+	while (buf < endbuf) {
+		cycle (c);
+		XORWORD (c->sbuf, buf);
+		buf += 4;
+	}
+
+	/* handle any trailing bytes */
+	nbytes &= 0x03;
+	if (nbytes != 0) {
+		cycle (c);
+		c->nbuf = 32;
+		while (c->nbuf != 0 && nbytes != 0) {
+			*buf++ ^= c->sbuf & 0xFF;
+			c->sbuf >>= 8;
+			c->nbuf -= 8;
+			--nbytes;
+		}
+	}
 }
 
 /* accumulate words into MAC without encryption
  * Note that plaintext is accumulated for MAC.
  */
-void
-shn_maconly(shn_ctx *c, UCHAR *buf, int nbytes)
+void shn_maconly (shn_ctx * c, UCHAR * buf, int nbytes)
 {
-    UCHAR       *endbuf;
+	UCHAR *endbuf;
 
-    /* handle any previously buffered bytes */
-    if (c->nbuf != 0) {
-	while (c->nbuf != 0 && nbytes != 0) {
-	    c->mbuf ^= (*buf++) << (32 - c->nbuf);
-	    c->nbuf -= 8;
-	    --nbytes;
+	/* handle any previously buffered bytes */
+	if (c->nbuf != 0) {
+		while (c->nbuf != 0 && nbytes != 0) {
+			c->mbuf ^= (*buf++) << (32 - c->nbuf);
+			c->nbuf -= 8;
+			--nbytes;
+		}
+		if (c->nbuf != 0)	/* not a whole word yet */
+			return;
+		/* LFSR already cycled */
+		macfunc (c, c->mbuf);
 	}
-	if (c->nbuf != 0) /* not a whole word yet */
-	    return;
-	/* LFSR already cycled */
-	macfunc(c, c->mbuf);
-    }
 
-    /* handle whole words */
-    endbuf = &buf[nbytes & ~((WORD)0x03)];
-    while (buf < endbuf)
-    {
-	cycle(c);
-	macfunc(c, BYTE2WORD(buf));
-	buf += 4;
-    }
-
-    /* handle any trailing bytes */
-    nbytes &= 0x03;
-    if (nbytes != 0) {
-	cycle(c);
-	c->mbuf = 0;
-	c->nbuf = 32;
-	while (c->nbuf != 0 && nbytes != 0) {
-	    c->mbuf ^= (*buf++) << (32 - c->nbuf);
-	    c->nbuf -= 8;
-	    --nbytes;
+	/* handle whole words */
+	endbuf = &buf[nbytes & ~((WORD) 0x03)];
+	while (buf < endbuf) {
+		cycle (c);
+		macfunc (c, BYTE2WORD (buf));
+		buf += 4;
 	}
-    }
+
+	/* handle any trailing bytes */
+	nbytes &= 0x03;
+	if (nbytes != 0) {
+		cycle (c);
+		c->mbuf = 0;
+		c->nbuf = 32;
+		while (c->nbuf != 0 && nbytes != 0) {
+			c->mbuf ^= (*buf++) << (32 - c->nbuf);
+			c->nbuf -= 8;
+			--nbytes;
+		}
+	}
 }
 
 /* Combined MAC and encryption.
  * Note that plaintext is accumulated for MAC.
  */
-void
-shn_encrypt(shn_ctx *c, UCHAR *buf, int nbytes)
+void shn_encrypt (shn_ctx * c, UCHAR * buf, int nbytes)
 {
-    UCHAR       *endbuf;
-    WORD	t = 0;
+	UCHAR *endbuf;
+	WORD t = 0;
 
-    /* handle any previously buffered bytes */
-    if (c->nbuf != 0) {
-	while (c->nbuf != 0 && nbytes != 0) {
-	    c->mbuf ^= *buf << (32 - c->nbuf);
-	    *buf ^= (c->sbuf >> (32 - c->nbuf)) & 0xFF;
-	    ++buf;
-	    c->nbuf -= 8;
-	    --nbytes;
+	/* handle any previously buffered bytes */
+	if (c->nbuf != 0) {
+		while (c->nbuf != 0 && nbytes != 0) {
+			c->mbuf ^= *buf << (32 - c->nbuf);
+			*buf ^= (c->sbuf >> (32 - c->nbuf)) & 0xFF;
+			++buf;
+			c->nbuf -= 8;
+			--nbytes;
+		}
+		if (c->nbuf != 0)	/* not a whole word yet */
+			return;
+		/* LFSR already cycled */
+		macfunc (c, c->mbuf);
 	}
-	if (c->nbuf != 0) /* not a whole word yet */
-	    return;
-	/* LFSR already cycled */
-	macfunc(c, c->mbuf);
-    }
 
-    /* handle whole words */
-    endbuf = &buf[nbytes & ~((WORD)0x03)];
-    while (buf < endbuf)
-    {
-	cycle(c);
-	t = BYTE2WORD(buf);
-	macfunc(c, t);
-	t ^= c->sbuf;
-	WORD2BYTE(t, buf);
-	buf += 4;
-    }
-
-    /* handle any trailing bytes */
-    nbytes &= 0x03;
-    if (nbytes != 0) {
-	cycle(c);
-	c->mbuf = 0;
-	c->nbuf = 32;
-	while (c->nbuf != 0 && nbytes != 0) {
-	    c->mbuf ^= *buf << (32 - c->nbuf);
-	    *buf ^= (c->sbuf >> (32 - c->nbuf)) & 0xFF;
-	    ++buf;
-	    c->nbuf -= 8;
-	    --nbytes;
+	/* handle whole words */
+	endbuf = &buf[nbytes & ~((WORD) 0x03)];
+	while (buf < endbuf) {
+		cycle (c);
+		t = BYTE2WORD (buf);
+		macfunc (c, t);
+		t ^= c->sbuf;
+		WORD2BYTE (t, buf);
+		buf += 4;
 	}
-    }
+
+	/* handle any trailing bytes */
+	nbytes &= 0x03;
+	if (nbytes != 0) {
+		cycle (c);
+		c->mbuf = 0;
+		c->nbuf = 32;
+		while (c->nbuf != 0 && nbytes != 0) {
+			c->mbuf ^= *buf << (32 - c->nbuf);
+			*buf ^= (c->sbuf >> (32 - c->nbuf)) & 0xFF;
+			++buf;
+			c->nbuf -= 8;
+			--nbytes;
+		}
+	}
 }
 
 /* Combined MAC and decryption.
  * Note that plaintext is accumulated for MAC.
  */
-void
-shn_decrypt(shn_ctx *c, UCHAR *buf, int nbytes)
+void shn_decrypt (shn_ctx * c, UCHAR * buf, int nbytes)
 {
-    UCHAR       *endbuf;
-    WORD	t = 0;
+	UCHAR *endbuf;
+	WORD t = 0;
 
-    /* handle any previously buffered bytes */
-    if (c->nbuf != 0) {
-	while (c->nbuf != 0 && nbytes != 0) {
-	    *buf ^= (c->sbuf >> (32 - c->nbuf)) & 0xFF;
-	    c->mbuf ^= *buf << (32 - c->nbuf);
-	    ++buf;
-	    c->nbuf -= 8;
-	    --nbytes;
+	/* handle any previously buffered bytes */
+	if (c->nbuf != 0) {
+		while (c->nbuf != 0 && nbytes != 0) {
+			*buf ^= (c->sbuf >> (32 - c->nbuf)) & 0xFF;
+			c->mbuf ^= *buf << (32 - c->nbuf);
+			++buf;
+			c->nbuf -= 8;
+			--nbytes;
+		}
+		if (c->nbuf != 0)	/* not a whole word yet */
+			return;
+		/* LFSR already cycled */
+		macfunc (c, c->mbuf);
 	}
-	if (c->nbuf != 0) /* not a whole word yet */
-	    return;
-	/* LFSR already cycled */
-	macfunc(c, c->mbuf);
-    }
 
-    /* handle whole words */
-    endbuf = &buf[nbytes & ~((WORD)0x03)];
-    while (buf < endbuf)
-    {
-	cycle(c);
-	t = BYTE2WORD(buf) ^ c->sbuf;
-	macfunc(c, t);
-	WORD2BYTE(t, buf);
-	buf += 4;
-    }
-
-    /* handle any trailing bytes */
-    nbytes &= 0x03;
-    if (nbytes != 0) {
-	cycle(c);
-	c->mbuf = 0;
-	c->nbuf = 32;
-	while (c->nbuf != 0 && nbytes != 0) {
-	    *buf ^= (c->sbuf >> (32 - c->nbuf)) & 0xFF;
-	    c->mbuf ^= *buf << (32 - c->nbuf);
-	    ++buf;
-	    c->nbuf -= 8;
-	    --nbytes;
+	/* handle whole words */
+	endbuf = &buf[nbytes & ~((WORD) 0x03)];
+	while (buf < endbuf) {
+		cycle (c);
+		t = BYTE2WORD (buf) ^ c->sbuf;
+		macfunc (c, t);
+		WORD2BYTE (t, buf);
+		buf += 4;
 	}
-    }
+
+	/* handle any trailing bytes */
+	nbytes &= 0x03;
+	if (nbytes != 0) {
+		cycle (c);
+		c->mbuf = 0;
+		c->nbuf = 32;
+		while (c->nbuf != 0 && nbytes != 0) {
+			*buf ^= (c->sbuf >> (32 - c->nbuf)) & 0xFF;
+			c->mbuf ^= *buf << (32 - c->nbuf);
+			++buf;
+			c->nbuf -= 8;
+			--nbytes;
+		}
+	}
 }
 
 /* Having accumulated a MAC, finish processing and return it.
  * Note that any unprocessed bytes are treated as if
  * they were encrypted zero bytes, so plaintext (zero) is accumulated.
  */
-void
-shn_finish(shn_ctx *c, UCHAR *buf, int nbytes)
+void shn_finish (shn_ctx * c, UCHAR * buf, int nbytes)
 {
-    int		i;
+	int i;
 
-    /* handle any previously buffered bytes */
-    if (c->nbuf != 0) {
-	/* LFSR already cycled */
-	macfunc(c, c->mbuf);
-    }
-    
-    /* perturb the MAC to mark end of input.
-     * Note that only the stream register is updated, not the CRC. This is an
-     * action that can't be duplicated by passing in plaintext, hence
-     * defeating any kind of extension attack.
-     */
-    cycle(c);
-    ADDKEY(INITKONST ^ (c->nbuf << 3));
-    c->nbuf = 0;
-
-    /* now add the CRC to the stream register and diffuse it */
-    for (i = 0; i < N; ++i)
-	c->R[i] ^= c->CRC[i];
-    shn_diffuse(c);
-
-    /* produce output from the stream buffer */
-    while (nbytes > 0) {
-        cycle(c);
-	if (nbytes >= 4) {
-	    WORD2BYTE(c->sbuf, buf);
-	    nbytes -= 4;
-	    buf += 4;
+	/* handle any previously buffered bytes */
+	if (c->nbuf != 0) {
+		/* LFSR already cycled */
+		macfunc (c, c->mbuf);
 	}
-	else {
-	    for (i = 0; i < nbytes; ++i)
-		buf[i] = Byte(c->sbuf, i);
-	    break;
+
+	/* perturb the MAC to mark end of input.
+	 * Note that only the stream register is updated, not the CRC. This is an
+	 * action that can't be duplicated by passing in plaintext, hence
+	 * defeating any kind of extension attack.
+	 */
+	cycle (c);
+	ADDKEY (INITKONST ^ (c->nbuf << 3));
+	c->nbuf = 0;
+
+	/* now add the CRC to the stream register and diffuse it */
+	for (i = 0; i < N; ++i)
+		c->R[i] ^= c->CRC[i];
+	shn_diffuse (c);
+
+	/* produce output from the stream buffer */
+	while (nbytes > 0) {
+		cycle (c);
+		if (nbytes >= 4) {
+			WORD2BYTE (c->sbuf, buf);
+			nbytes -= 4;
+			buf += 4;
+		}
+		else {
+			for (i = 0; i < nbytes; ++i)
+				buf[i] = Byte (c->sbuf, i);
+			break;
+		}
 	}
-    }
 }

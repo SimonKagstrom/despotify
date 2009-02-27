@@ -10,6 +10,5 @@
 
 #include "session.h"
 
-
-int gui_search(SESSION *, WINDOW *, char *);
+int gui_search (SESSION *, WINDOW *, char *);
 #endif

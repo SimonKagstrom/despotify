@@ -19,6 +19,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _SHN_DEFINED 1
 
 #include <limits.h>
+
 #if __STDC_VERSION__ >= 199901
 #include <stdint.h>
 #endif
@@ -46,23 +47,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ROTR(w,x) ((((w) & 0xffffffff) >> (x))|((w) << (32 - (x))))
 #endif
 
-typedef struct {
-    WORD	R[N];		/* Working storage for the shift register */
-    WORD	CRC[N];		/* Working storage for CRC accumulation */
-    WORD	initR[N];	/* saved register contents */ 
-    WORD	konst;		/* key dependent semi-constant */
-    WORD	sbuf;		/* encryption buffer */
-    WORD	mbuf;		/* partial word MAC buffer */
-    int		nbuf;		/* number of part-word stream bits buffered */
+typedef struct
+{
+	WORD R[N];		/* Working storage for the shift register */
+	WORD CRC[N];		/* Working storage for CRC accumulation */
+	WORD initR[N];		/* saved register contents */
+	WORD konst;		/* key dependent semi-constant */
+	WORD sbuf;		/* encryption buffer */
+	WORD mbuf;		/* partial word MAC buffer */
+	int nbuf;		/* number of part-word stream bits buffered */
 } shn_ctx;
 
 /* interface definitions */
-void shn_key(shn_ctx *c, UCHAR key[], int keylen); 	/* set key */
-void shn_nonce(shn_ctx *c, UCHAR nonce[], int nlen);	/* set Init Vector */
-void shn_stream(shn_ctx *c, UCHAR *buf, int nbytes);	/* stream cipher */
-void shn_maconly(shn_ctx *c, UCHAR *buf, int nbytes);	/* accumulate MAC */
-void shn_encrypt(shn_ctx *c, UCHAR *buf, int nbytes);	/* encrypt + MAC */
-void shn_decrypt(shn_ctx *c, UCHAR *buf, int nbytes);	/* decrypt + MAC */
-void shn_finish(shn_ctx *c, UCHAR *buf, int nbytes);	/* finalise MAC */
-
+void shn_key (shn_ctx * c, UCHAR key[], int keylen);	/* set key */
+void shn_nonce (shn_ctx * c, UCHAR nonce[], int nlen);	/* set Init Vector */
+void shn_stream (shn_ctx * c, UCHAR * buf, int nbytes);	/* stream cipher */
+void shn_maconly (shn_ctx * c, UCHAR * buf, int nbytes);	/* accumulate MAC */
+void shn_encrypt (shn_ctx * c, UCHAR * buf, int nbytes);	/* encrypt + MAC */
+void shn_decrypt (shn_ctx * c, UCHAR * buf, int nbytes);	/* decrypt + MAC */
+void shn_finish (shn_ctx * c, UCHAR * buf, int nbytes);	/* finalise MAC */
 #endif /* _SHN_DEFINED */

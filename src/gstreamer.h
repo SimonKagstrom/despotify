@@ -1,3 +1,4 @@
+
 #ifndef DESPOTIFY_GSTREAMER_H
 #define DESPOTIFY_GSTREAMER_H
 
@@ -7,8 +8,8 @@
 
 typedef struct gst_private
 {
-        GstElement *pipeline;
-        GMainLoop *loop;
+	GstElement *pipeline;
+	GMainLoop *loop;
 } gst_PRIVATE;
 
 int gstaudio_init_device (void *);

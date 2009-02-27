@@ -9,7 +9,6 @@
 #include "session.h"
 #include "channel.h"
 
-
 /* Core functionality */
 #define CMD_SECRETBLK	0x02
 #define CMD_PING	0x04
@@ -47,16 +46,19 @@
 #define CMD_PRODINFO	0x50
 #define CMD_WELCOME	0x69
 
-
-int cmd_send_cache_hash(SESSION *);
-int cmd_token_notify(SESSION *);
-int cmd_aeskey(SESSION *, unsigned char *, unsigned char *, channel_callback, void *);
-int cmd_search(SESSION *, char *, channel_callback, void *);
-int cmd_requestad(SESSION *, unsigned char);
-int cmd_request_image(SESSION *, unsigned char *, channel_callback, void *);
-int cmd_action(SESSION *, unsigned char *, unsigned char *);
-int cmd_getsubstreams(SESSION *, unsigned char *, unsigned int, unsigned int, unsigned int, channel_callback, void *);
-int cmd_browse(SESSION *, unsigned char, unsigned char *, int, channel_callback, void *);
-int cmd_getplaylist(SESSION *, unsigned char *, int, channel_callback, void *);
-int cmd_ping_reply(SESSION *);
+int cmd_send_cache_hash (SESSION *);
+int cmd_token_notify (SESSION *);
+int cmd_aeskey (SESSION *, unsigned char *, unsigned char *, channel_callback,
+		void *);
+int cmd_search (SESSION *, char *, channel_callback, void *);
+int cmd_requestad (SESSION *, unsigned char);
+int cmd_request_image (SESSION *, unsigned char *, channel_callback, void *);
+int cmd_action (SESSION *, unsigned char *, unsigned char *);
+int cmd_getsubstreams (SESSION *, unsigned char *, unsigned int, unsigned int,
+		       unsigned int, channel_callback, void *);
+int cmd_browse (SESSION *, unsigned char, unsigned char *, int,
+		channel_callback, void *);
+int cmd_getplaylist (SESSION *, unsigned char *, int, channel_callback,
+		     void *);
+int cmd_ping_reply (SESSION *);
 #endif

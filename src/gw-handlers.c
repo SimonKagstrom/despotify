@@ -6,7 +6,6 @@
 #include "gw.h"
 #include "gw-handlers.h"
 
-
 /*
  * Snoop on country packets
  *

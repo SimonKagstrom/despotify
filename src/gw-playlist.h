@@ -8,6 +8,5 @@
 
 #include "gw.h"
 
-
-int gw_getplaylist(SPOTIFYSESSION *, char *);
+int gw_getplaylist (SPOTIFYSESSION *, char *);
 #endif

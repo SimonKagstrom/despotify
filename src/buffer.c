@@ -10,18 +10,18 @@
 
 #include "buffer.h"
 
-
-BUFFER *buffer_init(void) {
+BUFFER *buffer_init (void)
+{
 	BUFFER *b;
 
-	b = (BUFFER *)malloc(sizeof(BUFFER));
-	if(!b)
+	b = (BUFFER *) malloc (sizeof (BUFFER));
+	if (!b)
 		return NULL;
 
 	/* Lazy alloc; nothing in the client will ever use this much data */
-	b->buf = calloc(1, 0x10000);
-	if(!b->buf) {
-		free(b);
+	b->buf = calloc (1, 0x10000);
+	if (!b->buf) {
+		free (b);
 		return NULL;
 	}
 
@@ -31,66 +31,66 @@ BUFFER *buffer_init(void) {
 	return b;
 }
 
+void buffer_free (BUFFER * b)
+{
+	if (b->buf)
+		free (b->buf);
 
-void buffer_free(BUFFER *b) {
-	if(b->buf)
-		free(b->buf);
-
-	free(b);
+	free (b);
 }
 
-
-void buffer_check_and_extend(BUFFER *b, int len) {
+void buffer_check_and_extend (BUFFER * b, int len)
+{
 	int need;
 
 	need = b->buflen + len;
-	if(need <= b->allocated)
+	if (need <= b->allocated)
 		return;
 
 	b->allocated = need;
-	b->buf = realloc(b->buf, b->allocated);
-	assert(b->buf != NULL);
+	b->buf = realloc (b->buf, b->allocated);
+	assert (b->buf != NULL);
 }
 
-
-unsigned char *buffer_append_raw(BUFFER *b, void *data, int len) {
+unsigned char *buffer_append_raw (BUFFER * b, void *data, int len)
+{
 	unsigned char *offset;
-	
-	buffer_check_and_extend(b, len);
+
+	buffer_check_and_extend (b, len);
 
 	offset = b->buf + b->buflen;
-	memcpy(offset, data, len);
+	memcpy (offset, data, len);
 	b->buflen += len;
 
 	return offset;
 }
 
-
-unsigned char *buffer_append_short(BUFFER *b, unsigned short value) {
+unsigned char *buffer_append_short (BUFFER * b, unsigned short value)
+{
 	unsigned short *dst;
 	unsigned char *offset;
 
-	buffer_check_and_extend(b, sizeof(unsigned short));
+	buffer_check_and_extend (b, sizeof (unsigned short));
 
 	offset = b->buf + b->buflen;
-	dst = (unsigned short *)offset;
-	*dst = htons(value);
-	b->buflen += sizeof(unsigned short);
+	dst = (unsigned short *) offset;
+	*dst = htons (value);
+	b->buflen += sizeof (unsigned short);
 
 	return offset;
 }
 
-
-unsigned char *buffer_append_int(BUFFER *b, int value) {
+unsigned char *buffer_append_int (BUFFER * b, int value)
+{
 	unsigned int *dst;
 	unsigned char *offset;
 
-	buffer_check_and_extend(b, sizeof(int));
+	buffer_check_and_extend (b, sizeof (int));
 
 	offset = b->buf + b->buflen;
-	dst = (unsigned int *)offset;
-	*dst = htonl(value);
-	b->buflen += sizeof(int);
+	dst = (unsigned int *) offset;
+	*dst = htonl (value);
+	b->buflen += sizeof (int);
 
 	return offset;
 }

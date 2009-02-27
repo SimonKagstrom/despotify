@@ -11,8 +11,8 @@
 
 #include "shn.h"
 
-
-typedef struct {
+typedef struct
+{
 	/* connection to Spotify's service */
 	int ap_sock;
 
@@ -63,7 +63,6 @@ typedef struct {
 	 */
 	unsigned char auth_hash[20];
 
-
 	DH *dh;
 	RSA *rsa;
 	unsigned char my_priv_key[96];
@@ -111,7 +110,6 @@ typedef struct {
 	 */
 	unsigned char auth_hmac[20];
 
-
 	unsigned char cache_hash[20];
 
 	/* Assigned country */
@@ -119,11 +117,10 @@ typedef struct {
 
 } SESSION;
 
-
-SESSION *session_init_client(void);
-void session_auth_set(SESSION *, char *, char *);
-int session_connect(SESSION *);
-SESSION *session_init_client(void);
-void session_disconnect(SESSION *);
-void session_free(SESSION *c);
+SESSION *session_init_client (void);
+void session_auth_set (SESSION *, char *, char *);
+int session_connect (SESSION *);
+SESSION *session_init_client (void);
+void session_disconnect (SESSION *);
+void session_free (SESSION * c);
 #endif

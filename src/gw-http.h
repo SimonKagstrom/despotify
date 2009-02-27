@@ -8,6 +8,5 @@
 
 #include "gw.h"
 
-
-int http_handle_request(RESTSESSION *);
+int http_handle_request (RESTSESSION *);
 #endif

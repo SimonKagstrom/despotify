@@ -11,8 +11,7 @@
 #include "event.h"
 #include "playlist.h"
 
-
-void gui_playlist(WINDOW *, char *);
-void gui_playlist_display(WINDOW *, struct playlist *);
-int gui_playlists_download(EVENT *, enum ev_flags);
+void gui_playlist (WINDOW *, char *);
+void gui_playlist_display (WINDOW *, struct playlist *);
+int gui_playlists_download (EVENT *, enum ev_flags);
 #endif

@@ -10,7 +10,6 @@
 
 #include "event.h"
 
-
-void gui_player(char *);
-int gui_player_event_processor(EVENT *, enum ev_flags);
+void gui_player (char *);
+int gui_player_event_processor (EVENT *, enum ev_flags);
 #endif

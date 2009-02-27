@@ -8,6 +8,5 @@
 
 #include "gw.h"
 
-
-int gw_search(SPOTIFYSESSION *, char *);
+int gw_search (SPOTIFYSESSION *, char *);
 #endif

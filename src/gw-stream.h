@@ -8,7 +8,7 @@
 
 #include "gw.h"
 
-
-int gw_file_key(SPOTIFYSESSION *, unsigned char *, unsigned char *);
-int gw_file_stream(SPOTIFYSESSION *, unsigned char *, unsigned int, unsigned int, unsigned char *);
+int gw_file_key (SPOTIFYSESSION *, unsigned char *, unsigned char *);
+int gw_file_stream (SPOTIFYSESSION *, unsigned char *, unsigned int,
+		    unsigned int, unsigned char *);
 #endif

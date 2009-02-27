@@ -8,6 +8,5 @@
 
 #include "gw.h"
 
-
-int gw_image(SPOTIFYSESSION *s, char *);
+int gw_image (SPOTIFYSESSION * s, char *);
 #endif

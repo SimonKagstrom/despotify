@@ -8,10 +8,9 @@
 
 #include "audio.h"
 
-
-int coreaudio_init_device(void *);
-int coreaudio_free_device(void *);
-int coreaudio_prepare_device(AUDIOCTX *);
-int coreaudio_play(AUDIOCTX *);
-int coreaudio_stop(AUDIOCTX *);
+int coreaudio_init_device (void *);
+int coreaudio_free_device (void *);
+int coreaudio_prepare_device (AUDIOCTX *);
+int coreaudio_play (AUDIOCTX *);
+int coreaudio_stop (AUDIOCTX *);
 #endif

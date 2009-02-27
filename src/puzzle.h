@@ -8,6 +8,5 @@
 
 #include "session.h"
 
-
-void puzzle_solve(SESSION *);
+void puzzle_solve (SESSION *);
 #endif
