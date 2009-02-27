@@ -104,6 +104,19 @@ static gboolean resume_cb (gpointer data)
         return FALSE;
 }
 
+static gboolean stop_cb(gpointer data)
+{
+        gst_PRIVATE *priv = (gst_PRIVATE *)data;
+
+		/* Tell loop thread to exit */
+        g_main_loop_quit (priv->loop);
+
+        gst_element_set_state (priv->pipeline, GST_STATE_NULL);
+        gst_object_unref (GST_OBJECT (priv->pipeline));
+
+        free (priv);
+		return FALSE;
+}
 
 static void need_data_cb (GstAppSrc * src, guint length, gpointer data) {
         ssize_t r;
@@ -158,7 +171,7 @@ int gstaudio_prepare_device (AUDIOCTX * actx)
         gst_PRIVATE *priv;
         GstElement *sink, *src;
 
-        DSFYDEBUG ("%s\n", __FUNCTION__);
+        DSFYDEBUG ("%s channels %d samplerate %f\n", __FUNCTION__, actx->channels, actx->samplerate);
 
         assert (actx->driverprivate == NULL);
 
@@ -248,15 +261,8 @@ int gstaudio_stop (AUDIOCTX * actx)
 
         DSFYDEBUG ("%s\n", __FUNCTION__);
 
-        /* Tell loop thread to exit */
-        g_main_loop_quit (priv->loop);
-
-        gst_element_set_state (priv->pipeline, GST_STATE_NULL);
-
-        gst_object_unref (GST_OBJECT (priv->pipeline));
-
-        free (priv);
-        actx->driverprivate = NULL;
+        g_idle_add(stop_cb, priv);
+		actx->driverprivate = NULL;
 
         return 0;
 }
