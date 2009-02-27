@@ -335,10 +335,11 @@ static int despotify_no_support_for_introduction_accounts(EVENT *ev, enum ev_fla
 		return 0;
 
 	printf( "\n\nHi!\n"
-		"You appear to be using despotify with a 'free' account.\n"
+		"\n"
+		"You do not have a premium account.\n"
 		"\n"
 		"We see a number of problems with providing an open source client for non-paying\n"
-		"users and hence this implementation does not support it out of the box. Sorry!\n"
+		"users and hence this implementation only supports premium accounts. Sorry!\n"
 		"\n"
 		"Consider upgrading to a premium account to support not only Spotify,\n"
 		"but also despotify's cause of opening up their service to their\n"

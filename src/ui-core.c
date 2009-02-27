@@ -534,7 +534,7 @@ void app_packet_callback(SESSION* session,
                 memcpy(foo, payload, len);
                 foo[len] = 0;
                 DSFYDEBUG("Product info is: %s\n", foo);
-                if(strstr(foo, "<type>free</type>")) {
+                if(!strstr(foo, "<type>premium</type>")) {
                         event_msg_post(MSG_CLASS_APP, MSG_APP_NOTFAIRGAME, NULL);
                 }
                 free(foo);
