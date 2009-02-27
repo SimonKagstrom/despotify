@@ -155,7 +155,8 @@ long pcm_read(void *private, char *buffer, int length, int bigendianp, int word,
   }
   
   /* Make sure we've always got 10 seconds of data buffered */
-  if(session->fifo->totbytes < ov_raw_tell(session->vf) + 10*160*1024/8) {
+  if( (session->dlstate != DL_END) && 
+      session->fifo->totbytes < ov_raw_tell(session->vf) + 10*160*1024/8) {
    
     DSFYDEBUG("pcm_read(): Locking session->fifo since we're low on data (FIFO total %.3fkB, vorbis offset %.3fkB, want %.3fkB)\n", 
 		session->fifo->totbytes / 1024.0,
@@ -189,7 +190,7 @@ long pcm_read(void *private, char *buffer, int length, int bigendianp, int word,
   }
   
 
-  DSFYDEBUG("pcm_read(): Calling ov_read(len=%d), might call snd_read_and_dequeue_callback() when OV runs of out internal buffer\n", length);
+  DSFYDEBUG("pcm_read(): Calling ov_read(len=%d), totbytes=%d, ov_raw_tell=%lld\n", length, session->fifo->totbytes, ov_raw_tell(session->vf));
   return(ov_read(session->vf, buffer, length, bigendianp, word, sgned, bitstream));
 }
 

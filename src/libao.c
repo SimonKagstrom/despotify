@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
@@ -110,6 +111,7 @@ int libao_resume (AUDIOCTX * actx) {
 int libao_play (AUDIOCTX * actx) {
 	ao_device *device;
 	ao_PRIVATE *priv = (ao_PRIVATE *) actx->driverprivate;
+        bool quit = false;
 
 	assert (priv != NULL);
 
@@ -117,7 +119,7 @@ int libao_play (AUDIOCTX * actx) {
 
 	/* Driver loop */
 	for (;;) {
-		unsigned char buf[1024];
+		unsigned char buf[8192];
 		ssize_t r;
 
 		/* Fetch state lock */
@@ -125,9 +127,7 @@ int libao_play (AUDIOCTX * actx) {
 
 		switch (priv->state) {
 		case AO_END:
-			pthread_cond_signal (&priv->end);
-			pthread_mutex_unlock (&priv->lock);
-			return (0);	/* exit thread */
+                        quit = true;
 			break;
 
 		case AO_PAUSED:
@@ -143,6 +143,9 @@ int libao_play (AUDIOCTX * actx) {
 
 		pthread_mutex_unlock (&priv->lock);
 
+                if (quit)
+                        break;
+
 		/* Read some data ... */
 		r = pcm_read (actx->pcmprivate, (char *) buf, sizeof (buf), 0,
 			      2, 1, NULL);
@@ -154,9 +157,9 @@ int libao_play (AUDIOCTX * actx) {
                 }
 
 		if (r <= 0) {
+			DSFYDEBUG ("pcm_read() == %zd\n", r);
 			if (r == 0)	/* EOF */
 				break;
-			DSFYDEBUG ("pcm_read() failed == %zd\n", r);
 			exit (-1);
 		}
 
@@ -166,26 +169,6 @@ int libao_play (AUDIOCTX * actx) {
 			exit (-1);
 		}
 	}
-
-	/* This will kill the thread */
-	return 0;
-}
-
-int libao_stop (AUDIOCTX * actx) {
-	ao_device *device;
-	ao_PRIVATE *priv = (ao_PRIVATE *) actx->driverprivate;
-
-	assert (priv != NULL);
-
-	device = (ao_device *) priv->device;
-
-	/* Tell loop thread to exit */
-	pthread_mutex_lock (&priv->lock);
-	priv->state = AO_END;
-
-	/* Wait for the player thread to end */
-	pthread_cond_wait (&priv->end, &priv->lock);
-	pthread_mutex_unlock (&priv->lock);
 
 	if (ao_close (device) == 0) {
 		DSFYDEBUG ("%s\n", "ao_close() failed");
@@ -197,6 +180,20 @@ int libao_stop (AUDIOCTX * actx) {
 		actx->driverprivate = NULL;
 	}
 
+	/* This will kill the thread */
+        DSFYDEBUG ("%s\n", "libao thread exiting");
+	return 0;
+}
+
+int libao_stop (AUDIOCTX * actx) {
+	ao_PRIVATE *priv = (ao_PRIVATE *) actx->driverprivate;
+
+	assert (priv != NULL);
+
+	/* Tell loop thread to exit */
+	pthread_mutex_lock (&priv->lock);
+	priv->state = AO_END;
+	pthread_mutex_unlock (&priv->lock);
 
 	return 0;
 }

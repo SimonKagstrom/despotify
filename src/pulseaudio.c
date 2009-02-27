@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
@@ -28,7 +29,7 @@
  *
  */
 int pulseaudio_init_device(void *unused) {
-   
+   (void)unused; /* don't warn */
    /* N/A */ 
    
    return 0;
@@ -118,6 +119,7 @@ int pulseaudio_play(AUDIOCTX *actx) {
    int error;
    pa_simple *s;
    pa_PRIVATE *priv = (pa_PRIVATE *) actx->driverprivate;
+   bool quit = false;
    
    assert(priv != NULL);
    
@@ -135,9 +137,7 @@ int pulseaudio_play(AUDIOCTX *actx) {
      switch(priv->state)
        {
        case PU_END:
-	 pthread_cond_signal(&priv->end);
-	 pthread_mutex_unlock(&priv->lock);
-	 return(0); /* exit thread */
+         quit = true;
 	 break; 
 	 
        case PU_PAUSED:
@@ -153,6 +153,9 @@ int pulseaudio_play(AUDIOCTX *actx) {
      
      pthread_mutex_unlock(&priv->lock);
      
+     if (quit)
+       break;
+
      /* Read some data ... */
      r = pcm_read(actx->pcmprivate, (char *)buf, sizeof(buf), 0, 2, 1, NULL);
      
@@ -176,29 +179,6 @@ int pulseaudio_play(AUDIOCTX *actx) {
      }
    }
    
-   /* This will kill the thread */ 
-   return 0;
-}
-
-
-int pulseaudio_stop(AUDIOCTX *actx) {
-   int error;
-   
-   pa_simple *s;
-   pa_PRIVATE *priv = (pa_PRIVATE *) actx->driverprivate;
-   
-   assert(priv != NULL);
-   
-   s = (pa_simple *) priv->pa_simple;
-
-   /* Tell loop thread to exit */ 
-   pthread_mutex_lock(&priv->lock);
-   priv->state = PU_END;
-
-   /* Wait for the player thread to end */
-   pthread_cond_wait(&priv->end, &priv->lock);
-   pthread_mutex_unlock(&priv->lock);
-   
    /* Make sure that every single sample was played */
    if (pa_simple_drain(s, &error) < 0) {
      DSFYDEBUG("pa_simple_drain() failed: %s\n", pa_strerror(error))
@@ -213,6 +193,21 @@ int pulseaudio_stop(AUDIOCTX *actx) {
      actx->driverprivate = NULL;
    }
 
+   /* This will kill the thread */ 
+   return 0;
+}
+
+
+int pulseaudio_stop(AUDIOCTX *actx) {
+   pa_PRIVATE *priv = (pa_PRIVATE *) actx->driverprivate;
+   
+   assert(priv != NULL);
+
+   /* Tell loop thread to exit */ 
+   pthread_mutex_lock(&priv->lock);
+   priv->state = PU_END;
+   pthread_mutex_unlock(&priv->lock);
+   
    return 0;
 }
 
