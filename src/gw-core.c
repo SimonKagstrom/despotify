@@ -873,5 +873,18 @@ SPOTIFYSESSION *spotify_find_http_client(void) {
 
 
 void app_packet_callback(SESSION* s, int cmd, unsigned char* payload, int len) {
-    (void)s; (void)cmd; (void)payload; (void)len; /* don't warn. */
+
+
+	switch(cmd) {
+        case CMD_COUNTRYCODE: {
+                int i;
+
+                for(i = 0; i < len && i < (int)sizeof(s->country) - 1; i ++)
+                        s->country[i] = payload[i];
+
+                s->country[i] = 0;
+                break;
+        }
+	}
+
 }
