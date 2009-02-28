@@ -163,7 +163,7 @@ long pcm_read (void *private, char *buffer, int length, int bigendianp,
 	snd_SESSION *session = (snd_SESSION *) private;
 
 	if (session->time_tell != NULL) {
-		DSFYDEBUG ("pcm_read(): Entering time_tell callback at %p\n",
+		DSFYDEBUG_SNDQUEUE ("pcm_read(): Entering time_tell callback at %p\n",
 			   session->time_tell);
 		session->time_tell (session,
 				    (int) ov_time_tell (session->vf));
@@ -174,7 +174,7 @@ long pcm_read (void *private, char *buffer, int length, int bigendianp,
 			session->fifo->totbytes <
 			ov_raw_tell (session->vf) + 10 * 160 * 1024 / 8) {
 
-		DSFYDEBUG
+		DSFYDEBUG_SNDQUEUE
 			("pcm_read(): Locking session->fifo since we're low on data (FIFO total %.3fkB, vorbis offset %.3fkB, want %.3fkB)\n",
 			 session->fifo->totbytes / 1024.0,
 			 ov_raw_tell (session->vf) / 1024.0,
@@ -205,12 +205,12 @@ long pcm_read (void *private, char *buffer, int length, int bigendianp,
 #endif
 		}
 
-		DSFYDEBUG
+		DSFYDEBUG_SNDQUEUE
 			("pcm_read(): Unlocking session->fifo after being low on data\n");
 		pthread_mutex_unlock (&session->lock);
 	}
 
-	DSFYDEBUG
+	DSFYDEBUG_SNDQUEUE
 		("pcm_read(): Calling ov_read(len=%d), totbytes=%d, ov_raw_tell=%lld\n",
 		 length, session->fifo->totbytes, ov_raw_tell (session->vf));
 	return (ov_read
@@ -318,7 +318,7 @@ void snd_ioctl (snd_SESSION * session, int cmd, void *data, int length)
 
 	session->fifo->totbytes += length;
 
-	DSFYDEBUG
+	DSFYDEBUG_SNDQUEUE
 		("snd_ioctl(): added a new buffer with %d bytes data, signalling receiver\n",
 		 length);
 	pthread_mutex_unlock (&session->fifo->lock);

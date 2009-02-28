@@ -11,3 +11,7 @@
 LINUX_BACKEND = gstreamer
 # LINUX_BACKEND = pulseaudio
 # LINUX_BACKEND = libao
+
+## Add more CFLAGS
+# CFLAGS += -DDEBUG_SNDQUEUE
+# CFLAGS += -DDEBUG_PACKETS

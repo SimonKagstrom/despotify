@@ -12,6 +12,12 @@
 #define DSFYDEBUG(...)
 #endif
 
+#ifdef DEBUG_SNDQUEUE
+#define DSFYDEBUG_SNDQUEUE(...) DSFYDEBUG(__VA_ARGS__)
+#else
+#define DSFYDEBUG_SNDQUEUE(...)
+#endif
+
 #define DSFYfree(p) free(p); (p) = NULL
 
 unsigned char *hex_ascii_to_bytes (char *, unsigned char *, int);
