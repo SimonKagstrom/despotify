@@ -100,8 +100,7 @@ void snd_destroy (snd_SESSION * session)
 
 	/* Free the FIFO */
 	if (session->fifo) {
-		pthread_cond_destroy (&session->fifo->cs);
-		pthread_mutex_destroy (&session->fifo->lock);
+		pthread_mutex_lock(&session->fifo->lock); /*rKA*/
 
 		/* free oggBuffs */
 		while (session->fifo->start) {
@@ -110,7 +109,12 @@ void snd_destroy (snd_SESSION * session)
 			DSFYfree (b);
 		}
 
+		pthread_mutex_unlock(&session->fifo->lock); /*rKA*/
 		DSFYfree (session->fifo);
+
+		pthread_cond_destroy (&session->fifo->cs);
+		pthread_mutex_destroy (&session->fifo->lock);
+
 	}
 
 	pthread_mutex_destroy (&session->lock);

@@ -2,8 +2,8 @@
 # $Id$
 # 
 #
-CFLAGS = -Wall -Wextra
-LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile 
+CFLAGS = -Wall -Wextra -ggdb
+LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile -ggdb
 
 CORE_OBJS = aes.o auth.o buffer.o channel.o commands.o dns.o event.o handlers.o keyexchange.o packet.o playlist.o puzzle.o session.o shn.o util.o xml.o
 DESPOTIFY_OBJS = ADMclubbing.o audio.o despotify.o ui-core.o ui-help.o ui-player.o ui-playlist.o ui-search.o sndqueue.o

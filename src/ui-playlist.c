@@ -294,7 +294,7 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 		buffer_append_raw (r->response,
 				   "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n",
 				   51);
-		if ((err =
+		if (r->playlist->playlist_id != NULL && (err =
 		     cmd_getplaylist (session, r->playlist->playlist_id, -1,
 				      gui_playlist_channel_callback,
 				      (void *) r)) == 0) {
