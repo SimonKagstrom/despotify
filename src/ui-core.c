@@ -244,10 +244,12 @@ void sig_winch_handler (int unused)
 	doupdate ();
 }
 
-void update_timer(void *p, int timeplayed)
+void update_timer(snd_SESSION *p, int timeplayed)
 {
   static int lasttime = 0; 
   int  h, w;
+
+  (void)p; /* Quell warning about it being unused. */
   
   if(lasttime != timeplayed)
     {

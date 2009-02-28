@@ -151,7 +151,7 @@ void snd_set_end_callback (snd_SESSION * session,
  * Set callback to be called when time updates.
  */
 void snd_set_timetell_callback (snd_SESSION * session,
-				audio_request_callback callback)
+				time_tell_callback callback)
 {
   session->time_tell = callback;
 }

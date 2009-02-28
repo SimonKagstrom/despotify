@@ -24,7 +24,7 @@
 #define REQ_SIZE 5*REQ_1_SECOND
 
 /* from ui-core.c */
-void update_timer(int timeplayed); 
+void update_timer(snd_SESSION *, int);
 
 struct playerctx
 {

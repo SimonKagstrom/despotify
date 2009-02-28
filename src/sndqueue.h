@@ -59,7 +59,11 @@ typedef struct oggFIFO
 
 } oggFIFO;
 
+struct snd_session;
+
 typedef int (*audio_request_callback) (void *);
+typedef void (*time_tell_callback) (struct snd_session *, int cur_time);
+
 typedef struct snd_session
 {
 	pthread_t thr_id;
@@ -89,7 +93,7 @@ typedef struct snd_session
 	void *audio_end_arg;
 
 	/* time tell callback */
-	void (*time_tell) (struct snd_session *, int cur_time);
+        time_tell_callback time_tell;
 
 } snd_SESSION;
 
@@ -100,7 +104,7 @@ void snd_set_data_callback (snd_SESSION *, audio_request_callback, void *);
 void snd_set_end_callback (snd_SESSION * session,
 			   audio_request_callback callback, void *arg);
 void snd_set_timetell_callback (snd_SESSION * session,
-                                audio_request_callback callback);
+                                time_tell_callback callback);
 
 int snd_stop (void *);
 void snd_start (snd_SESSION * session);
