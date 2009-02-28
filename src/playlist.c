@@ -97,13 +97,13 @@ void playlist_free (struct playlist *p, int free_tracks)
 	struct playlist *tmp;
 
 	if (p->playlist_id)
-		free (p->playlist_id);
+		DSFYfree (p->playlist_id);
 
 	if (p->name)
-		free (p->name);
+		DSFYfree (p->name);
 
 	if (p->author)
-		free (p->author);
+		DSFYfree (p->author);
 
 	if (free_tracks)
 		while (p->tracks)
@@ -116,7 +116,7 @@ void playlist_free (struct playlist *p, int free_tracks)
 		tmp->next = p->next;
 	}
 
-	free (p);
+	DSFYfree (p);
 }
 
 /* Mark playlist (1..N) as the currently selected playlist */
@@ -187,15 +187,15 @@ void playlist_track_del (struct playlist *p, unsigned char *id)
 	}
 
 	if (bad->title)
-		free (bad->title);
+		DSFYfree (bad->title);
 	if (bad->artist)
-		free (bad->artist);
+		DSFYfree (bad->artist);
 	if (bad->album)
-		free (bad->album);
+		DSFYfree (bad->album);
 	if (bad->key)
-		free (bad->key);
+		DSFYfree (bad->key);
 
-	free (bad);
+	DSFYfree (bad);
 
 	for (i = 0, t = p->tracks; t; i++, t = t->next)
 		t->id = i;
@@ -329,7 +329,7 @@ static void playlist_xml_handle_text (void *private, const XML_Char * s,
 			break;
 
 	if (!len) {
-		free (buf);
+		DSFYfree (buf);
 		return;
 	}
 
@@ -383,7 +383,7 @@ static void playlist_xml_handle_text (void *private, const XML_Char * s,
 		}
 	}
 
-	free (buf);
+	DSFYfree (buf);
 }
 
 static void tracks_meta_xml_handle_startelement (void *private,
@@ -454,7 +454,7 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 			break;
 
 	if (!len) {
-		free (buf);
+		DSFYfree (buf);
 		return;
 	}
 
@@ -479,5 +479,5 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 		}
 	}
 
-	free (buf);
+	DSFYfree (buf);
 }

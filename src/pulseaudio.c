@@ -189,7 +189,7 @@ int pulseaudio_play (AUDIOCTX * actx)
 		pa_simple_free (s);
 
 	if (actx->driverprivate != NULL) {
-		free (actx->driverprivate);
+		DSFYfree (actx->driverprivate);
 		actx->driverprivate = NULL;
 	}
 

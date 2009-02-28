@@ -129,7 +129,7 @@ int scrlwin_init (WINDOW * win, int w, int h)
 void scrlwin_free (void)
 {
 	if (scrlwinctx) {
-		free (scrlwinctx);
+		DSFYfree (scrlwinctx);
 	}
 }
 
@@ -168,8 +168,8 @@ void scrlwin_ent_free (struct scrlwin_entry *die)
 		e->next = die->next;
 	}
 
-	free (die->text);
-	free (die);
+	DSFYfree (die->text);
+	DSFYfree (die);
 }
 
 int scrlwin_action_play (struct scrlwin_entry *e)
@@ -540,7 +540,7 @@ void app_packet_callback (SESSION * session,
 				event_msg_post (MSG_CLASS_APP,
 						MSG_APP_NOTFAIRGAME, NULL);
 			}
-			free (foo);
+			DSFYfree (foo);
 		}
 		break;
 	}

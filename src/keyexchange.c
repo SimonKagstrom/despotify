@@ -117,7 +117,7 @@ int read_server_initial_packet (SESSION * session)
 
 	DSFYDEBUG ("read_server_initial_packet(): Reading 16 bytes..\n");
 	if ((ret =
-	     block_read (session->ap_sock, session->server_random_16, 16)) < 16) {
+	     block_read (session->ap_sock, session->server_random_16, 2)) < 2) {
 		DSFYDEBUG
 			("read_server_initial_packet(): Failed to read 'server_random_16'\n");
 		DSFYDEBUG
@@ -137,7 +137,7 @@ int read_server_initial_packet (SESSION * session)
 		     session->server_random_16, ret);
 #endif
 
-	if (session->server_random_16[0] != 0 || ret != 16) {
+	if (session->server_random_16[0] != 0 || ret != 2) {
 		printf ("read_server_initial_packet(): Status was 0x%02x, substatus 0x%02x: %s\n", session->server_random_16[0], session->server_random_16[1], session->server_random_16[1] == 1 ? "Client upgrade required" : session->server_random_16[1] == 3 ? "Non-existant user" : "Unknown error");
 		printf ("read_server_initial_packet(): remote host is %s:%d\n", session->server_host, session->server_port);
 
@@ -158,6 +158,20 @@ int read_server_initial_packet (SESSION * session)
 		return -1;
 	}
 
+	if ((ret =
+	     block_read (session->ap_sock, session->server_random_16 + 2, 14)) < 14) {
+		DSFYDEBUG
+			("read_server_initial_packet(): Failed to read 'server_random_16'\n");
+		DSFYDEBUG
+			("read_server_initial_packet(): Remote host was %s:%d\n",
+			 session->server_host, session->server_port);
+		if (ret > 0)
+			hexdump8x32
+				("read_server_initial_packet, server_random_16",
+				 session->server_random_16, ret);
+		return -1;
+	}
+	
 	if (block_read (session->ap_sock, &session->puzzle_denominator,
 			1) != 1) {
 		printf ("read_server_initial_packet(): Failed to read 'puzzle_denominator'\n");

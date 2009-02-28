@@ -182,7 +182,7 @@ int gui_player_event_processor (EVENT * e, enum ev_flags ev_kind)
 						snd_stop (snd);
 
 						if (playerctx) {
-							free (playerctx);
+							DSFYfree (playerctx);
 							playerctx = NULL;
 						}
 					}
@@ -230,7 +230,7 @@ int gui_player_event_processor (EVENT * e, enum ev_flags ev_kind)
 					("gui_player_event_processor(MSG_GUI_STOP): Calling snd_stop(), freeing playerctx and marking event as idle in state 1 with private=NULL\n");
 				snd_stop (snd);
 
-				free (playerctx);
+				DSFYfree (playerctx);
 				playerctx = NULL;
 				e->private = NULL;
 				e->state = 1;
@@ -422,7 +422,7 @@ static int gui_player_aes_callback (CHANNEL * ch, unsigned char *buf,
 	switch (ch->state) {
 	case CHANNEL_DATA:
 		if (t->key)
-			free (t->key);
+			DSFYfree (t->key);
 
 		t->key = malloc (len);
 		memcpy (t->key, buf, len);
@@ -513,7 +513,7 @@ static int gui_player_data_callback (CHANNEL * ch, unsigned char *buf,
 		/* Push data onto the sound buffer queue */
 		snd_ioctl (snd, SND_CMD_DATA, plaintext, len);
 
-		free (plaintext);
+		DSFYfree (plaintext);
 
 		break;
 
