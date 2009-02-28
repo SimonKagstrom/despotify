@@ -364,7 +364,7 @@ int cmd_browse (SESSION * session, unsigned char kind, unsigned char *idlist,
 	unsigned int dummyint;
 	int i, ret;
 
-	assert ((kind == 1 && num == 1) || kind == 3);
+	assert (((kind == 1 || kind == 2) && num == 1) || kind == 3);
 
 	strcpy (buf, "browse-");
 	for (i = 0; i < 17; i++)
