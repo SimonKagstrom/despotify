@@ -143,6 +143,17 @@ void snd_set_end_callback (snd_SESSION * session,
 {
 	session->audio_end = callback;
 	session->audio_end_arg = arg;
+
+
+}
+
+/*
+ * Set callback to be called when time updates.
+ */
+void snd_set_timetell_callback (snd_SESSION * session,
+				audio_request_callback callback)
+{
+  session->time_tell = callback;
 }
 
 /* Wrapper for ov_read() */

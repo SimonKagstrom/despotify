@@ -27,7 +27,7 @@
 #include "util.h"
 #include "xml.h"
 
-#define HEADER_H 4
+#define HEADER_H 5
 #define COMMAND_H 4
 
 /* windowing routines */
@@ -210,6 +210,9 @@ void gui_finish (int unused)
 	endwin ();
 }
 
+
+
+
 /*
  * Handle windowresizing gracefully
  * XXX - Don't do this in the signal handler!
@@ -239,6 +242,22 @@ void sig_winch_handler (int unused)
 	bottomwin_update (1);
 
 	doupdate ();
+}
+
+void update_timer(void *p, int timeplayed)
+{
+  static int lasttime = 0; 
+  int  h, w;
+  
+  if(lasttime != timeplayed)
+    {
+      getmaxyx (stdscr, h, w);
+      mvwprintw (header, 3, w - 44, "       ");
+      mvwprintw (header, 3, w - 44, "%d",timeplayed);
+      wrefresh (header);
+
+      lasttime = timeplayed;
+    }
 }
 
 static void header_update (int redraw)
@@ -276,6 +295,10 @@ static void header_update (int redraw)
 	wattroff (header, A_BOLD);
 	mvwprintw (header, 2, 2, "Current playlist: %s",
 		   p ? p->name : "<none>");
+
+	mvwprintw (header, 3, 2, "Currently playing: <todo>");
+
+	mvwprintw (header, 3, w - 60, "Seconds played:");
 
 	if (!ctx || ctx->ap_sock == -1) {
 		wattron (header, A_BOLD);

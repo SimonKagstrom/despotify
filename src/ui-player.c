@@ -23,6 +23,9 @@
 #define REQ_1_SECOND 4096*5
 #define REQ_SIZE 5*REQ_1_SECOND
 
+/* from ui-core.c */
+void update_timer(int timeplayed); 
+
 struct playerctx
 {
 	EVENT *event;
@@ -335,6 +338,10 @@ int gui_player_event_processor (EVENT * e, enum ev_flags ev_kind)
 				       (void *) playerctx);
 		snd_set_end_callback (snd, gui_player_end_callback,
 				      (void *) playerctx);
+		
+		/* Setup time tell function */
+		snd_set_timetell_callback(snd,update_timer);
+		
 
 		DSFYDEBUG
 			("gui_player_event_processor(state=2): configured data callback with private ptr=%p, starting sound\n",
