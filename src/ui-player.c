@@ -168,6 +168,8 @@ int gui_player_event_processor (EVENT * e, enum ev_flags ev_kind)
 					    && snd->actx != NULL)
 					/* can't be NULL with a playerctx */
 					);
+				
+				
 
 				if (e->private && snd && snd->actx->is_paused) {
 					DSFYDEBUG
@@ -209,6 +211,17 @@ int gui_player_event_processor (EVENT * e, enum ev_flags ev_kind)
 					event_mark_busy (e);
 					DSFYDEBUG
 						("gui_player_event_processor(MSG_GUI_PLAY): Proceeding to state 1 (AES key)\n");
+				}
+				
+				/* Tell the server we started playing so it can notify other clients on the same account */
+				if (cmd_token_notify (session)) {
+				  event_msg_post (MSG_CLASS_APP, MSG_APP_NET_ERROR,NULL);
+
+				  DSFYDEBUG
+				    ("cmd_token_notify() failed before attempting to play %s - %s\n",
+				     t->title, t->artist);
+
+				  break;
 				}
 
 				break;
@@ -289,24 +302,7 @@ int gui_player_event_processor (EVENT * e, enum ev_flags ev_kind)
 			/* The AES channel handler will upgrade our state */
 			break;
 		}
-
-		if (cmd_token_notify (session)) {
-			event_msg_post (MSG_CLASS_APP, MSG_APP_NET_ERROR,
-					NULL);
-
-			DSFYDEBUG
-				("cmd_token_notify() failed before attempting to play %s - %s\n",
-				 t->title, t->artist);
-
-			/*
-			 * XXX - Notify about failure?
-			 * Implement retrying when we're online again.
-			 *
-			 */
-
-			break;
-		}
-
+		
 		/* Expand key and set IV */
 		gui_player_aes_set_key (playerctx, t->key);
 
