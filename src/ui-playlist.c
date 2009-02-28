@@ -92,12 +92,13 @@ void gui_playlist_display (WINDOW * w, struct playlist *p)
 		   p->num_tracks, p->author);
 
 	getmaxyx (w, y, x);
-	for (i = 1, t = p->tracks; i < (y - 2 - 2) && t; i++, t = t->next) {
+	for (i = 0, t = p->tracks; i < (y - 2 - 2) && t; t = t->next) {
 		if (!t->has_meta_data)
 			continue;
 
+		i++;
 		wattron (w, A_BOLD);
-		mvwprintw (w, 2 + i, 2, "%2d:", i);
+		mvwprintw (w, 2 + i, 2, "%2d:", t->id + 1);
 		wattroff (w, A_BOLD);
 		mvwprintw (w, 2 + i, 7, "%.24s - %.22s [%.24s]", t->title,
 			   t->artist, t->album);

@@ -186,12 +186,6 @@ void playlist_track_del (struct playlist *p, unsigned char *id)
 		t->next = bad->next;
 	}
 
-	if (bad->title)
-		free (bad->title);
-	if (bad->artist)
-		free (bad->artist);
-	if (bad->album)
-		free (bad->album);
 	if (bad->key)
 		DSFYfree (bad->key);
 
@@ -423,9 +417,11 @@ static void tracks_meta_xml_handle_endelement (void *private,
 			ctx->track->has_meta_data = 1;
 
 			if (!memcmp (ctx->track->file_id, invalid_file_id,
-				     20))
+				     20)) {
+				DSFYDEBUG("Dropping unplayable track %d\n", ctx->track->id);
 				playlist_track_del (ctx->pl,
 						    ctx->track->track_id);
+			}
 		}
 
 		ctx->track = NULL;
@@ -468,12 +464,13 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 			}
 		}
 		else if (ctx->track) {
+#define DSFYstrncat(target, data, len) strncat(target, data, sizeof(target)-strlen(target)-1-len)
 			if (!strcmp (ts->name, "artist"))
-				strncat (ctx->track->artist, buf, len);
+				DSFYstrncat(ctx->track->artist, buf, len);
 			else if (!strcmp (ts->name, "title"))
-				strncat (ctx->track->title, buf, len);
+				DSFYstrncat (ctx->track->title, buf, len);
 			else if (!strcmp (ts->name, "album"))
-				strncat (ctx->track->album, buf, len);
+				DSFYstrncat (ctx->track->album, buf, len);
 			else if (!strcmp (ts->name, "length"))
 				ctx->track->length = atoi (buf);
 		}
