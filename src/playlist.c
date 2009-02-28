@@ -187,11 +187,11 @@ void playlist_track_del (struct playlist *p, unsigned char *id)
 	}
 
 	if (bad->title)
-		DSFYfree (bad->title);
+		free (bad->title);
 	if (bad->artist)
-		DSFYfree (bad->artist);
+		free (bad->artist);
 	if (bad->album)
-		DSFYfree (bad->album);
+		free (bad->album);
 	if (bad->key)
 		DSFYfree (bad->key);
 
@@ -469,11 +469,11 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 		}
 		else if (ctx->track) {
 			if (!strcmp (ts->name, "artist"))
-				ctx->track->artist = strdup (buf);
+				strncat (ctx->track->artist, buf, len);
 			else if (!strcmp (ts->name, "title"))
-				ctx->track->title = strdup (buf);
+				strncat (ctx->track->title, buf, len);
 			else if (!strcmp (ts->name, "album"))
-				ctx->track->album = strdup (buf);
+				strncat (ctx->track->album, buf, len);
 			else if (!strcmp (ts->name, "length"))
 				ctx->track->length = atoi (buf);
 		}

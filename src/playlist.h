@@ -13,9 +13,9 @@ struct track
 	unsigned char track_id[16];
 	unsigned char file_id[20];
 	unsigned char *key;
-	char *title;
-	char *artist;
-	char *album;
+	char title[1024];
+	char artist[1024];
+	char album[1024];
 	int length;
 	struct track *next;
 };
