@@ -7,7 +7,7 @@ all: libgstapp.a
 
 
 libgstapp.a: gstappsrc.o gstappbuffer.o gstapp-marshal.o
-	ar rcs $@ $^
+	$(AR) rcs $@ $^
 
 gstapp-marshal.o: gstapp-marshal.h
 

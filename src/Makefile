@@ -3,7 +3,7 @@
 # 
 #
 CFLAGS = -Wall -Wextra -ggdb
-LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile -ggdb
+LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile
 
 CORE_OBJS = aes.o auth.o buffer.o channel.o commands.o dns.o event.o handlers.o keyexchange.o packet.o playlist.o puzzle.o session.o shn.o util.o xml.o
 DESPOTIFY_OBJS = ADMclubbing.o audio.o despotify.o ui-core.o ui-help.o ui-player.o ui-playlist.o ui-search.o sndqueue.o
@@ -13,11 +13,11 @@ LINUX_BACKEND = gstreamer
 
 include Makefile.local.mk
 
-ifdef DEBUG
-    CFLAGS += -DDEBUG -ggdb
+ifeq ($(DEBUG), 1)
+    CFLAGS += -DDEBUG
 endif
 
-ifndef NOGUI
+ifneq ($(NOGUI) , 1)
     CFLAGS += -DGUI
 endif
 
@@ -69,17 +69,17 @@ Makefile.dep:
 endif
 
 gstapp/libgstapp.a:
-	make -C gstapp
+	$(MAKE) -C gstapp
 
 clean:
-	make -C gstapp clean
+	$(MAKE) -C gstapp clean
 	rm -f $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS) $(D) despotify gateway Makefile.dep
 
 despotify: $(CORE_OBJS) $(DESPOTIFY_OBJS)
-	gcc -o $@ $(LDFLAGS) -lncurses $(CORE_OBJS) $(DESPOTIFY_OBJS)
+	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -lncurses $(CORE_OBJS) $(DESPOTIFY_OBJS)
 
 gateway: $(CORE_OBJS) $(GATEWAY_OBJS)
-	gcc -o $@ $(LDFLAGS) $(CORE_OBJS) $(GATEWAY_OBJS)
+	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(CORE_OBJS) $(GATEWAY_OBJS)
 
 privacy:
 	echo *.c *h|xargs -n1 -t indent -bacc -bc -nce  -br -di1 -eei -nip -npsl -sob -nbad -nbc -i8
