@@ -143,15 +143,20 @@ int read_server_initial_packet (SESSION * session)
 
 		if (session->server_random_16[1] == 1) {
 			ret = block_read (session->ap_sock, buf,
-					  sizeof (buf));
+					  0x10c);
 			if (ret > 0) {
 				hexdump8x32
 					("read_server_initial_packet, upgrade packet",
 					 buf, ret);
 
 				padlen = buf[0x010b];
-				buf[ret] = 0;
-				printf ("Upgrade URL:\n%s\n", buf + 0x10c);
+				
+				if ((ret = block_read (session->ap_sock, buf, padlen)) > 0)
+				{
+  					buf[ret] = 0;
+  					hexdump8x32("read_server_initial_packet, upgrade URL", buf, ret);
+  					printf ("Upgrade URL:\n%s\n", buf + 14);
+				}
 			}
 		}
 
