@@ -15,7 +15,7 @@ int gui_help (WINDOW * w, char *helpstring)
 	box (w, 0, 0);
 
 	mvwprintw (w, 1, 2,
-		   "available commands: list, play, pause, stop, search, help\n");
+		   "available commands: list, play, pause, stop, search, help");
 
 	wattron (w, A_BOLD);
 	mvwprintw (w, 3, 2, "list [number]");
