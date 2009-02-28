@@ -283,7 +283,7 @@ void key_init (SESSION * session)
 	pub_key = BN_bin2bn (session->remote_pub_key, 96, NULL);
 	if ((i =
 	     DH_compute_key (session->shared_key, pub_key,
-			     session->dh)) != 96) {
+			     session->dh)) < 0) {
 		FILE *fd = fopen ("/tmp/despotify-spotify-pubkey", "w");
 		fwrite (pub_key, 1, 96, fd);
 		fclose (fd);
