@@ -88,7 +88,7 @@ void gui_playlist_display (WINDOW * w, struct playlist *p)
 	mvwprintw (w, 1, 2, "Playlist");
 	wattroff (w, A_BOLD);
 
-	mvwprintw (w, 1, 11, "%.25s, %d tracks, by %.20s\n", p->name,
+	mvwprintw (w, 1, 11, "%.25s, %d tracks, by %.20s", p->name,
 		   p->num_tracks, p->author);
 
 	getmaxyx (w, y, x);
