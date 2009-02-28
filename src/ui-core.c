@@ -252,19 +252,27 @@ void update_timer(snd_SESSION *p, int timeplayed)
   (void)p; /* Quell warning about it being unused. */
   
   if(lasttime != timeplayed)
-    {
+  {
+      int x, y;
+
       getmaxyx (stdscr, h, w);
       mvwprintw (header, 3, w - 44, "       ");
       mvwprintw (header, 3, w - 44, "%d",timeplayed);
+
       wrefresh (header);
 
+      /* Reset the cursor to the input field, where it belongs. */
+      getyx (bottomwin, x, y);
+      wmove (bottomwin, x, y);
+      wrefresh (bottomwin);
+
       lasttime = timeplayed;
-    }
+  }
 }
 
 static void header_update (int redraw)
 {
-	int h, w;
+	int h, w, x, y;
 	struct playlist *p, **pp;
 	int playlists, playlists_loaded;
 
@@ -336,6 +344,11 @@ static void header_update (int redraw)
 	}
 
 	wrefresh (header);
+
+        /* Reset the cursor to the input field, where it belongs. */
+        getyx (bottomwin, x, y);
+        wmove (bottomwin, x, y);
+        wrefresh (bottomwin);
 }
 
 static void bottomwin_update (int redraw)
