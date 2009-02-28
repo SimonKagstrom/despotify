@@ -117,7 +117,7 @@ int read_server_initial_packet (SESSION * session)
 
 	DSFYDEBUG ("read_server_initial_packet(): Reading 16 bytes..\n");
 	if ((ret =
-	     read (session->ap_sock, session->server_random_16, 16)) < 16) {
+	     block_read (session->ap_sock, session->server_random_16, 16)) < 16) {
 		DSFYDEBUG
 			("read_server_initial_packet(): Failed to read 'server_random_16'\n");
 		DSFYDEBUG

@@ -69,8 +69,7 @@ struct playlist *playlist_new (void)
 int playlist_set_id (struct playlist *p, unsigned char *id)
 {
 	if (p->playlist_id) {
-		free (p->playlist_id);
-		p->playlist_id = NULL;
+		DSFYfree(p->playlist_id);
 	}
 
 	if ((p->playlist_id = malloc (17)) == NULL)
