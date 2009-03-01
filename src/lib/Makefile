@@ -2,6 +2,7 @@
 # $Id$
 # 
 
+CFLAGS += -Igstapp/
 DEP_CC := $(CC)
 CC := $(LT) --mode=compile $(CC)
 
@@ -25,12 +26,12 @@ ifeq ($(shell uname -s),Linux)
         LIB_OBJS += gstapp/gstappsrc.o gstapp/gstappbuffer.o gstapp/gstapp-marshal.o
 
 gstapp/gstapp-marshal.h: gstapp/gstapp-marshal.list
-	glib-genmarshal --header --prefix=gst_app_marshal $^ > gstapp/gstapp-marshal.h.tmp
+	glib-genmarshal --header --prefix=gst_app_marshal gstapp/gstapp-marshal.list > gstapp/gstapp-marshal.h.tmp
 	mv gstapp/gstapp-marshal.h.tmp gstapp/gstapp-marshal.h
 
-gstapp/gstapp-marshal.c: gstapp/gstapp-marshal.list
+gstapp/gstapp-marshal.c: gstapp/gstapp-marshal.list gstapp/gstapp-marshal.h
 	echo "#include \"gstapp-marshal.h\"" >> gstapp/gstapp-marshal.c.tmp
-	glib-genmarshal --body --prefix=gst_app_marshal $^ >> gstapp/gstapp-marshal.c.tmp
+	glib-genmarshal --body --prefix=gst_app_marshal gstapp/gstapp-marshal.list >> gstapp/gstapp-marshal.c.tmp
 	mv gstapp/gstapp-marshal.c.tmp gstapp/gstapp-marshal.c
 
     endif
@@ -62,7 +63,7 @@ Makefile.dep: $(CFILES)
 endif
 
 clean:
-	$(LT) --mode=clean rm -f $(LIB_OBJS:.o=.lo) Makefile.dep
+	$(LT) --mode=clean rm -f $(notdir $(LIB_OBJS:.o=.lo)) Makefile.dep
 
 install: libdespotify.la
 	# install despotify.h /usr/include
