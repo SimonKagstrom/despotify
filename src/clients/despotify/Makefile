@@ -7,7 +7,7 @@ unexport LDFLAGS CFLAGS
 LIBDIR = ../../lib
 
 CFLAGS += -I$(LIBDIR)
-LDFLAGS += -L$(LIBDIR) -ldespotify -lncurses
+LDFLAGS += -lncurses $(LIBDIR)/libdespotify.la
 
 DESPOTIFY_OBJS = ADMclubbing.o despotify.o event.o ui-core.o ui-help.o ui-player.o ui-playlist.o ui-search.o
 
@@ -32,14 +32,14 @@ clean:
 	rm -f $(DESPOTIFY_OBJS) despotify Makefile.dep
 
 despotify: $(DESPOTIFY_OBJS) lib
-	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(DESPOTIFY_OBJS)
+	libtool --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(DESPOTIFY_OBJS)
 
 lib:
 	$(MAKE) -C $(LIBDIR)
 
 install: despotify 
 	@echo "Copying despotify binary to /usr/bin/despotify"
-	install despotify /usr/bin/despotify
+	libtool --mode=install despotify /usr/bin/despotify
 
 uninstall:
 	@echo "Removing despotify..."
