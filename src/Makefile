@@ -19,10 +19,10 @@ endif
 
 # Mac OS X specifics
 ifeq ($(shell uname -s),Darwin)
-    LT = glibtool
+    LT = glibtool --tag=CC
     LDFLAGS += -lresolv -framework CoreAudio
 else
-    LT = libtool
+    LT = libtool --tag=CC
 endif
 
 # Linux specifics
@@ -44,8 +44,8 @@ endif
 
 # FreeBSD specifics
 ifeq ($(shell uname -s),FreeBSD)
-	CFLAGS += -I/usr/local/include
-	LDFLAGS += -L/usr/local/include -lpulse -lpulse-simple
+    CFLAGS += -I/usr/local/include
+    LDFLAGS += -L/usr/local/include -lpulse -lpulse-simple
 endif
 
 CLIENTS = clients/despotify clients/gateway

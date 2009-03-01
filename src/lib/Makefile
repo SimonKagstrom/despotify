@@ -15,7 +15,7 @@ all: libdespotify.la
 
 # Mac OS X specifics
 ifeq ($(shell uname -s),Darwin)
-	LIB_OBJS += coreaudio.o
+    LIB_OBJS += coreaudio.o
 endif
 
 # Linux specifics
@@ -46,7 +46,7 @@ endif
 
 # FreeBSD specifics
 ifeq ($(shell uname -s),FreeBSD)
-	LIB_OBJS += pulseaudio.o
+    LIB_OBJS += pulseaudio.o
 endif
 
 libdespotify.la: $(LIB_OBJS)
