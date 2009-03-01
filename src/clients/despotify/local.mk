@@ -36,7 +36,7 @@ despotify: $(DESPOTIFY_OBJS) lib
 	$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(DESPOTIFY_OBJS)
 
 lib:
-	$(MAKE) -C $(LIBDIR)
+	$(MAKE) -C $(LIBDIR) -f local.mk
 
 install: despotify 
 	@echo "Copying despotify binary to /usr/bin/despotify"

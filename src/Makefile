@@ -20,33 +20,10 @@ endif
 # Mac OS X specifics
 ifeq ($(shell uname -s),Darwin)
     LT = glibtool --tag=CC
-    LDFLAGS += -lresolv -framework CoreAudio
 else
     LT = libtool --tag=CC
 endif
 
-# Linux specifics
-ifeq ($(shell uname -s),Linux)
-    LDFLAGS += -lresolv
-    ifeq ($(LINUX_BACKEND),gstreamer)
-	CFLAGS += $(shell pkg-config --cflags gstreamer-base-0.10)
-	LDFLAGS += $(shell pkg-config --libs-only-l --libs-only-L gstreamer-base-0.10)
-    endif
-
-    ifeq ($(LINUX_BACKEND),libao)
-	LDFLAGS += -lao
-    endif
-
-    ifeq ($(LINUX_BACKEND),pulseaudio)
-	LDFLAGS += -lpulse -lpulse-simple
-    endif
-endif
-
-# FreeBSD specifics
-ifeq ($(shell uname -s),FreeBSD)
-    CFLAGS += -I/usr/local/include
-    LDFLAGS += -L/usr/local/include -lpulse -lpulse-simple
-endif
 
 CLIENTS = clients/despotify clients/gateway
 SUBDIRS = lib $(CLIENTS)
@@ -55,24 +32,24 @@ all: $(SUBDIRS)
 
 clean: 
 	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir clean; \
+		$(MAKE) -C $$dir -f local.mk clean || exit $?; \
 	done
 
 .PHONY: all clean $(SUBDIRS) install uninstall
 
 $(SUBDIRS):
-	$(MAKE) -C $@
+	$(MAKE) -C $@ -f local.mk || exit $?
 
 clients: $(CLIENTS)
 
 install:
 	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir install; \
+		$(MAKE) -C $$dir -f local.mk install || exit $?; \
 	done
 
 uninstall:
 	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir uninstall; \
+		$(MAKE) -C $$dir -f local.mk uninstall || exit $?; \
 	done
 
 Makefile.local.mk:

@@ -17,11 +17,16 @@ all: libdespotify.la
 # Mac OS X specifics
 ifeq ($(shell uname -s),Darwin)
     LIB_OBJS += coreaudio.o
+    LDFLAGS += -lresolv -framework CoreAudio
 endif
 
 # Linux specifics
 ifeq ($(shell uname -s),Linux)
+    LDFLAGS += -lresolv
     ifeq ($(LINUX_BACKEND),gstreamer)
+        CFLAGS += $(shell pkg-config --cflags gstreamer-base-0.10)
+        LDFLAGS += $(shell pkg-config --libs-only-l --libs-only-L gstreamer-base-0.10)
+
         LIB_OBJS += gstreamer.o
         LIB_OBJS += gstapp/gstappsrc.o gstapp/gstappbuffer.o gstapp/gstapp-marshal.o
 
@@ -38,16 +43,20 @@ gstapp/gstapp-marshal.c: gstapp/gstapp-marshal.list gstapp/gstapp-marshal.h
 
     ifeq ($(LINUX_BACKEND),libao)
         LIB_OBJS += libao.o
+        LDFLAGS += -lao
     endif
 
     ifeq ($(LINUX_BACKEND),pulseaudio)
         LIB_OBJS += pulseaudio.o
+        LDFLAGS += -lpulse -lpulse-simple
     endif
 endif
 
 # FreeBSD specifics
 ifeq ($(shell uname -s),FreeBSD)
     LIB_OBJS += pulseaudio.o
+    CFLAGS += -I/usr/local/include
+    LDFLAGS += -L/usr/local/include -lpulse -lpulse-simple
 endif
 
 libdespotify.la: $(LIB_OBJS)

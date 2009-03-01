@@ -32,7 +32,7 @@ gateway: $(GATEWAY_OBJS) lib
 	$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(GATEWAY_OBJS)
 
 lib:
-	$(MAKE) -C $(LIBDIR)
+	$(MAKE) -C $(LIBDIR) -f local.mk
 
 install: gateway 
 	@echo "Copying gateway binary to /usr/bin/gateway"
