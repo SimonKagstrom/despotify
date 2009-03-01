@@ -6,7 +6,7 @@
 #ifndef DESPOTIFY_PLAYLIST_H
 #define DESPOTIFY_PLAYLIST_H
 
-struct track
+typedef struct track
 {
 	int id;
 	int has_meta_data;
@@ -18,7 +18,7 @@ struct track
 	char album[1024];
 	int length;
 	struct track *next;
-};
+} TRACK;
 
 enum playlist_flags
 {
@@ -28,7 +28,7 @@ enum playlist_flags
 	PLAYLIST_TRACKS_ERROR = 0x08,
 	PLAYLIST_SELECTED = 0x10
 };
-struct playlist
+typedef struct playlist
 {
 	enum playlist_flags flags;
 	char *name;
@@ -37,7 +37,7 @@ struct playlist
 	int num_tracks;
 	struct track *tracks;
 	struct playlist *next;
-};
+} PLAYLIST;
 
 #define PLAYLIST_LIST_PLAYLISTS	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 
