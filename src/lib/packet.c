@@ -93,9 +93,9 @@ int packet_write (SESSION * session, unsigned char cmd,
 	h->cmd = cmd;
 	h->len = htons (len);
 
+	ptr = buf + 3;
 	if (payload != NULL)
 	{
- 		ptr = buf + 3;
  		memcpy (ptr, payload, len);
 	}
 	

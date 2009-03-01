@@ -97,12 +97,12 @@ int send_client_initial_packet (SESSION * session)
 
 	if ((ret = write (session->ap_sock, esbuf_data(b), esbuf_idx(b))) <= 0) {
 		printf ("send_client_initial_packet(): connection lost\n");
-		buffer_free (b);
+		esbuf_free_ctx(ctx);
 		return -1;
 	}
 	else if (ret != esbuf_idx(b)) {
 		printf ("send_client_initial_packet(): only wrote %d of %d bytes\n", ret, esbuf_idx(b));
-		buffer_free (b);
+		esbuf_free_ctx(ctx);
 		return -1;
 	}
 

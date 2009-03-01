@@ -5,7 +5,7 @@
 
 export
 
-CFLAGS = -Wall -Wextra -ggdb
+CFLAGS = -Wall -Wextra -ggdb -Wno-pointer-sign
 LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile
 LD = $(CC)
 
