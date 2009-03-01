@@ -39,7 +39,7 @@ lib:
 
 install: despotify 
 	@echo "Copying despotify binary to /usr/bin/despotify"
-	$(LT) --mode=install despotify /usr/bin/despotify
+	$(LT) --mode=install install despotify /usr/bin/despotify
 
 uninstall:
 	@echo "Removing despotify..."

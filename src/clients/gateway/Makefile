@@ -35,7 +35,7 @@ lib:
 
 install: gateway 
 	@echo "Copying gateway binary to /usr/bin/gateway"
-	$(LT) --mode=install gateway /usr/bin/gateway
+	$(LT) --mode=install install gateway /usr/bin/gateway
 
 uninstall:
 	@echo "Removing gateway..."

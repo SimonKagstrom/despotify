@@ -66,9 +66,9 @@ clean:
 
 install: libdespotify.la
 	# install despotify.h /usr/include
-	$(LT) --mode=install libdespotify.la /usr/lib/libdespotify.la
+	$(LT) --mode=install install libdespotify.la /usr/lib/libdespotify.la
 	ldconfig -n /usr/lib
 
 uninstall:
 	# rm -f /usr/include/despotify.h 
-	rm -f /usr/lib/libdespotify.la*
+	$(LT) --mode=uninstall rm /usr/lib/libdespotify.la
