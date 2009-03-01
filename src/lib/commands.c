@@ -7,10 +7,11 @@
  */
 
 #include <stdio.h>
+#include <stdarg.h> /* needed for esbuf */
 #include <string.h>
 #include <assert.h>
 
-#include "buffer.h"
+#include "esbuf.h"
 #include "channel.h"
 #include "commands.h"
 #include "packet.h"
@@ -48,16 +49,18 @@ static int dump_generic (CHANNEL * ch, unsigned char *buf, unsigned short len)
 
 int cmd_send_cache_hash (SESSION * session)
 {
-	BUFFER *b;
+	esbuf_ctxh ctx;
+	esbuf *buf;
 	int ret;
 
-	b = buffer_init ();
-	buffer_append_raw (b, session->cache_hash,
+	ctx = esbuf_new_ctx();
+	buf = esbuf_init(ctx, sizeof(session->cache_hash));
+	esbuf_append_data (buf, session->cache_hash,
 			   sizeof (session->cache_hash));
 
-	ret = packet_write (session, 0x0f, b->buf, b->buflen);
+	ret = packet_write (session, 0x0f, esbuf_data(buf), esbuf_idx(buf));
 	DSFYDEBUG ("cmd_send_cache_hash: packet_write() returned %d\n", ret);
-	buffer_free (b);
+	esbuf_free_ctx(ctx);
 
 	return ret;
 }
@@ -69,12 +72,14 @@ int cmd_send_cache_hash (SESSION * session)
  */
 int cmd_requestad (SESSION * session, unsigned char ad_type)
 {
-	BUFFER *b;
+	esbuf_ctxh ctx;
+	esbuf *b;
 	CHANNEL *ch;
 	int ret;
 	char buf[100];
 
-	b = buffer_init ();
+	ctx = esbuf_new_ctx ();
+	b = esbuf_init (ctx, 0);
 	snprintf (buf, sizeof (buf), "RequestAd-with-type-%d", ad_type);
 	ch = channel_register (buf, dump_generic, NULL);
 
@@ -82,13 +87,13 @@ int cmd_requestad (SESSION * session, unsigned char ad_type)
 		("cmd_requestad: allocated channel %d, retrieving ads with type id %d\n",
 		 ch->channel_id, ad_type)
 
-		buffer_append_short (b, ch->channel_id);
-	buffer_append_raw (b, &ad_type, 1);
+		esbuf_append_uint16 (b, ch->channel_id);
+	esbuf_append_byte (b, ad_type);
 
-	ret = packet_write (session, CMD_REQUESTAD, b->buf, b->buflen);
+	ret = packet_write (session, CMD_REQUESTAD, esbuf_data(b), esbuf_idx(b));
 	DSFYDEBUG ("cmd_requestad: packet_write() returned %d\n", ret)
 
-		buffer_free (b);
+	esbuf_free_ctx (ctx);
 
 	return ret;
 }
@@ -101,12 +106,14 @@ int cmd_requestad (SESSION * session, unsigned char ad_type)
 int cmd_request_image (SESSION * session, unsigned char *hash,
 		       channel_callback callback, void *private)
 {
-	BUFFER *b;
+	esbuf_ctxh ctx;
+	esbuf *b;
 	CHANNEL *ch;
 	int ret;
 	char buf[100];
 
-	b = buffer_init ();
+	ctx = esbuf_new_ctx();
+	b = esbuf_init(ctx, 0);
 	strcpy (buf, "image-");
 	hex_bytes_to_ascii (hash, buf + 6, 20);
 
@@ -115,14 +122,14 @@ int cmd_request_image (SESSION * session, unsigned char *hash,
 		("cmd_requestimg: allocated channel %d, retrieving img with UUID %s\n",
 		 ch->channel_id, buf + 6);
 
-	buffer_append_short (b, ch->channel_id);
-	buffer_append_raw (b, hash, 20);
+	esbuf_append_uint32 (b, ch->channel_id);
+	esbuf_append_data (b, hash, 20);
 
-	ret = packet_write (session, CMD_IMAGE, b->buf, b->buflen);
+	ret = packet_write (session, CMD_IMAGE, esbuf_data(b), esbuf_idx(b));
 	DSFYDEBUG ("cmd_requestimg: packet_write() returned %d\n", ret)
 
-		buffer_free (b);
-
+	esbuf_free_ctx(ctx);
+	
 	return ret;
 }
 
@@ -134,15 +141,15 @@ int cmd_request_image (SESSION * session, unsigned char *hash,
 int cmd_search (SESSION * session, char *searchtext,
 		channel_callback callback, void *private)
 {
-	BUFFER *b;
+	esbuf_ctxh ctx;
+	esbuf *b;
 	CHANNEL *ch;
 	int ret;
 	char buf[100];
 	unsigned char searchtext_length;
-	unsigned int dummyint;
-	unsigned short dummyshort;
 
-	b = buffer_init ();
+	ctx = esbuf_new_ctx();
+	b = esbuf_init (ctx, 0);
 
 	snprintf (buf, sizeof (buf), "Search-%s", searchtext);
 	ch = channel_register (buf, callback, private);
@@ -150,27 +157,24 @@ int cmd_search (SESSION * session, char *searchtext,
 	DSFYDEBUG ("cmd_search: allocated channel %d, searching for '%s'\n",
 		   ch->channel_id, searchtext)
 
-		buffer_append_short (b, ch->channel_id);
+	esbuf_append_uint16 (b, ch->channel_id);
 
-	dummyint = 0;
-	buffer_append_int (b, dummyint);
+	esbuf_append_uint32 (b, 0);
 
-	dummyint = 0xffffffff;
-	buffer_append_int (b, dummyint);
+	esbuf_append_uint32 (b, 0xffffffff);
 
-	dummyshort = 0;
-	buffer_append_short (b, dummyshort);
+	esbuf_append_uint16 (b, 0);
 
 	searchtext_length = (unsigned char) strlen (searchtext);
-	buffer_append_raw (b, &searchtext_length, 1);
+	esbuf_append_byte (b, &searchtext_length);
 
-	buffer_append_raw (b, searchtext, searchtext_length);
+	esbuf_append_data (b, searchtext, searchtext_length);
 
-	ret = packet_write (session, CMD_SEARCH, b->buf, b->buflen);
+	ret = packet_write (session, CMD_SEARCH, esbuf_data(b), esbuf_idx(b));
 	DSFYDEBUG ("cmd_search: packet_write() returned %d\n", ret)
 
-		buffer_free (b);
-
+	esbuf_free_ctx(ctx);
+	
 	return ret;
 }
 
@@ -181,13 +185,8 @@ int cmd_search (SESSION * session, char *searchtext,
 int cmd_token_notify (SESSION * session)
 {
 	int ret;
-	BUFFER *b;
-
-	/* Request the playing token before playing a song */
-	b = buffer_init ();
-
-	ret = packet_write (session, CMD_TOKENNOTIFY, b->buf, b->buflen);
-	buffer_free (b);
+	
+	ret = packet_write (session, CMD_TOKENNOTIFY, NULL, 0);
 	if (ret != 0) {
 		DSFYDEBUG
 			("cmd_token_notify(): packet_write(cmd=0x4f) returned %d, aborting!\n",
@@ -202,17 +201,18 @@ int cmd_aeskey (SESSION * session, unsigned char *file_id,
 		void *private)
 {
 	int ret;
-	BUFFER *b;
+	esbuf_ctxh ctx;
+	esbuf *b;
 	unsigned short zero;
 	CHANNEL *ch;
 	char buf[256];
 
 	/* Request the AES key for this file by sending the file ID and track ID */
-	b = buffer_init ();
-	buffer_append_raw (b, file_id, 20);
-	buffer_append_raw (b, track_id, 16);
-	zero = 0;
-	buffer_append_short (b, zero);
+	ctx = esbuf_new_ctx();
+	b = esbuf_init (ctx, 0);
+	esbuf_append_data (b, file_id, 20);
+	esbuf_append_data (b, track_id, 16);
+	esbuf_append_uint16 (b, 0);
 
 	/* Allocate a channel and set its name to key-<file id> */
 	strcpy (buf, "key-");
@@ -224,10 +224,10 @@ int cmd_aeskey (SESSION * session, unsigned char *file_id,
 
 	/* Force DATA state to be able to handle these packets with the channel infrastructure */
 	ch->state = CHANNEL_DATA;
-	buffer_append_short (b, ch->channel_id);
+	esbuf_append_uint16 (b, ch->channel_id);
 
-	ret = packet_write (session, CMD_REQKEY, b->buf, b->buflen);
-	buffer_free (b);
+	ret = packet_write (session, CMD_REQKEY, esbuf_data(b), esbuf_idx(b));
+	esbuf_free_ctx(ctx);
 	if (ret != 0) {
 		DSFYDEBUG
 			("cmd_key(): packet_write(cmd=0x0c) returned %d, aborting!\n",
@@ -266,6 +266,7 @@ int cmd_action (SESSION * session, unsigned char *file_id,
 
 #ifdef P2P
 	/* Request a 100 byte P2P initialization block */
+	/* XXX FIXME - use esbuf */
 	b = buffer_init ();
 	buffer_append_raw (b, file_id, 20);
 
@@ -297,10 +298,10 @@ int cmd_getsubstreams (SESSION * session, unsigned char *file_id,
 		       void *private)
 {
 	char buf[512];
-	BUFFER *b;
+	esbuf_ctxh ctx;
+	esbuf *b;
 	CHANNEL *ch;
 	int ret;
-	unsigned short dummyshort;
 
 	hex_bytes_to_ascii (file_id, buf, 20);
 	ch = channel_register (buf, callback, private);
@@ -308,37 +309,35 @@ int cmd_getsubstreams (SESSION * session, unsigned char *file_id,
 		("cmd_getsubstreams: allocated channel %d, retrieving song '%s'\n",
 		 ch->channel_id, ch->name)
 
-		b = buffer_init ();
-	buffer_append_short (b, ch->channel_id);
+	ctx = esbuf_new_ctx();
+	b = esbuf_init (ctx, 0);
+	esbuf_append_uint16 (b, ch->channel_id);
 
 	/* I have no idea wtf these 10 bytes are for */
-	dummyshort = 0x0800;
-	buffer_append_short (b, dummyshort);
-	dummyshort = 0x0000;
-	buffer_append_short (b, dummyshort);
-	buffer_append_short (b, dummyshort);
-	buffer_append_short (b, dummyshort);
-	dummyshort = 0x4e20;	/* ??? If I just wasn't drunk when I wrote this.. */
-	buffer_append_short (b, dummyshort);
+	esbuf_append_uint16 (b, 0x0800);
+	esbuf_append_uint16 (b, 0x0000);
+	esbuf_append_uint16 (b, 0x0000);
+	esbuf_append_uint16 (b, 0x0000);
+	esbuf_append_uint16 (b, 0x4e20); /* drugs are bad for you, m'kay? */
 
-	buffer_append_int (b, unknown_200k);
+	esbuf_append_uint32 (b, unknown_200k);
 
-	buffer_append_raw (b, file_id, 20);
+	esbuf_append_data (b, file_id, 20);
 
 	assert (offset % 4096 == 0);
 	assert (length % 4096 == 0);
 	offset >>= 2;
 	length >>= 2;
-	buffer_append_int (b, offset);
-	buffer_append_int (b, offset + length);
+	esbuf_append_uint32 (b, offset);
+	esbuf_append_uint32 (b, offset + length);
 
 	hex_bytes_to_ascii (file_id, buf, 20);
 	DSFYDEBUG
 		("Sending GetSubstreams(file_id=%s, offset=%u [%u bytes], length=%u [%u bytes])\n",
 		 buf, offset, offset << 2, length, length << 2);
 
-	ret = packet_write (session, 0x08, b->buf, b->buflen);
-	buffer_free (b);
+	ret = packet_write (session, 0x08, esbuf_data(b), esbuf_idx(b));
+	esbuf_free_ctx(ctx);
 
 	if (ret != 0) {
 		channel_unregister (ch);
@@ -358,10 +357,10 @@ int cmd_getsubstreams (SESSION * session, unsigned char *file_id,
 int cmd_browse (SESSION * session, unsigned char kind, unsigned char *idlist,
 		int num, channel_callback callback, void *private)
 {
-	BUFFER *b;
+	esbuf_ctxh ctx;
+	esbuf *b;
 	CHANNEL *ch;
 	char buf[256];
-	unsigned int dummyint;
 	int i, ret;
 
 	assert (((kind == 1 || kind == 2) && num == 1) || kind == 3);
@@ -371,28 +370,28 @@ int cmd_browse (SESSION * session, unsigned char kind, unsigned char *idlist,
 		sprintf (buf + 7 + 2 * i, "%02x", idlist[i]);
 	ch = channel_register (buf, callback, private);
 
-	b = buffer_init ();
-	buffer_append_short (b, ch->channel_id);
+	ctx = esbuf_new_ctx();
+	b = esbuf_init (ctx, 0);
+	esbuf_append_uint16 (b, ch->channel_id);
 
-	buffer_append_raw (b, &kind, 1);
+	esbuf_append_byte (b, kind);
 
 	for (i = 0; i < num; i++)
-		buffer_append_raw (b, idlist + i * 16, 16);
+		esbuf_append_data (b, idlist + i * 16, 16);
 
 	if (kind == 0x01) {
 		assert (num == 1);
-		dummyint = 0;
-		buffer_append_int (b, dummyint);
+		esbuf_append_uint32 (b, 0);
 	}
 
 	if ((ret =
-	     packet_write (session, CMD_BROWSE, b->buf, b->buflen)) != 0) {
+	     packet_write (session, CMD_BROWSE, esbuf_data(b), esbuf_idx(b))) != 0) {
 		DSFYDEBUG
 			("cmd_browse(): packet_write(cmd=0x30) returned %d, aborting!\n",
 			 ret)
 	}
 
-	buffer_free (b);
+	esbuf_free_ctx(ctx);
 
 	return ret;
 }
@@ -405,10 +404,9 @@ int cmd_browse (SESSION * session, unsigned char kind, unsigned char *idlist,
 int cmd_getplaylist (SESSION * session, unsigned char *playlist_id,
 		     int unknown, channel_callback callback, void *private)
 {
-	BUFFER *b;
+	esbuf_ctxh ctx;
+	esbuf *b;
 	CHANNEL *ch;
-	unsigned int dummyint;
-	unsigned char kind;
 	char buf[256];
 	int ret;
 
@@ -417,46 +415,44 @@ int cmd_getplaylist (SESSION * session, unsigned char *playlist_id,
 	buf[9 + 2 * 17] = 0;
 	ch = channel_register (buf, callback, private);
 
-	b = buffer_init ();
-	buffer_append_short (b, ch->channel_id);
-	buffer_append_raw (b, playlist_id, 17);
-	buffer_append_int (b, unknown);
-	dummyint = 0;
-	buffer_append_int (b, dummyint);
-	dummyint = 0xffffffff;
-	buffer_append_int (b, dummyint);
-	kind = 0x01;
-	buffer_append_raw (b, &kind, 1);
+	ctx = esbuf_new_ctx ();
+	b = esbuf_init (ctx, 0);
+	esbuf_append_uint16 (b, ch->channel_id);
+	esbuf_append_data (b, playlist_id, 17);
+	esbuf_append_uint32 (b, unknown);
+	esbuf_append_uint32 (b, 0);
+	esbuf_append_uint32 (b, 0xffffffff);
+	esbuf_append_byte (b, 0x1);
 
 	if ((ret =
-	     packet_write (session, CMD_PLAYLIST, b->buf, b->buflen)) != 0) {
+	     packet_write (session, CMD_PLAYLIST, esbuf_data(b), esbuf_idx(b))) != 0) {
 		DSFYDEBUG
 			("cmd_getplaylist(): packet_write(cmd=0x35) returned %d, aborting!\n",
 			 ret);
 	}
 
-	buffer_free (b);
-
+	esbuf_free_ctx(ctx);
+	
 	return ret;
 }
 
 int cmd_ping_reply (SESSION * session)
 {
-	BUFFER *b;
-	unsigned int zero;
+	esbuf_ctxh ctx;
+	esbuf *b;
 	int ret;
 
-	b = buffer_init ();
-	zero = 0;
-	buffer_append_int (b, zero);
+	ctx = esbuf_new_ctx();
+	b = esbuf_init (ctx, 4);
+	esbuf_append_uint32 (b, 0);
 
-	if ((ret = packet_write (session, CMD_PONG, b->buf, b->buflen)) != 0) {
+	if ((ret = packet_write (session, CMD_PONG, esbuf_data(b), esbuf_idx(b))) != 0) {
 		DSFYDEBUG
 			("cmd_ping_reply(): packet_write(cmd=0x49) returned %d, aborting!\n",
 			 ret);
 	}
 
-	buffer_free (b);
-
+	esbuf_free_ctx(ctx);
+	
 	return ret;
 }

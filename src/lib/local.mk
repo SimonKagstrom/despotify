@@ -8,7 +8,7 @@ CC := $(LT) --mode=compile $(CC)
 
 LDFLAGS += -rpath /usr/lib
 
-LIB_OBJS += aes.o audio.o auth.o buffer.o channel.o commands.o dns.o handlers.o keyexchange.o packet.o playlist.o puzzle.o session.o shn.o sndqueue.o util.o xml.o
+LIB_OBJS += aes.o audio.o auth.o buffer.o channel.o commands.o dns.o esbuf.o handlers.o keyexchange.o packet.o playlist.o puzzle.o session.o shn.o sndqueue.o util.o xml.o
 
 .PHONY: all clean
 

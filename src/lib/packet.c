@@ -93,15 +93,18 @@ int packet_write (SESSION * session, unsigned char cmd,
 	h->cmd = cmd;
 	h->len = htons (len);
 
-	ptr = buf + 3;
-	memcpy (ptr, payload, len);
-
+	if (payload != NULL)
+	{
+ 		ptr = buf + 3;
+ 		memcpy (ptr, payload, len);
+	}
+	
 #ifdef DEBUG_PACKETS
 	DSFYDEBUG
 		("packet_write(): Sending packet with command 0x%02x, length %d\n",
 		 h->cmd, ntohs (h->len));
 	logdata ("send-hdr", session->key_send_IV, (unsigned char *) h, 3);
-	logdata ("send-payload", session->key_send_IV, payload, len);
+	if (payload != NULL) logdata ("send-payload", session->key_send_IV, payload, len);
 #endif
 
 	shn_encrypt (&session->shn_send, buf, 3 + len);

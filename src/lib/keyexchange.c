@@ -13,7 +13,7 @@
 #include <openssl/hmac.h>
 
 #include "auth.h"
-#include "buffer.h"
+#include "esbuf.h"
 #include "session.h"
 #include "keyexchange.h"
 #include "util.h"
@@ -42,38 +42,39 @@ int do_key_exchange (SESSION * session)
 
 int send_client_initial_packet (SESSION * session)
 {
-	BUFFER *b;
-	unsigned short version;
+	esbuf_ctxh ctx;
+	esbuf *b;
 	unsigned short len;
-	unsigned short *len_ptr;
 	unsigned char num_random_bytes;
 	int ret;
+	unsigned int len_idx;
+	
+	ctx = esbuf_new_ctx();
+	b = esbuf_init (ctx, 0);
 
-	b = buffer_init ();
-
-	version = 2;
-	buffer_append_short (b, version);
+	esbuf_append_uint16 (b, 2);
 
 	/* Default to zero, update later */
 	len = 0;
-	len_ptr = (unsigned short *) buffer_append_short (b, len);
+	len_idx = esbuf_idx(b);
+	esbuf_append_uint16 (b, len);
 
-	buffer_append_raw (b, &session->client_OS, 1);
-	buffer_append_raw (b, session->client_id, 4);
-	buffer_append_int (b, session->client_revision);
+	esbuf_append_byte (b, session->client_OS);
+	esbuf_append_data (b, session->client_id, 4);
+	esbuf_append_uint32 (b, session->client_revision);
 
-	buffer_append_raw (b, session->client_random_16, 16);
+	esbuf_append_data (b, session->client_random_16, 16);
 
-	buffer_append_raw (b, session->my_pub_key, 96);
+	esbuf_append_data (b, session->my_pub_key, 96);
 
 	BN_bn2bin (session->rsa->n, session->rsa_pub_exp);
-	buffer_append_raw (b, session->rsa_pub_exp,
+	esbuf_append_data (b, session->rsa_pub_exp,
 			   sizeof (session->rsa_pub_exp));
 
-	buffer_append_raw (b, &session->username_len, 1);
-	buffer_append_raw (b, (unsigned char *) session->username,
+	esbuf_append_byte (b, session->username_len);
+	esbuf_append_data (b, (unsigned char *) session->username,
 			   session->username_len);
-	buffer_append_raw (b, "\x01\x40", 2);
+	esbuf_append_uint16 (b, 0x0140);
 
 	/*
 	 * Append zero or more random bytes
@@ -81,31 +82,32 @@ int send_client_initial_packet (SESSION * session)
 	 *
 	 */
 	num_random_bytes = 1;
-	buffer_append_raw (b, &num_random_bytes, 1);
+	esbuf_append_byte (b, num_random_bytes);
 
 	/*
 	 * Update length byte
 	 *
 	 */
-	*len_ptr = htons (b->buflen);
+	esbuf_set_byte(b, len_idx, esbuf_idx(b) >> 8);
+	esbuf_set_byte(b, len_idx + 1, esbuf_idx(b) & 0xff);
 
 #ifdef DEBUG_LOGIN
-	hexdump8x32 ("initial client packet", b->buf, b->buflen);
+	hexdump8x32 ("initial client packet", esbuf_data(b), esbuf_idx(b));
 #endif
 
-	if ((ret = write (session->ap_sock, b->buf, b->buflen)) <= 0) {
+	if ((ret = write (session->ap_sock, esbuf_data(b), esbuf_idx(b))) <= 0) {
 		printf ("send_client_initial_packet(): connection lost\n");
 		buffer_free (b);
 		return -1;
 	}
-	else if (ret != b->buflen) {
-		printf ("send_client_initial_packet(): only wrote %d of %d bytes\n", ret, b->buflen);
+	else if (ret != esbuf_idx(b)) {
+		printf ("send_client_initial_packet(): only wrote %d of %d bytes\n", ret, esbuf_idx(b));
 		buffer_free (b);
 		return -1;
 	}
 
-	buffer_free (b);
-
+	esbuf_free_ctx(ctx);
+	
 	return 0;
 }
 

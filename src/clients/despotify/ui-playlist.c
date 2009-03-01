@@ -9,6 +9,9 @@
 
 #include <curses.h>
 
+#include <stdarg.h> /* needed for esbuf */
+
+#include "esbuf.h"
 #include "buffer.h"
 #include "channel.h"
 #include "commands.h"
