@@ -25,7 +25,8 @@ Makefile.dep:
 endif
 
 clean:
-	rm -f $(GATEWAY_OBJS) gateway Makefile.dep
+	$(LT) --mode=clean rm -f gateway
+	rm -f $(GATEWAY_OBJS) Makefile.dep
 
 gateway: $(GATEWAY_OBJS) lib
 	$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(GATEWAY_OBJS)

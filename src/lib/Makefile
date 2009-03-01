@@ -62,7 +62,7 @@ Makefile.dep: $(CFILES)
 endif
 
 clean:
-	rm -f $(LIB_OBJS) Makefile.dep
+	$(LT) --mode=clean rm -f $(LIB_OBJS:.o=.lo) Makefile.dep
 
 install: libdespotify.la
 	# install despotify.h /usr/include
@@ -71,4 +71,4 @@ install: libdespotify.la
 
 uninstall:
 	# rm -f /usr/include/despotify.h 
-	$(LT) --mode=uninstall rm /usr/lib/libdespotify.la
+	$(LT) --mode=uninstall rm -f /usr/lib/libdespotify.la

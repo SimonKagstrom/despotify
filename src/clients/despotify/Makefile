@@ -29,7 +29,8 @@ Makefile.dep:
 endif
 
 clean:
-	rm -f $(DESPOTIFY_OBJS) despotify Makefile.dep
+	$(LT) --mode=clean rm -f despotify
+	rm -f $(DESPOTIFY_OBJS) Makefile.dep
 
 despotify: $(DESPOTIFY_OBJS) lib
 	$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(DESPOTIFY_OBJS)
