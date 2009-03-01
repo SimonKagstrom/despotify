@@ -32,14 +32,14 @@ clean:
 	rm -f $(DESPOTIFY_OBJS) despotify Makefile.dep
 
 despotify: $(DESPOTIFY_OBJS) lib
-	libtool --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(DESPOTIFY_OBJS)
+	$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(DESPOTIFY_OBJS)
 
 lib:
 	$(MAKE) -C $(LIBDIR)
 
 install: despotify 
 	@echo "Copying despotify binary to /usr/bin/despotify"
-	libtool --mode=install despotify /usr/bin/despotify
+	$(LT) --mode=install despotify /usr/bin/despotify
 
 uninstall:
 	@echo "Removing despotify..."

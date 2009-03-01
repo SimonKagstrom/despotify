@@ -3,7 +3,7 @@
 # 
 
 DEP_CC := $(CC)
-CC := libtool --mode=compile $(CC)
+CC := $(LT) --mode=compile $(CC)
 
 LDFLAGS += -rpath /usr/lib
 
@@ -50,7 +50,7 @@ ifeq ($(shell uname -s),FreeBSD)
 endif
 
 libdespotify.la: $(LIB_OBJS)
-	libtool --mode=link $(LD) -o libdespotify.la $(LDFLAGS) $(LIB_OBJS:.o=.lo)
+	$(LT) --mode=link $(LD) -o libdespotify.la $(LDFLAGS) $(LIB_OBJS:.o=.lo)
 
 ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
 CFILES = $(LIB_OBJS:.o=.c)
@@ -66,7 +66,7 @@ clean:
 
 install: libdespotify.la
 	# install despotify.h /usr/include
-	libtool --mode=install libdespotify.la /usr/lib/libdespotify.la
+	$(LT) --mode=install libdespotify.la /usr/lib/libdespotify.la
 	ldconfig -n /usr/lib
 
 uninstall:

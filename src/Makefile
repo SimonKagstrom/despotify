@@ -19,7 +19,10 @@ endif
 
 # Mac OS X specifics
 ifeq ($(shell uname -s),Darwin)
-	LDFLAGS += -lresolv -framework CoreAudio
+    LT = glibtool
+    LDFLAGS += -lresolv -framework CoreAudio
+else
+    LT = libtool
 endif
 
 # Linux specifics

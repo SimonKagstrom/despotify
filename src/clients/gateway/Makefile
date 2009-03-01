@@ -28,14 +28,14 @@ clean:
 	rm -f $(GATEWAY_OBJS) gateway Makefile.dep
 
 gateway: $(GATEWAY_OBJS) lib
-	libtool --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(GATEWAY_OBJS)
+	$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(GATEWAY_OBJS)
 
 lib:
 	$(MAKE) -C $(LIBDIR)
 
 install: gateway 
 	@echo "Copying gateway binary to /usr/bin/gateway"
-	libtool --mode=install gateway /usr/bin/gateway
+	$(LT) --mode=install gateway /usr/bin/gateway
 
 uninstall:
 	@echo "Removing gateway..."
