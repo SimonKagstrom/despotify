@@ -166,7 +166,7 @@ int cmd_search (SESSION * session, char *searchtext,
 	esbuf_append_uint16 (b, 0);
 
 	searchtext_length = (unsigned char) strlen (searchtext);
-	esbuf_append_byte (b, &searchtext_length);
+	esbuf_append_byte (b, searchtext_length);
 
 	esbuf_append_data (b, searchtext, searchtext_length);
 
