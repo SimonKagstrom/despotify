@@ -2,12 +2,12 @@
 # $Id$
 # 
 #
+
+export
+
 CFLAGS = -Wall -Wextra -ggdb
 LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile
-
-CORE_OBJS = aes.o auth.o buffer.o channel.o commands.o dns.o event.o handlers.o keyexchange.o packet.o playlist.o puzzle.o session.o shn.o util.o xml.o
-DESPOTIFY_OBJS = ADMclubbing.o audio.o despotify.o ui-core.o ui-help.o ui-player.o ui-playlist.o ui-search.o sndqueue.o
-GATEWAY_OBJS = gw-core.o gw-browse.o gw-handlers.o gw-image.o gw-playlist.o gw-search.o gw-stream.o gw-http.o base64.o
+LD = $(CC)
 
 LINUX_BACKEND = gstreamer
 
@@ -17,14 +17,9 @@ ifeq ($(DEBUG), 1)
     CFLAGS += -DDEBUG
 endif
 
-ifneq ($(NOGUI) , 1)
-    CFLAGS += -DGUI
-endif
-
 # Mac OS X specifics
 ifeq ($(shell uname -s),Darwin)
 	LDFLAGS += -lresolv -framework CoreAudio
-	DESPOTIFY_OBJS += coreaudio.o
 endif
 
 # Linux specifics
@@ -32,73 +27,51 @@ ifeq ($(shell uname -s),Linux)
     LDFLAGS += -lresolv
     ifeq ($(LINUX_BACKEND),gstreamer)
 	CFLAGS += $(shell pkg-config --cflags gstreamer-base-0.10)
-	LDFLAGS += $(shell pkg-config --libs gstreamer-base-0.10)
-	DESPOTIFY_OBJS += gstreamer.o gstapp/libgstapp.a
-	endif
+	LDFLAGS += $(shell pkg-config --libs-only-l --libs-only-L gstreamer-base-0.10)
+    endif
 
-	ifeq ($(LINUX_BACKEND),libao)
+    ifeq ($(LINUX_BACKEND),libao)
 	LDFLAGS += -lao
-	DESPOTIFY_OBJS += libao.o
-	endif
+    endif
 
-	ifeq ($(LINUX_BACKEND),pulseaudio)
+    ifeq ($(LINUX_BACKEND),pulseaudio)
 	LDFLAGS += -lpulse -lpulse-simple
-	DESPOTIFY_OBJS += pulseaudio.o
     endif
 endif
-
 
 # FreeBSD specifics
 ifeq ($(shell uname -s),FreeBSD)
 	CFLAGS += -I/usr/local/include
 	LDFLAGS += -L/usr/local/include -lpulse -lpulse-simple
-	DESPOTIFY_OBJS += pulseaudio.o
 endif
 
+CLIENTS = clients/despotify clients/gateway
+SUBDIRS = lib $(CLIENTS)
 
-all: despotify gateway
+all: $(SUBDIRS)
 
-ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
-OFILES = $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS)
-CFILES = $(filter-out %.a,$(OFILES:.o=.c))
+clean: 
+	for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir clean; \
+	done
 
-Makefile.dep:
-	$(CC) $(CFLAGS) -MM $(CFILES) > $@
+.PHONY: all clean $(SUBDIRS) install uninstall
 
--include Makefile.dep
-endif
+$(SUBDIRS):
+	$(MAKE) -C $@
 
-gstapp/libgstapp.a:
-	$(MAKE) -C gstapp
+clients: $(CLIENTS)
 
-clean:
-	$(MAKE) -C gstapp clean
-	rm -f $(CORE_OBJS) $(DESPOTIFY_OBJS) $(GATEWAY_OBJS) $(D) despotify gateway Makefile.dep
+install:
+	for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir install; \
+	done
 
-despotify: $(CORE_OBJS) $(DESPOTIFY_OBJS)
-	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -lncurses $(CORE_OBJS) $(DESPOTIFY_OBJS)
-
-gateway: $(CORE_OBJS) $(GATEWAY_OBJS)
-	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(CORE_OBJS) $(GATEWAY_OBJS)
-
-privacy:
-	echo *.c *h|xargs -n1 -t indent -bacc -bc -nce  -br -di1 -eei -nip -npsl -sob -nbad -nbc -i8
+uninstall:
+	for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir uninstall; \
+	done
 
 Makefile.local.mk:
 	@echo " **** No Makefile.local.mk found, copying dist."
 	cp Makefile.local.mk.dist Makefile.local.mk
-
-install: despotify gateway
-	@echo "Copying Despotify binary to /usr/bin/despotify"
-	install despotify /usr/bin/despotify
-	@echo "Copying despotify gateway to /usr/bin/gateway"
-	install gateway /usr/bin/gateway
-	@echo "Done!"
-	@echo "You can run Despotify with the command 'despotify'."
-	@echo "And you can also run the despotify gateway with the command 'gateway'."
-
-uninstall:
-	@echo "Removing Despotify & gateway..."
-	rm -f /usr/bin/despotify /usr/bin/gateway
-	@echo "Done!"
-

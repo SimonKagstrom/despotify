@@ -1,12 +1,10 @@
-CFLAGS = -Wall -ggdb $(shell pkg-config --cflags gstreamer-0.10)
-LDFLAGS = $(shell pkg-config --libs gstreamer-0.10)
+GSTAPP_OBJS = gstappsrc.o gstappbuffer.o gstapp-marshal.o
 
 glib_enum_prefix = gst_app
 
 all: libgstapp.a
 
-
-libgstapp.a: gstappsrc.o gstappbuffer.o gstapp-marshal.o
+libgstapp.a: $(GSTAPP_OBJS)
 	$(AR) rcs $@ $^
 
 gstapp-marshal.o: gstapp-marshal.h

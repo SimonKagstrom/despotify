@@ -15,7 +15,6 @@
 #include "commands.h"
 #include "packet.h"
 #include "util.h"
-#include "event.h"
 
 extern void app_packet_callback (SESSION *, int, unsigned char *, int);
 
@@ -190,7 +189,9 @@ int handle_packet (SESSION * session,
 		break;
 
 	case CMD_PAUSE:
+                /* TODO: No GUI events in here.
 		event_msg_post (MSG_CLASS_GUI, MSG_GUI_PAUSE, NULL);
+                */
 		break;
 	}
 
