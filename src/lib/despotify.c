@@ -31,9 +31,9 @@ BOOL despotify_authenticate(despotify_session *session, const char *user, const 
 
     session_auth_set (session->session, user, password);
 
-    if (session_sessionect (session->session) < 0)
+    if (session_connect (session->session) < 0)
     {
-        session->last_error = "Could not sessionect to server.";
+        session->last_error = "Could not connect to server.";
         return FALSE;
     }
 
@@ -60,12 +60,12 @@ void despotify_close(despotify_session *session)
     despotify_free(session, TRUE);
 }
 
-void despotify_free(despotify_session *session, BOOL should_dissessionect)
+void despotify_free(despotify_session *session, BOOL should_disconnect)
 {
     assert(session != NULL && session->session != NULL);
 
-    if (should_dissessionect)
-        session_dissessionect (session->session);
+    if (should_disconnect)
+        session_disconnect (session->session);
 
     session_free (session->session);
     free (session);
@@ -76,7 +76,7 @@ const char *despotify_get_error(despotify_session *session)
     const char *error;
     /* Only session_init_client() failing can cause this. */
     if (!session)
-        return "Could not allocate memory for a new despotify_session/session.";
+        return "Could not allocate memory for a new session.";
 
     error = session->last_error;
     session->last_error = NULL;

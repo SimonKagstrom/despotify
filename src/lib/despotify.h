@@ -29,12 +29,12 @@ BOOL despotify_authenticate(despotify_session *session, const char *user, const 
 
 #define despotify_change_user(session, user, password) { \
                         despotify_close(session); \
-                        (session) = despotify_new_despotify_session(); \
+                        (session) = despotify_new_session(); \
                         despotify_authenticate(session, user, password); \
                     } while (0)
 
 void despotify_close(despotify_session *session);
-void despotify_free(despotify_session *session, BOOL should_dissessionect);
+void despotify_free(despotify_session *session, BOOL should_disconnect);
 
 const char *despotify_get_error(despotify_session *session);
 
