@@ -34,22 +34,22 @@ all: $(SUBDIRS)
 
 clean: 
 	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir -f local.mk clean || exit $?; \
+		$(MAKE) -C $$dir -f local.mk clean || exit $$?; \
 	done
 
 clients: $(CLIENTS)
 $(CLIENTS): lib
 $(SUBDIRS):
-	$(MAKE) -C $@ -f local.mk || exit $?
+	$(MAKE) -C $@ -f local.mk
 
 install: $(SUBDIRS)
 	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir -f local.mk install || exit $?; \
+		$(MAKE) -C $$dir -f local.mk install || exit $$?; \
 	done
 
 uninstall:
 	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir -f local.mk uninstall || exit $?; \
+		$(MAKE) -C $$dir -f local.mk uninstall || exit $$?; \
 	done
 
 Makefile.local.mk:
