@@ -68,8 +68,6 @@
 
 #define SPOTIFYSESSION_TIMEOUT	600
 
-#define DEBUG
-
 int rest_fsm (RESTSESSION *);
 int spotify_fsm (SPOTIFYSESSION *);
 

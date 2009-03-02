@@ -6,6 +6,8 @@
  */
  
 #include <stdlib.h>
+#include <unistd.h>
+
 #include "network.h"
  
 // socket read, write
