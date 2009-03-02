@@ -220,7 +220,7 @@ void esbuf_vsprintf(esbuf *buf, unsigned char *format, va_list va)
   AKssize_t n;
     
   ESbuf_dASSERT(buf != NULL && format != NULL);
-  if ((n = vsnprintf(buf->head, buf->size, format, va)) >= buf->size)
+  if ((n = vsnprintf(buf->head, buf->size, format, va)) >= (AKssize_t)buf->size)
   {
     esbuf_set_size(buf, n);
     n = vsnprintf(buf->head, n, format, va);

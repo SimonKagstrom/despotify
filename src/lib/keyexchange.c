@@ -100,7 +100,7 @@ int send_client_initial_packet (SESSION * session)
 		esbuf_free_ctx(ctx);
 		return -1;
 	}
-	else if (ret != esbuf_idx(b)) {
+	else if (ret != (int)esbuf_idx(b)) {
 		printf ("send_client_initial_packet(): only wrote %d of %d bytes\n", ret, esbuf_idx(b));
 		esbuf_free_ctx(ctx);
 		return -1;

@@ -157,7 +157,7 @@ int send_client_auth (SESSION * session)
 		esbuf_free_ctx(ctx);
 		return -1;
 	}
-	else if (ret != esbuf_idx(buf)) {
+	else if (ret != (int)esbuf_idx(buf)) {
 		printf ("send_client_auth(): only wrote %d of %d bytes\n",
 			ret, esbuf_idx(buf));
 		esbuf_free_ctx(ctx);

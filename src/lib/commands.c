@@ -203,7 +203,6 @@ int cmd_aeskey (SESSION * session, unsigned char *file_id,
 	int ret;
 	esbuf_ctxh ctx;
 	esbuf *b;
-	unsigned short zero;
 	CHANNEL *ch;
 	char buf[256];
 
