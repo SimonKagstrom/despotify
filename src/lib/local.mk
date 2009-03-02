@@ -25,7 +25,7 @@ ifeq ($(shell uname -s),Linux)
         LDFLAGS += $(shell pkg-config --libs-only-l --libs-only-L gstreamer-base-0.10)
 
         LIB_OBJS += gstreamer.lo
-        LIB_OBJS += gstappsrc.lo gstappbuffer.lo gstapp-marshal.lo
+        LIB_OBJS += gstapp/gstappsrc.lo gstapp/gstappbuffer.lo gstapp/gstapp-marshal.lo
 
 gstapp/gstapp-marshal.h: gstapp/gstapp-marshal.list
 	glib-genmarshal --header --prefix=gst_app_marshal gstapp/gstapp-marshal.list > gstapp/gstapp-marshal.h.tmp
@@ -60,7 +60,7 @@ libdespotify.la: $(LIB_OBJS)
 	$(LT) --mode=link $(CC) -o libdespotify.la $(LDFLAGS) $(LIB_OBJS)
 
 %.lo: %.c
-	$(LT) --mode=compile $(CC) $(CFLAGS) -c $<
+	$(LT) --mode=compile $(CC) $(CFLAGS) -o $@ -c $<
 
 ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
 CFILES = $(LIB_OBJS:.lo=.c)
