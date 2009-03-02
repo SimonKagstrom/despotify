@@ -2,21 +2,18 @@
 # $Id$
 # 
 
-CFLAGS += -Igstapp/
-DEP_CC := $(CC)
-CC := $(LT) --mode=compile $(CC)
+LIB_OBJS = aes.lo audio.lo auth.lo buffer.lo channel.lo commands.lo dns.lo esbuf.lo handlers.lo keyexchange.lo packet.lo playlist.lo puzzle.lo session.lo shn.lo sndqueue.lo util.lo xml.lo
 
+CFLAGS += -Igstapp/
 LDFLAGS += -rpath /usr/lib
 
-LIB_OBJS += aes.o audio.o auth.o buffer.o channel.o commands.o dns.o esbuf.o handlers.o keyexchange.o packet.o playlist.o puzzle.o session.o shn.o sndqueue.o util.o xml.o
-
-.PHONY: all clean
+.PHONY: all clean install uninstall
 
 all: libdespotify.la
 
 # Mac OS X specifics
 ifeq ($(shell uname -s),Darwin)
-    LIB_OBJS += coreaudio.o
+    LIB_OBJS += coreaudio.lo
     LDFLAGS += -lresolv -framework CoreAudio
 endif
 
@@ -27,8 +24,8 @@ ifeq ($(shell uname -s),Linux)
         CFLAGS += $(shell pkg-config --cflags gstreamer-base-0.10)
         LDFLAGS += $(shell pkg-config --libs-only-l --libs-only-L gstreamer-base-0.10)
 
-        LIB_OBJS += gstreamer.o
-        LIB_OBJS += gstapp/gstappsrc.o gstapp/gstappbuffer.o gstapp/gstapp-marshal.o
+        LIB_OBJS += gstreamer.lo
+        LIB_OBJS += gstapp/gstappsrc.lo gstapp/gstappbuffer.lo gstapp/gstapp-marshal.lo
 
 gstapp/gstapp-marshal.h: gstapp/gstapp-marshal.list
 	glib-genmarshal --header --prefix=gst_app_marshal gstapp/gstapp-marshal.list > gstapp/gstapp-marshal.h.tmp
@@ -42,37 +39,40 @@ gstapp/gstapp-marshal.c: gstapp/gstapp-marshal.list gstapp/gstapp-marshal.h
     endif
 
     ifeq ($(LINUX_BACKEND),libao)
-        LIB_OBJS += libao.o
+        LIB_OBJS += libao.lo
         LDFLAGS += -lao
     endif
 
     ifeq ($(LINUX_BACKEND),pulseaudio)
-        LIB_OBJS += pulseaudio.o
+        LIB_OBJS += pulseaudio.lo
         LDFLAGS += -lpulse -lpulse-simple
     endif
 endif
 
 # FreeBSD specifics
 ifeq ($(shell uname -s),FreeBSD)
-    LIB_OBJS += pulseaudio.o
+    LIB_OBJS += pulseaudio.lo
     CFLAGS += -I/usr/local/include
     LDFLAGS += -L/usr/local/include -lpulse -lpulse-simple
 endif
 
 libdespotify.la: $(LIB_OBJS)
-	$(LT) --mode=link $(LD) -o libdespotify.la $(LDFLAGS) $(LIB_OBJS:.o=.lo)
+	$(LT) --mode=link $(CC) -o libdespotify.la $(LDFLAGS) $(LIB_OBJS)
+
+%.lo: %.c
+	$(LT) --mode=compile $(CC) $(CFLAGS) -c $<
 
 ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
-CFILES = $(LIB_OBJS:.o=.c)
+CFILES = $(LIB_OBJS:.lo=.c)
 
 Makefile.dep: $(CFILES)
-	$(DEP_CC) $(CFLAGS) -MM $(CFILES) > $@
+	$(CC) $(CFLAGS) -MM $(CFILES) | sed 's/^\([^ ]\+\).o:/\1.lo:/' > $@
 
 -include Makefile.dep
 endif
 
 clean:
-	$(LT) --mode=clean rm -f $(notdir $(LIB_OBJS:.o=.lo)) Makefile.dep
+	$(LT) --mode=clean rm -f $(notdir $(LIB_OBJS)) Makefile.dep
 
 install: libdespotify.la
 	# install despotify.h /usr/include

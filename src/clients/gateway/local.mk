@@ -5,15 +5,14 @@
 unexport LDFLAGS CFLAGS
 
 LIBDIR = ../../lib
+LIB = $(LIBDIR)/libdespotify.la
 
 CFLAGS += -I$(LIBDIR)
-LDFLAGS += $(LIBDIR)/libdespotify.la
 
 GATEWAY_OBJS = gw-core.o gw-browse.o gw-handlers.o gw-image.o gw-playlist.o gw-search.o gw-stream.o gw-http.o base64.o
 
+.PHONY: all clean install uninstall
 all: gateway
-
-.PHONY: all clean lib install uninstall
 
 ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
 CFILES = $(filter-out %.a,$(GATEWAY_OBJS:.o=.c))
@@ -28,11 +27,8 @@ clean:
 	$(LT) --mode=clean rm -f gateway
 	rm -f $(GATEWAY_OBJS) Makefile.dep
 
-gateway: $(GATEWAY_OBJS) lib
-	$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(GATEWAY_OBJS)
-
-lib:
-	$(MAKE) -C $(LIBDIR) -f local.mk
+gateway: $(GATEWAY_OBJS) $(LIB)
+	$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(LIB) $(GATEWAY_OBJS)
 
 install: gateway 
 	@echo "Copying gateway binary to /usr/bin/gateway"

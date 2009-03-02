@@ -28,6 +28,8 @@ endif
 CLIENTS = clients/despotify clients/gateway
 SUBDIRS = lib $(CLIENTS)
 
+.PHONY: all clean $(SUBDIRS) install uninstall
+
 all: $(SUBDIRS)
 
 clean: 
@@ -35,14 +37,12 @@ clean:
 		$(MAKE) -C $$dir -f local.mk clean || exit $?; \
 	done
 
-.PHONY: all clean $(SUBDIRS) install uninstall
-
+clients: $(CLIENTS)
+$(CLIENTS): lib
 $(SUBDIRS):
 	$(MAKE) -C $@ -f local.mk || exit $?
 
-clients: $(CLIENTS)
-
-install:
+install: $(SUBDIRS)
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir -f local.mk install || exit $?; \
 	done
