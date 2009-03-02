@@ -10,7 +10,7 @@
 
 #define panic(...) { printf(__VA_ARGS__); abort(); } while(0)
 
-despotify_session *despotify_new_despotify_session()
+despotify_session *despotify_new_session()
 {
     despotify_session *session = (despotify_session *) malloc(sizeof (despotify_session));
     if (!session)
