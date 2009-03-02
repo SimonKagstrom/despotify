@@ -11,6 +11,7 @@
 
 #include "shn.h"
 
+
 typedef struct
 {
 	/* connection to Spotify's service */
@@ -118,7 +119,7 @@ typedef struct
 } SESSION;
 
 SESSION *session_init_client (void);
-void session_auth_set (SESSION *, char *, char *);
+void session_auth_set (SESSION *, const char *, const char *);
 int session_connect (SESSION *);
 SESSION *session_init_client (void);
 void session_disconnect (SESSION *);

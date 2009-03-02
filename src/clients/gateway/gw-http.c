@@ -4,14 +4,18 @@
  *
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "network.h"
 
 #include "base64.h"
 #include "buffer.h"
 #include "gw.h"
 #include "gw-http.h"
+
 
 static int http_reply (RESTSESSION *, int, BUFFER *);
 static int http_reply_need_auth (RESTSESSION *);
@@ -111,7 +115,7 @@ static int http_reply_need_auth (RESTSESSION * r)
 	buffer_append_raw (b, "\r\n", 2);
 
 	ret = 0;
-	if (write (r->socket, b->buf, b->buflen) != b->buflen)
+	if (sock_send (r->socket, b->buf, b->buflen) != b->buflen)
 		ret = -1;
 
 	buffer_free (b);
@@ -138,7 +142,7 @@ static int http_reply (RESTSESSION * r, int status, BUFFER * response)
 	buffer_append_raw (b, response->buf, response->buflen);
 
 	ret = 0;
-	if (write (r->socket, b->buf, b->buflen) != b->buflen)
+	if (sock_send (r->socket, b->buf, b->buflen) != b->buflen)
 		ret = -1;
 
 	buffer_free (b);

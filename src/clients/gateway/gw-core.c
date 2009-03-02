@@ -44,13 +44,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/select.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <time.h>
 #include <assert.h>
 
+#include "network.h"
 #include "auth.h"
 #include "commands.h"
 #include "dns.h"
@@ -70,6 +68,8 @@
 
 #define SPOTIFYSESSION_TIMEOUT	600
 
+#define DEBUG
+
 int rest_fsm (RESTSESSION *);
 int spotify_fsm (SPOTIFYSESSION *);
 
@@ -79,6 +79,9 @@ static int num_clients;
 
 int main (int argc, char **argv)
 {
+	
+    if (network_init() != 0) return -1;
+
 	RESTSESSION **rest;
 	int num_rest;
 
@@ -151,7 +154,7 @@ int main (int argc, char **argv)
 				continue;
 			}
 
-			close (rest[i]->socket);
+			sock_close (rest[i]->socket);
 			free (rest[i]);
 
 			/* Replace this daemon session with the last one */
@@ -295,10 +298,11 @@ int rest_read_input (RESTSESSION * r)
 		if (nbytes_to_read == 0)
 			return -1;
 
-		ret = read (r->socket, r->input + r->input_len,
-			    nbytes_to_read);
-		if (ret <= 0)
+		ret = recv (r->socket, r->input + r->input_len, nbytes_to_read, 0);
+		if (ret <= 0) {
+			printf("rest_read_input(): read returned %d\n", ret);
 			return -1;
+		}
 
 		r->input_len += ret;
 		if (ret != nbytes_to_read)
@@ -331,7 +335,7 @@ int rest_fsm (RESTSESSION * r)
 
 		r->socket_has_data = 0;
 		r->state = REST_STATE_LOAD_COMMAND;
-		if ((ret = rest_read_input (r)) != 0)
+		if ((ret = rest_read_input (r)) != 0) 
 			break;
 
 	case REST_STATE_LOAD_COMMAND:
@@ -476,14 +480,14 @@ int rest_fsm (RESTSESSION * r)
 		else if (!strcmp (r->command, "id")) {
 			r->state = REST_STATE_LOAD_COMMAND;
 			sprintf (msg,
-				 "200 %zd OK The session id is shown below\n%s",
+				 "200 %d OK The session id is shown below\n%s",
 				 strlen (r->client->client_id),
 				 r->client->client_id);
 			block_write (r->socket, msg, strlen (msg));
 		}
 		else if (!strcmp (r->command, "country")) {
 			r->state = REST_STATE_LOAD_COMMAND;
-			sprintf (msg, "200 %zd OK Assigned country below\n%s",
+			sprintf (msg, "200 %d OK Assigned country below\n%s",
 				 strlen (r->client->session->country),
 				 r->client->session->country);
 			block_write (r->socket, msg, strlen (msg));

@@ -7,11 +7,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
 #include <assert.h>
+
+#include "network.h"
 
 #include <openssl/rand.h>
 #include <openssl/err.h>
@@ -41,6 +39,9 @@ static unsigned char DH_prime[] = {
 
 SESSION *session_init_client (void)
 {
+	if (network_init() != 0) {
+		return NULL;
+	}
 	SESSION *session;
 
 	if ((session = (SESSION *) calloc (1, sizeof (SESSION))) == NULL)
@@ -99,7 +100,7 @@ SESSION *session_init_client (void)
 	return session;
 }
 
-void session_auth_set (SESSION * session, char *username, char *password)
+void session_auth_set (SESSION * session, const char *username, const char *password)
 {
 	strncpy (session->username, username, sizeof (session->username) - 1);
 	session->username[sizeof (session->username) - 1] = 0;

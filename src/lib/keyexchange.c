@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <netinet/in.h>
 #include <assert.h>
+#include "network.h"
 
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
@@ -33,7 +33,7 @@ int do_key_exchange (SESSION * session)
 	}
 
 	if (read_server_initial_packet (session)) {
-		printf ("do_key_exchange(): send_client_initial_packet() failed\n");
+		printf ("do_key_exchange(): read_server_initial_packet() failed\n");
 		return -1;
 	}
 
@@ -94,8 +94,7 @@ int send_client_initial_packet (SESSION * session)
 #ifdef DEBUG_LOGIN
 	hexdump8x32 ("initial client packet", esbuf_data(b), esbuf_idx(b));
 #endif
-
-	if ((ret = write (session->ap_sock, esbuf_data(b), esbuf_idx(b))) <= 0) {
+	if ((ret = sock_send(session->ap_sock, esbuf_data(b), esbuf_idx(b))) <= 0) {
 		printf ("send_client_initial_packet(): connection lost\n");
 		esbuf_free_ctx(ctx);
 		return -1;

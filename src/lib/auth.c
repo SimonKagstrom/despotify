@@ -13,7 +13,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
-#include <netinet/in.h>
+#include "network.h"
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
 
@@ -152,7 +152,7 @@ int send_client_auth (SESSION * session)
 		     b->buflen);
 #endif
 
-	if ((ret = write (session->ap_sock, esbuf_data(buf), esbuf_idx(buf))) <= 0) {
+	if ((ret = sock_send (session->ap_sock, esbuf_data(buf), esbuf_idx(buf))) <= 0) {
 		printf ("send_client_auth(): connection lost\n");
 		esbuf_free_ctx(ctx);
 		return -1;

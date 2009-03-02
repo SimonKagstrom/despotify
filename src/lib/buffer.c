@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <arpa/inet.h>
+#include "network.h"
 
 #include "buffer.h"
 

@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include <netinet/in.h>
+#include "network.h"
 
 #include "channel.h"
 #include "util.h"
@@ -107,7 +107,7 @@ int channel_process (unsigned char *buf, unsigned short len, int error)
 	int ret;
 	unsigned char *ptr;
 	unsigned short header_len, consumed_len;
-
+	
 	/* Extract channel ID */
 	channel_id = *(unsigned short *) buf;
 	channel_id = ntohs (channel_id);

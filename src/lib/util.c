@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <errno.h>
+#include "network.h"
 
 #include "util.h"
 
@@ -99,9 +100,11 @@ ssize_t block_read (int fd, void *buf, size_t nbyte)
 
 	idx = 0;
 	while (idx < nbyte) {
-		if ((n = read (fd, buf + idx, nbyte - idx)) <= 0) {
+		if ((n = sock_recv (fd, buf + idx, nbyte - idx)) <= 0) {
+			#ifdef __use_posix__
 			if (errno == EINTR)
 				continue;
+			#endif
 			return n;
 		}
 		idx += n;
@@ -116,9 +119,11 @@ ssize_t block_write (int fd, void *buf, size_t nbyte)
 
 	idx = 0;
 	while (idx < nbyte) {
-		if ((n = write (fd, buf + idx, nbyte - idx)) <= 0) {
+		if ((n = sock_send (fd, buf + idx, nbyte - idx)) <= 0) {
+			#ifdef __use_posix__
 			if (errno == EINTR)
 				continue;
+			#endif
 			return n;
 		}
 		idx += n;

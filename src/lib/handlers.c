@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <netinet/in.h>
+#include "network.h"
 #include <assert.h>
 
 #include "channel.h"
@@ -73,7 +73,7 @@ int handle_channel (int cmd, unsigned char *payload, int len)
 			 ntohs (*(unsigned short *) (payload + 2)),
 			 ntohs (*(unsigned short *) (payload + 2)))
 	}
-
+	
 	return channel_process (payload, len, cmd == CMD_CHANNELERR);
 }
 

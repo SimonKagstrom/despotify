@@ -7,7 +7,7 @@
  */
 
 #include <stdlib.h>
-#include <netinet/in.h>
+#include "network.h"
 
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
@@ -15,6 +15,11 @@
 #include "puzzle.h"
 #include "session.h"
 #include "util.h"
+
+#if !defined srandom || !defined random
+#define srandom srand
+#define random rand
+#endif
 
 void puzzle_solve (SESSION * session)
 {

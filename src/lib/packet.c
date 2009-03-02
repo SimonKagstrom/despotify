@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <netinet/in.h>
+#include "network.h"
 #include <unistd.h>
 #include <time.h>
 #include <assert.h>

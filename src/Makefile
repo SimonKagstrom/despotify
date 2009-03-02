@@ -6,7 +6,8 @@
 export
 
 CFLAGS = -Wall -Wextra -ggdb
-LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile
+LDFLAGS = -lz -lexpat -lvorbisfile
+
 LD = $(CC)
 
 LINUX_BACKEND = gstreamer
@@ -24,10 +25,19 @@ else
     LT = libtool --tag=CC
 endif
 
+# windows specifics
+ifeq ($(firstword $(subst _, ,$(shell uname -s))), MINGW32)
+    LDFLAGS += -leay32
+else
+    LDFLAGS += -lcrypto
+endif
+
 # gcc2 & 3 are ancient and doesn't support -Wno-pointer-sign
 ifeq ($(firstword $(subst ., ,$(shell $(CC) -dumpversion))), 4)
     CFLAGS += -Wno-pointer-sign
 endif
+
+
 
 CLIENTS = clients/despotify clients/gateway
 SUBDIRS = lib $(CLIENTS)
