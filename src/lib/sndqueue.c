@@ -240,6 +240,9 @@ int snd_stop (void *arg)
 		DSFYfree (b);
 	}
 
+	session->fifo->start = NULL;
+	session->fifo->end = NULL;
+
 	/* Reset the session */
 	snd_reset (session);
 
