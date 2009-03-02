@@ -23,6 +23,8 @@
 #define REQ_1_SECOND 4096*5
 #define REQ_SIZE 5*REQ_1_SECOND
 
+extern char *current_song;
+
 /* from ui-core.c */
 void update_timer(snd_SESSION *, int);
 
@@ -119,6 +121,12 @@ static void gui_player_play (char *input)
 	DSFYDEBUG
 		("gui_player_play(): Sending MSG_GUI_PLAY for song %s - %s\n",
 		 t->title, t->artist);
+
+	if(current_song == NULL)
+	  current_song = (char *) malloc(150);
+
+	sprintf(current_song,"%.30s - %.30s",t->title, t->artist);
+
 }
 
 int gui_player_event_processor (EVENT * e, enum ev_flags ev_kind)

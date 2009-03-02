@@ -55,6 +55,9 @@ static time_t last_ping;
 /* Handle country code */
 static char country[4];
 
+/* Current song */
+char *current_song = NULL;
+
 struct scrlwin_entry
 {
 	int id;
@@ -255,9 +258,16 @@ void update_timer(snd_SESSION *p, int timeplayed)
   {
       int x, y;
 
+      /* Print seconds played */
       getmaxyx (stdscr, h, w);
       mvwprintw (header, 3, w - 44, "       ");
       mvwprintw (header, 3, w - 44, "%d",timeplayed);
+
+      /* Update song title as while we are at it */
+      if(current_song != NULL)
+	mvwprintw (header, 3, 2, "Playing: %s ",current_song);
+      else
+	mvwprintw (header, 3, 2, "Playing:  ");
 
       wrefresh (header);
 
@@ -303,10 +313,13 @@ static void header_update (int redraw)
 	mvwprintw (header, 1, 2, "Playlists: %2d/%2d", playlists_loaded,
 		   playlists);
 	wattroff (header, A_BOLD);
-	mvwprintw (header, 2, 2, "Current playlist: %s",
+	mvwprintw (header, 2, 2, "Playlist: %s",
 		   p ? p->name : "<none>");
 
-	mvwprintw (header, 3, 2, "Currently playing: <todo>");
+	if(current_song != NULL)
+	  mvwprintw (header, 3, 2, "Playing: %s ",current_song);
+	else
+	  mvwprintw (header, 3, 2, "Playing:  ");
 
 	mvwprintw (header, 3, w - 60, "Seconds played:");
 
