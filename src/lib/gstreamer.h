@@ -12,9 +12,9 @@ typedef struct gst_private
 	GMainLoop *loop;
 } gst_PRIVATE;
 
-int gstaudio_init_device (void *);
-int gstaudio_free_device (void);
-int gstaudio_prepare_device (AUDIOCTX *);
-int gstaudio_play (AUDIOCTX *);
-int gstaudio_stop (AUDIOCTX *);
+int gstreamer_init_device (void *);
+int gstreamer_free_device (void);
+int gstreamer_prepare_device (AUDIOCTX *);
+int gstreamer_play (AUDIOCTX *);
+int gstreamer_stop (AUDIOCTX *);
 #endif

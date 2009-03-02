@@ -86,7 +86,7 @@ static gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer user_data)
 	return 1;
 }
 
-static void gstaudio_free_buffer (void *buffer)
+static void gstreamer_free_buffer (void *buffer)
 {
 	g_free (buffer);
 }
@@ -146,7 +146,7 @@ static void need_data_cb (GstAppSrc * src, guint length, gpointer data)
 		exit (-1);
 	}
 
-	gstbuf = gst_app_buffer_new (buffer, r, gstaudio_free_buffer, buffer);
+	gstbuf = gst_app_buffer_new (buffer, r, gstreamer_free_buffer, buffer);
 	if (gst_app_src_push_buffer (GST_APP_SRC (src), gstbuf) !=
 			GST_FLOW_OK)
 		DSFYDEBUG ("%s> call to push_buffer failed\n", __FUNCTION__);
@@ -156,7 +156,7 @@ static void need_data_cb (GstAppSrc * src, guint length, gpointer data)
  * Initialize and get an output device
  *
  */
-int gstaudio_init_device (void *unused)
+int gstreamer_init_device (void *unused)
 {
 	(void) unused;		/* don't warn. */
 	DSFYDEBUG ("%s\n", __FUNCTION__);
@@ -175,7 +175,7 @@ int gstaudio_init_device (void *unused)
  * Prepare for playback by configuring sample rate, channels, ..
  * 
  */
-int gstaudio_prepare_device (AUDIOCTX * actx)
+int gstreamer_prepare_device (AUDIOCTX * actx)
 {
 	gst_PRIVATE *priv;
 	GstElement *sink, *src;
@@ -235,25 +235,21 @@ int gstaudio_prepare_device (AUDIOCTX * actx)
 	return 0;
 }
 
-int gstaudio_pause (AUDIOCTX * actx)
+int gstreamer_pause (AUDIOCTX * actx)
 {
-	(void) actx;		/* don't warn. */
-
 	DSFYDEBUG ("%s\n", __FUNCTION__);
-	g_idle_add (pause_cb, NULL);
+	g_idle_add (pause_cb, actx->driverprivate);
 	return 0;
 }
 
-int gstaudio_resume (AUDIOCTX * actx)
+int gstreamer_resume (AUDIOCTX * actx)
 {
-	(void) actx;		/* don't warn. */
-
 	DSFYDEBUG ("%s\n", __FUNCTION__);
-	g_idle_add (resume_cb, NULL);
+	g_idle_add (resume_cb, actx->driverprivate);
 	return 0;
 }
 
-int gstaudio_play (AUDIOCTX * actx)
+int gstreamer_play (AUDIOCTX * actx)
 {
 	gst_PRIVATE *priv = (gst_PRIVATE *) actx->driverprivate;
 	assert (priv != NULL);
@@ -268,7 +264,7 @@ int gstaudio_play (AUDIOCTX * actx)
 	return 0;
 }
 
-int gstaudio_stop (AUDIOCTX * actx)
+int gstreamer_stop (AUDIOCTX * actx)
 {
 	gst_PRIVATE *priv = (gst_PRIVATE *) actx->driverprivate;
 	assert (priv != NULL);
@@ -281,21 +277,21 @@ int gstaudio_stop (AUDIOCTX * actx)
 	return 0;
 }
 
-int gstaudio_free_device (void)
+int gstreamer_free_device (void)
 {
 	DSFYDEBUG ("%s\n", __FUNCTION__);
 	return 0;
 }
 
-AUDIODRIVER gstaudio_driver_desc = {
-	gstaudio_init_device,
-	gstaudio_free_device,
+AUDIODRIVER gstreamer_driver_desc = {
+	gstreamer_init_device,
+	gstreamer_free_device,
 
-	gstaudio_prepare_device,
-	gstaudio_play,
-	gstaudio_stop,
-	gstaudio_pause,
-	gstaudio_resume
+	gstreamer_prepare_device,
+	gstreamer_play,
+	gstreamer_stop,
+	gstreamer_pause,
+	gstreamer_resume
 }
 
-, *driver = &gstaudio_driver_desc;
+, *driver = &gstreamer_driver_desc;
