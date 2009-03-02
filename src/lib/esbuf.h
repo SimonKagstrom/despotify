@@ -9,7 +9,7 @@
 
 #define ESbuf_PANIC(f...) esbuf_panic(__FILE__, __LINE__, NULL, 0, ##f)
 #define ESbuf_PANIC_FROM(f...) esbuf_panic(__FILE__, __LINE__, from_file, from_line, ##f)
-#define ESbuf_ASSERT(cond) if (!(cond)) esbuf_panic(__FILE__, __LINE__, NULL, 0, "Assertion (" __STRING(cond) ") failed")
+#define ESbuf_ASSERT(cond) if (!(cond)) esbuf_panic(__FILE__, __LINE__, NULL, 0, "Assertion (" #cond ") failed")
 #ifdef ESBUF_DEBUG
 #define ESbuf_dASSERT(cond) ESbuf_ASSERT(cond)
 #else

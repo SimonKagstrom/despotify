@@ -5,7 +5,7 @@
 
 export
 
-CFLAGS = -Wall -Wextra -ggdb -Wno-pointer-sign
+CFLAGS = -Wall -Wextra -ggdb
 LDFLAGS = -lcrypto -lz -lexpat -lvorbisfile
 LD = $(CC)
 
@@ -24,6 +24,10 @@ else
     LT = libtool --tag=CC
 endif
 
+# gcc2 & 3 are ancient and doesn't support -Wno-pointer-sign
+ifeq ($(firstword $(subst ., ,$(shell $(CC) -dumpversion))), 4)
+    CFLAGS += -Wno-pointer-sign
+endif
 
 CLIENTS = clients/despotify clients/gateway
 SUBDIRS = lib $(CLIENTS)
