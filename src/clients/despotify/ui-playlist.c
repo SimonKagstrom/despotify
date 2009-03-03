@@ -75,6 +75,12 @@ void gui_playlist_display (WINDOW * w, struct playlist *p)
 {
 	struct track *t;
 	int i, x, y;
+	getmaxyx (w, y, x);
+
+	int maxlen = x - 8;
+	int len1 = maxlen * 40 / 100;
+	int len2 = maxlen * 30 / 100;
+	int len3 = maxlen * 30 / 100;
 
 	if (p == NULL) {
 		struct playlist **plroot = playlist_root ();
@@ -90,30 +96,36 @@ void gui_playlist_display (WINDOW * w, struct playlist *p)
 	wclear (w);
 	box (w, 0, 0);
 
+
 	wattron (w, A_BOLD);
 	mvwprintw (w, 1, 2, "Playlist");
+	
 	wattroff (w, A_BOLD);
 
 	mvwprintw (w, 1, 11, "%.25s, %d tracks, by %.20s", p->name,
 		   p->num_tracks, p->author);
+	
+	wattron (w, A_BOLD);
+	mvwprintw (w, 3 , 3, "#") ;
+	mvwprintw (w, 3 , 6, "%-*.*s %-*.*s %-*.*s",
+		   len1, len1, "Title",
+		   len2, len2, "Artist",
+		   len3, len3, "Album");
+	wattroff (w, A_BOLD);
 
-	getmaxyx (w, y, x);
-	for (i = 0, t = p->tracks; i < (y - 2 - 2) && t; t = t->next) {
+	
+	for (i = 0, t = p->tracks; i < (y - 2 - 2 - 1) && t; t = t->next) {
 		if (!t->has_meta_data)
 			continue;
 
 		i++;
 		wattron (w, A_BOLD);
-                mvwprintw (w, 2 + i, 2, "%2d", t->id + 1);
-                wattroff (w, A_BOLD);
-                int maxlen = x - 8;
-                int len1 = maxlen * 40 / 100;
-                int len2 = maxlen * 30 / 100;
-                int len3 = maxlen * 30 / 100;
-                mvwprintw (w, 2 + i, 6, "%-*.*s %-*.*s %-*.*s",
-                           len1, len1, t->title,
-                           len2, len2, t->artist,
-                           len3, len3, t->album);
+		mvwprintw (w, 3 + i, 2, "%2d", t->id + 1);
+		wattroff (w, A_BOLD);
+		mvwprintw (w, 3 + i, 6, "%-*.*s %-*.*s %-*.*s",
+			   len1, len1, t->title,
+			   len2, len2, t->artist,
+			   len3, len3, t->album);
 	}
 
 	wrefresh (w);
