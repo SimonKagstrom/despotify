@@ -58,7 +58,7 @@ void gui_playlist (WINDOW * w, char *input)
 			wattron (w, A_BOLD);
 			mvwprintw (w, i, 2, "%2d:", i);
 			wattroff (w, A_BOLD);
-			mvwprintw (w, i, 6, "%.60s", p->name);
+			mvwprintw (w, i, 6, "%.*s", maxx - 7, p->name);
 		}
 	}
 
@@ -106,8 +106,25 @@ void gui_playlist_display (WINDOW * w, struct playlist *p)
 		wattron (w, A_BOLD);
 		mvwprintw (w, 2 + i, 2, "%2d:", t->id + 1);
 		wattroff (w, A_BOLD);
-		mvwprintw (w, 2 + i, 7, "%.24s - %.22s [%.24s]", t->title,
-			   t->artist, t->album);
+                size_t len1 = strlen(t->title);
+                size_t len2 = strlen(t->artist);
+                size_t len3 = strlen(t->album);
+                size_t maxlen = x - 14;
+                if (len1 + len2 + len3 > maxlen) {
+                        if (len1 > maxlen) {
+                                len1 = len2 = len3 = maxlen / 3;
+                        }
+                        else if (len1 + len2 > maxlen) {
+                                len2 = len3 = (maxlen - len1) / 2;
+                        }
+                        else {
+                                len3 = maxlen - len1 - len2;
+                        }
+                }
+		mvwprintw (w, 2 + i, 7, "%.*s - %.*s [%.*s]",
+                           len1, t->title,
+			   len2, t->artist,
+                           len3, t->album);
 	}
 
 	wrefresh (w);
