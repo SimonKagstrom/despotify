@@ -478,14 +478,14 @@ int rest_fsm (RESTSESSION * r)
 		else if (!strcmp (r->command, "id")) {
 			r->state = REST_STATE_LOAD_COMMAND;
 			sprintf (msg,
-				 "200 %d OK The session id is shown below\n%s",
+				 "200 %zd OK The session id is shown below\n%s",
 				 strlen (r->client->client_id),
 				 r->client->client_id);
 			block_write (r->socket, msg, strlen (msg));
 		}
 		else if (!strcmp (r->command, "country")) {
 			r->state = REST_STATE_LOAD_COMMAND;
-			sprintf (msg, "200 %d OK Assigned country below\n%s",
+			sprintf (msg, "200 %zd OK Assigned country below\n%s",
 				 strlen (r->client->session->country),
 				 r->client->session->country);
 			block_write (r->socket, msg, strlen (msg));

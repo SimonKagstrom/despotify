@@ -293,7 +293,7 @@ void esbuf_free(esbuf_ctxh ctxh, esbuf *buf)
   if ((ctx = esbuf_find_ctx(ctxh)) == NULL) ESbuf_PANIC("esbuf_free(): Invalid ctx %.8x", ctxh);
   cur = ctx->head;
   while (cur != buf && cur != NULL) cur = cur->next;
-  if (cur == NULL) ESbuf_PANIC("esbuf_free(): Unknown esbuf %.8x", (unsigned int)buf);
+  if (cur == NULL) ESbuf_PANIC("esbuf_free(): Unknown esbuf %p", buf);
 #ifdef ESBUF_DEBUG
   printf("DEBUG: freeing buf %.8x\n", (unsigned int)cur);
 #endif
