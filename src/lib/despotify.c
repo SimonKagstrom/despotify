@@ -25,7 +25,7 @@ despotify_session *despotify_new_session()
     return session;
 }
 
-BOOL despotify_authenticate(despotify_session *session, const char *user, const char *password)
+bool despotify_authenticate(despotify_session *session, const char *user, const char *password)
 {
     assert(session != NULL && session->session != NULL);
 
@@ -34,13 +34,13 @@ BOOL despotify_authenticate(despotify_session *session, const char *user, const 
     if (session_connect (session->session) < 0)
     {
         session->last_error = "Could not connect to server.";
-        return FALSE;
+        return false;
     }
 
     if (do_key_exchange (session->session) < 0)
     {
         session->last_error = "Key exchange failed.";
-        return FALSE;
+        return false;
     }
 
     auth_generate_auth_hash (session->session);
@@ -49,18 +49,18 @@ BOOL despotify_authenticate(despotify_session *session, const char *user, const 
     if (do_auth (session->session) < 0)
     {
         session->last_error = "Authentication failed.";
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 void despotify_close(despotify_session *session)
 {
-    despotify_free(session, TRUE);
+    despotify_free(session, true);
 }
 
-void despotify_free(despotify_session *session, BOOL should_disconnect)
+void despotify_free(despotify_session *session, bool should_disconnect)
 {
     assert(session != NULL && session->session != NULL);
 
@@ -104,30 +104,30 @@ PLAYLIST **despotify_get_playlists(despotify_session *session)
     panic("despotify_get_playlists() not implemented!\n");
     return NULL;
 }
-BOOL despotify_append_song(despotify_session *session, PLAYLIST *playlist, TRACK *song)
+bool despotify_append_song(despotify_session *session, PLAYLIST *playlist, TRACK *song)
 {
     panic("despotify_append_song() not implemented!\n");
-    return FALSE;
+    return false;
 }
-BOOL despotify_remove_song(despotify_session *session, PLAYLIST *playlist, TRACK *song)
+bool despotify_remove_song(despotify_session *session, PLAYLIST *playlist, TRACK *song)
 {
     panic("despotify_remove_song() not implemented!\n");
-    return FALSE;
+    return false;
 }
-BOOL despotify_delete_playlist(despotify_session *session, PLAYLIST *playlist)
+bool despotify_delete_playlist(despotify_session *session, PLAYLIST *playlist)
 {
     panic("despotify_delete_playlist() not implemented!\n");
-    return FALSE;
+    return false;
 }
 PLAYLIST *despotify_create_playlist(despotify_session *session, const char *name)
 {
     panic("despotify_create_playlist() not implemented!\n");
     return NULL;
 }
-BOOL despotify_rename_playlist(despotify_session *session, PLAYLIST *playlist, const char *new_name)
+bool despotify_rename_playlist(despotify_session *session, PLAYLIST *playlist, const char *new_name)
 {
     panic("despotify_rename_playlist() not implemented!\n");
-    return FALSE;
+    return false;
 }
 PLAYLIST *despotify_free_playlist(despotify_session *session, PLAYLIST *playlist)
 {
@@ -136,24 +136,24 @@ PLAYLIST *despotify_free_playlist(despotify_session *session, PLAYLIST *playlist
 }
 
 /* Playback control. */
-BOOL despotify_stop(despotify_session *session)
+bool despotify_stop(despotify_session *session)
 {
     panic("despotify_stop() not implemented!\n");
-    return FALSE;
+    return false;
 }
-BOOL despotify_pause(despotify_session *session)
+bool despotify_pause(despotify_session *session)
 {
     panic("despotify_pause() not implemented!\n");
-    return FALSE;
+    return false;
 }
-BOOL despotify_resume(despotify_session *session)
+bool despotify_resume(despotify_session *session)
 {
     panic("despotify_resume() not implemented!\n");
-    return FALSE;
+    return false;
 }
 
-BOOL despotify_play(despotify_session *session, TRACK *song)
+bool despotify_play(despotify_session *session, TRACK *song)
 {
     panic("despotify_play() not implemented!\n");
-    return FALSE;
+    return false;
 }
