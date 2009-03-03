@@ -40,7 +40,7 @@ void gui_playlist (WINDOW * w, char *input)
 	struct playlist *p, **plroot;
 	int i, num;
 
-	werase (w);
+	wclear (w);
 	box (w, 0, 0);
 
 	if ((num = atoi (input)) < 0)
@@ -84,7 +84,7 @@ void gui_playlist_display (WINDOW * w, struct playlist *p)
 			return;
 	}
 
-	werase (w);
+	wclear (w);
 	box (w, 0, 0);
 
 	wattron (w, A_BOLD);
