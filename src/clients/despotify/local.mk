@@ -23,13 +23,19 @@ ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
 CFILES = $(filter-out %.a,$(DESPOTIFY_OBJS:.o=.c))
 
 Makefile.dep:
-	$(CC) $(CFLAGS) -MM $(CFILES) > $@
+	@echo Generating dependencies
+	$(SILENT)$(CC) $(CFLAGS) -MM $(CFILES) > $@
 
 -include Makefile.dep
 endif
 
+%.o: %.c
+	@echo CC $<
+	$(SILENT)$(CC) $(CFLAGS) -o $@ -c $<
+
 despotify: $(DESPOTIFY_OBJS) $(LIB)
-	$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(LIB) $(DESPOTIFY_OBJS)
+	@echo LD $@
+	$(SILENT)$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(LIB) $(DESPOTIFY_OBJS)
 
 clean:
 	$(LT) --mode=clean rm -f despotify

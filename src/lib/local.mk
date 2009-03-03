@@ -62,16 +62,19 @@ ifeq ($(shell uname -s),FreeBSD)
 endif
 
 libdespotify.la: $(LIB_OBJS)
-	$(LT) --mode=link $(CC) -o libdespotify.la $(LDFLAGS) $(LIB_OBJS)
+	@echo LD $@
+	$(SILENT)$(LT) --mode=link $(CC) -o libdespotify.la $(LDFLAGS) $(LIB_OBJS)
 
 %.lo: %.c
-	$(LT) --mode=compile $(CC) $(CFLAGS) -o $@ -c $<
+	@echo CC $<
+	$(SILENT)$(LT) --mode=compile $(CC) $(CFLAGS) -o $@ -c $<
 
 ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
 CFILES = $(LIB_OBJS:.lo=.c)
 
 Makefile.dep: $(CFILES)
-	$(CC) $(CFLAGS) -MM $(CFILES) | sed 's/^\([^ ]\+\).o:/\1.lo:/' > $@
+	@echo Generating dependencies
+	$(SILENT)$(CC) $(CFLAGS) -MM $(CFILES) | sed 's/^\([^ ]\+\).o:/\1.lo:/' > $@
 
 -include Makefile.dep
 endif

@@ -10,6 +10,13 @@ LDFLAGS = -lz -lexpat -lvorbisfile
 
 LD = $(CC)
 
+ifndef V
+# run "make V=1" to see full command lines
+SILENT := @
+SILENTDIR := -s
+SILENTLIB := --quiet
+endif
+
 LINUX_BACKEND = gstreamer
 
 include Makefile.local.mk
@@ -22,7 +29,7 @@ endif
 ifeq ($(shell uname -s),Darwin)
     LT = glibtool --tag=CC
 else
-    LT = libtool --tag=CC
+    LT = libtool $(SILENTLIB) --tag=CC
 endif
 
 # windows specifics
@@ -54,7 +61,7 @@ clean:
 clients: $(CLIENTS)
 $(CLIENTS): lib
 $(SUBDIRS):
-	$(MAKE) -C $@ -f local.mk
+	$(MAKE) $(SILENTDIR) -C $@ -f local.mk
 
 install: $(SUBDIRS)
 	for dir in $(SUBDIRS); do \

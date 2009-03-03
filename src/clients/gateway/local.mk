@@ -18,17 +18,23 @@ ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
 CFILES = $(filter-out %.a,$(GATEWAY_OBJS:.o=.c))
 
 Makefile.dep:
-	$(CC) $(CFLAGS) -MM $(CFILES) > $@
+	@echo Generating dependencies
+	@$(CC) $(CFLAGS) -MM $(CFILES) > $@
 
 -include Makefile.dep
 endif
+
+%.o: %.c
+	@echo CC $<
+	$(SILENT)$(CC) $(CFLAGS) -o $@ -c $<
 
 clean:
 	$(LT) --mode=clean rm -f gateway
 	rm -f $(GATEWAY_OBJS) Makefile.dep
 
 gateway: $(GATEWAY_OBJS) $(LIB)
-	$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(LIB) $(GATEWAY_OBJS)
+	@echo LD $@
+	$(SILENT)$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(LIB) $(GATEWAY_OBJS)
 
 install: gateway 
 	@echo "Copying gateway binary to /usr/bin/gateway"
