@@ -422,7 +422,7 @@ int gui_action_handler (EVENT * e, enum ev_flags ev_kind)
 				break;
 
 			case MSG_GUI_REFRESH:
-				header_update (0);
+				header_update (1);
 				doupdate ();
 				break;
 
