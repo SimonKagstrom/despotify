@@ -365,8 +365,7 @@ int cmd_browse (SESSION * session, unsigned char kind, unsigned char *idlist,
 	assert (((kind == 1 || kind == 2) && num == 1) || kind == 3);
 
 	strcpy (buf, "browse-");
-	for (i = 0; i < 17; i++)
-		sprintf (buf + 7 + 2 * i, "%02x", idlist[i]);
+	hex_bytes_to_ascii(idlist, buf + 7, 16);
 	ch = channel_register (buf, callback, private);
 
 	ctx = esbuf_new_ctx();
