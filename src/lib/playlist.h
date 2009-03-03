@@ -31,8 +31,8 @@ enum playlist_flags
 typedef struct playlist
 {
 	enum playlist_flags flags;
-	char *name;
-	char *author;
+	char name[1024];
+	char author[1024];
 	unsigned char *playlist_id;
 	int num_tracks;
 	struct track *tracks;

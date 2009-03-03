@@ -19,6 +19,7 @@
 #endif
 
 #define DSFYfree(p) free(p); (p) = NULL
+#define DSFYstrncat(target, data, len) strncat(target, data, sizeof(target)-strlen(target)-1-len)
 
 unsigned char *hex_ascii_to_bytes (char *, unsigned char *, int);
 char *hex_bytes_to_ascii (unsigned char *, char *, int);

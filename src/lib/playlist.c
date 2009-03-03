@@ -53,9 +53,6 @@ struct playlist *playlist_new (void)
 
 	p->flags = 0;
 
-	p->name = NULL;
-	p->author = NULL;
-
 	p->tracks = NULL;
 	p->playlist_id = NULL;
 	p->num_tracks = 0;
@@ -83,13 +80,13 @@ int playlist_set_id (struct playlist *p, unsigned char *id)
 void playlist_set_name (struct playlist *p, char *name)
 {
 	if (name)
-		p->name = strdup (name);
+		strcpy (p->name, name);
 }
 
 void playlist_set_author (struct playlist *p, char *author)
 {
 	if (author)
-		p->author = strdup (author);
+		strcpy (p->author, author);
 }
 
 void playlist_free (struct playlist *p, int free_tracks)
@@ -98,12 +95,6 @@ void playlist_free (struct playlist *p, int free_tracks)
 
 	if (p->playlist_id)
 		DSFYfree (p->playlist_id);
-
-	if (p->name)
-		DSFYfree (p->name);
-
-	if (p->author)
-		DSFYfree (p->author);
 
 	if (free_tracks)
 		while (p->tracks)
@@ -333,7 +324,7 @@ static void playlist_xml_handle_text (void *private, const XML_Char * s,
 						 "//next-change/change")) !=
 			NULL && !strcmp (ts->name, "user")) {
 
-		playlist_set_author (ctx->pl, (char *) buf);
+		DSFYstrncat (ctx->pl->author, buf, len);
 	}
 	else if (!ctx->list_playlists
 			&& (ts =
@@ -341,7 +332,7 @@ static void playlist_xml_handle_text (void *private, const XML_Char * s,
 						 "//next-change/change/ops"))
 			!= NULL && !strcmp (ts->name, "name")) {
 
-		playlist_set_name (ctx->pl, (char *) buf);
+		DSFYstrncat (ctx->pl->name, buf, len);
 	}
 	else if ((ts =
 		  xml_has_parent_path (ctx->taglist,
@@ -464,7 +455,6 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 			}
 		}
 		else if (ctx->track) {
-#define DSFYstrncat(target, data, len) strncat(target, data, sizeof(target)-strlen(target)-1-len)
 			if (!strcmp (ts->name, "artist"))
 				DSFYstrncat(ctx->track->artist, buf, len);
 			else if (!strcmp (ts->name, "title"))
