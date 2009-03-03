@@ -141,7 +141,7 @@ int session_connect (SESSION * session)
 			     sizeof (sin)) != -1)
 			break;
 
-		close (session->ap_sock);
+		sock_close (session->ap_sock);
 		session->ap_sock = -1;
 	}
 
@@ -164,7 +164,7 @@ int session_connect (SESSION * session)
 void session_disconnect (SESSION * session)
 {
 	if (session->ap_sock != -1) {
-		close (session->ap_sock);
+		sock_close (session->ap_sock);
 		session->ap_sock = -1;
 	}
 
