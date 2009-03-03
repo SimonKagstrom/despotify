@@ -47,8 +47,11 @@ void gui_playlist (WINDOW * w, char *input)
 		num = 0;
 
 	if (num == 0) {
+                int maxy, maxx;
+                getmaxyx (w, maxy, maxx);
+                maxy -= 1;
 		plroot = playlist_root ();
-		for (i = 1, p = *plroot; i < 25 && p; i++, p = p->next) {
+                for (i = 1, p = *plroot; i < maxy && p; i++, p = p->next) {
 			if ((p->flags & PLAYLIST_LOADED) == 0)
 				continue;
 
