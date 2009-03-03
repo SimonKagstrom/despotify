@@ -609,6 +609,12 @@ static int gui_player_end_callback (void *arg)
 	DSFYDEBUG ("gui_player_end_callback() - pctx->track == %p\n",
 		   pctx->track);
 
+
+	if(current_song == NULL)
+	  current_song = (char *) malloc(150);
+
+	sprintf(current_song,"%.30s - %.30s",t->title, t->artist);
+
 	/* Run the event handler as soon as possible */
 	event_mark_busy (pctx->event);
 
