@@ -112,19 +112,20 @@ int packet_write (SESSION * session, unsigned char cmd,
 
 	shn_finish (&session->shn_send, ptr, 4);
 
-	if ((ret =
-	     block_write (session->ap_sock, buf,
-			  3 + len + 4)) != 3 + len + 4) {
+	ret = block_write (session->ap_sock, buf, 3 + len + 4);
 
+	free(buf);
+
+	session->key_send_IV++;
+
+
+	if(ret != 3 + len + 4) {
 #ifdef DEBUG_PACKETS
 		DSFYDEBUG ("packet_write(): only wrote %d of %d bytes\n", ret,
 			   3 + len + 4);
 #endif
-
 		return -1;
 	}
-
-	session->key_send_IV++;
 
 	return 0;
 }
