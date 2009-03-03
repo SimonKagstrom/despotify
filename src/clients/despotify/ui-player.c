@@ -122,11 +122,10 @@ static void gui_player_play (char *input)
 		("gui_player_play(): Sending MSG_GUI_PLAY for song %s - %s\n",
 		 t->title, t->artist);
 
-	if(current_song == NULL)
-	  current_song = (char *) malloc(150);
+        if (current_song == NULL) /* Boo, static size. */
+          current_song = (char *) malloc(150);
 
-	sprintf(current_song,"%.30s - %.30s",t->title, t->artist);
-
+        snprintf(current_song, 150, "%.30s - %.30s", t->title, t->artist);
 }
 
 int gui_player_event_processor (EVENT * e, enum ev_flags ev_kind)
