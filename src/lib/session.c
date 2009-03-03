@@ -163,7 +163,7 @@ int session_connect (SESSION * session)
 
 void session_disconnect (SESSION * session)
 {
-	if (session->ap_sock != 0) {
+	if (session->ap_sock != -1) {
 		close (session->ap_sock);
 		session->ap_sock = -1;
 	}
