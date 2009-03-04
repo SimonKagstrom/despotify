@@ -188,10 +188,7 @@ int pulseaudio_play (AUDIOCTX * actx)
 	if (s)
 		pa_simple_free (s);
 
-	if (actx->driverprivate != NULL) {
-		DSFYfree (actx->driverprivate);
-		actx->driverprivate = NULL;
-	}
+        pthread_cond_signal (&priv->end);
 
 	/* This will kill the thread */
 	return 0;
@@ -206,7 +203,17 @@ int pulseaudio_stop (AUDIOCTX * actx)
 	/* Tell loop thread to exit */
 	pthread_mutex_lock (&priv->lock);
 	priv->state = PU_END;
+        pthread_cond_wait (&priv->end, &priv->lock);
 	pthread_mutex_unlock (&priv->lock);
+
+        /* When the other loop has exited, free the non-audio
+         * resources (memory, mutexes).
+         */
+        pthread_mutex_destroy (&priv->lock);
+        pthread_cond_destroy (&priv->end);
+        pthread_cond_destroy (&priv->pause);
+
+        DSFYfree (actx->driverprivate);
 
 	return 0;
 }
