@@ -114,25 +114,19 @@ void gui_playlist_display (WINDOW * w, struct playlist *p)
 	wattroff (w, A_BOLD);
 
 	
-	for (i = 0, t = p->tracks; i < (y - 2 - 2 - 1) && t; t = t->next) {
+	for (i = 0, t = p->tracks; i < (y - 2 - 2 - 1) && t; t = t->next, i++) {
+                wattron (w, A_BOLD);
+                mvwprintw (w, 3 + i, 2, "%2d", t->id + 1);
+
 		if (!t->has_meta_data){
-		i++;
-		wattron (w, A_BOLD);
-		mvwprintw (w, 3 + i, 2, "%2d", t->id + 1);
-		mvwprintw (w, 3 + i, 6, "Unplayable");
-		wattroff (w, A_BOLD);
-  
-		}
-			
-		else {
-		i++;
-		wattron (w, A_BOLD);
-		mvwprintw (w, 3 + i, 2, "%2d", t->id + 1);
-		wattroff (w, A_BOLD);
-		mvwprintw (w, 3 + i, 6, "%-*.*s %-*.*s %-*.*s",
-			   len1, len1, t->title,
-			   len2, len2, t->artist,
-			   len3, len3, t->album);
+                    mvwprintw (w, 3 + i, 6, "Unplayable");
+                    wattroff (w, A_BOLD);
+                } else {
+                    wattroff (w, A_BOLD);
+                    mvwprintw (w, 3 + i, 6, "%-*.*s %-*.*s %-*.*s",
+                               len1, len1, t->title,
+                               len2, len2, t->artist,
+                               len3, len3, t->album);
 		}
 	}
 
