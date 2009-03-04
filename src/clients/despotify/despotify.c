@@ -10,6 +10,7 @@
 #include <sys/select.h>
 #include <ncurses.h>
 #include <pthread.h>
+#include <locale.h>
 
 #include "ADMclubbing.h"
 #include "audio.h"
@@ -48,6 +49,8 @@ int main (int argc, char **argv)
 		ADMclubbing ();
 		return -1;
 	}
+
+	setlocale (LC_ALL, "");
 
 	/* Initialize audio output device */
 	if (audio_init ()) {

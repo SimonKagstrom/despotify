@@ -8,7 +8,7 @@ LIBDIR = ../../lib
 LIB = $(LIBDIR)/libdespotify.la
 
 CFLAGS += -I$(LIBDIR)
-LDFLAGS += -lncurses 
+LDFLAGS += -lncursesw
 
 DESPOTIFY_OBJS = ADMclubbing.o despotify.o event.o ui-core.o ui-help.o ui-player.o ui-playlist.o ui-search.o
 
