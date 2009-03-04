@@ -200,6 +200,30 @@ static struct track *playlist_track_by_id (struct playlist *p,
 	return t;
 }
 
+/* This just gets the next track, wrapping if neccessary. */
+struct track *playlist_next_track (struct playlist *p, 
+                                   struct track *after)
+{
+    if (after->next == NULL)
+        return p->tracks;
+    else
+        return after->next;
+}
+
+/* This finds the next playable track, wrapping if neccessary,
+ * giving up after one whole traversal. */
+struct track *playlist_next_playable (struct playlist *p,
+                                      struct track *after)
+{
+    struct track *tmp;
+    for (tmp = playlist_next_track(p, after); tmp != after; tmp = playlist_next_track(p, tmp))
+    {
+        if (tmp->has_meta_data)
+            return tmp;
+    }
+    return NULL;
+}
+
 /*
  * Create playlist from XML
  *
@@ -398,7 +422,7 @@ static void tracks_meta_xml_handle_endelement (void *private,
 					       const XML_Char * name)
 {
 	struct parsingctx *ctx = (struct parsingctx *) private;
-	static unsigned char invalid_file_id[20];
+	static unsigned char invalid_file_id[20] = {0};
 
 	(void) name;		/* don't warn. */
 

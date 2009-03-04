@@ -52,6 +52,9 @@ void playlist_set_author (struct playlist *, char *);
 struct track *playlist_track_add (struct playlist *, unsigned char *);
 void playlist_track_del (struct playlist *, unsigned char *);
 
+struct track *playlist_next_track (struct playlist *, struct track *);
+struct track *playlist_next_playable (struct playlist *, struct track *);
+
 struct playlist *playlist_select (int);
 struct playlist *playlist_selected (void);
 

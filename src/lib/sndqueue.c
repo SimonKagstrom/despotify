@@ -225,6 +225,12 @@ int snd_stop (void *arg)
 	oggBUFF *b;
 	int ret;
 
+        if (!arg)
+        {
+            DSFYDEBUG ("%s: Got NULL session, ignoring call.\n", __FUNCTION__);
+            return 0;
+        }
+
 	DSFYDEBUG ("%s: Entering with arg %p\n", __FUNCTION__, arg);
 	DSFYDEBUG ("%s: audio context is %p, dl state is %d\n", __FUNCTION__,
 		   session->actx, session->dlstate);

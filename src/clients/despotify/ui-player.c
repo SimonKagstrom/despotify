@@ -77,7 +77,7 @@ void gui_player (char *input)
 static void gui_player_play (char *input)
 {
 	struct playlist *p, **rootptr;
-	struct track *t;
+	struct track *tmp, *to_play = NULL;
 	struct playerctx *playerctx;
 	int track_num;
 	void **container;
@@ -93,7 +93,6 @@ static void gui_player_play (char *input)
 	/* Fail if none selected or if empty */
 	if (p == NULL || p->tracks == NULL) {
 		/* XXX - Tell the user there's nothing to play */
-
 		return;
 	}
 
@@ -101,15 +100,35 @@ static void gui_player_play (char *input)
 	if ((track_num = atoi (input)) < 1)
 		track_num = 1;
 
-	for (t = p->tracks; t; t = t->next)
-		if (--track_num == 0 || t->next == NULL)
-			break;
+        /* Either find the right track to play, or the last track
+         * in the playlist. */
+        for (tmp = p->tracks; tmp && track_num > 0; --track_num)
+        {
+            to_play = tmp;
+            tmp = tmp->next;
+        }
+
+        /* If the track is unplayable, find the next playable track,
+         * if any. 
+         */
+        if (!to_play->has_meta_data)
+        {
+            DSFYDEBUG("%s: Wanted track was unplayable, finding next playable.\n", __FUNCTION__);
+            to_play = playlist_next_playable(p, to_play);
+            if (!to_play)
+            {
+                if (current_song != NULL)
+                    DSFYfree(current_song);
+                DSFYDEBUG("%s: Finding next playable failed.\n", __FUNCTION__);
+                return;
+            }
+        }
 
 	/* Allocate player context to keep track of stuff */
 	playerctx = malloc (sizeof (struct playerctx));
 	playerctx->event = NULL;	/* Filled in by gui_player_event_processor() */
 	playerctx->playlist = p;
-	playerctx->track = t;
+	playerctx->track = to_play;
 	playerctx->offset = 0;
 	playerctx->request_size = REQ_SIZE;
 
@@ -120,12 +139,12 @@ static void gui_player_play (char *input)
 
 	DSFYDEBUG
 		("gui_player_play(): Sending MSG_GUI_PLAY for song %s - %s\n",
-		 t->title, t->artist);
+		 to_play->title, to_play->artist);
 
         if (current_song == NULL) /* Boo, static size. */
           current_song = (char *) malloc(150);
 
-        snprintf(current_song, 150, "%.30s - %.30s", t->title, t->artist);
+        snprintf(current_song, 150, "%.30s - %.30s", to_play->title, to_play->artist);
 }
 
 int gui_player_event_processor (EVENT * e, enum ev_flags ev_kind)
@@ -584,7 +603,6 @@ static int gui_player_audio_callback (void *arg)
 static int gui_player_end_callback (void *arg)
 {
 	struct playerctx *pctx = (struct playerctx *) arg;
-	struct track *t = NULL;
 
 	DSFYDEBUG ("gui_player_end_callback(arg=%p)\n", arg);
 
@@ -593,10 +611,14 @@ static int gui_player_end_callback (void *arg)
 	snd_reset (pctx->snd);
 
 	/* Select the next available track in the playlist */
-	if ((t = pctx->track->next) == NULL)
-		t = pctx->playlist->tracks;
+        pctx->track = playlist_next_playable (pctx->playlist, pctx->track);
 
-	pctx->track = t;
+        if (!pctx->track)
+        {
+            if (current_song != NULL)
+                DSFYfree(current_song);
+            return 0;
+        }
 
 	/* ..and make the event handler fetch the key for this track */
 	pctx->event->state = 1;
@@ -608,11 +630,10 @@ static int gui_player_end_callback (void *arg)
 	DSFYDEBUG ("gui_player_end_callback() - pctx->track == %p\n",
 		   pctx->track);
 
-
 	if(current_song == NULL)
 	  current_song = (char *) malloc(150);
 
-	sprintf(current_song,"%.30s - %.30s",t->title, t->artist);
+	snprintf(current_song, 150, "%.30s - %.30s", pctx->track->title, pctx->track->artist);
 
 	/* Run the event handler as soon as possible */
 	event_mark_busy (pctx->event);
