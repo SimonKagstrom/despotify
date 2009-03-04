@@ -97,7 +97,13 @@ a.cur {
 <h1>Source code for Despotify</h1>
 <p>The latest version of the source code is available in our <a href="http://sourceforge.net/svn/?group_id=254350">Subversion repository</a></p>
 <p>Feel free to <a href="http://despotify.svn.sourceforge.net/src/">browse the source code</a></p>
-<p>You'll need ncurses (<em>libncurses-dev</em>), OpenSSL (<em>libssl-dev</em>), zlib (<em>zlib1g-dev</em>), libvorbis (<em>libvorbis-dev</em>), expat (<em>libexpat1-dev</em>) and pulseaudio (<em>libpulse-dev</em>) or gstreamer (<em>libgstreamer-plugins-base0.10-0</em> and <em>libgstreamer0.10-dev</em>) to compile.</p>
+<p>You'll need ncursesw, OpenSSL, zlib, libvorbis, expat and one of the packages to support the audio backends. Under Linux you can choose between pulseaudio, gstreamer and libao.</p>
+<p><pre>Installation command for dependencies under Debian/Ubuntu
+  aptitude install libncursesw5-dev libssl-dev zlib1g-dev libvorbis-dev libexpat1-dev
+  aptitude install libpulse-dev # For pulseaudio backend
+  aptitude install libgstreamer-plugins-base0.10-0 libgstreamer0.10-dev # For GStreamer backend
+  aptitude install libao-dev # For libao backend
+</pre></p>
 <hr />
 
 
