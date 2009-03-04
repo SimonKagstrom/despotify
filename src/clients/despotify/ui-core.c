@@ -260,7 +260,7 @@ void update_timer(snd_SESSION *p, int timeplayed)
 
       /* Print seconds played */
       getmaxyx (stdscr, h, w);
-      mvwprintw (header, 3, w - 44, "       ");
+      header_update(1);
       mvwprintw (header, 3, w - 44, "%d",timeplayed);
 
       /* Update song title as while we are at it */
