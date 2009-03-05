@@ -123,8 +123,16 @@ a.cur {
 	<a href="#legal">Legal</a>
 </div>
 <h1>News</h1>
-<h3>2009/02/26 - Update regarding the usage of 'Free' accounts</h3>
-<p>Despotify has been blocked for users using 'Free' accounts. You can still use Despotify using 'Premium' accounts.</p>
+<h3>March 5th, 2009 - despotify's involvement in security breach</h3>
+<p>Despotify is actively and falsely being accused of hacking into Spotify.<br />
+Under <a href="#criticism">Criticism</a> is our statement on the matter.
+</p>
+<p><strong>despotify</strong> is about providing an open source client to Spotify's service and providing tools to allow third parties to develop new and cool services that make use of Spotify's platform and services.<br />
+Please see our <a href="#faq">FAQ</a> for more information.
+</p>
+<h3>February 26th, 2009 - Update regarding the usage of 'Free' accounts</h3>
+<p>Despotify has been blocked for users using 'Free' accounts.<br />
+You can still use Despotify using 'Premium' accounts.</p>
 <p>We will not attempt to circumvent this block, nor accept any patches circumventing it. If you disagree with this decision, you are free to fork the code.</p>
 
 <hr />
@@ -311,7 +319,7 @@ away the ad-routine is just too simple. We strongly believe that you should pay 
 if you want to use the open source client. </p>
 
 <h3>Does your software impose the country restrictions?</h3>
-<p>No. So called <em>Geographic Rights Management</em> is just stupid and client side restrictions in open source software is silly. The movie industry already proved how inane and futile this is by region coding DVDs. If you want (optional) GRM support, feel free to submit a patch. :)</p>
+<p>No. So called <em>Geographic Rights Management</em> is just stupid and client side restrictions in open source software is silly. The movie industry already proved how insane and futile this is by region coding DVDs. If you want (optional) GRM support, feel free to submit a patch. :)</p>
 
 <h3>How much bandwidth does the client need?</h3>
 <p>This question has so far gone unanswered in Spotify's corner at GetSatisfaction.com.</p>
@@ -390,19 +398,45 @@ Assume no privacy.</p>
 	<a href="#legal">Legal</a>
 </div>
 <h1>Criticism</h1>
-<p>As much as we'd like it, this site is not about commenting on Despotify, our actions or Spotify.<br />
-But as avid supporters of the social media scene we've decided a good compromise would be to let you post relevant links to threads on <a href="http://jaiku.com">Jaiku</a>, <a href="http://bloggy.se">Bloggy</a>, blog posts or news articles.<br />
+<p>Spotify recently notified its users about a possible <a href="http://www.spotify.com/blog/archives/2009/03/04/spotify-security-notice/">information leak</a> (<a href="http://www.spotify.com/blog/archives/2009/03/04/updated-security-notice/">updated</a>).</p>
+<p>An unknown group, who was later lated <a href="http://www.idg.se/2.1085/1.215898/despotify-bakom-hacket">identified (Swedish only)</a> in an interview with their CEO, as being the despotify team, could have compromised the security and privacy of individual user accounts.</p>
+<p>Several news sites wrote articles about the incident, most of the not comprehending what really happened despite Spotify's detailed blog posts on the matter. UK <a href="http://www.guardian.co.uk">The Guardian</a> initially named us <a href="http://www.guardian.co.uk/technology/2009/mar/05/spotify-hackers-password">computer criminals</a> and many Swedish news sites falsely reported that someone had broken into Spotify and had stolen a lot of passwords and details about their users (Swedish: <a href="http://www.aftonbladet.se/nyheter/article4562242.ab">here</a>, <a href="http://www.affarsvarlden.se/hem/nyheter/article531193.ece">here</a>, and <a href="http://sydsvenskan.se/digitalt/article417522/Spotify-hackat---losenord-pa-vift.html">here</a>). That's not what happened.
 </p>
+<h3>So what really happened?</h3>
+<p>While auditing Spotify's software back in November 2008 we monitored data the Spotify client exchanged with the server and things it processed internally.</p>
+<p>It turned out that whenever you added someone else's shared playlist, the Spotify client software would request information from Spotify's servers about the author of that playlist.<br />
+The information returned contained things like a <a href="http://en.wikipedia.org/wiki/Cryptographic_hash_function">hash</a> (based on a <a href="http://en.wikipedia.org/wiki/Salt_(cryptography)">salt</a> and the user's password), date of birth, city and other things that Spotify knew about this user.
+</p>
+<p>We realized that the password hash that was transfered to the client when you added someone else's playlist, could be used as a way of autenticating to the server as the owner of the playlist, without knowing his or her password. That was bad.</p>
+<p>A few days before Spotify finally stopped relaying the password hash (and some other unnecessary information) we realized that this hash actually was a <a href="http://en.wikipedia.org/wiki/SHA_hash_functions">SHA-1</a> hash over a 10 character <em>salt</em>, a space character, and the user's password.<br />
+Since we by this time both knew the resulting hash value and part of the message that was hashed (i.e, salt and the space character), we now had everything we needed to successfully <a href="http://en.wikipedia.org/wiki/Brute_force_attack">brute force</a> the original password.</p>
 <p>
-<form action="post.php" method="post">
-	<div>
-	<strong>Link URL</strong>
-	<input type="text" name="url" size="50" />
-	<input type="submit" name="" value="Post link!" disabled="disabled" />
-	</div>
-	<em>Currently disabled due to load problems on host</em>
-</form>
+During the 18th of December 2008, Spotify removed parts of the information that was returned to the client when it asked for a user's details, notably the password hash.<br />
+<strong>For us</strong>, that meant that the <strong>possibility</strong> to steal a lot of password hashes now was gone.</p>
+<p>In fact, we were left with previously requested information (stored for research purposes) for approximately <strong>40 different users</strong>. These users were mostly people whose playlists we were listening to. Others were employees of Spotify, because we thought it would be interesting to see if, and in that case how, employee's details differed from Joe Average's account.
 </p>
+
+<p>
+On February 17th, 2009 we released despotify, our open source Spotify client.<br />
+It still had support for requesting details about a particular user's account, as is also shown in our <a href="#despotify">video introduction</a>. This information was made up of things like the account holder's email address, date of birth (YYYY-mm-dd), postal code and a few other not-interesting details.</p>
+<p>
+Hours after making despotify public, Spotify realized the privacy issues involved and stopped leaking the above mentioned information. Shortly afterwards, we also removed support for requesting that information (it didn't work anymore) from the despotify code in our Subversion repository.
+</p>
+<p>On March 4th, 2009 Spotify posted information about these issues on their <a href="http://www.spotify.com/blog/">blog</a>.<br />
+</p>
+<h3>Am I at risk?</h3>
+<p>While we only got our hands on ~40 different user's details, there's still a risk that <strong>others also</strong> found the same issue that we did.<br />
+It's impossible to know for sure and hence full disclosure and notifying those that <strong>could</strong> be affected is required.<br />
+In other words, Spotify has responded to this issue in an exceptionally good way.
+</p>
+<h3>Why did you not report this issue to Spotify?</h3>
+<p>If we would have reported this, Spotify would have understood that there was people out there actively thinkering with the internals of their software.<br />
+We simply didn't want to risk jeopardizing the continued research we were doing by reporting the issue.
+</p>
+<h3>So you didn't really hack into Spotify?</h3>
+<p>No. We did not hack into their servers and we certainly did not exploit a weakness in their web platform, as some media reports claim.</p>
+<p>We've only used a feature already part of the communication protocol between the client and the server to obtain the data. Even the official client software (version 0.3.8 and before) did just this, although you could not request data for arbitrary users.</p>
+
 <hr />
 
 
