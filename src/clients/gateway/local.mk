@@ -14,15 +14,9 @@ GATEWAY_OBJS = gw-core.o gw-browse.o gw-handlers.o gw-image.o gw-playlist.o gw-s
 .PHONY: all clean install uninstall
 all: gateway
 
-ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
-CFILES = $(filter-out %.a,$(GATEWAY_OBJS:.o=.c))
-
-Makefile.dep:
-	@echo Generating dependencies
-	@$(CC) $(CFLAGS) -MM $(CFILES) > $@
-
--include Makefile.dep
-endif
+# These are the files we depgen for. :-)
+CFILES = $(GATEWAY_OBJS:.o=.c)
+include ../depgen.mk
 
 %.o: %.c
 	@echo CC $<

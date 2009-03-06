@@ -19,15 +19,9 @@ endif
 .PHONY: all clean install uninstall
 all: despotify 
 
-ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
-CFILES = $(filter-out %.a,$(DESPOTIFY_OBJS:.o=.c))
-
-Makefile.dep:
-	@echo Generating dependencies
-	$(SILENT)$(CC) $(CFLAGS) -MM $(CFILES) > $@
-
--include Makefile.dep
-endif
+# These are the files we depgen for. :-)
+CFILES = $(DESPOTIFY_OBJS:.o=.c)
+include ../depgen.mk
 
 %.o: %.c
 	@echo CC $<

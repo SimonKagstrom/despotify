@@ -46,7 +46,7 @@ endif
 
 
 
-CLIENTS = clients/despotify clients/gateway
+CLIENTS = clients/despotify clients/gateway clients/simple
 SUBDIRS = lib $(CLIENTS)
 
 .PHONY: all clean $(SUBDIRS) install uninstall
