@@ -6,47 +6,69 @@
 /* This is for track and playlist structs. */
 #include "playlist.h"
 
-typedef struct 
+struct despotify_session
 {
+    bool initialized;
     SESSION *session;
     const char *last_error;
-} despotify_session;
+};
 
 /* Session stuff. */
-despotify_session *despotify_new_session();
-bool despotify_authenticate(despotify_session *session, const char *user, const char *password);
+struct despotify_session *despotify_init();
 
-#define despotify_change_user(session, user, password) { \
+void despotify_exit(struct despotify_session *ds);
+
+bool despotify_authenticate(struct despotify_session *ds, 
+                            const char *user, 
+                            const char *password);
+
+#define despotify_change_user(session, user, password) \
+                    do { \
                         despotify_close(session); \
                         (session) = despotify_new_session(); \
                         despotify_authenticate(session, user, password); \
                     } while (0)
 
-void despotify_close(despotify_session *session);
-void despotify_free(despotify_session *session, bool should_disconnect);
+void despotify_free(struct despotify_session *ds, bool should_disconnect);
 
-const char *despotify_get_error(despotify_session *session);
+const char *despotify_get_error(struct despotify_session *ds);
 
 /* Information. */
-TRACK *despotify_get_currently_playing(despotify_session *session);
+struct track *despotify_get_current_track(struct despotify_session *ds);
+
 /* We need to determine if there is any / enough info to warrant this:
- * user despotify_get_user_info(despotify_session *session); */
+ * user despotify_get_user_info(struct despotify_session *ds); */
 
 /* Playlist handling. */
-PLAYLIST *despotify_search(despotify_session *session, const char *terms);
-PLAYLIST **despotify_get_playlists(despotify_session *session);
-bool despotify_append_song(despotify_session *session, PLAYLIST *playlist, TRACK *song);
-bool despotify_remove_song(despotify_session *session, PLAYLIST *playlist, TRACK *song);
-bool despotify_delete_playlist(despotify_session *session, PLAYLIST *playlist);
-PLAYLIST *despotify_create_playlist(despotify_session *session, const char *name);
-bool despotify_rename_playlist(despotify_session *session, PLAYLIST *playlist, const char *new_name);
-PLAYLIST *despotify_free_playlist(despotify_session *session, PLAYLIST *playlist);
+struct playlist* despotify_search(struct despotify_session *ds, 
+                                  char *searchtext);
+
+struct playlist** despotify_get_playlists(struct despotify_session *ds);
+bool despotify_append_song(struct despotify_session *ds, 
+                           struct playlist *playlist, 
+                           struct track *song);
+
+bool despotify_remove_song(struct despotify_session *ds, 
+                           struct playlist *playlist, 
+                           struct track *song);
+
+bool despotify_delete_playlist(struct despotify_session *ds, 
+                               struct playlist *playlist);
+
+struct playlist * despotify_create_playlist(struct despotify_session *ds,
+                          const char *name);
+
+bool despotify_rename_playlist(struct despotify_session *ds,
+                               struct playlist *playlist, 
+                               const char *new_name);
+
+void despotify_free_playlist(struct playlist* playlist);
 
 /* Playback control. */
-bool despotify_stop(despotify_session *session);
-bool despotify_pause(despotify_session *session);
-bool despotify_resume(despotify_session *session);
+bool despotify_stop(struct despotify_session *ds);
+bool despotify_pause(struct despotify_session *ds);
+bool despotify_resume(struct despotify_session *ds);
 
-bool despotify_play(despotify_session *session, TRACK *song);
+bool despotify_play(struct despotify_session *ds, struct track *song);
 
 #endif

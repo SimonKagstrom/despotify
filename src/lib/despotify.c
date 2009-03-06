@@ -5,155 +5,206 @@
 #include "despotify.h"
 
 #include "auth.h"
+#include "buffer.h"
+#include "commands.h"
+#include "handlers.h"
 #include "keyexchange.h"
+#include "packet.h"
+#include "playlist.h"
 #include "session.h"
+#include "util.h"
 
-#define panic(...) { printf(__VA_ARGS__); abort(); } while(0)
+static int despotify_handle_packet(struct despotify_session* ds);
 
-despotify_session *despotify_new_session()
+struct despotify_session* despotify_init()
 {
-    despotify_session *session = (despotify_session *) malloc(sizeof (despotify_session));
-    if (!session)
+    struct despotify_session* ds = calloc(1,sizeof(struct despotify_session));
+    if (!ds)
         return NULL;
 
-    memset(session, 0, sizeof (despotify_session));
-
-    session->session = session_init_client ();
-    if (!session->session)
+    ds->session = session_init_client();
+    if (!ds->session)
         return NULL;
 
-    return session;
+    return ds;
 }
 
-bool despotify_authenticate(despotify_session *session, const char *user, const char *password)
+bool despotify_authenticate(struct despotify_session* ds,
+                            const char* user,
+                            const char* password)
 {
-    assert(session != NULL && session->session != NULL);
+    assert(ds != NULL && ds->session != NULL);
 
-    session_auth_set (session->session, user, password);
+    session_auth_set(ds->session, user, password);
 
-    if (session_connect (session->session) < 0)
+    if (session_connect(ds->session) < 0)
     {
-        session->last_error = "Could not connect to server.";
+        ds->last_error = "Could not connect to server.";
         return false;
     }
+    DSFYDEBUG("%s", "session_connect() completed\n");
 
-    if (do_key_exchange (session->session) < 0)
+    if (do_key_exchange(ds->session) < 0)
     {
-        session->last_error = "Key exchange failed.";
+        ds->last_error = "Key exchange failed.";
         return false;
     }
+    DSFYDEBUG("%s", "do_key_exchange() completed\n");
 
-    auth_generate_auth_hash (session->session);
-    key_init (session->session);
+    auth_generate_auth_hash(ds->session);
+    key_init(ds->session);
 
-    if (do_auth (session->session) < 0)
+    if (do_auth(ds->session) < 0)
     {
-        session->last_error = "Authentication failed.";
+        ds->last_error = "Authentication failed.";
         return false;
     }
+    DSFYDEBUG("%s", "do_auth() completed\n");
 
+    /* handle all packets until we get the big welcome */
+    while (!ds->session->welcomed) {
+        if (despotify_handle_packet(ds))
+            return false;
+    }
+    
     return true;
 }
 
-void despotify_close(despotify_session *session)
+void despotify_exit(struct despotify_session* ds)
 {
-    despotify_free(session, true);
+    despotify_free(ds, true);
 }
 
-void despotify_free(despotify_session *session, bool should_disconnect)
+void despotify_free(struct despotify_session* ds, bool should_disconnect)
 {
-    assert(session != NULL && session->session != NULL);
+    assert(ds != NULL && ds->session != NULL);
 
     if (should_disconnect)
-        session_disconnect (session->session);
+        session_disconnect(ds->session);
 
-    session_free (session->session);
-    free (session);
+    session_free(ds->session);
+    free(ds);
 }
 
-const char *despotify_get_error(despotify_session *session)
+const char* despotify_get_error(struct despotify_session* ds)
 {
-    const char *error;
+    const char* error;
+
     /* Only session_init_client() failing can cause this. */
-    if (!session)
+    if (!ds)
         return "Could not allocate memory for a new session.";
 
-    error = session->last_error;
-    session->last_error = NULL;
+    error = ds->last_error;
+    ds->last_error = NULL;
 
     return error;
 }
 
-/* Information. */
-TRACK *despotify_get_currently_playing(despotify_session *session)
+struct search
 {
-    panic("despotify_get_currently_playing() not implemented!\n");
-    return NULL;
-}
-/* We need to determine if there is any / enough info to warrant this:
- * user despotify_get_user_info(despotify_session *session); */
+    struct buffer* response;
+    struct playlist* playlist;
+};
 
-/* Playlist handling. */
-PLAYLIST *despotify_search(despotify_session *session, const char *terms)
+static int despotify_search_callback(CHANNEL*  ch, 
+                                     unsigned char* buf,
+                                     unsigned short len)
 {
-    panic("despotify_search() not implemented!\n");
-    return NULL;
-}
-PLAYLIST **despotify_get_playlists(despotify_session *session)
-{
-    panic("despotify_get_playlists() not implemented!\n");
-    return NULL;
-}
-bool despotify_append_song(despotify_session *session, PLAYLIST *playlist, TRACK *song)
-{
-    panic("despotify_append_song() not implemented!\n");
-    return false;
-}
-bool despotify_remove_song(despotify_session *session, PLAYLIST *playlist, TRACK *song)
-{
-    panic("despotify_remove_song() not implemented!\n");
-    return false;
-}
-bool despotify_delete_playlist(despotify_session *session, PLAYLIST *playlist)
-{
-    panic("despotify_delete_playlist() not implemented!\n");
-    return false;
-}
-PLAYLIST *despotify_create_playlist(despotify_session *session, const char *name)
-{
-    panic("despotify_create_playlist() not implemented!\n");
-    return NULL;
-}
-bool despotify_rename_playlist(despotify_session *session, PLAYLIST *playlist, const char *new_name)
-{
-    panic("despotify_rename_playlist() not implemented!\n");
-    return false;
-}
-PLAYLIST *despotify_free_playlist(despotify_session *session, PLAYLIST *playlist)
-{
-    panic("despotify_free_playlist() not implemented!\n");
-    return NULL;
-}
+    struct search* s = (struct search*) ch->private;
 
-/* Playback control. */
-bool despotify_stop(despotify_session *session)
-{
-    panic("despotify_stop() not implemented!\n");
-    return false;
-}
-bool despotify_pause(despotify_session *session)
-{
-    panic("despotify_pause() not implemented!\n");
-    return false;
-}
-bool despotify_resume(despotify_session *session)
-{
-    panic("despotify_resume() not implemented!\n");
-    return false;
+    switch (ch->state) {
+        case CHANNEL_HEADER:
+            /* ignore unknown data */
+            return 0;
+
+        case CHANNEL_DATA:
+            /* Skip a minimal gzip header */
+            if (ch->total_data_len < 10) {
+		int skip_len = 10 - ch->total_data_len;
+		while (skip_len && len) {
+                    skip_len--;
+                    len--;
+                    buf++;
+		}
+
+		if (len == 0)
+                    return 0;
+            }
+
+            buffer_check_and_extend(s->response, len);
+            buffer_append_raw(s->response, buf, len);
+            break;
+            
+        case CHANNEL_END:
+            s->playlist->flags |= PLAYLIST_LOADED;
+
+            /* Add tracks */
+            playlist_track_update_from_gzxml(s->playlist,
+                                             s->response->buf,
+                                             s->response->buflen);
+            
+            /* Since this is a newly added playlist
+               we know it's the first one */
+            playlist_select (1);
+            break;
+
+        case CHANNEL_ERROR:
+            return 1;
+
+        default:
+            /* unknown state */
+            return 2;
+    }
+
+    return 0;
 }
 
-bool despotify_play(despotify_session *session, TRACK *song)
+struct playlist* despotify_search(struct despotify_session* ds,
+                                  char* searchtext)
 {
-    panic("despotify_play() not implemented!\n");
-    return false;
+    struct search s;
+    s.response = buffer_init();
+    s.playlist = playlist_new();
+
+    char buf[80];
+    snprintf(buf, sizeof buf, "Search: %s", searchtext);
+    buf[(sizeof buf)-1] = 0;
+    playlist_set_name(s.playlist, buf);
+    playlist_set_author(s.playlist, ds->session->username);
+
+    int ret = cmd_search(ds->session, searchtext, 
+                         despotify_search_callback, &s);
+    if (ret) {
+        ds->last_error = "cmd_search() failed";
+        return NULL;
+    }
+
+    do {
+        if (despotify_handle_packet(ds))
+            return NULL;
+    } while (!(s.playlist->flags & PLAYLIST_LOADED));
+    
+    buffer_free(s.response);
+
+    return s.playlist;
+}
+
+void despotify_free_playlist(struct playlist* playlist)
+{
+    playlist_free(playlist, 1);
+}
+
+static int despotify_handle_packet(struct despotify_session* ds)
+{
+    SESSION* s = ds->session;
+    PHEADER hdr;
+    unsigned char* payload;
+
+    int err = packet_read(s, &hdr, &payload);
+    if (!err) {
+        err = handle_packet(s, hdr.cmd, payload, hdr.len);
+        DSFYfree(payload); /* Allocated in packet_read() */
+    }
+
+    return err;
 }

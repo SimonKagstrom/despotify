@@ -6,6 +6,7 @@
 #ifndef DESPOTIFY_SESSION_H
 #define DESPOTIFY_SESSION_H
 
+#include <stdbool.h>
 #include <openssl/dh.h>
 #include <openssl/rsa.h>
 
@@ -116,6 +117,8 @@ typedef struct
 	/* Assigned country */
 	char country[4];
 
+        /* Has session progressed past CMD_WELCOME ? */
+        bool welcomed;
 } SESSION;
 
 SESSION *session_init_client (void);
