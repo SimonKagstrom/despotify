@@ -9,7 +9,6 @@
 #include <assert.h>
 #include "network.h"
 
-#include <openssl/sha.h>
 #include <openssl/hmac.h>
 
 #include "auth.h"

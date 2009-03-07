@@ -14,25 +14,25 @@
 #include <unistd.h>
 #include <assert.h>
 #include "network.h"
-#include <openssl/sha.h>
 #include <openssl/hmac.h>
 
 #include "auth.h"
 #include "esbuf.h"
 #include "puzzle.h"
 #include "util.h"
+#include "sha1.h"
 
 void auth_generate_auth_hash (SESSION * session)
 {
-	SHA_CTX ctx;
+	SHA1_CTX ctx;
 
-	SHA1_Init (&ctx);
+	SHA1Init (&ctx);
 
-	SHA1_Update (&ctx, session->salt, 10);
-	SHA1_Update (&ctx, " ", 1);
-	SHA1_Update (&ctx, session->password, strlen (session->password));
+	SHA1Update (&ctx, session->salt, 10);
+	SHA1Update (&ctx, " ", 1);
+	SHA1Update (&ctx, session->password, strlen (session->password));
 
-	SHA1_Final (session->auth_hash, &ctx);
+	SHA1Final (session->auth_hash, &ctx);
 
 #ifdef DEBUG_LOGIN
 	hexdump8x32 ("auth_generate_auth_hash, auth_hash", session->auth_hash,

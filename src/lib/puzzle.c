@@ -9,12 +9,13 @@
 #include <stdlib.h>
 #include "network.h"
 
-#include <openssl/sha.h>
 #include <openssl/hmac.h>
 
 #include "puzzle.h"
 #include "session.h"
 #include "util.h"
+#include "sha1.h"
+
 
 #if !defined srandom || !defined random
 #define srandom srand
@@ -23,7 +24,7 @@
 
 void puzzle_solve (SESSION * session)
 {
-	SHA_CTX ctx;
+	SHA1_CTX ctx;
 	unsigned char digest[20];
 	unsigned int *nominator_from_hash;
 	unsigned int denominator;
@@ -48,15 +49,15 @@ void puzzle_solve (SESSION * session)
 	srandom (*(unsigned int *) &ctx);
 	nominator_from_hash = (unsigned int *) (digest + 16);
 	do {
-		SHA1_Init (&ctx);
-		SHA1_Update (&ctx, session->server_random_16, 16);
+		SHA1Init (&ctx);
+		SHA1Update (&ctx, session->server_random_16, 16);
 
 		/* Let's waste some precious pseudorandomness */
 		for (i = 0; i < 8; i++)
 			session->puzzle_solution[i] = random ();
-		SHA1_Update (&ctx, session->puzzle_solution, 8);
+		SHA1Update (&ctx, session->puzzle_solution, 8);
 
-		SHA1_Final (digest, &ctx);
+		SHA1Final (digest, &ctx);
 
 		/* byteswap (XXX - htonl() won't work on bigendian machines!) */
 		*nominator_from_hash = htonl (*nominator_from_hash);
