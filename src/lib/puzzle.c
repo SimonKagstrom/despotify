@@ -9,8 +9,6 @@
 #include <stdlib.h>
 #include "network.h"
 
-#include <openssl/hmac.h>
-
 #include "puzzle.h"
 #include "session.h"
 #include "util.h"
