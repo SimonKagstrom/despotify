@@ -9,8 +9,6 @@
 #include <assert.h>
 #include "network.h"
 
-#include <openssl/hmac.h>
-
 #include "auth.h"
 #include "esbuf.h"
 #include "session.h"
@@ -355,9 +353,9 @@ void key_init (SESSION * session)
 			     sizeof (message));
 #endif
 
-		HMAC (EVP_sha1 (), session->shared_key, 96, message,
-		      sizeof (message), hmac_ptr, &mac_len);
-
+	        sha1_hmac(session->shared_key, 96, message,
+			  sizeof (message), hmac_ptr);
+		
 		/*
 		 * Overwrite the 20 first bytes of the message with output from this round
 		 *

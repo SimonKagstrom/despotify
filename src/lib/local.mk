@@ -2,7 +2,7 @@
 # $Id$
 # 
 
-LIB_OBJS = aes.lo audio.lo auth.lo buffer.lo channel.lo commands.lo dns.lo esbuf.lo handlers.lo keyexchange.lo packet.lo playlist.lo puzzle.lo session.lo shn.lo sndqueue.lo util.lo xml.lo network.lo despotify.lo sha1.lo
+LIB_OBJS = aes.lo audio.lo auth.lo buffer.lo channel.lo commands.lo dns.lo esbuf.lo handlers.lo keyexchange.lo packet.lo playlist.lo puzzle.lo session.lo shn.lo sndqueue.lo util.lo xml.lo network.lo despotify.lo sha1.lo hmac.lo
 
 CFLAGS += -Igstapp/
 LDFLAGS += -rpath /usr/lib

@@ -14,13 +14,13 @@
 #include <unistd.h>
 #include <assert.h>
 #include "network.h"
-#include <openssl/hmac.h>
 
 #include "auth.h"
 #include "esbuf.h"
 #include "puzzle.h"
 #include "util.h"
 #include "sha1.h"
+#include "hmac.h"
 
 void auth_generate_auth_hash (SESSION * session)
 {
@@ -110,8 +110,8 @@ void auth_generate_auth_hmac (SESSION * session, unsigned char *auth_hmac,
 		     sizeof (session->key_hmac));
 #endif
 
-	HMAC (EVP_sha1 (), session->key_hmac, sizeof (session->key_hmac),
-	      esbuf_data(buf), esbuf_idx(buf), auth_hmac, &mac_len);
+	sha1_hmac ( session->key_hmac, sizeof (session->key_hmac),
+		    esbuf_data(buf), esbuf_idx(buf), auth_hmac);
 
 #ifdef DEBUG_LOGIN
 	hexdump8x32 ("auth_generate_auth_hmac, HMAC digest", auth_hmac,
