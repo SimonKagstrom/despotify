@@ -9,6 +9,7 @@
 #include "commands.h"
 #include "handlers.h"
 #include "keyexchange.h"
+#include "network.h"
 #include "packet.h"
 #include "playlist.h"
 #include "session.h"
@@ -16,7 +17,22 @@
 
 static int despotify_handle_packet(struct despotify_session* ds);
 
-struct despotify_session* despotify_init()
+
+bool despotify_init()
+{
+    if (network_init() != 0)
+        return false;
+    return true;
+}
+
+bool despotify_cleanup()
+{
+    if (network_cleanup() != 0)
+        return false;
+    return true;
+}
+
+struct despotify_session* despotify_init_client()
 {
     struct despotify_session* ds = calloc(1,sizeof(struct despotify_session));
     if (!ds)

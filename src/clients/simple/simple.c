@@ -16,9 +16,15 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    struct despotify_session* ds = despotify_init();
-    if (!ds) {
+    if (!despotify_init())
+    {
         printf("despotify_init() failed\n");
+        return 1;
+    }
+
+    struct despotify_session* ds = despotify_init_client();
+    if (!ds) {
+        printf("despotify_init_client() failed\n");
         return 1;
     }
     
@@ -41,6 +47,12 @@ int main(int argc, char** argv)
     }
 
     despotify_exit(ds);
+
+    if (!despotify_cleanup())
+    {
+        printf("despotify_cleanup() failed\n");
+        return 1;
+    }
 
     return 0;
 }

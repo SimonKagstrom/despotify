@@ -13,8 +13,12 @@ struct despotify_session
     const char *last_error;
 };
 
+/* Global init / deinit library. */
+bool despotify_init();
+bool despotify_cleanup();
+
 /* Session stuff. */
-struct despotify_session *despotify_init();
+struct despotify_session *despotify_init_client();
 
 void despotify_exit(struct despotify_session *ds);
 
