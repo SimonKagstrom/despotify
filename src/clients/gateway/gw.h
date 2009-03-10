@@ -102,7 +102,7 @@ struct _RESTSESSION
 	char input[4096];
 	int input_len;
 
-	char command[1024];
+	char command[4096];
 
 	char username[256];
 	char password[256];
