@@ -39,9 +39,9 @@ static void tracks_meta_xml_handle_text (void *, const XML_Char *, int);
 
 static struct playlist *root;
 
-struct playlist **playlist_root (void)
+struct playlist *playlist_root (void)
 {
-	return &root;
+	return root;
 }
 
 struct playlist *playlist_new (void)

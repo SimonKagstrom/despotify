@@ -37,7 +37,7 @@ static SESSION *session;
 
 void gui_playlist (WINDOW * w, char *input)
 {
-	struct playlist *p, **plroot;
+	struct playlist *p;
 	int i, num;
 
 	wclear (w);
@@ -50,8 +50,7 @@ void gui_playlist (WINDOW * w, char *input)
                 int maxy, maxx;
                 getmaxyx (w, maxy, maxx);
                 maxy -= 1;
-		plroot = playlist_root ();
-                for (i = 1, p = *plroot; i < maxy && p; i++, p = p->next) {
+                for (i = 1, p = playlist_root(); i < maxy && p; i++, p = p->next) {
 			if ((p->flags & PLAYLIST_LOADED) == 0)
 				continue;
 
@@ -83,9 +82,7 @@ void gui_playlist_display (WINDOW * w, struct playlist *p)
 	int len3 = maxlen * 30 / 100;
 
 	if (p == NULL) {
-		struct playlist **plroot = playlist_root ();
-
-		for (p = *plroot; p; p = p->next)
+		for (p = playlist_root(); p; p = p->next)
 			if (p->flags & PLAYLIST_SELECTED)
 				break;
 
@@ -136,7 +133,7 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 {
 	int err = 0;
 	struct reqcontext *r;
-	struct playlist *p, **rootptr;
+	struct playlist *p;
 	struct track *t;
 
 	if (ev_kind == EV_MSG) {
@@ -293,8 +290,7 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 		/* Load tracks in each playlist */
 	case 2:
 		/* Find not yet loaded playlists.. */
-		rootptr = playlist_root ();
-		for (p = *rootptr; p; p = p->next)
+		for (p = playlist_root(); p; p = p->next)
 			if ((p->flags & (PLAYLIST_LOADED | PLAYLIST_ERROR)) ==
 					0)
 				break;
@@ -343,8 +339,7 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 		/* Load track meta data */
 	case 3:
 		/* Find a playlist that hasn't had track meta data loaded yet */
-		rootptr = playlist_root ();
-		for (p = *rootptr; p; p = p->next) {
+		for (p = playlist_root(); p; p = p->next) {
 			if ((p->flags & (PLAYLIST_TRACKS_LOADED |
 					 PLAYLIST_ERROR)) == 0) {
 				if (p->num_tracks != 0)

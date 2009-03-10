@@ -34,6 +34,17 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    if (despotify_get_playlists(ds))
+    {
+        struct playlist *p; 
+        printf("List of playlists on account:\n");
+        for (p = ds->playlists; p; p = p->next)
+        {
+            printf("  Playlist name:   %s\n", p->name);
+            printf("  Playlist author: %s\n", p->author);
+        }
+    }
+
     struct playlist* pl = despotify_search(ds, "machinae");
     if (pl) {
         printf("Playlist name: %s\n", pl->name);

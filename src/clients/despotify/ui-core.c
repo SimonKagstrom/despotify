@@ -283,7 +283,7 @@ void update_timer(snd_SESSION *p, int timeplayed)
 static void header_update (int redraw)
 {
 	int h, w, x, y;
-	struct playlist *p, **pp;
+	struct playlist *p;
 	int playlists, playlists_loaded;
 
 	getmaxyx (stdscr, h, w);
@@ -298,14 +298,13 @@ static void header_update (int redraw)
 	}
 
 	playlists = playlists_loaded = 0;
-	pp = playlist_root ();
-	for (p = *pp; p; p = p->next) {
+	for (p = playlist_root(); p; p = p->next) {
 		playlists++;
 		if (p->flags & PLAYLIST_LOADED)
 			playlists_loaded++;
 	}
 
-	for (p = *pp; p; p = p->next)
+	for (p = playlist_root(); p; p = p->next)
 		if (p->flags & PLAYLIST_SELECTED)
 			break;
 

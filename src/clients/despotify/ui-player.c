@@ -76,17 +76,14 @@ void gui_player (char *input)
 
 static void gui_player_play (char *input)
 {
-	struct playlist *p, **rootptr;
+	struct playlist *p;
 	struct track *tmp, *to_play = NULL;
 	struct playerctx *playerctx;
 	int track_num;
 	void **container;
 
-	rootptr = playlist_root ();
-	p = *rootptr;
-
 	/* Find the currently selected playlist */
-	for (p = *rootptr; p; p = p->next)
+	for (p = playlist_root(); p; p = p->next)
 		if (p->flags & PLAYLIST_SELECTED)
 			break;
 

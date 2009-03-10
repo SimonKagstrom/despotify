@@ -149,7 +149,10 @@ static void need_data_cb (GstAppSrc * src, guint length, gpointer data)
 	gstbuf = gst_app_buffer_new (buffer, r, gstreamer_free_buffer, buffer);
 	if (gst_app_src_push_buffer (GST_APP_SRC (src), gstbuf) !=
 			GST_FLOW_OK)
+        {
+                (void)0; /* just to shut up the warn if not DEBUG. */
 		DSFYDEBUG ("%s> call to push_buffer failed\n", __FUNCTION__);
+        }
 }
 
 /*

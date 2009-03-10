@@ -224,3 +224,101 @@ static int despotify_handle_packet(struct despotify_session* ds)
 
     return err;
 }
+
+struct playlist_request
+{
+    struct buffer* response;
+    struct playlist *playlist;
+    unsigned char *track_id_list;
+};
+
+static int despotify_playlist_callback (CHANNEL *ch, unsigned char *buf,
+                                          unsigned short len)
+{
+	struct playlist_request *r = (struct playlist_request *) ch->private;
+	int skip_len;
+
+	switch (ch->state) {
+	case CHANNEL_DATA:
+		/* In case of retrieving track meta info, skip a minimal gzip header */
+		if (r->track_id_list && ch->total_data_len < 10) {
+			skip_len = 10 - ch->total_data_len;
+			while (skip_len && len) {
+				skip_len--;
+				len--;
+				buf++;
+			}
+
+			if (len == 0)
+				break;
+		}
+
+                buffer_check_and_extend (r->response, len);
+		buffer_append_raw (r->response, buf, len);
+		break;
+
+	case CHANNEL_ERROR:
+		if (r->track_id_list) // PLAYLIST_BROWSE_ERROR
+                {
+                    r->playlist->flags |= PLAYLIST_TRACKS_ERROR;
+                    DSFYfree (r->track_id_list);
+                }
+		else if (r->playlist != NULL) // PLAYLIST_TRACKS_ERROR
+                    r->playlist->flags |= PLAYLIST_ERROR;
+                /* else PLAYLIST_LIST_ERROR */
+
+                buffer_free (r->response);
+
+		break;
+
+	case CHANNEL_END:
+		if (r->track_id_list)
+                {
+
+                    playlist_track_update_from_gzxml (r->playlist,
+                                  r->response->buf,
+                                  r->response->buflen);
+
+                    DSFYfree (r->track_id_list);
+                }
+                else
+                {
+                    playlist_create_from_xml ((char *)r->response->buf,
+                                              r->playlist);
+                }
+                buffer_free (r->response);
+
+		break;
+
+	default:
+		break;
+	}
+
+	return 0;
+}
+
+bool despotify_get_playlists(struct despotify_session *ds)
+{
+    int err;
+    struct playlist_request r;
+
+    r.response = buffer_init ();
+    r.playlist = NULL;
+    r.track_id_list = NULL;
+
+    buffer_append_raw (r.response, "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n", 51);
+    if ((err = cmd_getplaylist (ds->session, (unsigned char *)
+                    PLAYLIST_LIST_PLAYLISTS, -1,
+                    despotify_playlist_callback,
+                    (void *) &r)) != 0) {
+        buffer_free (r.response);
+
+        ds->last_error = "Network error.";
+        session_disconnect(ds->session);
+
+        return false;
+    }
+
+    ds->playlists = playlist_root();
+    return true;
+}

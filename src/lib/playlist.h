@@ -41,7 +41,7 @@ typedef struct playlist
 
 #define PLAYLIST_LIST_PLAYLISTS	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 
-struct playlist **playlist_root (void);
+struct playlist *playlist_root (void);
 struct playlist *playlist_new (void);
 void playlist_free (struct playlist *, int);
 

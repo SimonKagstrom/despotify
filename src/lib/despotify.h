@@ -10,6 +10,7 @@ struct despotify_session
 {
     bool initialized;
     SESSION *session;
+    struct playlist* playlists;
     const char *last_error;
 };
 
@@ -47,7 +48,7 @@ struct track *despotify_get_current_track(struct despotify_session *ds);
 struct playlist* despotify_search(struct despotify_session *ds, 
                                   char *searchtext);
 
-struct playlist** despotify_get_playlists(struct despotify_session *ds);
+bool despotify_get_playlists(struct despotify_session *ds);
 bool despotify_append_song(struct despotify_session *ds, 
                            struct playlist *playlist, 
                            struct track *song);
