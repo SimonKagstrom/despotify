@@ -39,9 +39,6 @@ static unsigned char DH_prime[] = {
 
 SESSION *session_init_client (void)
 {
-	if (network_init() != 0) {
-		return NULL;
-	}
 	SESSION *session;
 
 	if ((session = (SESSION *) calloc (1, sizeof (SESSION))) == NULL)

@@ -58,6 +58,12 @@ int main (int argc, char **argv)
 		return -1;
 	}
 
+        /* Initialize network. */
+        if (network_init ()) {
+		fprintf (stderr, "Could not initialize network.\n");
+		return -1;
+	}
+
 	/* Initialize client context */
 	c = session_init_client ();
 
