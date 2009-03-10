@@ -86,6 +86,7 @@ int do_auth (SESSION * session)
 void auth_generate_auth_hmac (SESSION * session, unsigned char *auth_hmac,
 			      unsigned int mac_len)
 {
+        (void)mac_len;
 	esbuf_ctxh ctx;
 	esbuf *buf;
 	

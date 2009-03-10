@@ -11,6 +11,7 @@
 
 #include "auth.h"
 #include "esbuf.h"
+#include "hmac.h"
 #include "session.h"
 #include "keyexchange.h"
 #include "util.h"
