@@ -501,7 +501,7 @@ int rest_fsm (RESTSESSION * r)
 				r->state = REST_STATE_WAITING;
 				if ((ret =
 				     gw_browse (r->client, 1,
-						r->command + 13)) != 0)
+						r->command + 13, 1)) != 0)
 					r->state = REST_STATE_FREE_CLIENT;
 			}
 		}
@@ -516,22 +516,22 @@ int rest_fsm (RESTSESSION * r)
 				r->state = REST_STATE_WAITING;
 				if ((ret =
 				     gw_browse (r->client, 2,
-						r->command + 12)) != 0)
+						r->command + 12, 1)) != 0)
 					r->state = REST_STATE_FREE_CLIENT;
 			}
 		}
 		else if (!strncmp (r->command, "browsetrack ", 12)) {
-			if (strlen (r->command) != 12 + 2 * 16) {
+			if ((strlen (r->command) - 12) % (2 * 16) == 0) {
 				r->state = REST_STATE_LOAD_COMMAND;
 				sprintf (msg,
-					 "501 0 WARN Track ID must be provided in hex as 32 characters\n");
+					 "501 0 WARN Track ID must be provided in hex as 32[,64,96,128,..] characters\n");
 				block_write (r->socket, msg, strlen (msg));
 			}
 			else {
 				r->state = REST_STATE_WAITING;
 				if ((ret =
 				     gw_browse (r->client, 3,
-						r->command + 12)) != 0)
+						r->command + 12, strlen(r->command + 12) / 32)) != 0)
 					r->state = REST_STATE_FREE_CLIENT;
 			}
 		}

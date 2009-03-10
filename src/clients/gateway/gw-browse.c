@@ -18,12 +18,12 @@ static int gw_browse_result_decompress (DECOMPRESSCTX *, unsigned char *,
 static int gw_browse_result_callback (CHANNEL *, unsigned char *,
 				      unsigned short);
 
-int gw_browse (SPOTIFYSESSION * s, unsigned char kind, char *id_as_hex)
+int gw_browse (SPOTIFYSESSION * s, unsigned char kind, char *id_as_hex, int num_ids)
 {
 	DECOMPRESSCTX *dctx;
-	unsigned char id[16];
+	unsigned char id[16*num_ids];
 
-	hex_ascii_to_bytes (id_as_hex, id, 16);
+	hex_ascii_to_bytes (id_as_hex, id, 16*num_ids);
 
 	dctx = (DECOMPRESSCTX *) malloc (sizeof (DECOMPRESSCTX));
 
@@ -43,7 +43,7 @@ int gw_browse (SPOTIFYSESSION * s, unsigned char kind, char *id_as_hex)
 	s->output = dctx;
 	s->output_len = 0;
 
-	return cmd_browse (s->session, kind, id, 1, gw_browse_result_callback,
+	return cmd_browse (s->session, kind, id, num_ids, gw_browse_result_callback,
 			   (void *) s);
 }
 

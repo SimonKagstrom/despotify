@@ -8,5 +8,5 @@
 
 #include "gw.h"
 
-int gw_browse (SPOTIFYSESSION * s, unsigned char, char *);
+int gw_browse (SPOTIFYSESSION * s, unsigned char, char *, int);
 #endif
