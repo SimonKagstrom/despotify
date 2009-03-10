@@ -1,7 +1,7 @@
 <?php
 
 class Despotify {
-	private $socket;
+	public $socket;
 	private $sessionid;
 	private $loggedin;
 	private $gateway;
@@ -290,58 +290,68 @@ class Despotify {
 		return $info;
 	}
 
-	function browsetrack($trackid) {
+	function browsetrack($trackids) {
 		if (! $this->sock_connected()) 
 			return false;
 
-		$info = array();
+		$tmp_tracks = "";
+		$counter = 0;
+		$global_counter = 0;
 
-		$trackid = substr(trim($trackid),0,32);
-		socket_write($this->socket, "browsetrack $trackid\n");
-	        if (($len = $this->sock_get_header()) === FALSE) 
-        		return false;
-		$return = $this->sock_read($len);
-		$xml = new SimpleXMLElement($return);
-
-		$info = array();
-
-		$info['trackid'] = $trackid;
-
-		$title = $xml->xpath("/result/tracks/track/title");
-		$info['title'] = utf8_decode($title[0]);
-
-		$artistid = $xml->xpath("/result/tracks/track/artist-id");
-		$info['artistid'] = utf8_decode($artistid[0]);
-
-		$artist = $xml->xpath("/result/tracks/track/artist");
-		$info['artist'] = utf8_decode($artist[0]);
-
-		$album = $xml->xpath("/result/tracks/track/album");
-		$info['album'] = utf8_decode($album[0]);
-
-		$albumid = $xml->xpath("/result/tracks/track/album-id");
-		$info['albumid'] = utf8_decode($albumid[0]);
-
-		$year = $xml->xpath("/result/tracks/track/year");
-		$info['year'] = utf8_decode($year[0]);
-
-		$tracknumber = $xml->xpath("/result/tracks/track/track-number");
-		$info['tracknumber'] = utf8_decode($tracknumber[0]);
-
-		$length = $xml->xpath("/result/tracks/track/length");
-		$info['length'] = utf8_decode($length[0]);
-
-		$file = $xml->xpath("/result/tracks/track/files/file");
-		if ($file) {
-			$file = (array)$file;
-
-			$info['fileid'] = (string)$file[0]->attributes()->id;
-			$info['fileformat'] = (string)$file[0]->attributes()->format;
+		$tracks = array();
+		$trackidlist = array();
+		if (is_array($trackids)) {
+			$trackidlist = $trackids;
 		}
+		else {
+			$trackidlist[] = $trackids;
+		}
+			
+		foreach ($trackidlist as $trackid) {
 
-		$info['spotifyuri'] = "spotify:track:".$this->idtouri($trackid);
+			if (strlen($trackid) % 32 != 0) {
+				$this->error = "track ids must be 32 chars each";
+				$this->errorcode = 9;
+				return false;
+			}
 
-		return $info;
+			$tracknum .= $trackid;
+			$counter += 1;
+			if ($counter % 20 == 0 || $counter == count($trackidlist)) {
+				socket_write($this->socket, "browsetrack $tracknum\n");
+echo "browsetrack $tracknum \n";
+	        		if (($len = $this->sock_get_header()) === FALSE) 
+        				return false;
+				$return = $this->sock_read($len);
+				$xml = new SimpleXMLElement($return);
+
+				$info = array();
+				
+				$items = $xml->xpath("/result/tracks/track");
+				while ($node = each($items)) {	
+					$track = array();
+					$arr = (array)$node[1];
+					$track['trackid'] = $arr['id'];
+					$track['title'] = $arr['title'];
+					$track['artistid'] = $arr['artist-id'];
+					$track['artist'] = $arr['artist'];
+					$track['album'] = $arr['album'];
+					$track['albumid'] = $arr['album-id'];
+					$track['year'] = $arr['year'];
+					$track['tracknumber'] = $arr['track-number'];
+					$track['length'] = $arr['length'];
+					$track['spotifyuri'] = "spotify:track:".$this->idtouri($track['trackid']);
+
+					$file = (array)$arr['files'];
+
+					$track['fileid'] = (string)$file['file']->attributes()->id;
+					$track['fileformat'] = (string)$file['file']->attributes()->format;
+
+					$tracks[] = $track;
+				}
+			}
+		}
+		return $tracks;
 	}
 
 	function disconnect() {
