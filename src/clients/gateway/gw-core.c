@@ -521,7 +521,7 @@ int rest_fsm (RESTSESSION * r)
 			}
 		}
 		else if (!strncmp (r->command, "browsetrack ", 12)) {
-			if ((strlen (r->command + 12) % (2 * 16) != 0 || strlen (r->command + 12) / (2 * 16) > 128 || strlen(r->command + 12) < 32) {
+			if (strlen (r->command + 12) % (2 * 16) != 0 || strlen (r->command + 12) / (2 * 16) > 128 || strlen(r->command + 12) < 32) {
 				r->state = REST_STATE_LOAD_COMMAND;
 				sprintf (msg,
 					 "501 0 WARN Track ID must be provided in hex as 32[,64,96,128,..] characters\n");
