@@ -122,7 +122,7 @@ int cmd_request_image (SESSION * session, unsigned char *hash,
 		("cmd_requestimg: allocated channel %d, retrieving img with UUID %s\n",
 		 ch->channel_id, buf + 6);
 
-	esbuf_append_uint32 (b, ch->channel_id);
+	esbuf_append_uint16 (b, ch->channel_id);
 	esbuf_append_data (b, hash, 20);
 
 	ret = packet_write (session, CMD_IMAGE, esbuf_data(b), esbuf_idx(b));
