@@ -99,10 +99,10 @@ struct _RESTSESSION
 	int socket_has_data;
 	time_t last_activity;
 
-	char input[4096];
+	char input[8192];
 	int input_len;
 
-	char command[4096];
+	char command[8192];
 
 	char username[256];
 	char password[256];
