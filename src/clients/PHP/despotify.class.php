@@ -306,23 +306,22 @@ class Despotify {
 		else {
 			$trackidlist[] = $trackids;
 		}
-			
-		foreach ($trackidlist as $trackid) {
-
-			if (strlen($trackid) % 32 != 0) {
+		for ($i=0; $i<count($trackidlist); $i++) {
+			if (strlen($trackidlist[$i]) % 32 != 0) {
 				$this->error = "track ids must be 32 chars each";
 				$this->errorcode = 9;
 				return false;
 			}
 
-			$tracknum .= $trackid;
+			$tracknum .= $trackidlist[$i];
 			$counter += 1;
-			if ($counter % 20 == 0 || $counter == count($trackidlist)) {
+			if ($counter % 128 == 0 || $counter == count($trackidlist)) {
 				socket_write($this->socket, "browsetrack $tracknum\n");
-echo "browsetrack $tracknum \n";
 	        		if (($len = $this->sock_get_header()) === FALSE) 
         				return false;
 				$return = $this->sock_read($len);
+
+				$tracknum = "";
 				$xml = new SimpleXMLElement($return);
 
 				$info = array();
@@ -343,9 +342,10 @@ echo "browsetrack $tracknum \n";
 					$track['spotifyuri'] = "spotify:track:".$this->idtouri($track['trackid']);
 
 					$file = (array)$arr['files'];
-
-					$track['fileid'] = (string)$file['file']->attributes()->id;
-					$track['fileformat'] = (string)$file['file']->attributes()->format;
+					if ($file) {
+						$track['fileid'] = (string)$file['file']->attributes()->id;
+						$track['fileformat'] = (string)$file['file']->attributes()->format;
+					}
 
 					$tracks[] = $track;
 				}
