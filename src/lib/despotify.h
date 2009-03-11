@@ -1,6 +1,7 @@
 #ifndef LIBDESPOTIFY_H
 #define LIBDESPOTIFY_H
 
+#include <pthread.h>
 #include <stdbool.h>
 #include "session.h"
 /* This is for track and playlist structs. */
@@ -10,8 +11,23 @@ struct despotify_session
 {
     bool initialized;
     SESSION *session;
+    struct snd_session* snd_session;
     struct playlist* playlists;
     const char *last_error;
+
+    /* AES CTR state */
+    struct {
+        unsigned int  state[4 * (10 + 1)];
+        unsigned char IV[16];
+        unsigned char keystream[16];
+    } aes;
+
+    pthread_t thread;
+
+    struct track* track;
+    struct playlist* playlist;
+    struct buffer* response;
+    int offset;
 };
 
 /* Global init / deinit library. */
@@ -57,7 +73,7 @@ bool despotify_remove_song(struct despotify_session *ds,
                            struct playlist *playlist, 
                            struct track *song);
 
-bool despotify_delete_playlist(struct despotify_session *ds, 
+bool despotify_delete_playlist(struct despotify_session *ds,
                                struct playlist *playlist);
 
 struct playlist * despotify_create_playlist(struct despotify_session *ds,
@@ -70,10 +86,12 @@ bool despotify_rename_playlist(struct despotify_session *ds,
 void despotify_free_playlist(struct playlist* playlist);
 
 /* Playback control. */
+bool despotify_play(struct despotify_session *ds,
+                    struct playlist* playlist,
+                    struct track *song);
 bool despotify_stop(struct despotify_session *ds);
 bool despotify_pause(struct despotify_session *ds);
 bool despotify_resume(struct despotify_session *ds);
 
-bool despotify_play(struct despotify_session *ds, struct track *song);
 
 #endif

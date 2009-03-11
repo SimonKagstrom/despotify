@@ -6,6 +6,7 @@
 #ifndef DESPOTIFY_SESSION_H
 #define DESPOTIFY_SESSION_H
 
+#include <pthread.h>
 #include <stdbool.h>
 #include <openssl/dh.h>
 #include <openssl/rsa.h>
@@ -117,8 +118,14 @@ typedef struct
 	/* Assigned country */
 	char country[4];
 
-        /* Has session progressed past CMD_WELCOME ? */
-        bool welcomed;
+        /* login synchronization */
+        pthread_mutex_t login_mutex;
+        pthread_cond_t  login_cond;
+
+        /* search synchronization */
+        pthread_mutex_t search_mutex;
+        pthread_cond_t  search_cond;
+    
 } SESSION;
 
 SESSION *session_init_client (void);

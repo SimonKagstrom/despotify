@@ -46,17 +46,26 @@ int main(int argc, char** argv)
     }
 
     struct playlist* pl = despotify_search(ds, "machinae");
-    if (pl) {
-        printf("Playlist name: %s\n", pl->name);
-        printf("Playlist author: %s\n", pl->author);
-
-        int i=1;
-        for (struct track* t = pl->tracks; t; t = t->next) {
-            printf("%2d: %s\n", i++, t->title);
-        }
-        despotify_free_playlist(pl);
+    if (!pl) {
+        printf("Search failed: %s\n", despotify_get_error(ds));
+        return 1;
     }
 
+    printf("Playlist name: %s\n", pl->name);
+    printf("Playlist author: %s\n", pl->author);
+
+    int i=1;
+    for (struct track* t = pl->tracks; t; t = t->next) {
+        printf("%2d: %s\n", i++, t->title);
+    }
+
+    /* play first track in playlist */
+    despotify_play(ds, pl, pl->tracks);
+
+    /* let it play a while */
+    sleep(10);
+    
+    despotify_free_playlist(pl);
     despotify_exit(ds);
 
     if (!despotify_cleanup())

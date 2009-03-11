@@ -5,6 +5,7 @@
  *
  */
 
+#include <pthread.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -102,8 +103,11 @@ int handle_aeskey (unsigned char *payload, int len)
 
 static int handle_welcome (SESSION * session)
 {
-        session->welcomed = true;
-	return 0;
+    /* signal "login complete" */
+    pthread_mutex_lock(&session->login_mutex);
+    pthread_cond_signal(&session->login_cond);
+    pthread_mutex_unlock(&session->login_mutex);
+    return 0;
 }
 
 int handle_packet (SESSION * session,
