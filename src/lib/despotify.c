@@ -482,6 +482,7 @@ static int despotify_get_playlists_callback (CHANNEL *ch,
                                              unsigned short len)
 {
     struct despotify_session* ds = ch->private;
+    bool done = false;
 
     switch (ch->state) {
 	case CHANNEL_DATA:
@@ -503,16 +504,23 @@ static int despotify_get_playlists_callback (CHANNEL *ch,
 	case CHANNEL_ERROR:
             if (ds->playlist)
                 ds->playlist->flags |= PLAYLIST_ERROR;
-            buf_free (ds->response);
+            done = true;
             break;
 
 	case CHANNEL_END:
             playlist_create_from_xml(ds->response->ptr, ds->playlist);
-            buf_free (ds->response);
+            done = true;
             break;
 
 	default:
             break;
+    }
+
+    if (done) {
+        /* tell despotify_get_playlists() that we're done */
+        pthread_mutex_lock(&ds->session->search_mutex);
+        pthread_cond_signal(&ds->session->search_cond);
+        pthread_mutex_unlock(&ds->session->search_mutex);
     }
 
     return 0;
@@ -537,6 +545,11 @@ struct playlist* despotify_get_playlists(struct despotify_session *ds)
 
         return NULL;
     }
+
+    /* wait until playlist fetch is ready */
+    pthread_mutex_lock(&ds->session->search_mutex);
+    pthread_cond_wait(&ds->session->search_cond, &ds->session->search_mutex);
+    pthread_mutex_unlock(&ds->session->search_mutex);
 
     buf_free(ds->response);
 
