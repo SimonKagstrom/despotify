@@ -642,12 +642,12 @@ int rest_fsm (RESTSESSION * r)
 					block_write (r->socket, msg,
 						     strlen (msg));
 					if (block_write (r->socket,
-							 ((BUFFER *)
+							 ((struct buf*)
 							  r->client->
-							  output)->buf,
-							 ((BUFFER *)
+							  output)->ptr,
+							 ((struct buf*)
 							  r->client->
-							  output)->buflen) <=
+							  output)->len) <=
 							0)
 						ret = -1;
 
@@ -655,7 +655,7 @@ int rest_fsm (RESTSESSION * r)
 				else
 					ret = r->httpreq->callback (r);
 
-				buffer_free ((BUFFER *) r->client->output);
+				buf_free ((struct buf*) r->client->output);
 			}
 			else {
 				if (!r->httpreq) {

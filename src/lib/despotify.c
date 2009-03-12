@@ -3,13 +3,13 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "despotify.h"
 
 #include "aes.h"
 #include "auth.h"
-#include "buffer.h"
+#include "buf.h"
 #include "channel.h"
 #include "commands.h"
+#include "despotify.h"
 #include "handlers.h"
 #include "keyexchange.h"
 #include "network.h"
@@ -410,16 +410,15 @@ static int despotify_search_callback(CHANNEL*  ch,
                     return 0;
             }
 
-            buffer_check_and_extend(ds->response, len);
-            buffer_append_raw(ds->response, buf, len);
+            buf_append_data(ds->response, buf, len);
             break;
             
         case CHANNEL_END:
 
             /* Add tracks */
             playlist_track_update_from_gzxml(ds->playlist,
-                                             ds->response->buf,
-                                             ds->response->buflen);
+                                             ds->response->ptr,
+                                             ds->response->len);
             
             /* Since this is a newly added playlist
                we know it's the first one */
@@ -447,7 +446,7 @@ static int despotify_search_callback(CHANNEL*  ch,
 struct playlist* despotify_search(struct despotify_session* ds,
                                   char* searchtext)
 {
-    ds->response = buffer_init();
+    ds->response = buf_new();
     ds->playlist = playlist_new();
 
     char buf[80];
@@ -468,7 +467,7 @@ struct playlist* despotify_search(struct despotify_session* ds,
     pthread_cond_wait(&ds->session->search_cond, &ds->session->search_mutex);
     pthread_mutex_unlock(&ds->session->search_mutex);
     
-    buffer_free(ds->response);
+    buf_free(ds->response);
 
     return ds->playlist;
 }
@@ -478,100 +477,68 @@ void despotify_free_playlist(struct playlist* playlist)
     playlist_free(playlist, 1);
 }
 
-struct playlist_request
+static int despotify_get_playlists_callback (CHANNEL *ch,
+                                             unsigned char *buf,
+                                             unsigned short len)
 {
-    struct buffer* response;
-    struct playlist *playlist;
-    unsigned char *track_id_list;
-};
+    struct despotify_session* ds = ch->private;
 
-static int despotify_playlist_callback (CHANNEL *ch, unsigned char *buf,
-                                          unsigned short len)
-{
-	struct playlist_request *r = (struct playlist_request *) ch->private;
-	int skip_len;
-
-	switch (ch->state) {
+    switch (ch->state) {
 	case CHANNEL_DATA:
-		/* In case of retrieving track meta info, skip a minimal gzip header */
-		if (r->track_id_list && ch->total_data_len < 10) {
-			skip_len = 10 - ch->total_data_len;
-			while (skip_len && len) {
-				skip_len--;
-				len--;
-				buf++;
-			}
-
-			if (len == 0)
-				break;
+            /* Skip a minimal gzip header */
+            if (ch->total_data_len < 10) {
+		int skip_len = 10 - ch->total_data_len;
+		while (skip_len && len) {
+                    skip_len--;
+                    len--;
+                    buf++;
 		}
 
-                buffer_check_and_extend (r->response, len);
-		buffer_append_raw (r->response, buf, len);
-		break;
+		if (len == 0)
+                    return 0;
+            }
+            buf_append_data(ds->response, buf, len);
+            break;
 
 	case CHANNEL_ERROR:
-		if (r->track_id_list) // PLAYLIST_BROWSE_ERROR
-                {
-                    r->playlist->flags |= PLAYLIST_TRACKS_ERROR;
-                    DSFYfree (r->track_id_list);
-                }
-		else if (r->playlist != NULL) // PLAYLIST_TRACKS_ERROR
-                    r->playlist->flags |= PLAYLIST_ERROR;
-                /* else PLAYLIST_LIST_ERROR */
-
-                buffer_free (r->response);
-
-		break;
+            if (ds->playlist)
+                ds->playlist->flags |= PLAYLIST_ERROR;
+            buf_free (ds->response);
+            break;
 
 	case CHANNEL_END:
-		if (r->track_id_list)
-                {
-
-                    playlist_track_update_from_gzxml (r->playlist,
-                                  r->response->buf,
-                                  r->response->buflen);
-
-                    DSFYfree (r->track_id_list);
-                }
-                else
-                {
-                    playlist_create_from_xml ((char *)r->response->buf,
-                                              r->playlist);
-                }
-                buffer_free (r->response);
-
-		break;
+            playlist_create_from_xml(ds->response->ptr, ds->playlist);
+            buf_free (ds->response);
+            break;
 
 	default:
-		break;
-	}
+            break;
+    }
 
-	return 0;
+    return 0;
 }
 
-bool despotify_get_playlists(struct despotify_session *ds)
+struct playlist* despotify_get_playlists(struct despotify_session *ds)
 {
-    int err;
-    struct playlist_request r;
+    ds->response = buf_new();
+    ds->playlist = NULL;
 
-    r.response = buffer_init ();
-    r.playlist = NULL;
-    r.track_id_list = NULL;
+    static const char* load_lists = 
+        "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n";
 
-    buffer_append_raw (r.response, "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n", 51);
-    if ((err = cmd_getplaylist (ds->session, (unsigned char *)
-                    PLAYLIST_LIST_PLAYLISTS, -1,
-                    despotify_playlist_callback,
-                    (void *) &r)) != 0) {
-        buffer_free (r.response);
+    buf_append_data(ds->response, (char*)load_lists, strlen(load_lists));
 
+    int error = cmd_getplaylist(ds->session, PLAYLIST_LIST_PLAYLISTS, -1,
+                                despotify_get_playlists_callback, ds);
+    if (error) {
+        DSFYDEBUG("Failed getting playlists\n");
         ds->last_error = "Network error.";
         session_disconnect(ds->session);
 
-        return false;
+        return NULL;
     }
 
-    ds->playlists = playlist_root();
-    return true;
+    buf_free(ds->response);
+
+    return playlist_root();
 }

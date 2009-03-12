@@ -11,8 +11,7 @@
 
 #include <stdarg.h> /* needed for esbuf */
 
-#include "esbuf.h"
-#include "buffer.h"
+#include "buf.h"
 #include "channel.h"
 #include "commands.h"
 #include "event.h"
@@ -25,7 +24,7 @@
 
 struct reqcontext
 {
-	BUFFER *response;
+	struct buf *response;
 	struct playlist *playlist;
 	unsigned char *track_id_list;
 };
@@ -170,10 +169,10 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 				 *
 				 */
 				playlist_create_from_xml ((char *)
-							  r->response->buf,
+							  r->response->ptr,
 							  r->playlist);
 
-				buffer_free (r->response);
+				buf_free (r->response);
 				DSFYfree (r);
 
 				event_mark_busy (e);
@@ -184,7 +183,7 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 			case MSG_GUI_PLAYLIST_LIST_ERROR:
 				r = *(struct reqcontext **) e->msg->data;
 
-				buffer_free (r->response);
+				buf_free (r->response);
 				DSFYfree (r);
 
 				/* Retry fetch playlist in 15 seconds */
@@ -198,7 +197,7 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 
 				r->playlist->flags |= PLAYLIST_ERROR;
 
-				buffer_free (r->response);
+				buf_free (r->response);
 				DSFYfree (r);
 
 				/* retry in 15 seconds */
@@ -212,10 +211,10 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 
 				/* This will update r->playlist->flags accordingly */
 				playlist_track_update_from_gzxml (r->playlist,
-								  r->response->buf,
-								  r->response->buflen);
+								  r->response->ptr,
+								  r->response->len);
 
-				buffer_free (r->response);
+				buf_free (r->response);
 				DSFYfree (r->track_id_list);
 				DSFYfree (r);
 
@@ -228,7 +227,7 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 
 				r->playlist->flags |= PLAYLIST_TRACKS_ERROR;
 
-				buffer_free (r->response);
+				buf_free (r->response);
 				DSFYfree (r->track_id_list);
 				DSFYfree (r);
 
@@ -261,11 +260,11 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 	case 1:
 		/* The request context */
 		r = (struct reqcontext *) malloc (sizeof (struct reqcontext));
-		r->response = buffer_init ();
+		r->response = buf_new();
 		r->playlist = NULL;
 		r->track_id_list = NULL;
 
-		buffer_append_raw (r->response,
+		buf_append_data (r->response,
 				   "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n",
 				   51);
 		if ((err = cmd_getplaylist (session, (unsigned char *)
@@ -278,7 +277,7 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 			event_mark_idle (e);
 		}
 		else {
-			buffer_free (r->response);
+			buf_free (r->response);
 			DSFYfree (r);
 			event_msg_post (MSG_CLASS_APP, MSG_APP_NET_ERROR,
 					NULL);
@@ -309,11 +308,11 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 
 		/* The request context */
 		r = (struct reqcontext *) malloc (sizeof (struct reqcontext));
-		r->response = buffer_init ();
+		r->response = buf_new ();
 		r->playlist = p;
 		r->track_id_list = NULL;
 
-		buffer_append_raw (r->response,
+		buf_append_data (r->response,
 				   "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n",
 				   51);
 		if (r->playlist->playlist_id != NULL && (err =
@@ -325,7 +324,7 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 			event_mark_idle (e);
 		}
 		else {
-			buffer_free (r->response);
+			buf_free (r->response);
 			DSFYfree (r);
 			event_msg_post (MSG_CLASS_APP, MSG_APP_NET_ERROR,
 					NULL);
@@ -358,7 +357,7 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 
 		/* The request context */
 		r = (struct reqcontext *) malloc (sizeof (struct reqcontext));
-		r->response = buffer_init ();
+		r->response = buf_new();
 		r->playlist = p;
 		r->track_id_list = malloc (16 * p->num_tracks);
 		for (p->num_tracks = 0, t = p->tracks; t;
@@ -375,7 +374,7 @@ int gui_playlists_download (EVENT * e, enum ev_flags ev_kind)
 			event_mark_idle (e);
 		}
 		else {
-			buffer_free (r->response);
+			buf_free (r->response);
 			DSFYfree (r->track_id_list);
 			DSFYfree (r);
 			event_msg_post (MSG_CLASS_APP, MSG_APP_NET_ERROR,
@@ -417,7 +416,7 @@ static int gui_playlist_channel_callback (CHANNEL * ch, unsigned char *buf,
 				break;
 		}
 
-		buffer_append_raw (r->response, buf, len);
+		buf_append_data (r->response, buf, len);
 		break;
 
 	case CHANNEL_ERROR:

@@ -8,7 +8,7 @@
 #include <assert.h>
 
 #include "aes.h"
-#include "buffer.h"
+#include "buf.h"
 #include "channel.h"
 #include "commands.h"
 #include "gw.h"
@@ -19,7 +19,7 @@ typedef struct
 {
 	unsigned int offset;
 	unsigned int len;
-	BUFFER *data;
+	struct buf *data;
 
 	/* AES CTR state */
 	unsigned int state[4 * (10 + 1)];
@@ -37,23 +37,23 @@ int gw_file_key (SPOTIFYSESSION * s, unsigned char *file_id,
 	char buf[40 + 1];
 	int i;
 
-	s->output = buffer_init ();
+	s->output = buf_new ();
 	s->output_len = 0;
-	buffer_append_raw (s->output,
+	buf_append_data (s->output,
 			   "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<filekey>\n",
 			   51);
 
-	buffer_append_raw (s->output, "<file>", 6);
+	buf_append_data (s->output, "<file>", 6);
 	for (i = 0; i < 20; i++)
 		sprintf (buf + 2 * i, "%02x", file_id[i]);
-	buffer_append_raw (s->output, buf, 40);
-	buffer_append_raw (s->output, "</file>\n", 8);
+	buf_append_data (s->output, buf, 40);
+	buf_append_data (s->output, "</file>\n", 8);
 
-	buffer_append_raw (s->output, "<track>", 7);
+	buf_append_data (s->output, "<track>", 7);
 	for (i = 0; i < 16; i++)
 		sprintf (buf + 2 * i, "%02x", track_id[i]);
-	buffer_append_raw (s->output, buf, 32);
-	buffer_append_raw (s->output, "</track>\n", 9);
+	buf_append_data (s->output, buf, 32);
+	buf_append_data (s->output, "</track>\n", 9);
 
 	hexdump8x32 (" file_key, file_id", file_id, 20);
 	hexdump8x32 (" file_key, trackid", track_id, 16);
@@ -66,24 +66,24 @@ static int gw_file_key_callback (CHANNEL * ch, unsigned char *buf,
 				 unsigned short len)
 {
 	SPOTIFYSESSION *s = (SPOTIFYSESSION *) ch->private;
-	BUFFER *b = (BUFFER *) s->output;
+	struct buf *b = s->output;
 	char hexkey[32 + 1];
 	int i;
 
 	switch (ch->state) {
 	case CHANNEL_DATA:
-		buffer_append_raw (b, "<key>", 5);
+		buf_append_data (b, "<key>", 5);
 		for (i = 0; i < 16 && i < len; i++)
 			sprintf (hexkey + 2 * i, "%02x", buf[i]);
 		hexkey[32] = 0;
-		buffer_append_raw (b, hexkey, 32);
-		buffer_append_raw (b, "</key>\n", 7);
-		buffer_append_raw (b, "</filekey>\n", 11);
-		s->output_len = b->buflen;
+		buf_append_data (b, hexkey, 32);
+		buf_append_data (b, "</key>\n", 7);
+		buf_append_data (b, "</filekey>\n", 11);
+		s->output_len = b->len;
 		break;
 
 	case CHANNEL_ERROR:
-		buffer_free (b);
+		buf_free (b);
 		s->output = NULL;
 		s->output_len = -1;
 		break;
@@ -113,7 +113,7 @@ int gw_file_stream (SPOTIFYSESSION * s, unsigned char *file_id,
 	if (!sctx)
 		return -1;
 
-	if ((sctx->data = buffer_init ()) == NULL) {
+	if ((sctx->data = buf_new ()) == NULL) {
 		free (sctx);
 		return -1;
 	}
@@ -167,7 +167,7 @@ static int gw_file_stream_callback (CHANNEL * ch, unsigned char *buf,
 {
 	SPOTIFYSESSION *s = (SPOTIFYSESSION *) ch->private;
 	STREAMCTX *sctx = (STREAMCTX *) s->output;
-	BUFFER *b = sctx->data;
+	struct buf *b = sctx->data;
 	unsigned char *ciphertext, *plaintext;
 	unsigned char *w, *x, *y, *z;
 	int block, i, j;
@@ -215,14 +215,13 @@ static int gw_file_stream_callback (CHANNEL * ch, unsigned char *buf,
 			}
 		}
 
-		buffer_check_and_extend (b, len);
-		buffer_append_raw (b, plaintext, len);
+		buf_append_data (b, plaintext, len);
 		free (plaintext);
 		break;
 
 	case CHANNEL_ERROR:
 		s->state = CLIENT_STATE_COMMAND_COMPLETE;
-		buffer_free (b);
+		buf_free (b);
 		free (sctx);
 		s->output = NULL;
 		s->output_len = -1;
@@ -232,7 +231,7 @@ static int gw_file_stream_callback (CHANNEL * ch, unsigned char *buf,
 		s->state = CLIENT_STATE_COMMAND_COMPLETE;
 		free (s->output);
 		s->output = b;
-		s->output_len = b->buflen;
+		s->output_len = b->len;
 		break;
 
 	default:

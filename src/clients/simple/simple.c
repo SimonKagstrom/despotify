@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "despotify.h"
 
 int main(int argc, char** argv)
@@ -34,17 +35,20 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    if (despotify_get_playlists(ds))
-    {
-        struct playlist *p; 
-        printf("List of playlists on account:\n");
-        for (p = ds->playlists; p; p = p->next)
+    printf("List of playlists on account:\n");
+    struct playlist *p = despotify_get_playlists(ds);
+    if (!p) {
+        printf(" (Account has no stored playlists)\n");
+    }
+    else {
+        for (; p; p = p->next)
         {
             printf("  Playlist name:   %s\n", p->name);
             printf("  Playlist author: %s\n", p->author);
         }
     }
 
+    printf("Search:\n");
     struct playlist* pl = despotify_search(ds, "machinae");
     if (!pl) {
         printf("Search failed: %s\n", despotify_get_error(ds));
@@ -81,6 +85,6 @@ void app_packet_callback(SESSION *s, int cmd, unsigned char* buf, int len)
 {
     (void)s;
     (void)buf;
-
-    printf("Got packet type 0x%02x (%3d bytes)\n", cmd, len);
+    (void)cmd;
+    (void)len;
 }

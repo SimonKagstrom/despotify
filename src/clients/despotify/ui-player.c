@@ -9,7 +9,6 @@
 #include <assert.h>
 
 #include "aes.h"
-#include "buffer.h"
 #include "channel.h"
 #include "commands.h"
 #include "event.h"

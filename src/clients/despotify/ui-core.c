@@ -11,7 +11,6 @@
 
 #include <curses.h>
 
-#include "buffer.h"
 #include "channel.h"
 #include "commands.h"
 #include "event.h"

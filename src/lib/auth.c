@@ -16,7 +16,7 @@
 #include "network.h"
 
 #include "auth.h"
-#include "esbuf.h"
+#include "buf.h"
 #include "puzzle.h"
 #include "util.h"
 #include "sha1.h"
@@ -87,85 +87,79 @@ void auth_generate_auth_hmac (SESSION * session, unsigned char *auth_hmac,
 			      unsigned int mac_len)
 {
         (void)mac_len;
-	esbuf_ctxh ctx;
-	esbuf *buf;
+        struct buf* buf = buf_new();
 	
-	ctx = esbuf_new_ctx();
-	buf = esbuf_init(ctx, 0);
-	esbuf_append_data (buf, session->client_random_16,
-			   sizeof (session->client_random_16));
-	esbuf_append_data (buf, session->server_random_16,
+	buf_append_data (buf, session->client_random_16,
+                         sizeof (session->client_random_16));
+	buf_append_data (buf, session->server_random_16,
 			   sizeof (session->server_random_16));
-	esbuf_append_data (buf, session->my_pub_key, 96);
-	esbuf_append_data (buf, session->remote_pub_key, 96);
-	esbuf_append_data (buf, session->rsa_pub_exp,
+	buf_append_data (buf, session->my_pub_key, 96);
+	buf_append_data (buf, session->remote_pub_key, 96);
+	buf_append_data (buf, session->rsa_pub_exp,
 			   sizeof (session->rsa_pub_exp));
-	esbuf_append_data (buf, &session->username_len, 1);
-	esbuf_append_data (buf, session->username, session->username_len);
-	esbuf_append_data (buf, "\x01\x40", 2);
+	buf_append_data (buf, &session->username_len, 1);
+	buf_append_data (buf, session->username, session->username_len);
+	buf_append_data (buf, "\x01\x40", 2);
 
 #ifdef DEBUG_LOGIN
-	hexdump8x32 ("auth_generate_auth_hmac, HMAC message", b->buf,
-		     b->buflen);
+	hexdump8x32 ("auth_generate_auth_hmac, HMAC message", buf->ptr,
+		     buf->len);
 	hexdump8x32 ("auth_generate_auth_hmac, HMAC key", session->key_hmac,
 		     sizeof (session->key_hmac));
 #endif
 
 	sha1_hmac ( session->key_hmac, sizeof (session->key_hmac),
-		    esbuf_data(buf), esbuf_idx(buf), auth_hmac);
+		    buf->ptr, buf->len, auth_hmac);
 
 #ifdef DEBUG_LOGIN
 	hexdump8x32 ("auth_generate_auth_hmac, HMAC digest", auth_hmac,
 		     mac_len);
 #endif
 
-	esbuf_free_ctx(ctx);
+	buf_free(buf);
 }
 
 int send_client_auth (SESSION * session)
 {
-	esbuf_ctxh ctx;
-	esbuf *buf;
 	int ret;
+        struct buf* buf = buf_new();
 
-	ctx = esbuf_new_ctx();
-	buf = esbuf_init(ctx, 0);
-	esbuf_append_data (buf, session->puzzle_solution,
-			   sizeof (session->puzzle_solution));
-	esbuf_append_data (buf, session->auth_hmac,
-			   sizeof (session->auth_hmac));
+	buf_append_data (buf, session->puzzle_solution,
+                         sizeof (session->puzzle_solution));
+	buf_append_data (buf, session->auth_hmac,
+                         sizeof (session->auth_hmac));
 
 	/*
 	 * Unknown
 	 *
 	 */
-	esbuf_append_byte (buf, 0x0);
+	buf_append_u8 (buf, 0x0);
 
 	/*
 	 * Payload length (including length byte itself) and payload
 	 * The payload can be anything and doesn't appear to be used.
 	 *
 	 */
-	esbuf_append_byte(buf, 0x1); /* zero payload */
+	buf_append_u8(buf, 0x1); /* zero payload */
 
 #ifdef DEBUG_LOGIN
-	hexdump8x32 ("send_client_auth, second client packet", b->buf,
-		     b->buflen);
+	hexdump8x32 ("send_client_auth, second client packet", buf->ptr,
+		     buf->len);
 #endif
 
-	if ((ret = sock_send (session->ap_sock, esbuf_data(buf), esbuf_idx(buf))) <= 0) {
+	if ((ret = sock_send (session->ap_sock, buf->ptr, buf->len)) <= 0) {
 		printf ("send_client_auth(): connection lost\n");
-		esbuf_free_ctx(ctx);
+		buf_free(buf);
 		return -1;
 	}
-	else if (ret != (int)esbuf_idx(buf)) {
+	else if (ret != buf->len) {
 		printf ("send_client_auth(): only wrote %d of %d bytes\n",
-			ret, esbuf_idx(buf));
-		esbuf_free_ctx(ctx);
+			ret, buf->len);
+		buf_free(buf);
 		return -1;
 	}
 
-	esbuf_free_ctx(ctx);
+	buf_free(buf);
 	
 	return 0;
 }

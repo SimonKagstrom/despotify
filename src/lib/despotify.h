@@ -12,7 +12,6 @@ struct despotify_session
     bool initialized;
     SESSION *session;
     struct snd_session* snd_session;
-    struct playlist* playlists;
     const char *last_error;
 
     /* AES CTR state */
@@ -26,7 +25,7 @@ struct despotify_session
 
     struct track* track;
     struct playlist* playlist;
-    struct buffer* response;
+    struct buf* response;
     int offset;
 };
 
@@ -64,7 +63,7 @@ struct track *despotify_get_current_track(struct despotify_session *ds);
 struct playlist* despotify_search(struct despotify_session *ds, 
                                   char *searchtext);
 
-bool despotify_get_playlists(struct despotify_session *ds);
+struct playlist* despotify_get_playlists(struct despotify_session *ds);
 bool despotify_append_song(struct despotify_session *ds, 
                            struct playlist *playlist, 
                            struct track *song);

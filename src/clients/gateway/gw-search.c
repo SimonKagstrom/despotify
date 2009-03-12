@@ -6,7 +6,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "buffer.h"
+#include "buf.h"
 #include "channel.h"
 #include "commands.h"
 #include "gw.h"
@@ -33,7 +33,7 @@ int gw_search (SPOTIFYSESSION * s, char *searchtext)
 		return -1;
 	}
 
-	dctx->b = buffer_init ();
+	dctx->b = buf_new ();
 
 	s->output = dctx;
 	s->output_len = 0;
@@ -57,7 +57,7 @@ static int gw_search_result_callback (CHANNEL * ch, unsigned char *buf,
 		s->state = CLIENT_STATE_COMMAND_COMPLETE;
 
 		inflateEnd (&dctx->z);
-		buffer_free (dctx->b);
+		buf_free (dctx->b);
 		free (dctx);
 
 		s->output = NULL;
@@ -74,7 +74,7 @@ static int gw_search_result_callback (CHANNEL * ch, unsigned char *buf,
 		 *
 		 */
 		s->output = dctx->b;
-		s->output_len = dctx->b->buflen;
+		s->output_len = dctx->b->len;
 
 		free (dctx);
 
@@ -111,15 +111,15 @@ static int gw_search_result_decompress (DECOMPRESSCTX * dctx,
 
 	ret = 1;
 	do {
-		buffer_check_and_extend (dctx->b, CHUNKSZ);
-		dctx->z.avail_out = dctx->b->allocated - dctx->b->buflen;
-		dctx->z.next_out = dctx->b->buf + dctx->b->buflen;
+		buf_extend (dctx->b, CHUNKSZ);
+		dctx->z.avail_out = dctx->b->size - dctx->b->len;
+		dctx->z.next_out = dctx->b->ptr + dctx->b->len;
 
 		e = inflate (&dctx->z, Z_NO_FLUSH);
 		if (e != Z_OK && e != Z_STREAM_END)
 			break;
 
-		dctx->b->buflen += CHUNKSZ - dctx->z.avail_out;
+		dctx->b->len += CHUNKSZ - dctx->z.avail_out;
 	} while (dctx->z.avail_out == 0);
 
 	dctx->z.next_in = Z_NULL;

@@ -10,7 +10,7 @@
 #include <time.h>
 #include <zlib.h>
 
-#include "buffer.h"
+#include "buf.h"
 #include "session.h"
 
 enum client_state_t
@@ -58,7 +58,7 @@ typedef struct
 
 typedef struct
 {
-	BUFFER *b;
+	struct buf *b;
 	z_stream z;
 	int decompression_done;
 } DECOMPRESSCTX;

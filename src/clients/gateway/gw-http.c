@@ -12,12 +12,12 @@
 #include "network.h"
 
 #include "base64.h"
-#include "buffer.h"
+#include "buf.h"
 #include "gw.h"
 #include "gw-http.h"
 
 
-static int http_reply (RESTSESSION *, int, BUFFER *);
+static int http_reply (RESTSESSION *, int, struct buf *);
 static int http_reply_need_auth (RESTSESSION *);
 static void http_cleanup (RESTSESSION * r);
 static int http_complete_login (RESTSESSION *);
@@ -27,7 +27,7 @@ static char connection_close[] = "Connection: close\r\n";
 
 int http_handle_request (RESTSESSION * r)
 {
-	BUFFER *b;
+	struct buf *b;
 	char buf[512];
 	char *p;
 	SPOTIFYSESSION *client;
@@ -72,15 +72,15 @@ int http_handle_request (RESTSESSION * r)
 
 	}
 	else {
-		b = buffer_init ();
+		b = buf_new ();
 		sprintf (buf,
 			 "You're logged in as '%s' with password '%s'<br />\n",
 			 r->username, r->password);
 		if (client)
-			buffer_append_raw (b, buf, strlen (buf));
+			buf_append_data(b, buf, strlen (buf));
 		sprintf (buf, "The requested URL '%s' was not found!\n",
 			 r->httpreq->url);
-		buffer_append_raw (b, buf, strlen (buf));
+		buf_append_data(b, buf, strlen (buf));
 		return http_reply (r, 404, b);
 	}
 
@@ -99,54 +99,54 @@ static void http_cleanup (RESTSESSION * r)
 
 static int http_reply_need_auth (RESTSESSION * r)
 {
-	BUFFER *b;
+	struct buf *b;
 	int ret;
 	char buf[256];
 
-	b = buffer_init ();
+	b = buf_new();
 	strcpy (buf, "HTTP/1.1 401\r\n");
-	buffer_append_raw (b, buf, strlen (buf));
+	buf_append_data (b, buf, strlen (buf));
 	strcpy (buf, "WWW-Authenticate: Basic realm=\"Spotify\"\r\n");
-	buffer_append_raw (b, buf, strlen (buf));
-	buffer_append_raw (b, content_type, strlen (content_type));
-	buffer_append_raw (b, connection_close, strlen (connection_close));
+	buf_append_data (b, buf, strlen (buf));
+	buf_append_data (b, content_type, strlen (content_type));
+	buf_append_data (b, connection_close, strlen (connection_close));
 	strcpy (buf, "Content-Length: 0\r\n");
-	buffer_append_raw (b, buf, strlen (buf));
-	buffer_append_raw (b, "\r\n", 2);
+	buf_append_data (b, buf, strlen (buf));
+	buf_append_data (b, "\r\n", 2);
 
 	ret = 0;
-	if (sock_send (r->socket, b->buf, b->buflen) != b->buflen)
+	if (sock_send (r->socket, b->ptr, b->len) != b->len)
 		ret = -1;
 
-	buffer_free (b);
+	buf_free (b);
 	http_cleanup (r);
 
 	return ret;
 }
 
-static int http_reply (RESTSESSION * r, int status, BUFFER * response)
+static int http_reply (RESTSESSION * r, int status, struct buf * response)
 {
-	BUFFER *b;
+	struct buf *b;
 	int ret;
 	char respcode[100];
 	char content_len[256];
 
-	b = buffer_init ();
+	b = buf_new ();
 	sprintf (respcode, "HTTP/1.1 %03d\r\n", status);
-	buffer_append_raw (b, respcode, strlen (respcode));
-	buffer_append_raw (b, content_type, strlen (content_type));
-	buffer_append_raw (b, connection_close, strlen (connection_close));
-	sprintf (content_len, "Content-Length: %d\r\n", response->buflen);
-	buffer_append_raw (b, content_len, strlen (content_len));
-	buffer_append_raw (b, "\r\n", 2);
-	buffer_append_raw (b, response->buf, response->buflen);
+	buf_append_data (b, respcode, strlen (respcode));
+	buf_append_data (b, content_type, strlen (content_type));
+	buf_append_data (b, connection_close, strlen (connection_close));
+	sprintf (content_len, "Content-Length: %d\r\n", response->len);
+	buf_append_data (b, content_len, strlen (content_len));
+	buf_append_data (b, "\r\n", 2);
+	buf_append_data (b, response->ptr, response->len);
 
 	ret = 0;
-	if (sock_send (r->socket, b->buf, b->buflen) != b->buflen)
+	if (sock_send (r->socket, b->ptr, b->len) != b->len)
 		ret = -1;
 
-	buffer_free (b);
-	buffer_free (response);
+	buf_free (b);
+	buf_free (response);
 	http_cleanup (r);
 
 	return ret;
@@ -154,13 +154,13 @@ static int http_reply (RESTSESSION * r, int status, BUFFER * response)
 
 static int http_complete_login (RESTSESSION * r)
 {
-	BUFFER *response;
+	struct buf *response;
 
 	if (r->client->state != CLIENT_STATE_IDLE_CONNECTED)
 		return http_reply_need_auth (r);
 
-	response = buffer_init ();
-	buffer_append_raw (response, "logged in!\n", 11);
+	response = buf_new ();
+	buf_append_data (response, "logged in!\n", 11);
 
 	return http_reply (r, 200, response);
 }

@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-#include "buffer.h"
+#include "buf.h"
 #include "channel.h"
 #include "commands.h"
 #include "gw.h"
@@ -19,7 +19,7 @@ int gw_image (SPOTIFYSESSION * s, char *id_as_hex)
 {
 	unsigned char id[20];
 
-	s->output = buffer_init ();
+	s->output = buf_new ();
 	s->output_len = 0;
 
 	hex_ascii_to_bytes (id_as_hex, id, 20);
@@ -32,7 +32,7 @@ static int gw_image_result_callback (CHANNEL * ch, unsigned char *data,
 				     unsigned short len)
 {
 	SPOTIFYSESSION *s = (SPOTIFYSESSION *) ch->private;
-	BUFFER *b = (BUFFER *) s->output;
+	struct buf *b = s->output;
 
 	/* Ignore those unknown data bytes */
 	if (ch->state == CHANNEL_HEADER)
@@ -41,7 +41,7 @@ static int gw_image_result_callback (CHANNEL * ch, unsigned char *data,
 	if (ch->state == CHANNEL_ERROR) {
 		s->state = CLIENT_STATE_COMMAND_COMPLETE;
 
-		buffer_free (b);
+		buf_free (b);
 
 		s->output = NULL;
 		s->output_len = -1;
@@ -51,13 +51,12 @@ static int gw_image_result_callback (CHANNEL * ch, unsigned char *data,
 	else if (ch->state == CHANNEL_END) {
 		s->state = CLIENT_STATE_COMMAND_COMPLETE;
 
-		s->output_len = b->buflen;
+		s->output_len = b->len;
 
 		return 0;
 	}
 
-	buffer_check_and_extend (b, len);
-	buffer_append_raw (b, data, len);
+	buf_append_data (b, data, len);
 
 	return 0;
 }

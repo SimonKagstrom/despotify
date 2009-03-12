@@ -8,7 +8,7 @@
 
 #include <curses.h>
 
-#include "buffer.h"
+#include "buf.h"
 #include "channel.h"
 #include "commands.h"
 #include "playlist.h"
@@ -21,7 +21,7 @@
 struct reqcontext
 {
 	WINDOW *win;
-	BUFFER *response;
+        struct buf *response;
 	struct playlist *playlist;
 	unsigned char *track_id_list;
 };
@@ -36,7 +36,7 @@ int gui_search (SESSION * ctx, WINDOW * w, char *searchtext)
 
 	r = (struct reqcontext *) malloc (sizeof (struct reqcontext));
 	r->win = w;
-	r->response = buffer_init ();
+	r->response = buf_new ();
 	r->playlist = playlist_new ();
 	snprintf (buf, sizeof (buf), "Search: %s", searchtext);
 	buf[sizeof (buf) - 1] = 0;
@@ -64,8 +64,8 @@ static int gui_search_result_callback (CHANNEL * ch, unsigned char *buf,
 
 		/* Add tracks */
 		playlist_track_update_from_gzxml (r->playlist,
-						  r->response->buf,
-						  r->response->buflen);
+						  r->response->ptr,
+						  r->response->len);
 
 		/* Since this is a newly added playlist we know it's the first one */
 		playlist_select (1);
@@ -92,8 +92,7 @@ static int gui_search_result_callback (CHANNEL * ch, unsigned char *buf,
 			return 0;
 	}
 
-	buffer_check_and_extend (r->response, len);
-	buffer_append_raw (r->response, buf, len);
+	buf_append_data (r->response, buf, len);
 
 	/* Parse more data */
 	wprintw (r->win, "..");
