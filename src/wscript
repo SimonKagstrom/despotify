@@ -29,3 +29,16 @@ def configure(conf):
 
 def build(bld):
 	bld.add_subdirs(subdirs)
+
+
+def shutdown():
+	import Options, Utils, Build, os
+
+	# Run ldconfig when installing if we're root and ldconfig exists
+	if Options.commands['install'] and os.geteuid() == 0:
+		ldconfig = '/sbin/ldconfig'
+		if os.path.isfile(ldconfig):
+			libprefix = Utils.subst_vars('${PREFIX}/lib', Build.bld.env)
+
+			try: Utils.cmd_output(ldconfig + ' ' + libprefix)
+			except: pass

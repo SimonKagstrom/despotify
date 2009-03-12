@@ -30,7 +30,7 @@ files = """
 # Audio output plugins
 class Coreaudio:
 	def find(self, conf):
-		if not conf.check_cc(header_name='AudioUnit/AudioUnit.h', defines="HAVE_COREAUDIO"):
+		if not conf.check_cc(header_name='AudioUnit/AudioUnit.h', defines='HAVE_COREAUDIO'):
 			return False
 
 		return True
@@ -88,6 +88,7 @@ def set_options(opt):
 def configure(conf):
 	import Options
 
+	conf.check_tool('misc')
 
 	if Options.options.debug:
 		conf.env['DEFINES_libdespotify'] = ['DEBUG']
@@ -169,4 +170,12 @@ def build(bld):
 
 	bld.install_files('${PREFIX}/include/despotify', 'despotify.h')
 	bld.install_files('${PREFIX}/include/despotify', 'playlist.h')
-	bld.install_files('${PREFIX}/lib/pkgconfig', 'despotify.pc')
+
+	# Generate pkgconfig file
+	obj = bld.new_task_gen('subst')
+	obj.source = 'despotify.pc.in'
+	obj.target = 'despotify.pc'
+	obj.dict = {
+		'PREFIX': bld.env['PREFIX'],
+	}
+	obj.install_path = bld.env['PREFIX'] + '/lib/pkgconfig'
