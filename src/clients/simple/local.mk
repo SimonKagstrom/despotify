@@ -20,9 +20,9 @@ clean:
 	rm -f $(OBJS) Makefile.dep
 
 install: simple
-	@echo "Copying simple binary to /usr/bin/simple"
-	$(LT) --mode=install install simple /usr/bin/simple
+	@echo "Copying simple binary to $(INSTALL_PREFIX)/bin/simple"
+	$(LT) --mode=install install simple $(INSTALL_PREFIX)/bin/simple
 
 uninstall:
 	@echo "Removing simple..."
-	rm -f /usr/bin/simple
+	rm -f $(INSTALL_PREFIX)/bin/simple

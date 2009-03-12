@@ -7,6 +7,9 @@
 ## Disable GUI stuff
 # NOGUI = 1
 
+## Install prefix
+# INSTALL_PREFIX=/usr
+
 ## Choose audio backend
 LINUX_BACKEND = gstreamer
 # LINUX_BACKEND = pulseaudio

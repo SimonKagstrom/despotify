@@ -36,9 +36,9 @@ clean:
 	rm -f $(DESPOTIFY_OBJS) Makefile.dep
 
 install: despotify 
-	@echo "Copying despotify binary to /usr/bin/despotify"
-	$(LT) --mode=install install despotify /usr/bin/despotify
+	@echo "Copying despotify binary to $(INSTALL_PREFIX)/bin/despotify"
+	$(LT) --mode=install install despotify $(INSTALL_PREFIX)/bin/despotify
 
 uninstall:
 	@echo "Removing despotify..."
-	rm -f /usr/bin/despotify
+	rm -f $(INSTALL_PREFIX)/bin/despotify

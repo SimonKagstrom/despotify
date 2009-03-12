@@ -17,6 +17,7 @@ SILENTDIR := -s
 SILENTLIB := --quiet
 endif
 
+INSTALL_PREFIX = /usr
 LINUX_BACKEND = gstreamer
 
 include Makefile.local.mk
@@ -43,8 +44,6 @@ endif
 ifeq ($(firstword $(subst ., ,$(shell $(CC) -dumpversion))), 4)
     CFLAGS += -Wno-pointer-sign
 endif
-
-
 
 CLIENTS = clients/despotify clients/gateway clients/simple
 SUBDIRS = lib $(CLIENTS)
