@@ -1,5 +1,5 @@
 /*
- * $Id: pulseaudio.c 768 2009-02-24 18:42:02Z x $
+ * $Id$
  *
  * Linux PulseAudio audio output driver for Despotify
  *

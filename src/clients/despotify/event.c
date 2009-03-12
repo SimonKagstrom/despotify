@@ -1,5 +1,5 @@
 /*
- * $Id: event.c 703 2009-02-23 02:46:13Z x $
+ * $Id$
  *
  * Event subsystem for despotify
  *

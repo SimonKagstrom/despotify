@@ -1,7 +1,7 @@
 /*
  * A very simple despotify client, to show how the library is used.
  *
- * $Id: despotify.c 734 2009-02-23 18:27:54Z x $
+ * $Id$
  *
  */
 

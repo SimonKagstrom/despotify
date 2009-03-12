@@ -1,5 +1,5 @@
 /*
- * $Id: gw-http.c 511 2009-02-09 00:10:34Z x $
+ * $Id$
  * Process HTTP requests
  *
  */

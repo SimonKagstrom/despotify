@@ -1,5 +1,5 @@
 /*
- * $Id: gw-core.c 734 2009-02-23 18:27:54Z x $
+ * $Id$
  *
  * This is a gateway to the Spotify server, intended for use 
  * in combination with scripted services or HTTP REST.

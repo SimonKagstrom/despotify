@@ -7,7 +7,7 @@
  * or neighboring rights to buf.c. This work is published from Sweden.
  * http://creativecommons.org/publicdomain/zero/1.0/
  *
- * $Id: $
+ * $Id$
  */
 
 #ifndef _BUF_H_

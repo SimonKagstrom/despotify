@@ -1,5 +1,5 @@
 /*
- * $Id: libao.c 740 2009-02-23 20:28:25Z x $
+ * $Id$
  *
  * Libao audio output driver for Despotify
  *

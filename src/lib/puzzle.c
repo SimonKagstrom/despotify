@@ -1,5 +1,5 @@
 /*
- * $Id: puzzle.c 733 2009-02-23 18:16:17Z x $
+ * $Id$
  *
  * Zero-modulus bruteforce puzzle to prevent 
  * Denial of Service and password bruteforce attacks

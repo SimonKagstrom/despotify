@@ -1,5 +1,5 @@
 /*
- * $Id: playlist.c 698 2009-02-23 01:56:59Z x $
+ * $Id$
  *
  * Playlist related stuff
  *
