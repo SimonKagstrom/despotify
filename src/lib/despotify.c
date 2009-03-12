@@ -3,7 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 
-
 #include "aes.h"
 #include "auth.h"
 #include "buf.h"
@@ -24,6 +23,10 @@
 bool despotify_init()
 {
     DSFYDEBUG("called by thread %lx\n", pthread_self());
+
+    if (audio_init())
+        return false;
+
     if (network_init() != 0)
         return false;
     return true;
@@ -338,7 +341,6 @@ static int despotify_snd_end_callback(void* arg)
 /* called at head of pcm_read() */
 static void despotify_snd_timetell_callback(snd_SESSION* snd, int t)
 {
-    DSFYDEBUG("begin\n");
     (void)snd;
     (void)t;
 }
