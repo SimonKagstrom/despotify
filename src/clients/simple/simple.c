@@ -46,6 +46,7 @@ int main(int argc, char** argv)
             printf("  Playlist name:   %s\n", p->name);
             printf("  Playlist author: %s\n", p->author);
         }
+        despotify_free_playlist(p);
     }
 
     printf("Search:\n");
@@ -60,15 +61,23 @@ int main(int argc, char** argv)
 
     int i=1;
     for (struct track* t = pl->tracks; t; t = t->next) {
-        printf("%2d: %s\n", i++, t->title);
+        printf("%2d: %s (%d:%02d)\n", i++, t->title,
+               t->length / 60000, t->length % 60000 / 1000);
     }
 
     /* play first track in playlist */
     despotify_play(ds, pl, pl->tracks);
 
     /* let it play a while */
-    sleep(10);
-    
+    sleep(5);
+
+    despotify_pause(ds);
+    sleep(1);
+    despotify_resume(ds);
+
+    sleep(5);
+    despotify_stop(ds);
+
     despotify_free_playlist(pl);
     despotify_exit(ds);
 
