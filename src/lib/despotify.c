@@ -381,6 +381,12 @@ bool despotify_play(struct despotify_session* ds,
     return true;
 }
 
+bool despotify_stop(struct despotify_session* ds)
+{
+    snd_stop(ds->snd_session);
+    return true;
+}
+
 /****************************************************
  *
  *  Search
