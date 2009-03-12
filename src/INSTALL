@@ -1,0 +1,55 @@
+$Id$
+
+
+Despotify is using the build system waf.
+
+
+Dependencies
+~~~~~~~~~~~~
+
+You'll need:
+
+Python >= 2.3.x (for the build system)
+OpenSSL, zlib, libvorbis and expat (for the library)
+ncurses or ncursesw (for the ncurses client)
+
+Supported audio outputs are: Coreaudio, GStreamer, libao and PulseAudio
+
+
+Configure
+~~~~~~~~~
+
+$ ./waf configure
+
+
+Some basic options:
+  --prefix=<path> : tells waf to put the installation in path
+  --debug : enables debug code
+  --audio-output=plugin : selects this audio output plugin instead of audio detecting
+  --nocache : rerun all configuration tests.
+  -p : show a useless but cool progress bar when building!
+
+
+
+Building
+~~~~~~~~~
+
+$ ./waf build
+
+
+Installing
+~~~~~~~~~
+
+$ sudo ./waf install
+
+
+Running
+~~~~~~~~~
+
+Now you can run our ncurses client with:
+
+$ despotify <login> <password>
+
+or the gateway
+
+$ despotify-gateway <bind address> <bind port>

@@ -1,0 +1,18 @@
+files = ['simple.c']
+
+def set_options(opt):
+	pass
+
+def configure(conf):
+	conf.env['CCFLAGS_c99'] = '-std=c99'
+
+	return True
+
+def build(bld):
+	obj = bld.new_task_gen('cc', 'program')
+	obj.target = 'despotify-simple'
+	obj.includes = '. ../../lib'
+	obj.source = files
+	obj.uselib = 'c99'
+	obj.uselib_local = 'despotify'
+	obj.install_path = '${PREFIX}/bin'

@@ -1,0 +1,45 @@
+files = """
+	ADMclubbing.c
+	despotify.c
+	event.c
+	ui-core.c
+	ui-help.c
+	ui-player.c
+	ui-playlist.c
+	ui-search.c
+	""".split()
+
+def set_options(opt):
+	opt.add_option('--nogui', action = 'store_true', default = False,
+	               help = 'Disable GUI')
+
+
+def configure(conf):
+	import Options
+
+	if not conf.check_cc(lib="ncursesw", uselib_store="curses"):
+		if not conf.check_cc(lib="ncurses", uselib_store="curses"):
+			return False
+
+
+	conf.env['DEFINES_despotify'] = []
+
+	if not Options.options.nogui:
+		conf.env['DEFINES_despotify'].append('GUI')
+
+	if Options.options.debug:
+		conf.env['DEFINES_despotify'].append('DEBUG')
+
+
+	return True
+
+
+def build(bld):
+	obj = bld.new_task_gen('cc', 'program')
+	obj.target = 'despotify'
+	obj.includes = '. ../../lib'
+	obj.defines = bld.env['DEFINES_despotify']
+	obj.source = files
+	obj.uselib = 'curses'
+	obj.uselib_local = 'despotify'
+	obj.install_path = '${PREFIX}/bin'
