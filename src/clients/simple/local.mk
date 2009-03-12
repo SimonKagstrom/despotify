@@ -11,7 +11,7 @@ all: simple
 CFILES = $(OBJS:.o=.c)
 include ../depgen.mk
 
-simple: $(OBJS) $(DLIB)
+simple: $(OBJS) $(LIB)
 	@echo LD $@
 	$(SILENT)$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIB)
 
