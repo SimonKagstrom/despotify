@@ -293,6 +293,7 @@ void key_init (SESSION * session)
 		     96);
 	hexdump8x32 ("key_init, shared key", session->shared_key, 96);
 #endif
+        BN_free(pub_key);
 
 	/*
 	 * Prepare a message to authenticate.
