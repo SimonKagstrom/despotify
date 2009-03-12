@@ -508,6 +508,7 @@ static int despotify_get_playlists_callback (CHANNEL *ch,
             break;
 
 	case CHANNEL_END:
+            buf_append_u8(ds->response, 0); /* null terminate xml string */
             playlist_create_from_xml(ds->response->ptr, ds->playlist);
             done = true;
             break;
