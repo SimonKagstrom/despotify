@@ -70,11 +70,6 @@ int libao_prepare_device (AUDIOCTX * actx)
 		exit (-1);
 	}
 
-	if (pthread_cond_init (&priv->end, NULL) != 0) {
-		perror ("pthread_cond_init");
-		exit (-1);
-	}
-
 	priv->device = device;
 	actx->driverprivate = (void *) priv;
 
@@ -177,8 +172,10 @@ int libao_play (AUDIOCTX * actx)
 		exit (-1);
 	}
 
-        pthread_cond_signal (&priv->end);
+        pthread_mutex_destroy (&priv->lock);
+        pthread_cond_destroy (&priv->pause);
 
+        DSFYfree(actx->driverprivate);
 	/* This will kill the thread */
 	DSFYDEBUG ("libao thread exiting\n");
 	return 0;
@@ -190,20 +187,10 @@ int libao_stop (AUDIOCTX * actx)
 
 	assert (priv != NULL);
 
-	/* Tell loop thread to exit */
+	/* Tell loop to exit */
 	pthread_mutex_lock (&priv->lock);
 	priv->state = AO_END;
-        pthread_cond_wait (&priv->end, &priv->lock);
 	pthread_mutex_unlock (&priv->lock);
-
-        /* When the other loop has exited, free the non-audio
-         * resources (memory, mutexes).
-         */
-        pthread_mutex_destroy (&priv->lock);
-        pthread_cond_destroy (&priv->end);
-        pthread_cond_destroy (&priv->pause);
-
-        DSFYfree(actx->driverprivate);
 
 	return 0;
 }
