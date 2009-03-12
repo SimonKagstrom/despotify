@@ -1,4 +1,6 @@
 # vim: set fileencoding=utf-8 filetype=python :
+# $Id$
+
 files = """
 	base64.c
 	gw-browse.c

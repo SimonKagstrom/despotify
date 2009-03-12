@@ -1,7 +1,10 @@
 $Id$
 
+Build system
+~~~~~~~~~~~~
 
 Despotify is using the build system waf.
+More info about waf can be found on: http://code.google.com/p/waf/
 
 
 Dependencies
@@ -13,7 +16,9 @@ Python >= 2.3.x (for the build system)
 OpenSSL, zlib, libvorbis and expat (for the library)
 ncurses or ncursesw (for the ncurses client)
 
-Supported audio outputs are: Coreaudio, GStreamer, libao and PulseAudio
+Supported audio outputs are: CoreAudio, GStreamer, libao and PulseAudio
+
+You need the -dev packages for all libraries except Python.
 
 
 Configure
@@ -22,34 +27,51 @@ Configure
 $ ./waf configure
 
 
-Some basic options:
+Some options (see a more complete list with ./waf configure --help):
   --prefix=<path> : tells waf to put the installation in path
-  --debug : enables debug code
-  --audio-output=plugin : selects this audio output plugin instead of audio detecting
   --nocache : rerun all configuration tests.
-  -p : show a useless but cool progress bar when building!
 
+  --debug : enables debug code
+  --audio-output=<plugin> : selects this audio output plugin instead of autodetecting.
+                            valid plugins: coreaudio, gstreamer, libao, pulseaudio
 
 
 Building
-~~~~~~~~~
+~~~~~~~~
 
 $ ./waf build
 
+or just
+
+$ ./waf
+
+
+Some options (see a more complete list with ./waf build --help):
+  -p : show a useless but cool progress bar when building!
+  -j<num> : run <num> simultaneous compile processes, can speed up building
+
 
 Installing
-~~~~~~~~~
+~~~~~~~~~~
 
 $ sudo ./waf install
 
 
 Running
-~~~~~~~~~
+~~~~~~~
 
-Now you can run our ncurses client with:
+Now you can run our ncurses client with
 
 $ despotify <login> <password>
 
 or the gateway
 
 $ despotify-gateway <bind address> <bind port>
+
+
+Tip for developers
+~~~~~~~~~~~~~~~~~~
+
+If you don't want to install everytime you change something you can
+set LD_LIBRARY_PATHt to _build_/default/lib in you shell and then
+run for example: _build_/default/clients/despotify/despotify
