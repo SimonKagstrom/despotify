@@ -89,7 +89,6 @@ void xml_push_tag (struct tagstack **head, const XML_Char * tag)
 {
 	struct tagstack *e;
 
-	e = malloc (sizeof (struct tagstack));
 	if (*head == NULL)
 		*head = e = malloc (sizeof (struct tagstack));
 	else {
