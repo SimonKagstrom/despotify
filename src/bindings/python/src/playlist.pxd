@@ -41,15 +41,3 @@ cdef extern from "/usr/include/despotify/playlist.h":
     void playlist_set_author(playlist *, char *)
     void playlist_free(playlist *, int)
     playlist * playlist_selected()
-
-cdef class Track:
-    cdef track* track
-
-cdef class Playlist:
-    cdef playlist* playlist
-
-cdef list playlist_to_list(playlist* playlists)
-cdef list tracks_to_list(track* tracks)
-
-cdef Track _create_track(track* track)
-cdef Playlist _create_playlist(playlist* playlist)

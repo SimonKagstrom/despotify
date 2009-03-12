@@ -17,12 +17,14 @@ def pkgconfig(*packages, **kw):
 
     return kw
 
+files = map(lambda f: 'src/' + f, ['callback.c', 'spytify.c'])
+
 setup(name         = 'spytify',
       version      = 'v0.1',
       description  = 'spytify - Python bindings for libdespotify',
       author       = 'Jørgen Pedersen Tjernø',
       author_email = 'jorgen@devsoft.no',
       license      = 'New BSD (3-clause BSD)',
-      ext_modules  = [Extension('spytify', ['src/callback.c', 'src/spytify.c'], **pkgconfig('despotify'))]
+      ext_modules  = [Extension('spytify', files, **pkgconfig('despotify'))]
      )
 

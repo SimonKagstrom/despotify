@@ -3,6 +3,8 @@ import atexit
 class SpytifyError(Exception):
     pass
 
+include "playlist.pxi"
+
 cdef class Spytify:
     def __init__(self, str user, str pw):
         self.ds = despotify_init_client()

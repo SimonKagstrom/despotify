@@ -1,3 +1,5 @@
+# vim: set fileencoding=utf-8 filetype=pyrex :
+
 cdef list playlist_to_list(playlist* playlists):
     cdef list l = []
     while playlists:
@@ -59,7 +61,7 @@ cdef class Playlist:
 
     def __dealloc__(self):
         if self.playlist:
-            playlist.playlist_free(self.playlist, 1) # Is this right? 1 means "free tracks."
+            playlist_free(self.playlist, 1) # Is this right? 1 means "free tracks."
 
 # Based on http://wiki.cython.org/FAQ#CanCythongenerateCcodeforclasses.3F
 cdef extern from "spytify.h":
