@@ -20,6 +20,7 @@
 #include "commands.h"
 #include "handlers.h"
 #include "keyexchange.h"
+#include "network.h"
 #include "packet.h"
 #include "puzzle.h"
 #include "ui.h"
