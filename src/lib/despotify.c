@@ -329,10 +329,13 @@ static int despotify_snd_end_callback(void* arg)
     /* Select the next available track in the playlist */
     ds->track = playlist_next_playable(ds->playlist, ds->track);
 
-    /* request key for next track */
-    int error = cmd_aeskey(ds->session, ds->track->file_id,
+    int error = 0;
+    if (ds->track) {
+        /* request key for next track */
+        error = cmd_aeskey(ds->session, ds->track->file_id,
                            ds->track->track_id,
                            despotify_aes_callback, ds);
+    }
     
     DSFYDEBUG("end\n");
     return error;
