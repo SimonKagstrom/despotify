@@ -471,6 +471,12 @@ struct playlist* despotify_search(struct despotify_session* ds,
     
     buf_free(ds->response);
 
+    if (!ds->playlist->num_tracks) {
+        playlist_free(ds->playlist, 1);
+        ds->last_error = "No tracks found";
+        return NULL;
+    }
+
     return ds->playlist;
 }
 
