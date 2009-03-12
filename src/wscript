@@ -3,8 +3,14 @@ from logging import fatal, info
 
 srcdir = '.'
 blddir = '_build_'
+conf_revision = 1
 
 subdirs = ['lib', 'clients/despotify', 'clients/gateway', 'clients/simple']
+
+
+def need_reconf():
+	fatal('You need to rerun ./waf configure')
+	raise SystemExit(1)
 
 
 def set_options(opt):
@@ -27,7 +33,16 @@ def configure(conf):
 			raise SystemExit(1)
 
 
+	conf.env['CONF_REVISION'] = conf_revision
+
+
 def build(bld):
+	if not bld.env['CONF_REVISION']:
+		need_reconf()
+
+	if bld.env['CONF_REVISION'] < conf_revision:
+		need_reconf()
+
 	bld.add_subdirs(subdirs)
 
 
