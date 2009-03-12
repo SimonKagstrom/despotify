@@ -14,7 +14,7 @@
 #include "shn.h"
 
 
-typedef struct
+typedef struct session
 {
 	/* connection to Spotify's service */
 	int ap_sock;

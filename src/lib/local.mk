@@ -86,9 +86,10 @@ install: libdespotify.la
 	$(LT) --mode=install install -D libdespotify.la $(INSTALL_PREFIX)/lib/libdespotify.la
 	ldconfig -n $(INSTALL_PREFIX)/lib
 	
-	install -D despotify.h $(INSTALL_PREFIX)/include
+	install -D playlist.h despotify.h $(INSTALL_PREFIX)/include/despotify
 	install -D despotify.pc $(INSTALL_PREFIX)/lib/pkgconfig/despotify.pc
 
 uninstall:
 	$(LT) --mode=uninstall rm -f $(INSTALL_PREFIX)/lib/libdespotify.la
-	rm -f $(INSTALL_PREFIX)/include/despotify.h $(INSTALL_PREFIX)/lib/pkgconfig/despotify.pc
+	rm -fr $(INSTALL_PREFIX)/include/despotify/
+	rm -f $(INSTALL_PREFIX)/lib/pkgconfig/despotify.pc

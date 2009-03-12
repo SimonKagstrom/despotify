@@ -3,14 +3,13 @@
 
 #include <pthread.h>
 #include <stdbool.h>
-#include "session.h"
 /* This is for track and playlist structs. */
 #include "playlist.h"
 
 struct despotify_session
 {
     bool initialized;
-    SESSION *session;
+    struct session* session;
     struct snd_session* snd_session;
     const char *last_error;
 
