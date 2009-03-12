@@ -29,11 +29,11 @@ struct despotify_session
 };
 
 /* Global init / deinit library. */
-bool despotify_init();
-bool despotify_cleanup();
+bool despotify_init(void);
+bool despotify_cleanup(void);
 
 /* Session stuff. */
-struct despotify_session *despotify_init_client();
+struct despotify_session *despotify_init_client(void);
 
 void despotify_exit(struct despotify_session *ds);
 
