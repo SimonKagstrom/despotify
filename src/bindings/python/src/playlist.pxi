@@ -43,6 +43,9 @@ cdef class Track:
         def __get__(self):
             return self.track.length
 
+    def __str__(self):
+        return '<Track: %s - %s - %s>' % (self.artist, self.title, self.album)
+
 cdef class Playlist:
     def __init__(self):
         raise TypeError("This class cannot be instantiated from Python")
@@ -62,6 +65,9 @@ cdef class Playlist:
     def __dealloc__(self):
         if self.playlist:
             playlist_free(self.playlist, 1) # Is this right? 1 means "free tracks."
+
+    def __str__(self):
+        return '<Playlist: %s by %s>' % (self.name, self.author)
 
 # Based on http://wiki.cython.org/FAQ#CanCythongenerateCcodeforclasses.3F
 cdef extern from "spytify.h":

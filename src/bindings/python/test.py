@@ -4,7 +4,9 @@
 # Copyright Jørgen P. Tjernø <jorgen@devsoft.no>
 
 from getpass import getpass
+import random
 import sys
+import time
 
 import spytify
 
@@ -51,6 +53,20 @@ def main():
     for track in sr.tracks:
         print_track(track)
 
+    random_track = random.choice(sr.tracks)
+    print "Playing %s" % random_track
+    s.play(sr, random_track)
+
+    time.sleep(10)
+
+    print "Pausing."
+    s.pause()
+    time.sleep(2)
+
+    print "Aaaand back again."
+    s.resume()
+
+    time.sleep(5)
     s.close()
 
 if __name__ == '__main__':

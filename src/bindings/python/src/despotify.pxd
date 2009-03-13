@@ -27,23 +27,28 @@ cdef extern from "/usr/include/despotify/despotify.h":
         buf * response
         int offset
 
-    playlist * despotify_get_stored_playlists(despotify_session *)
-    dbool despotify_stop(despotify_session *)
-    dbool despotify_resume(despotify_session *)
-    dbool despotify_rename_playlist(despotify_session *, playlist *, char *)
-    dbool despotify_delete_playlist(despotify_session *, playlist *)
-    void despotify_exit(despotify_session *)
     despotify_session * despotify_init_client()
-    playlist * despotify_search(despotify_session *, char *)
-    char * despotify_get_error(despotify_session *)
     dbool despotify_authenticate(despotify_session *, char *, char *)
-    dbool despotify_pause(despotify_session *)
-    dbool despotify_cleanup()
-    dbool despotify_remove_song(despotify_session *, playlist *, track *)
-    dbool despotify_play(despotify_session *, playlist *, track *)
-    void despotify_free_playlist(playlist *)
+    void despotify_exit(despotify_session *)
     void despotify_free(despotify_session *, dbool)
-    playlist * despotify_create_playlist(despotify_session *, char *)
+
+    char * despotify_get_error(despotify_session *)
+
+    dbool despotify_play(despotify_session *, playlist *, track *)
+    dbool despotify_pause(despotify_session *)
+    dbool despotify_resume(despotify_session *)
+    dbool despotify_stop(despotify_session *)
+
     track * despotify_get_current_track(despotify_session *)
-    dbool despotify_init()
+    playlist * despotify_get_stored_playlists(despotify_session *)
+    playlist * despotify_search(despotify_session *, char *)
+
+    playlist * despotify_create_playlist(despotify_session *, char *)
+    dbool despotify_rename_playlist(despotify_session *, playlist *, char *)
     dbool despotify_append_song(despotify_session *, playlist *, track *)
+    dbool despotify_remove_song(despotify_session *, playlist *, track *)
+    dbool despotify_delete_playlist(despotify_session *, playlist *)
+    void despotify_free_playlist(playlist *)
+
+    dbool despotify_init()
+    dbool despotify_cleanup()

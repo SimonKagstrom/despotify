@@ -13,6 +13,10 @@ cdef class Spytify:
 
         self.authenticate(user, pw)
 
+    def authenticate(self, str user, str pw):
+        if not despotify_authenticate(self.ds, user, pw):
+            raise SpytifyError(despotify_get_error(self.ds))
+
     def stored_playlists(self):
         return playlist_to_list(despotify_get_stored_playlists(self.ds))
 
@@ -23,8 +27,20 @@ cdef class Spytify:
         else:
             return _create_playlist(search)
 
-    def authenticate(self, str user, str pw):
-        if not despotify_authenticate(self.ds, user, pw):
+    def play(self, Playlist playlist, Track track):
+        if not despotify_play(self.ds, playlist.playlist, track.track):
+            raise SpytifyError(despotify_get_error(self.ds))
+
+    def pause(self):
+        if not despotify_pause(self.ds):
+            raise SpytifyError(despotify_get_error(self.ds))
+
+    def resume(self):
+        if not despotify_resume(self.ds):
+            raise SpytifyError(despotify_get_error(self.ds))
+
+    def stop(self):
+        if not despotify_stop(self.ds):
             raise SpytifyError(despotify_get_error(self.ds))
 
     def close(self):
