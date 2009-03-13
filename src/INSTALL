@@ -73,5 +73,5 @@ Tip for developers
 ~~~~~~~~~~~~~~~~~~
 
 If you don't want to install everytime you change something you can
-set LD_LIBRARY_PATHt to _build_/default/lib in you shell and then
+set LD_LIBRARY_PATH to _build_/default/lib in your shell and then
 run for example: _build_/default/clients/despotify/despotify
