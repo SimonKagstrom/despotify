@@ -1,6 +1,6 @@
-prefix=@PREFIX@
-exec_prefix=${prefix}/bin
-libdir=${prefix}/lib
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
 includedir=${prefix}/include/despotify
 
 Name: libdespotify
