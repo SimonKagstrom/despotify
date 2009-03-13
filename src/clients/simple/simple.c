@@ -36,17 +36,23 @@ int main(int argc, char** argv)
     }
 
     printf("List of playlists on account:\n");
-    struct playlist *p = despotify_get_playlists(ds);
-    if (!p) {
+    struct playlist *sp = despotify_get_stored_playlists(ds);
+    if (!sp) {
         printf(" (Account has no stored playlists)\n");
     }
     else {
-        for (; p; p = p->next)
+        printf("Account has %d stored playlists:\n", sp->num_tracks);
+        for (struct playlist* p = sp; p; p = p->next)
         {
             printf("  Playlist name:   %s\n", p->name);
             printf("  Playlist author: %s\n", p->author);
+
+            int i = 1;
+            for (struct track* t = p->tracks; t; t = t->next) {
+                printf("  %2d: %s (%s)\n", i++, t->title, t->artist);
+            }
         }
-        despotify_free_playlist(p);
+        despotify_free_playlist(sp);
     }
 
     printf("Search:\n");
@@ -66,16 +72,20 @@ int main(int argc, char** argv)
     }
 
     /* play first track in playlist */
+    printf("Playing track 1\n");
     despotify_play(ds, pl, pl->tracks);
 
     /* let it play a while */
     sleep(5);
 
+    printf("Pause 1s\n");
     despotify_pause(ds);
     sleep(1);
+    printf("Resume\n");
     despotify_resume(ds);
 
     sleep(5);
+    printf("Stop\n");
     despotify_stop(ds);
 
     despotify_free_playlist(pl);

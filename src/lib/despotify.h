@@ -26,6 +26,12 @@ struct despotify_session
     struct playlist* playlist;
     struct buf* response;
     int offset;
+
+    /* client/lib synchronization */
+    pthread_mutex_t sync_mutex;
+    pthread_cond_t  sync_cond;
+
+    bool null_playlist;
 };
 
 /* Global init / deinit library. */
@@ -62,7 +68,7 @@ struct track *despotify_get_current_track(struct despotify_session *ds);
 struct playlist* despotify_search(struct despotify_session *ds, 
                                   char *searchtext);
 
-struct playlist* despotify_get_playlists(struct despotify_session *ds);
+struct playlist* despotify_get_stored_playlists(struct despotify_session *ds);
 bool despotify_append_song(struct despotify_session *ds, 
                            struct playlist *playlist, 
                            struct track *song);
