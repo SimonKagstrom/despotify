@@ -13,8 +13,8 @@ cdef class Spytify:
 
         self.authenticate(user, pw)
 
-    def get_playlists(self):
-        return playlist_to_list(despotify_get_playlists(self.ds))
+    def stored_playlists(self):
+        return playlist_to_list(despotify_get_stored_playlists(self.ds))
 
     def search(self, str searchtext):
         cdef playlist* search = despotify_search(self.ds, searchtext)

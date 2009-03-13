@@ -27,7 +27,7 @@ cdef extern from "/usr/include/despotify/despotify.h":
         buf * response
         int offset
 
-    playlist * despotify_get_playlists(despotify_session *)
+    playlist * despotify_get_stored_playlists(despotify_session *)
     dbool despotify_stop(despotify_session *)
     dbool despotify_resume(despotify_session *)
     dbool despotify_rename_playlist(despotify_session *, playlist *, char *)
