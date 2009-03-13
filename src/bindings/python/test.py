@@ -49,24 +49,28 @@ def main():
     sr = s.search(searchterm)
 
     print "\nSearch:"
-    print " %s, by %s" % (sr.name, sr.author)
-    for track in sr.tracks:
-        print_track(track)
+    if not sr:
+        print "No search hits."
+    else:
+        print " %s, by %s" % (sr.name, sr.author)
+        for track in sr.tracks:
+            print_track(track)
 
-    random_track = random.choice(sr.tracks)
-    print "Playing %s" % random_track
-    s.play(sr, random_track)
+        random_track = random.choice(sr.tracks)
+        print "Playing %s" % random_track
+        s.play(sr, random_track)
 
-    time.sleep(10)
+        time.sleep(10)
 
-    print "Pausing."
-    s.pause()
-    time.sleep(2)
+        print "Pausing."
+        s.pause()
+        time.sleep(2)
 
-    print "Aaaand back again."
-    s.resume()
+        print "Aaaand back again."
+        s.resume()
 
-    time.sleep(5)
+        time.sleep(5)
+
     s.close()
 
 if __name__ == '__main__':
