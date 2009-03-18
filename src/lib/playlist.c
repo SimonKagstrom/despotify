@@ -453,6 +453,8 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 	int i;
 	char *buf;
 	unsigned char id[17];
+        unsigned char albumidbuf[17];
+        unsigned char artistidbuf[17];
 
 	buf = (char *) malloc (len + 1);
 	memcpy (buf, s, len);
@@ -487,6 +489,15 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 				DSFYstrncat (ctx->track->album, buf, len);
 			else if (!strcmp (ts->name, "length"))
 				ctx->track->length = atoi (buf);
+                        else if (!strcmp (ts->name, "album-id")) {
+                                hex_ascii_to_bytes(buf, albumidbuf, len / 2);
+                                DSFYstrncat(ctx->track->album_id, albumidbuf, len / 2);
+                        }
+                        else if (!strcmp (ts->name, "artist-id")) {
+                                hex_ascii_to_bytes(buf, artistidbuf, len / 2);
+                                DSFYstrncat(ctx->track->artist_id, artistidbuf, len / 2);
+                        }
+
 		}
 	}
 
