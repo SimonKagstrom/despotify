@@ -6,8 +6,12 @@
 #ifndef DESPOTIFY_UTIL_H
 #define DESPOTIFY_UTIL_H
 
+#include <pthread.h>
+#include <sys/times.h>
+#include <unistd.h>
+
 #ifdef DEBUG
-#define DSFYDEBUG(...) { FILE *fd = fopen("/tmp/gui.log","at"); fprintf(fd, "%s:%d ", __FILE__, __LINE__); fprintf(fd, __VA_ARGS__); fclose(fd); }
+#define DSFYDEBUG(...) { FILE *fd = fopen("/tmp/gui.log","at"); fprintf(fd, "%ld %lx %s:%d %s() ", times(NULL), pthread_self(), __FILE__, __LINE__, __func__); fprintf(fd, __VA_ARGS__); fclose(fd); }
 #else
 #define DSFYDEBUG(...)
 #endif
@@ -19,7 +23,8 @@
 #endif
 
 #define DSFYfree(p) free(p); (p) = NULL
-#define DSFYstrncat(target, data, len) strncat(target, data, sizeof(target)-strlen(target)-1-len)
+#define DSFYstrncat(target, data, len) do { strncat(target, data, sizeof(target)-1); ((unsigned char*)target)[sizeof(target)-1] = 0; } while (0)
+#define DSFYstrncpy(target, data, len) do { strncpy(target, data, sizeof(target)-1); ((unsigned char*)target)[sizeof(target)-1] = 0; } while (0)
 
 unsigned char *hex_ascii_to_bytes (char *, unsigned char *, int);
 char *hex_bytes_to_ascii (unsigned char *, char *, int);

@@ -627,13 +627,16 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
     ds->playlist = NULL;
     despotify_get_playlist(ds, NULL);
 
-    struct playlist* p;
-    for (p = playlist_root(); p; p = p->next) {
+    int count = 0;
+    for (struct playlist* p = playlist_root(); p; p = p->next) {
         ds->playlist = p;
         despotify_get_playlist(ds, p->playlist_id);
+        count++;
     }
 
     ds->null_playlist = false;
 
-    return playlist_root();
+    struct playlist* root = playlist_root();
+    root->num_tracks = count;
+    return root;
 }

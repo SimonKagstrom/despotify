@@ -95,23 +95,27 @@ void playlist_set_author (struct playlist *p, char *author)
 
 void playlist_free (struct playlist *p, int free_tracks)
 {
-	struct playlist *tmp;
+    /* free all lists in this chain */
+    while (p) {
+        if (p->playlist_id)
+            DSFYfree (p->playlist_id);
 
-	if (p->playlist_id)
-		DSFYfree (p->playlist_id);
+        if (free_tracks)
+            while (p->tracks)
+                playlist_track_del (p, p->tracks->track_id);
 
-	if (free_tracks)
-		while (p->tracks)
-			playlist_track_del (p, p->tracks->track_id);
+        if (p == root)
+            root = p->next;
+        else {
+            struct playlist *tmp;
+            for ( tmp = root; tmp->next != p; tmp = tmp->next);
+            tmp->next = p->next;
+        }
 
-	if (p == root)
-		root = p->next;
-	else {
-		for (tmp = root; tmp->next != p; tmp = tmp->next);
-		tmp->next = p->next;
-	}
-
-	DSFYfree (p);
+        struct playlist* prev = p;
+        p = p->next;
+        DSFYfree (prev);
+    }
 }
 
 /* Mark playlist (1..N) as the currently selected playlist */
@@ -363,7 +367,7 @@ static void playlist_xml_handle_text (void *private, const XML_Char * s,
 						 "//next-change/change")) !=
 			NULL && !strcmp (ts->name, "user")) {
 
-		DSFYstrncat (ctx->pl->author, buf, len);
+		DSFYstrncpy (ctx->pl->author, buf, len);
 	}
 	else if (!ctx->list_playlists
 			&& (ts =
@@ -371,7 +375,7 @@ static void playlist_xml_handle_text (void *private, const XML_Char * s,
 						 "//next-change/change/ops"))
 			!= NULL && !strcmp (ts->name, "name")) {
 
-		DSFYstrncat (ctx->pl->name, buf, len);
+		DSFYstrncpy (ctx->pl->name, buf, len);
 	}
 	else if ((ts =
 		  xml_has_parent_path (ctx->taglist,
@@ -506,7 +510,7 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 
 	if ((ts = xml_has_parent_path (ts, "//tracks/track")) != NULL) {
 		if (!strcmp (ts->name, "id")) {
-			strncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+			DSFYstrncpy (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
 			if (strlen (ctx->tmp_id) == 32) {
 				hex_ascii_to_bytes (ctx->tmp_id, id, 16);
 				if ((ctx->track = playlist_track_by_id (ctx->pl, id)) == NULL) {
@@ -521,7 +525,7 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 		else if (!strcmp (ts->name, "redirect")) {
 			/* Update old id if still present */
 			if (ctx->new_track) {
-				strncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+				DSFYstrncpy (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
 				if (strlen (ctx->tmp_id) == 32) {
 					hex_ascii_to_bytes (ctx->tmp_id, id, 16);
 					/* Update all entries with old ids */
@@ -544,22 +548,22 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 		}
 		else if (ctx->track) {
 			if (!strcmp (ts->name, "artist"))
-				DSFYstrncat(ctx->track->artist, buf, len);
+				DSFYstrncpy(ctx->track->artist, buf, len);
 			else if (!strcmp (ts->name, "title"))
-				DSFYstrncat (ctx->track->title, buf, len);
+				DSFYstrncpy (ctx->track->title, buf, len);
 			else if (!strcmp (ts->name, "album"))
-				DSFYstrncat (ctx->track->album, buf, len);
+				DSFYstrncpy (ctx->track->album, buf, len);
 			else if (!strcmp (ts->name, "length"))
 				ctx->track->length = atoi (buf);
 			else if (!strcmp (ts->name, "album-id")) {
-				strncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+				DSFYstrncpy (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
 				if (strlen (ctx->tmp_id) == 32) {
 					hex_ascii_to_bytes (ctx->tmp_id, ctx->track->album_id, 16);
 					ctx->tmp_id[0] = 0;
 				}
 			}
 			else if (!strcmp (ts->name, "artist-id")) {
-				strncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+				DSFYstrncpy (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
 				if (strlen (ctx->tmp_id) == 32) {
 					hex_ascii_to_bytes (ctx->tmp_id, ctx->track->artist_id, 16);
 					ctx->tmp_id[0] = 0;
