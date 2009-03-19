@@ -5,7 +5,7 @@
 
 export
 
-CFLAGS = -Wall -Wextra -ggdb -std=c99
+CFLAGS = -Wall -Wextra -ggdb -std=gnu99
 LDFLAGS = -lz -lexpat -lvorbisfile
 
 LD = $(CC)
