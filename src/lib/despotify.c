@@ -500,6 +500,7 @@ void despotify_free_playlist(struct playlist* playlist)
 static bool despotify_load_tracks(struct despotify_session *ds)
 {
     struct playlist* pl = ds->playlist;
+    struct track* t = pl->tracks;
 
     /* construct an array of 16-byte track ids */
     char* tracklist = malloc(MAX_BROWSE_REQ * 16);
@@ -510,7 +511,6 @@ static bool despotify_load_tracks(struct despotify_session *ds)
 
         ds->response = buf_new();
  
-        struct track* t = pl->tracks;
         for (count = 0; t && count < MAX_BROWSE_REQ; t = t->next, count++) {
             memcpy(tracklist + count * 16, t->track_id, 16);
         }
