@@ -22,6 +22,10 @@ struct parsingctx
 
 	/* the current track we're adding info for, point to an item in pl->tracks */
 	struct track *track;
+	/* buffer for safe text parsing */
+	char tmp_id[33];
+	/* new track appended */
+	int new_track;
 
 	int list_playlists;
 };
@@ -162,10 +166,16 @@ struct track *playlist_track_add (struct playlist *p, unsigned char *id)
 
 void playlist_track_del (struct playlist *p, unsigned char *id)
 {
-	struct track *t, *bad;
+	struct track* bad = playlist_track_by_id (p, id);
+	playlist_track_del_ptr(p, bad);
+}
+
+void playlist_track_del_ptr (struct playlist *p, struct track *bad)
+{
+	struct track *t;
 	int i;
 
-	if ((bad = playlist_track_by_id (p, id)) == NULL)
+	if (bad == NULL)
 		return;
 
 	if ((t = p->tracks) == bad)
@@ -184,6 +194,9 @@ void playlist_track_del (struct playlist *p, unsigned char *id)
 
 	for (i = 0, t = p->tracks; t; i++, t = t->next)
 		t->id = i;
+
+	if (t)
+		t->next = NULL;
 
 	p->num_tracks = i;
 }
@@ -269,6 +282,8 @@ int playlist_track_update_from_gzxml (struct playlist *target, void *data,
 	ctx.pl = target;
 	ctx.taglist = NULL;
 	ctx.track = NULL;
+	ctx.tmp_id[0] = 0;
+	ctx.new_track = 0;
 	ctx.list_playlists = 0;
 
 	XML_SetUserData (ctx.gzxml->p, (void *) &ctx);
@@ -427,19 +442,39 @@ static void tracks_meta_xml_handle_endelement (void *private,
 	(void) name;		/* don't warn. */
 
 	if (xml_has_parent_path (ctx->taglist, "//tracks")) {
-		/* Remove unplayable tracks from playlist */
 		if (ctx->track) {
 			ctx->track->has_meta_data = 1;
 
+			/* Remove unplayable tracks from playlist */
+			/* XXX: Aren't we a little harsh here? */
 			if (!memcmp (ctx->track->file_id, invalid_file_id,
 				     20)) {
 				DSFYDEBUG("Dropping unplayable track %d\n", ctx->track->id);
 				playlist_track_del (ctx->pl,
 						    ctx->track->track_id);
 			}
+
+			/* Copy meta data to duplicates */
+                        for (struct track* t = ctx->pl->tracks; t; t = t->next)
+                        {
+				if (!t->has_meta_data &&
+					!memcmp (t->track_id, ctx->track->track_id, 16))
+                                {
+					memcpy (t->file_id, ctx->track->file_id, sizeof(t->file_id));
+					memcpy (t->album_id, ctx->track->album_id, sizeof(t->album_id));
+					memcpy (t->artist_id, ctx->track->artist_id, sizeof(t->artist_id));
+					memcpy (t->title, ctx->track->title, sizeof(t->title));
+					memcpy (t->artist, ctx->track->artist, sizeof(t->artist));
+					memcpy (t->album, ctx->track->album, sizeof(t->album));
+					t->length = ctx->track->length;
+					t->has_meta_data = 1;
+				}
+			}
 		}
 
 		ctx->track = NULL;
+		ctx->tmp_id[0] = 0;
+		ctx->new_track = 0;
 	}
 
 	xml_pop_tag (&ctx->taglist);
@@ -473,11 +508,40 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 
 	if ((ts = xml_has_parent_path (ts, "//tracks/track")) != NULL) {
 		if (!strcmp (ts->name, "id")) {
-			hex_ascii_to_bytes (buf, id, strlen (buf) / 2);
-			if ((ctx->track =
-			     playlist_track_by_id (ctx->pl, id)) == NULL) {
-				/* Create track since it wasn't previously found */
-				ctx->track = playlist_track_add (ctx->pl, id);
+			strncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+			if (strlen (ctx->tmp_id) == 32) {
+				hex_ascii_to_bytes (ctx->tmp_id, id, 16);
+				if ((ctx->track = playlist_track_by_id (ctx->pl, id)) == NULL) {
+					/* Create track since it wasn't previously found */
+					ctx->track = playlist_track_add (ctx->pl, id);
+					ctx->tmp_id[0] = 0;
+					ctx->new_track = 1;
+				}
+			}
+		}
+		/* Track is redirected */
+		else if (!strcmp (ts->name, "redirect")) {
+			/* Update old id if still present */
+			if (ctx->new_track) {
+				strncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+				if (strlen (ctx->tmp_id) == 32) {
+					hex_ascii_to_bytes (ctx->tmp_id, id, 16);
+					/* Update all entries with old ids */
+                                        struct track *t;
+					for (t = ctx->pl->tracks; t; t = t->next) {
+						if (!t->has_meta_data && !memcmp (t->track_id, id, 16)) {
+							memcpy (t->track_id, ctx->track->track_id, 16);
+							/* Remove redundant addition */
+							if (ctx->new_track) {
+								playlist_track_del_ptr (ctx->pl, ctx->track);
+								ctx->track = t;
+								ctx->new_track = 0;
+							}
+						}
+					}
+					ctx->tmp_id[0] = 0;
+				}
+				/* TODO: Sync server-side playlist */
 			}
 		}
 		else if (ctx->track) {

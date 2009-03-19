@@ -19,6 +19,7 @@
 #include "util.h"
 
 #define BUFFER_SIZE (160*1024 * 5 / 8) /* 160 kbit * 5 seconds */
+#define MAX_BROWSE_REQ 244 /* max entries to load in one browse request */
 
 bool despotify_init()
 {
@@ -485,6 +486,12 @@ struct playlist* despotify_search(struct despotify_session* ds,
     return ds->playlist;
 }
 
+/**************************************************************
+ *
+ *  Playlists
+ *
+ */
+
 void despotify_free_playlist(struct playlist* playlist)
 {
     playlist_free(playlist, 1);
@@ -492,35 +499,40 @@ void despotify_free_playlist(struct playlist* playlist)
 
 static bool despotify_load_tracks(struct despotify_session *ds)
 {
-    ds->response = buf_new();
-
     struct playlist* pl = ds->playlist;
 
     /* construct an array of 16-byte track ids */
-    char* tracklist = malloc(pl->num_tracks * 16);
-    struct track* t;
-    int i = 0;
-    for (t = pl->tracks; t; t = t->next) {
-        memcpy(tracklist + i*16, t->track_id, 16);
-        i++;
-    }
-    
-    int error = cmd_browse(ds->session, 3, tracklist, pl->num_tracks,
-                           despotify_search_callback, ds);
-    if (error) {
-        DSFYDEBUG("cmd_browse() failed with %d\n", error);
-        ds->last_error = "Network error.";
-        session_disconnect(ds->session);
-        return false;
-    }
+    char* tracklist = malloc(MAX_BROWSE_REQ * 16);
+ 
+    /* don't request too many tracks at once */
+    int count;
+    for (int totcount=0; totcount < pl->num_tracks; totcount += count) {
 
-    /* wait until track fetch is ready */
-    pthread_mutex_lock(&ds->sync_mutex);
-    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
-    pthread_mutex_unlock(&ds->sync_mutex);
-
+        ds->response = buf_new();
+ 
+        struct track* t = pl->tracks;
+        for (count = 0; t && count < MAX_BROWSE_REQ; t = t->next, count++) {
+            memcpy(tracklist + count * 16, t->track_id, 16);
+        }
+ 
+        int error = cmd_browse(ds->session, 3, tracklist, count, 
+                               despotify_search_callback, ds);
+ 
+        if (error) {
+            DSFYDEBUG("cmd_browse() failed with %d\n", error);
+            ds->last_error = "Network error.";
+            session_disconnect(ds->session);
+            return false;
+        }
+ 
+        /* wait until track fetch is ready */
+        pthread_mutex_lock(&ds->sync_mutex);
+        pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
+        pthread_mutex_unlock(&ds->sync_mutex);
+ 
+        buf_free(ds->response);
+    }
     free(tracklist);
-    buf_free(ds->response);
 
     return true;
 }
