@@ -12,8 +12,8 @@ typedef struct track
 	int has_meta_data;
 	unsigned char track_id[16];
 	unsigned char file_id[20];
-        unsigned char album_id[17];
-        unsigned char artist_id[17];
+	unsigned char album_id[16];
+	unsigned char artist_id[16];
 	unsigned char *key;
 	char title[1024];
 	char artist[1024];

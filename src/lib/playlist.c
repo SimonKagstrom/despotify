@@ -488,8 +488,6 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 	int i;
 	char *buf;
 	unsigned char id[17];
-        unsigned char albumidbuf[17];
-        unsigned char artistidbuf[17];
 
 	buf = (char *) malloc (len + 1);
 	memcpy (buf, s, len);
@@ -514,9 +512,9 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 				if ((ctx->track = playlist_track_by_id (ctx->pl, id)) == NULL) {
 					/* Create track since it wasn't previously found */
 					ctx->track = playlist_track_add (ctx->pl, id);
-					ctx->tmp_id[0] = 0;
 					ctx->new_track = 1;
 				}
+				ctx->tmp_id[0] = 0;
 			}
 		}
 		/* Track is redirected */
@@ -553,15 +551,20 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 				DSFYstrncat (ctx->track->album, buf, len);
 			else if (!strcmp (ts->name, "length"))
 				ctx->track->length = atoi (buf);
-                        else if (!strcmp (ts->name, "album-id")) {
-                                hex_ascii_to_bytes(buf, albumidbuf, len / 2);
-                                DSFYstrncat(ctx->track->album_id, albumidbuf, len / 2);
-                        }
-                        else if (!strcmp (ts->name, "artist-id")) {
-                                hex_ascii_to_bytes(buf, artistidbuf, len / 2);
-                                DSFYstrncat(ctx->track->artist_id, artistidbuf, len / 2);
-                        }
-
+			else if (!strcmp (ts->name, "album-id")) {
+				strncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+				if (strlen (ctx->tmp_id) == 32) {
+					hex_ascii_to_bytes (ctx->tmp_id, ctx->track->album_id, 16);
+					ctx->tmp_id[0] = 0;
+				}
+			}
+			else if (!strcmp (ts->name, "artist-id")) {
+				strncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+				if (strlen (ctx->tmp_id) == 32) {
+					hex_ascii_to_bytes (ctx->tmp_id, ctx->track->artist_id, 16);
+					ctx->tmp_id[0] = 0;
+				}
+			}
 		}
 	}
 
