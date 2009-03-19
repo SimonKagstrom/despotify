@@ -361,10 +361,10 @@ class Despotify {
 
 
 	function uritoid($uri) {
-		return $this->s_base_convert($uri, 62, 16);
+		return str_pad($this->s_base_convert($uri, 62, 16), 32, '0', STR_PAD_LEFT);
 	}
 	function idtouri($id) {
-		return $this->s_base_convert($id, 16,62);
+		return str_pad($this->s_base_convert($id, 16,62), 22, '0', STR_PAD_LEFT);
 	}
 	function sessionid() {
 		return $this->sessionid;
