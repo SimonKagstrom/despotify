@@ -119,7 +119,7 @@ static int gw_search_result_decompress (DECOMPRESSCTX * dctx,
 		if (e != Z_OK && e != Z_STREAM_END)
 			break;
 
-		dctx->b->len += CHUNKSZ - dctx->z.avail_out;
+		dctx->b->len = dctx->z.total_out;
 	} while (dctx->z.avail_out == 0);
 
 	dctx->z.next_in = Z_NULL;
