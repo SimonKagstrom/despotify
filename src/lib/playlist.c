@@ -511,7 +511,7 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 
 	if ((ts = xml_has_parent_path (ts, "//tracks/track")) != NULL) {
 		if (!strcmp (ts->name, "id")) {
-			DSFYstrncpy (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+			DSFYstrncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
 			if (strlen (ctx->tmp_id) == 32) {
 				hex_ascii_to_bytes (ctx->tmp_id, id, 16);
 				if ((ctx->track = playlist_track_by_id (ctx->pl, id)) == NULL) {
