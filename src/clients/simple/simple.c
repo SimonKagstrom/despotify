@@ -49,7 +49,12 @@ int main(int argc, char** argv)
 
             int i = 1;
             for (struct track* t = p->tracks; t; t = t->next) {
-                printf("  %2d: %s (%s)\n", i++, t->title, t->artist);
+                if (t->has_meta_data) {
+                    printf("  %3d: %s (%s)\n", i++, t->title, t->artist);
+                }
+                else {
+                    printf("  %3d: N/A\n", i++);
+                }
             }
         }
         despotify_free_playlist(sp);

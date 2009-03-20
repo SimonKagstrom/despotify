@@ -56,12 +56,6 @@ struct playlist *playlist_new (void)
 	if (!p)
 		return NULL;
 
-	p->flags = 0;
-
-	p->tracks = NULL;
-	p->playlist_id = NULL;
-	p->num_tracks = 0;
-
 	p->next = root;
 	root = p;
 
@@ -497,6 +491,12 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 	buf = (char *) malloc (len + 1);
 	memcpy (buf, s, len);
 	buf[len] = 0;
+
+	/* Track already processed */
+	if (ctx->track && ctx->track->has_meta_data) {
+		DSFYfree (buf);
+		return;
+	}
 
 	/* Skip whitespace nodes */
 	for (i = 0; len; i++, len--)
