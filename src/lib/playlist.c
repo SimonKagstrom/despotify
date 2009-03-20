@@ -52,7 +52,8 @@ struct playlist *playlist_new (void)
 {
 	struct playlist *p;
 
-	if ((p = malloc (sizeof (struct playlist))) == NULL)
+        p = calloc (1,sizeof (struct playlist));
+	if (!p)
 		return NULL;
 
 	p->flags = 0;
@@ -367,7 +368,7 @@ static void playlist_xml_handle_text (void *private, const XML_Char * s,
 						 "//next-change/change")) !=
 			NULL && !strcmp (ts->name, "user")) {
 
-		DSFYstrncpy (ctx->pl->author, buf, len);
+		DSFYstrncat (ctx->pl->author, buf, len);
 	}
 	else if (!ctx->list_playlists
 			&& (ts =
@@ -375,7 +376,7 @@ static void playlist_xml_handle_text (void *private, const XML_Char * s,
 						 "//next-change/change/ops"))
 			!= NULL && !strcmp (ts->name, "name")) {
 
-		DSFYstrncpy (ctx->pl->name, buf, len);
+		DSFYstrncat (ctx->pl->name, buf, len);
 	}
 	else if ((ts =
 		  xml_has_parent_path (ctx->taglist,
@@ -525,7 +526,7 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 		else if (!strcmp (ts->name, "redirect")) {
 			/* Update old id if still present */
 			if (ctx->new_track) {
-				DSFYstrncpy (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+				DSFYstrncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
 				if (strlen (ctx->tmp_id) == 32) {
 					hex_ascii_to_bytes (ctx->tmp_id, id, 16);
 					/* Update all entries with old ids */
@@ -548,22 +549,22 @@ static void tracks_meta_xml_handle_text (void *private, const XML_Char * s,
 		}
 		else if (ctx->track) {
 			if (!strcmp (ts->name, "artist"))
-				DSFYstrncpy(ctx->track->artist, buf, len);
+				DSFYstrncat(ctx->track->artist, buf, len);
 			else if (!strcmp (ts->name, "title"))
-				DSFYstrncpy (ctx->track->title, buf, len);
+				DSFYstrncat (ctx->track->title, buf, len);
 			else if (!strcmp (ts->name, "album"))
-				DSFYstrncpy (ctx->track->album, buf, len);
+				DSFYstrncat (ctx->track->album, buf, len);
 			else if (!strcmp (ts->name, "length"))
 				ctx->track->length = atoi (buf);
 			else if (!strcmp (ts->name, "album-id")) {
-				DSFYstrncpy (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+				DSFYstrncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
 				if (strlen (ctx->tmp_id) == 32) {
 					hex_ascii_to_bytes (ctx->tmp_id, ctx->track->album_id, 16);
 					ctx->tmp_id[0] = 0;
 				}
 			}
 			else if (!strcmp (ts->name, "artist-id")) {
-				DSFYstrncpy (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
+				DSFYstrncat (ctx->tmp_id, buf, 32 - strlen (ctx->tmp_id));
 				if (strlen (ctx->tmp_id) == 32) {
 					hex_ascii_to_bytes (ctx->tmp_id, ctx->track->artist_id, 16);
 					ctx->tmp_id[0] = 0;
