@@ -7,7 +7,9 @@ unexport LDFLAGS CFLAGS
 LIBDIR = ../../lib
 LIB = $(LIBDIR)/libdespotify.la
 
-CFLAGS += -I$(LIBDIR)
+NCURSES_INCLUDE ?= /usr/include/ncursesw
+
+CFLAGS += -I$(LIBDIR) -I$(NCURSES_INCLUDE)
 LDFLAGS += -lncursesw
 
 DESPOTIFY_OBJS = ADMclubbing.o despotify.o event.o ui-core.o ui-help.o ui-player.o ui-playlist.o ui-search.o

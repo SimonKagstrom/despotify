@@ -8,7 +8,10 @@
 # NOGUI = 1
 
 ## Install prefix
-# INSTALL_PREFIX=/usr
+# INSTALL_PREFIX = /usr
+
+## Specify ncurses include path explicitly. (should contain curses.h)
+# NCURSES_INCLUDE = /usr/local/include/ncursesw
 
 ## Choose audio backend
 LINUX_BACKEND = gstreamer

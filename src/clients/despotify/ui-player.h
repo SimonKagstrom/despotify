@@ -6,7 +6,7 @@
 #ifndef DESPOTIFY_UI_PLAYER_H
 #define DESPOTIFY_UI_PLAYER_H
 
-#include <ncursesw/curses.h>
+#include <curses.h>
 
 #include "event.h"
 

@@ -6,7 +6,7 @@
 #ifndef DESPOTIFY_UI_SEARCH_H
 #define DESPOTIFY_UI_SEARCH_H
 
-#include <ncursesw/curses.h>
+#include <curses.h>
 
 #include "session.h"
 

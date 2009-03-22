@@ -7,7 +7,7 @@
 #include <string.h>
 #include <time.h>
 
-#include <ncursesw/curses.h>
+#include <curses.h>
 
 #include <stdarg.h> /* needed for esbuf */
 
