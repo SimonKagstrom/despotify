@@ -23,7 +23,7 @@ void sha1_hmac(unsigned char *inputkey, size_t inputkeylen,
   unsigned char *key = inputkey; 
   unsigned char ipad[HMAC_SHA1_BLOCKSIZE];
   unsigned char opad[HMAC_SHA1_BLOCKSIZE];
-  int i; 
+  unsigned int i; 
 
   /* Shorten key if needed */ 
   if (keylen > HMAC_SHA1_BLOCKSIZE)
