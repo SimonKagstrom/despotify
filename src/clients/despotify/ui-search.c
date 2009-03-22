@@ -6,7 +6,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include <curses.h>
+#include <ncursesw/curses.h>
 
 #include "buf.h"
 #include "channel.h"

@@ -9,7 +9,7 @@
 #include <time.h>
 #include <netinet/in.h>
 
-#include <curses.h>
+#include <ncursesw/curses.h>
 
 #include "channel.h"
 #include "commands.h"

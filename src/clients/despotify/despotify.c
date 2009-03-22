@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/select.h>
-#include <ncurses.h>
+#include <ncursesw/ncurses.h>
 #include <pthread.h>
 #include <locale.h>
 

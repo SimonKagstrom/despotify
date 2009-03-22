@@ -3,7 +3,7 @@
  *
  */
 
-#include <curses.h>
+#include <ncursesw/curses.h>
 
 #include "ui.h"
 #include "ui-help.h"
