@@ -46,6 +46,11 @@
 #define CMD_PRODINFO	0x50
 #define CMD_WELCOME	0x69
 
+/* browse types */
+#define BROWSE_ARTIST  1
+#define BROWSE_ALBUM   2
+#define BROWSE_TRACK   3
+
 int cmd_send_cache_hash (SESSION *);
 int cmd_token_notify (SESSION *);
 int cmd_aeskey (SESSION *, unsigned char *, unsigned char *, channel_callback,

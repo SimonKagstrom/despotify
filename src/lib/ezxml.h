@@ -101,6 +101,9 @@ const char *ezxml_attr(ezxml_t xml, const char *attr);
 // Returns NULL if not found.
 ezxml_t ezxml_get(ezxml_t xml, ...);
 
+// same as ezxml_get but takes an already initialized va_list
+ezxml_t ezxml_vget(ezxml_t xml, va_list ap);
+
 // Converts an ezxml structure back to xml. Returns a string of xml data that
 // must be freed.
 char *ezxml_toxml(ezxml_t xml);

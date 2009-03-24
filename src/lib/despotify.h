@@ -22,6 +22,8 @@ struct despotify_session
 
     pthread_t thread;
 
+    struct album* album;
+    struct artist* artist;
     struct track* track;
     struct playlist* playlist;
     struct buf* response;
@@ -60,6 +62,9 @@ const char *despotify_get_error(struct despotify_session *ds);
 
 /* Information. */
 struct track *despotify_get_current_track(struct despotify_session *ds);
+struct artist* despotify_get_artist(struct despotify_session* ds,
+                                    char* artist_id);
+void despotify_free_artist(struct artist* a);
 
 /* We need to determine if there is any / enough info to warrant this:
  * user despotify_get_user_info(struct despotify_session *ds); */

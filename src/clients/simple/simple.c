@@ -38,6 +38,7 @@ void print_help(void)
     printf("\nAvailable commands:\n"
            "list [num]           List stored playlists\n"
            "search [string]      Search tracks\n"
+           "artist [num]         Show information about artist for track [num]\n"
            "play [num]           Play track [num] in the last viewed list\n"
            "stop, pause, resume  Control playback\n"
            "help                 This text\n"
@@ -94,6 +95,7 @@ void command_loop(struct despotify_session* ds)
                 if (searchlist)
                     despotify_free_playlist(searchlist);
 
+                despotify_stop(ds); /* since we replace the list */
                 searchlist = despotify_search(ds, buf + 7);
                 if (!searchlist) {
                     printf("Search failed: %s\n", despotify_get_error(ds));
@@ -106,6 +108,34 @@ void command_loop(struct despotify_session* ds)
             }
         }
 
+        /* artist */
+        else if (!strncmp(buf, "artist", 6)) {
+            int num = atoi(buf + 7);
+            if (!num) {
+                printf("usage: list [num]\n");
+                continue;
+            }
+            if (!lastlist) {
+                printf("No playlist\n");
+                continue;
+            }
+
+            /* find the requested artist */
+            struct track* t = lastlist->tracks;
+            for (int i=1; i<num; i++)
+                t = t->next;
+
+            struct artist* a = despotify_get_artist(ds, t->artist_id);
+            printf("Name: %s\n"
+                   "Genres: %s\n"
+                   "Years active: %s\n"
+                   "%d albums:\n",                   
+                   a->name, a->genres, a->years_active, a->num_albums);
+            for (struct album* al = a->albums; al; al = al->next)
+                printf(" %s (%d)\n", al->name, al->year);
+            despotify_free_artist(a);
+        }
+        
         /* play */
         else if (!strncmp(buf, "play", 4)) {
             if (!lastlist) {

@@ -8,6 +8,8 @@
 
 #include <stdbool.h>
 
+#define STRING_LENGTH 256
+
 typedef struct track
 {
 	int id;
@@ -15,12 +17,12 @@ typedef struct track
 	unsigned char track_id[16];
 	unsigned char file_id[20];
 	unsigned char album_id[16];
-	unsigned char artist_id[16];
+	unsigned char artist_id[33];
 	unsigned char cover_id[16];
 	unsigned char *key;
-	char title[1024];
-	char artist[1024];
-	char album[1024];
+	char title[STRING_LENGTH];
+	char artist[STRING_LENGTH];
+	char album[STRING_LENGTH];
 	int length;
 	int tracknumber;
 	int year;
@@ -38,13 +40,36 @@ enum playlist_flags
 typedef struct playlist
 {
 	enum playlist_flags flags;
-	char name[1024];
-	char author[1024];
-	unsigned char *playlist_id;
+	char name[STRING_LENGTH];
+	char author[STRING_LENGTH];
+	unsigned char playlist_id[17];
 	int num_tracks;
 	struct track *tracks;
 	struct playlist *next;
 } PLAYLIST;
+
+struct album {
+    char name[STRING_LENGTH];
+    char id[16];
+    int num_tracks;
+    struct track* tracks;
+    int year;
+    char cover_id[20];
+    void* cover_jpg;
+    struct album* next;
+};
+
+struct artist {
+    char name[STRING_LENGTH];
+    char id[16];
+    char* text;
+    char portrait_id[20];
+    char* portrait;
+    char genres[STRING_LENGTH];
+    char years_active[STRING_LENGTH];
+    int num_albums;
+    struct album* albums;
+};
 
 #define PLAYLIST_LIST_PLAYLISTS	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 
@@ -56,7 +81,11 @@ struct playlist* playlist_parse_playlist(struct playlist* pl,
                                          int len,
                                          bool list_of_lists);
 
-bool playlist_parse_tracks(struct playlist* pl,
+bool playlist_parse_searchlist(struct playlist* pl,
+                             unsigned char* xml,
+                             int len );
+
+bool playlist_parse_artist(struct artist* a,
                            unsigned char* xml,
                            int len );
 
