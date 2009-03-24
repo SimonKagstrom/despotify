@@ -7,8 +7,155 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 #include <unistd.h>
 #include "despotify.h"
+
+void print_list_of_lists(struct playlist* rootlist)
+{
+    if (!rootlist) {
+        printf(" <no stored playlists>\n");
+    }
+    else {
+        int count=1;
+        for (struct playlist* p = rootlist; p; p = p->next)
+            printf("%2d: %-40s %s\n", count++, p->name, p->author);
+    }
+}
+
+
+void print_playlist(struct playlist* pl)
+{
+    int count = 1;
+    for (struct track* t = pl->tracks; t; t = t->next)
+        printf("%2d: %-40s %2d:%02d %s\n", count++, t->title,
+               t->length / 60000, t->length % 60000 / 1000, t->artist);
+}
+
+void print_help(void)
+{
+    printf("\nAvailable commands:\n"
+           "list [num]           List stored playlists\n"
+           "search [string]      Search tracks\n"
+           "play [num]           Play track [num] in the last viewed list\n"
+           "stop, pause, resume  Control playback\n"
+           "help                 This text\n"
+           "quit                 Quit\n");
+}
+
+void command_loop(struct despotify_session* ds)
+{
+    bool loop = true;
+    char buf[80];
+    struct playlist* rootlist = NULL;
+    struct playlist* searchlist = NULL;
+    struct playlist* lastlist = NULL;
+
+    print_help();
+
+    do {
+        printf("\n> ");
+        fflush(stdout);
+        bzero(buf, sizeof buf);
+        fgets(buf, sizeof buf -1, stdin);
+
+        /* list */
+        if (!strncmp(buf, "list", 4)) {
+            int num = atoi(buf + 5);
+            if (num) {
+                if (!rootlist) {
+                    printf("Stored lists not loaded. Run 'list' without parameter to load.\n");
+                    continue;
+                }
+
+                /* skip to playlist number <num> */
+                struct playlist* p = rootlist;
+                for (int i=1; i<num && p; i++)
+                    p = p->next;
+
+                if (p) {
+                    print_playlist(p);
+                    lastlist = p;
+                }
+                else
+                    printf("Invalid playlist number %d\n", num);
+            }
+            else {
+                if (!rootlist)
+                    rootlist = despotify_get_stored_playlists(ds);
+                print_list_of_lists(rootlist);
+            }
+        }
+
+        /* search */
+        else if (!strncmp(buf, "search", 6)) {
+            if (buf[7]) {
+                if (searchlist)
+                    despotify_free_playlist(searchlist);
+
+                searchlist = despotify_search(ds, buf + 7);
+                if (!searchlist) {
+                    printf("Search failed: %s\n", despotify_get_error(ds));
+                    continue;
+                }
+            }
+            if (searchlist) {
+                print_playlist(searchlist);
+                lastlist = searchlist;
+            }
+        }
+
+        /* play */
+        else if (!strncmp(buf, "play", 4)) {
+            if (!lastlist) {
+                printf("No list to play from. Use 'list' or 'search' to select a list.\n");
+                continue;
+            }
+
+            /* skip to track <num> */
+            int num = atoi(buf + 5);
+            struct track* t = lastlist->tracks;
+            for (int i=1; i<num && t; i++)
+                t = t->next;
+            if (t)
+                despotify_play(ds, lastlist, t);
+            else
+                printf("Invalid track number %d\n", num);
+        }
+
+        /* stop */
+        else if (!strncmp(buf, "stop", 4)) {
+            despotify_stop(ds);
+        }
+
+        /* pause */
+        else if (!strncmp(buf, "pause", 5)) {
+            despotify_pause(ds);
+        }
+
+        /* resume */
+        else if (!strncmp(buf, "resume", 5)) {
+            despotify_resume(ds);
+        }
+        
+        /* help */
+        else if (!strncmp(buf, "help", 4)) {
+            print_help();
+        }
+
+        /* quit */
+        else if (!strncmp(buf, "quit", 4)) {
+            loop = false;
+        }
+    } while(loop);
+
+    if (rootlist)
+        despotify_free_playlist(rootlist);
+
+    if (searchlist)
+        despotify_free_playlist(searchlist);
+}
 
 int main(int argc, char** argv)
 {
@@ -35,65 +182,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    printf("List of playlists on account:\n");
-    struct playlist *sp = despotify_get_stored_playlists(ds);
-    if (!sp) {
-        printf(" (Account has no stored playlists)\n");
-    }
-    else {
-        printf("Account has %d stored playlists:\n", sp->num_tracks);
-        for (struct playlist* p = sp; p; p = p->next)
-        {
-            printf("  Playlist name:   %s\n", p->name);
-            printf("  Playlist author: %s\n", p->author);
+    command_loop(ds);
 
-            int i = 1;
-            for (struct track* t = p->tracks; t; t = t->next) {
-                if (t->has_meta_data) {
-                    printf("  %3d: %s (%s)\n", i++, t->title, t->artist);
-                }
-                else {
-                    printf("  %3d: N/A\n", i++);
-                }
-            }
-        }
-        despotify_free_playlist(sp);
-    }
-
-    printf("Search:\n");
-    struct playlist* pl = despotify_search(ds, "machinae");
-    if (!pl) {
-        printf("Search failed: %s\n", despotify_get_error(ds));
-        return 1;
-    }
-
-    printf("Playlist name: %s\n", pl->name);
-    printf("Playlist author: %s\n", pl->author);
-
-    int i=1;
-    for (struct track* t = pl->tracks; t; t = t->next) {
-        printf("%2d: %s (%d:%02d)\n", i++, t->title,
-               t->length / 60000, t->length % 60000 / 1000);
-    }
-
-    /* play first track in playlist */
-    printf("Playing track 1\n");
-    despotify_play(ds, pl, pl->tracks);
-
-    /* let it play a while */
-    sleep(5);
-
-    printf("Pause 1s\n");
-    despotify_pause(ds);
-    sleep(1);
-    printf("Resume\n");
-    despotify_resume(ds);
-
-    sleep(5);
-    printf("Stop\n");
-    despotify_stop(ds);
-
-    despotify_free_playlist(pl);
     despotify_exit(ds);
 
     if (!despotify_cleanup())
