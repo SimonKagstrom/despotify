@@ -125,7 +125,13 @@ static int parse_tracks(ezxml_t xml, struct track* t)
         xmlstoreid(t->cover_id, sizeof t->cover_id, track, "cover", -1);
         xmlstoreid(t->album_id, sizeof t->album_id, track, "album-id", -1);
         xmlstrncpy(t->artist_id, sizeof t->artist_id, track, "artist-id", -1);
-        xmlstoreid(t->file_id, sizeof t->file_id, track, "files",0, "file",-1);
+
+        ezxml_t file = ezxml_get(track, "files",0, "file",-1);
+        if (file) {
+            char* id = (char*)ezxml_attr(file, "id");
+            if (id)
+                hex_ascii_to_bytes(id, t->file_id, sizeof t->file_id);
+        }
 
         t->year = atoi(ezxml_get(track, "year",-1)->txt);
         t->length = atoi(ezxml_get(track, "length",-1)->txt);
