@@ -37,7 +37,7 @@ struct playlist* playlist_parse_playlist(struct playlist* pl,
         struct playlist* prev = NULL;
         struct playlist* p = pl;
 
-        for (char* id = strtok(items, ","); id; id = strtok(NULL, ","))
+        for (char* id = strtok(items, ",\n"); id; id = strtok(NULL, ",\n"))
         {
             if (prev) {
                 p = calloc(1, sizeof(struct playlist));
@@ -56,7 +56,7 @@ struct playlist* playlist_parse_playlist(struct playlist* pl,
 
         int track_count = 0;
 
-        for (char* id = strtok(items, ","); id; id = strtok(NULL, ","))
+        for (char* id = strtok(items, ",\n"); id; id = strtok(NULL, ",\n"))
         {
             if (prev) {
                 t = calloc(1, sizeof(struct track));
