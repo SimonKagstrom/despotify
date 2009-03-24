@@ -291,7 +291,10 @@ static int despotify_snd_data_callback(void* arg)
     struct despotify_session* ds = arg;
 
     DSFYDEBUG("Calling cmd_getsubstreams() with offset %d and len %d\n", ds->offset, BUFFER_SIZE);
-    if (cmd_getsubstreams(ds->session, ds->track->file_id,
+    char fid[20];
+    hex_ascii_to_bytes(ds->track->file_id, fid, sizeof fid);
+
+    if (cmd_getsubstreams(ds->session, fid,
                           ds->offset, BUFFER_SIZE,
                           200 * 1000, /* unknown, static value */
                           despotify_substream_callback, ds))
@@ -325,10 +328,12 @@ static int despotify_snd_end_callback(void* arg)
 
     int error = 0;
     if (ds->track) {
+        char fid[20], tid[16];
+        hex_ascii_to_bytes(ds->track->file_id, fid, sizeof fid);
+        hex_ascii_to_bytes(ds->track->track_id, tid, sizeof tid);
+
         /* request key for next track */
-        error = cmd_aeskey(ds->session, ds->track->file_id,
-                           ds->track->track_id,
-                           despotify_aes_callback, ds);
+        error = cmd_aeskey(ds->session, fid, tid, despotify_aes_callback, ds);
     }
     
     return error;
@@ -368,8 +373,12 @@ bool despotify_play(struct despotify_session* ds,
 
     ds->track = t;
     ds->playlist = pl;
-    int error = cmd_aeskey(ds->session, t->file_id, t->track_id,
-                           despotify_aes_callback, ds);
+
+    char fid[20], tid[16];
+    hex_ascii_to_bytes(ds->track->file_id, fid, sizeof fid);
+    hex_ascii_to_bytes(ds->track->track_id, tid, sizeof tid);
+
+    int error = cmd_aeskey(ds->session, fid, tid, despotify_aes_callback, ds);
     if (error) {
         DSFYDEBUG("cmd_aeskey() failed for %s - %s\n", t->title, t->artist);
         return false;
@@ -610,9 +619,8 @@ static bool despotify_load_tracks(struct despotify_session *ds)
 
         ds->response = buf_new();
  
-        for (count = 0; t && count < MAX_BROWSE_REQ; t = t->next, count++) {
-            memcpy(tracklist + count * 16, t->track_id, 16);
-        }
+        for (count = 0; t && count < MAX_BROWSE_REQ; t = t->next, count++)
+            hex_ascii_to_bytes(t->track_id, tracklist + count * 16, 16);
  
         int error = cmd_browse(ds->session, BROWSE_TRACK, tracklist, count, 
                                despotify_gzip_callback, ds);
@@ -654,11 +662,16 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
 
     buf_append_data(ds->response, (char*)load_lists, strlen(load_lists));
 
-    if (!playlist_id)
+    char pid[17];
+    if (playlist_id)
+        hex_ascii_to_bytes(playlist_id, pid, 17);
+    else {
         /* enable list_of_lists state */
         ds->list_of_lists = true;
-
-    int error = cmd_getplaylist(ds->session, playlist_id ? playlist_id : (unsigned char*)PLAYLIST_LIST_PLAYLISTS,
+        memset(pid, 0, sizeof pid);
+    }
+        
+    int error = cmd_getplaylist(ds->session, pid,
                                 -1, despotify_plain_callback, ds);
     if (error) {
         DSFYDEBUG("Failed getting playlists\n");

@@ -23,8 +23,8 @@
 #endif
 
 #define DSFYfree(p) free(p); (p) = NULL
-#define DSFYstrncat(target, data, len) do { strncat(target, data, sizeof(target)-1); ((unsigned char*)target)[sizeof(target)-1] = 0; } while (0)
-#define DSFYstrncpy(target, data, len) do { strncpy(target, data, sizeof(target)-1); ((unsigned char*)target)[sizeof(target)-1] = 0; } while (0)
+#define DSFYstrncat(target, data, size) do { strncat(target, data, size-1); ((unsigned char*)target)[size-1] = 0; } while (0)
+#define DSFYstrncpy(target, data, size) do { strncpy(target, data, size-1); ((unsigned char*)target)[size-1] = 0; } while (0)
 
 unsigned char *hex_ascii_to_bytes (char *, unsigned char *, int);
 char *hex_bytes_to_ascii (unsigned char *, char *, int);

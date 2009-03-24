@@ -71,7 +71,7 @@ struct playlist* playlist_parse_playlist(struct playlist* pl,
                 p = calloc(1, sizeof(struct playlist));
                 prev->next = p;
             }
-            hex_ascii_to_bytes(id, p->playlist_id, sizeof p->playlist_id);
+            DSFYstrncpy(p->playlist_id, id, sizeof p->playlist_id);
             prev = p;
         }
     }
@@ -89,7 +89,7 @@ struct playlist* playlist_parse_playlist(struct playlist* pl,
                 t = calloc(1, sizeof(struct track));
                 prev->next = t;
             }
-            hex_ascii_to_bytes(id, t->track_id, sizeof(t->track_id));
+            DSFYstrncpy(t->track_id, id, sizeof t->track_id);
             prev = t;
             track_count++;
         }
@@ -121,16 +121,16 @@ static int parse_tracks(ezxml_t xml, struct track* t)
         xmlstrncpy(t->album, sizeof t->album, track, "album",-1);
         xmlstrncpy(t->artist, sizeof t->artist, track, "artist",-1);
 
-        xmlstoreid(t->track_id, sizeof t->track_id, track, "id", -1);
-        xmlstoreid(t->cover_id, sizeof t->cover_id, track, "cover", -1);
-        xmlstoreid(t->album_id, sizeof t->album_id, track, "album-id", -1);
+        xmlstrncpy(t->track_id, sizeof t->track_id, track, "id", -1);
+        xmlstrncpy(t->cover_id, sizeof t->cover_id, track, "cover", -1);
+        xmlstrncpy(t->album_id, sizeof t->album_id, track, "album-id", -1);
         xmlstrncpy(t->artist_id, sizeof t->artist_id, track, "artist-id", -1);
 
         ezxml_t file = ezxml_get(track, "files",0, "file",-1);
         if (file) {
             char* id = (char*)ezxml_attr(file, "id");
             if (id)
-                hex_ascii_to_bytes(id, t->file_id, sizeof t->file_id);
+                DSFYstrncpy(t->file_id, id, sizeof t->file_id);
         }
 
         t->year = atoi(ezxml_get(track, "year",-1)->txt);
@@ -170,8 +170,8 @@ bool playlist_parse_artist(struct artist* a,
     xmlstrncpy(a->name, sizeof a->name, top, "name", -1);
     xmlstrncpy(a->genres, sizeof a->genres, top, "genres", -1);
     xmlstrncpy(a->years_active, sizeof a->years_active, top, "years-active",-1);
-    xmlstoreid(a->id, sizeof a->id, top, "id", -1);
-    xmlstoreid(a->portrait_id, sizeof a->portrait_id, top,
+    xmlstrncpy(a->id, sizeof a->id, top, "id", -1);
+    xmlstrncpy(a->portrait_id, sizeof a->portrait_id, top,
                "portrait", 0, "id", -1);
 
     ezxml_t x = ezxml_get(top, "bios",0,"bio",0,"text",-1);
@@ -194,8 +194,8 @@ bool playlist_parse_artist(struct artist* a,
         }
 
         xmlstrncpy(album->name, sizeof album->name, xalb, "name", -1);
-        xmlstoreid(album->id, sizeof album->id, xalb, "id", -1);
-        xmlstoreid(album->cover_id, sizeof album->cover_id, xalb, "cover", -1);
+        xmlstrncpy(album->id, sizeof album->id, xalb, "id", -1);
+        xmlstrncpy(album->cover_id, sizeof album->cover_id, xalb, "cover", -1);
         album->year = atoi(ezxml_get(xalb, "year",-1)->txt);
 
         /* TODO: support multiple discs per album  */

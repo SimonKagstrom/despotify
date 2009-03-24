@@ -14,11 +14,11 @@ typedef struct track
 {
 	int id;
 	int has_meta_data;
-	unsigned char track_id[16];
-	unsigned char file_id[20];
-	unsigned char album_id[16];
+	unsigned char track_id[33];
+	unsigned char file_id[41];
+	unsigned char album_id[33];
 	unsigned char artist_id[33];
-	unsigned char cover_id[16];
+	unsigned char cover_id[33];
 	unsigned char *key;
 	char title[STRING_LENGTH];
 	char artist[STRING_LENGTH];
@@ -42,7 +42,7 @@ typedef struct playlist
 	enum playlist_flags flags;
 	char name[STRING_LENGTH];
 	char author[STRING_LENGTH];
-	unsigned char playlist_id[17];
+	unsigned char playlist_id[35];
 	int num_tracks;
 	struct track *tracks;
 	struct playlist *next;
@@ -50,20 +50,20 @@ typedef struct playlist
 
 struct album {
     char name[STRING_LENGTH];
-    char id[16];
+    char id[33];
     int num_tracks;
     struct track* tracks;
     int year;
-    char cover_id[20];
+    char cover_id[41];
     void* cover_jpg;
     struct album* next;
 };
 
 struct artist {
     char name[STRING_LENGTH];
-    char id[16];
+    char id[33];
     char* text;
-    char portrait_id[20];
+    char portrait_id[41];
     char* portrait;
     char genres[STRING_LENGTH];
     char years_active[STRING_LENGTH];
