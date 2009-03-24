@@ -106,7 +106,10 @@ bool playlist_parse_tracks(struct playlist* pl,
         hex_ascii_to_bytes(ezxml_child(track, "id")->txt, t->track_id, sizeof t->track_id);
         hex_ascii_to_bytes(ezxml_child(track, "album-id")->txt, t->album_id, sizeof t->album_id);
         hex_ascii_to_bytes(ezxml_child(track, "artist-id")->txt, t->artist_id, sizeof t->artist_id);
+        hex_ascii_to_bytes(ezxml_child(track, "cover")->txt, t->cover_id, sizeof t->cover_id);
         t->length = atoi(ezxml_child(track, "length")->txt);
+        t->tracknumber = atoi(ezxml_child(track, "track-number")->txt);
+        t->year = atoi(ezxml_child(track, "year")->txt);
 
         ezxml_t file = ezxml_get(track, "files", 0, "file", -1);
         if (file)
