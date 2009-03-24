@@ -17,8 +17,6 @@
 #include "packet.h"
 #include "util.h"
 
-extern void app_packet_callback (SESSION *, int, unsigned char *, int);
-
 int handle_secret_block (SESSION * session, unsigned char *payload, int len)
 {
 	unsigned int *t;
@@ -164,8 +162,6 @@ int handle_packet (SESSION * session,
                 */
 		break;
 	}
-
-	app_packet_callback (session, cmd, payload, len);
 
 	return error;
 }

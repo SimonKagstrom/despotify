@@ -224,11 +224,3 @@ int main(int argc, char** argv)
 
     return 0;
 }
-
-void app_packet_callback(struct session *s, int cmd, unsigned char* buf, int len)
-{
-    (void)s;
-    (void)buf;
-    (void)cmd;
-    (void)len;
-}
