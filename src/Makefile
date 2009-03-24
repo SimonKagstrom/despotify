@@ -6,7 +6,7 @@
 export
 
 CFLAGS = -Wall -Wextra -ggdb -std=gnu99
-LDFLAGS = -lz -lexpat -lvorbisfile
+LDFLAGS = -lz -lvorbisfile
 
 LD = $(CC)
 
@@ -45,7 +45,7 @@ ifeq ($(firstword $(subst ., ,$(shell $(CC) -dumpversion))), 4)
     CFLAGS += -Wno-pointer-sign
 endif
 
-CLIENTS = clients/despotify clients/gateway clients/simple
+CLIENTS = clients/simple clients/gateway # clients/despotify
 SUBDIRS = lib $(CLIENTS)
 
 .PHONY: all clean $(SUBDIRS) install uninstall
