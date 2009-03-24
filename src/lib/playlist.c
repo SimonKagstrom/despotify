@@ -201,6 +201,7 @@ bool playlist_parse_artist(struct artist* a,
         album_count++;
     }
     a->num_albums = album_count;
+    ezxml_free(top);
         
     return true;
 }

@@ -823,4 +823,5 @@ void despotify_free_artist(struct artist* a)
         next_album = al->next;
         free(al);
     }
+    free(a);
 }
