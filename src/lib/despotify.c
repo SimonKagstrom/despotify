@@ -1,7 +1,9 @@
 #include <assert.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <zlib.h>
 
 #include "aes.h"
 #include "auth.h"
@@ -9,6 +11,7 @@
 #include "channel.h"
 #include "commands.h"
 #include "despotify.h"
+#include "ezxml.h"
 #include "handlers.h"
 #include "keyexchange.h"
 #include "network.h"
@@ -315,7 +318,10 @@ static int despotify_snd_end_callback(void* arg)
     ds->offset = 0;
 
     /* Select the next available track in the playlist */
-    ds->track = playlist_next_playable(ds->playlist, ds->track);
+    struct track* t;
+    for (t = ds->playlist->tracks; t && t != ds->track; t = t->next);
+    if (t)
+        ds->track = t->next;
 
     int error = 0;
     if (ds->track) {
@@ -339,6 +345,8 @@ bool despotify_play(struct despotify_session* ds,
                     struct playlist* pl,
                     struct track* t)
 {
+    //DSFYDEBUG("pl=%p, t=%p\n", pl, t);
+
     if (ds->snd_session) {
         snd_stop(ds->snd_session);
         snd_reset(ds->snd_session);
@@ -389,6 +397,63 @@ bool despotify_resume(struct despotify_session* ds)
     return true;
 }
 
+
+static struct buf* despotify_inflate(unsigned char* data, int len)
+{
+    struct z_stream_s z;
+    memset(&z, 0, sizeof z);
+
+    int rc = inflateInit2(&z, -MAX_WBITS);
+    if (rc != Z_OK) {
+        DSFYDEBUG("error: inflateInit() returned %d\n", rc);
+        return false;
+    }
+
+    z.next_in = data;
+    z.avail_in = len;
+
+    struct buf* b = buf_new();
+    buf_extend(b, 4096);
+    bool loop = true;
+
+    int offset = 0;
+    while (loop) {
+        z.avail_out = b->size - offset;
+        z.next_out = b->ptr + offset;
+
+        rc = inflate(&z, Z_NO_FLUSH);
+        switch (rc) {
+            case Z_OK:
+                /* inflated fine */
+                if (z.avail_out == 0) {
+                    /* zlib needs more output buffer */
+                    offset = b->size;
+                    buf_extend(b, b->size * 2);
+                }
+                break;
+
+            case Z_STREAM_END:
+                /* end of input */
+                loop = false;
+                break;
+
+            default:
+                /* error */
+                DSFYDEBUG("error: inflate() returned %d\n", rc);
+                loop = false;
+                buf_free(b);
+                b = NULL;
+                break;
+        }
+    }
+    b->len = b->size - z.avail_out;
+    buf_append_u8(b, 0); /* null terminate string */
+
+    inflateEnd(&z);
+
+    return b;
+}
+
 /****************************************************
  *
  *  Search
@@ -420,15 +485,18 @@ static int despotify_search_callback(CHANNEL*  ch,
             buf_append_data(ds->response, buf, len);
             break;
             
-        case CHANNEL_END:
+        case CHANNEL_END: {
             /* Add tracks */
-            playlist_track_update_from_gzxml(ds->playlist,
-                                             ds->response->ptr,
-                                             ds->response->len);
-            
+            struct buf* b = despotify_inflate(ds->response->ptr,
+                                              ds->response->len);
+            if (b) {
+                playlist_parse_tracks(ds->playlist, b->ptr, b->len);
+                buf_free(b);
+            }
             ds->playlist->flags |= PLAYLIST_LOADED;
             done = true;
             break;
+        }
 
         case CHANNEL_ERROR:
             if (ds->playlist)
@@ -478,7 +546,7 @@ struct playlist* despotify_search(struct despotify_session* ds,
     buf_free(ds->response);
 
     if (!ds->playlist->num_tracks) {
-        playlist_free(ds->playlist, 1);
+        playlist_free(ds->playlist);
         ds->last_error = "No tracks found";
         return NULL;
     }
@@ -494,7 +562,7 @@ struct playlist* despotify_search(struct despotify_session* ds,
 
 void despotify_free_playlist(struct playlist* playlist)
 {
-    playlist_free(playlist, 1);
+    playlist_free(playlist);
 }
 
 static bool despotify_load_tracks(struct despotify_session *ds)
@@ -557,8 +625,10 @@ static int despotify_get_playlist_callback (CHANNEL *ch,
 
 	case CHANNEL_END:
             buf_append_u8(ds->response, 0); /* null terminate xml string */
-            DSFYDEBUG("playlist response xml:\n%s\n", ds->response->ptr);
-            playlist_create_from_xml(ds->response->ptr, ds->playlist);
+            ds->playlist = playlist_parse_playlist(ds->playlist,
+                                                   ds->response->ptr,
+                                                   ds->response->len,
+                                                   ds->list_of_lists);
             done = true;
             break;
 
@@ -580,15 +650,16 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
                                         unsigned char* playlist_id)
 {
     ds->response = buf_new();
-
-    /* when loading lists, we fill out an already existing playlist */
-    if (!ds->null_playlist)
-        ds->playlist = playlist_new();
+    ds->playlist = playlist_new();
 
     static const char* load_lists = 
         "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n";
 
     buf_append_data(ds->response, (char*)load_lists, strlen(load_lists));
+
+    if (!playlist_id)
+        /* enable list_of_lists state */
+        ds->list_of_lists = true;
 
     int error = cmd_getplaylist(ds->session, playlist_id ? playlist_id : (unsigned char*)PLAYLIST_LIST_PLAYLISTS,
                                 -1, despotify_get_playlist_callback, ds);
@@ -605,6 +676,7 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
     pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
     pthread_mutex_unlock(&ds->sync_mutex);
 
+    ds->list_of_lists = false;
     buf_free(ds->response);
 
     if (playlist_id) {
@@ -622,21 +694,23 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
 struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
 {
     /* load list of lists */
-    ds->null_playlist = true;
-
-    ds->playlist = NULL;
-    despotify_get_playlist(ds, NULL);
-
+    struct playlist* metalist = despotify_get_playlist(ds, NULL);
+    struct playlist* root = NULL;
+    struct playlist* prev = NULL;
+    
     int count = 0;
-    for (struct playlist* p = playlist_root(); p; p = p->next) {
-        ds->playlist = p;
-        despotify_get_playlist(ds, p->playlist_id);
+
+    for (struct playlist* p = metalist; p; p = p->next) {
+        struct playlist* new = despotify_get_playlist(ds, p->playlist_id);
+        if (prev)
+            prev->next = new;
+        else
+            root = new;
+        prev = new;
         count++;
     }
+    playlist_free(metalist);
 
-    ds->null_playlist = false;
-
-    struct playlist* root = playlist_root();
     root->num_tracks = count;
     return root;
 }

@@ -6,6 +6,8 @@
 #ifndef DESPOTIFY_PLAYLIST_H
 #define DESPOTIFY_PLAYLIST_H
 
+#include <stdbool.h>
+
 typedef struct track
 {
 	int id;
@@ -43,29 +45,20 @@ typedef struct playlist
 
 #define PLAYLIST_LIST_PLAYLISTS	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 
-struct playlist *playlist_root (void);
-struct playlist *playlist_new (void);
-void playlist_free (struct playlist *, int);
+struct playlist* playlist_new(void);
+void playlist_free(struct playlist* pl);
 
-int playlist_set_id (struct playlist *, unsigned char *);
+struct playlist* playlist_parse_playlist(struct playlist* pl,
+                                         unsigned char* xml,
+                                         int len,
+                                         bool list_of_lists);
+
+bool playlist_parse_tracks(struct playlist* pl,
+                           unsigned char* xml,
+                           int len );
+
 void playlist_set_name (struct playlist *, char *);
 void playlist_set_author (struct playlist *, char *);
 
-struct track *playlist_track_add (struct playlist *, unsigned char *);
-void playlist_track_del (struct playlist *, unsigned char *);
-void playlist_track_del_ptr (struct playlist *, struct track *);
 
-struct track *playlist_next_track (struct playlist *, struct track *);
-struct track *playlist_next_playable (struct playlist *, struct track *);
-
-struct playlist *playlist_select (int);
-struct playlist *playlist_selected (void);
-
-int playlist_create_from_xml (char *, struct playlist *);
-
-int playlist_track_update_from_gzxml (struct playlist *, void *, int);
-
-struct track *tracklist_add (struct playlist *p, unsigned char *,
-			     unsigned char *, char *, char *, char *, int);
-void tracklist_free (struct track **, struct track *);
 #endif

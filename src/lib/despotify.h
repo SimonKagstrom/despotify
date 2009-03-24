@@ -31,7 +31,7 @@ struct despotify_session
     pthread_mutex_t sync_mutex;
     pthread_cond_t  sync_cond;
 
-    bool null_playlist;
+    bool list_of_lists;
 };
 
 /* Global init / deinit library. */
