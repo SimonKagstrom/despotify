@@ -454,15 +454,44 @@ static struct buf* despotify_inflate(unsigned char* data, int len)
     return b;
 }
 
-/****************************************************
- *
- *  Search
- *
- */
+static int despotify_plain_callback(CHANNEL *ch,
+                                    unsigned char *buf,
+                                    unsigned short len)
+{
+    struct despotify_session* ds = ch->private;
+    bool done = false;
 
-static int despotify_search_callback(CHANNEL*  ch, 
-                                     unsigned char* buf,
-                                     unsigned short len)
+    switch (ch->state) {
+	case CHANNEL_DATA:
+            buf_append_data(ds->response, buf, len);
+            break;
+
+	case CHANNEL_ERROR:
+            DSFYDEBUG("!!! channel error\n");
+            done = true;
+            break;
+
+	case CHANNEL_END:
+            done = true;
+            break;
+
+	default:
+            break;
+    }
+
+    if (done) {
+        /* tell caller we're done */
+        pthread_mutex_lock(&ds->sync_mutex);
+        pthread_cond_signal(&ds->sync_cond);
+        pthread_mutex_unlock(&ds->sync_mutex);
+    }
+
+    return 0;
+}
+
+static int despotify_gzip_callback(CHANNEL*  ch, 
+                                   unsigned char* buf,
+                                   unsigned short len)
 {
     struct despotify_session* ds = ch->private;
     bool done = false;
@@ -485,22 +514,12 @@ static int despotify_search_callback(CHANNEL*  ch,
             buf_append_data(ds->response, buf, len);
             break;
             
-        case CHANNEL_END: {
-            /* Add tracks */
-            struct buf* b = despotify_inflate(ds->response->ptr,
-                                              ds->response->len);
-            if (b) {
-                playlist_parse_searchlist(ds->playlist, b->ptr, b->len);
-                buf_free(b);
-            }
-            ds->playlist->flags |= PLAYLIST_LOADED;
+        case CHANNEL_END:
             done = true;
             break;
-        }
 
         case CHANNEL_ERROR:
-            if (ds->playlist)
-                ds->playlist->flags |= PLAYLIST_ERROR;
+            DSFYDEBUG("!!! channel error\n");
             done = true;
             break;
 
@@ -510,7 +529,7 @@ static int despotify_search_callback(CHANNEL*  ch,
     }
 
     if (done) {
-        /* tell despotify_search() we're done */
+        /* tell caller we're done */
         pthread_mutex_lock(&ds->sync_mutex);
         pthread_cond_signal(&ds->sync_cond);
         pthread_mutex_unlock(&ds->sync_mutex);
@@ -518,6 +537,12 @@ static int despotify_search_callback(CHANNEL*  ch,
 
     return 0;
 }
+
+/****************************************************
+ *
+ *  Search
+ *
+ */
 
 struct playlist* despotify_search(struct despotify_session* ds,
                                   char* searchtext)
@@ -532,7 +557,7 @@ struct playlist* despotify_search(struct despotify_session* ds,
     playlist_set_author(ds->playlist, ds->session->username);
 
     int ret = cmd_search(ds->session, searchtext, 
-                         despotify_search_callback, ds);
+                         despotify_gzip_callback, ds);
     if (ret) {
         ds->last_error = "cmd_search() failed";
         return NULL;
@@ -543,6 +568,12 @@ struct playlist* despotify_search(struct despotify_session* ds,
     pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
     pthread_mutex_unlock(&ds->sync_mutex);
     
+    /* Add tracks */
+    struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
+    if (b) {
+        playlist_parse_searchlist(ds->playlist, b->ptr, b->len);
+        buf_free(b);
+    }
     buf_free(ds->response);
 
     if (!ds->playlist->num_tracks) {
@@ -584,7 +615,7 @@ static bool despotify_load_tracks(struct despotify_session *ds)
         }
  
         int error = cmd_browse(ds->session, BROWSE_TRACK, tracklist, count, 
-                               despotify_search_callback, ds);
+                               despotify_gzip_callback, ds);
  
         if (error) {
             DSFYDEBUG("cmd_browse() failed with %d\n", error);
@@ -598,52 +629,18 @@ static bool despotify_load_tracks(struct despotify_session *ds)
         pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
         pthread_mutex_unlock(&ds->sync_mutex);
  
+        /* Add tracks */
+        struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
+        if (b) {
+            playlist_parse_searchlist(ds->playlist, b->ptr, b->len);
+            buf_free(b);
+        }
+
         buf_free(ds->response);
     }
     free(tracklist);
 
     return true;
-}
-
-static int despotify_get_playlist_callback (CHANNEL *ch,
-                                             unsigned char *buf,
-                                             unsigned short len)
-{
-    struct despotify_session* ds = ch->private;
-    bool done = false;
-
-    switch (ch->state) {
-	case CHANNEL_DATA:
-            buf_append_data(ds->response, buf, len);
-            break;
-
-	case CHANNEL_ERROR:
-            if (ds->playlist)
-                ds->playlist->flags |= PLAYLIST_ERROR;
-            done = true;
-            break;
-
-	case CHANNEL_END:
-            buf_append_u8(ds->response, 0); /* null terminate xml string */
-            ds->playlist = playlist_parse_playlist(ds->playlist,
-                                                   ds->response->ptr,
-                                                   ds->response->len,
-                                                   ds->list_of_lists);
-            done = true;
-            break;
-
-	default:
-            break;
-    }
-
-    if (done) {
-        /* tell despotify_get_playlists() that we're done */
-        pthread_mutex_lock(&ds->sync_mutex);
-        pthread_cond_signal(&ds->sync_cond);
-        pthread_mutex_unlock(&ds->sync_mutex);
-    }
-
-    return 0;
 }
 
 struct playlist* despotify_get_playlist(struct despotify_session *ds,
@@ -662,7 +659,7 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
         ds->list_of_lists = true;
 
     int error = cmd_getplaylist(ds->session, playlist_id ? playlist_id : (unsigned char*)PLAYLIST_LIST_PLAYLISTS,
-                                -1, despotify_get_playlist_callback, ds);
+                                -1, despotify_plain_callback, ds);
     if (error) {
         DSFYDEBUG("Failed getting playlists\n");
         ds->last_error = "Network error.";
@@ -676,6 +673,11 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
     pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
     pthread_mutex_unlock(&ds->sync_mutex);
 
+    buf_append_u8(ds->response, 0); /* null terminate xml string */
+    ds->playlist = playlist_parse_playlist(ds->playlist,
+                                           ds->response->ptr,
+                                           ds->response->len,
+                                           ds->list_of_lists);
     ds->list_of_lists = false;
     buf_free(ds->response);
 
@@ -722,61 +724,6 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
  *
  */
 
-static int despotify_artist_callback(CHANNEL*  ch, 
-                                     unsigned char* buf,
-                                     unsigned short len)
-{
-    struct despotify_session* ds = ch->private;
-    bool done = false;
-
-    switch (ch->state) {
-        case CHANNEL_DATA:
-            /* Skip a minimal gzip header */
-            if (ch->total_data_len < 10) {
-		int skip_len = 10 - ch->total_data_len;
-		while (skip_len && len) {
-                    skip_len--;
-                    len--;
-                    buf++;
-		}
-
-		if (len == 0)
-                    return 0;
-            }
-
-            buf_append_data(ds->response, buf, len);
-            break;
-            
-        case CHANNEL_END: {
-            struct buf* b = despotify_inflate(ds->response->ptr,
-                                              ds->response->len);
-            if (b) {
-                playlist_parse_artist(ds->artist, b->ptr, b->len);
-                buf_free(b);
-            }
-            done = true;
-            break;
-        }
-
-        case CHANNEL_ERROR:
-            done = true;
-            break;
-
-        default:
-            /* unknown state */
-            break;
-    }
-
-    if (done) {
-        /* tell despotify_get_artist() we're done */
-        pthread_mutex_lock(&ds->sync_mutex);
-        pthread_cond_signal(&ds->sync_cond);
-        pthread_mutex_unlock(&ds->sync_mutex);
-    }
-
-    return 0;
-}
-
 struct artist* despotify_get_artist(struct despotify_session* ds,
                                     char* artist_id)
 {
@@ -786,7 +733,7 @@ struct artist* despotify_get_artist(struct despotify_session* ds,
     unsigned char id[16];
     hex_ascii_to_bytes(artist_id, id, sizeof id);
     int error = cmd_browse(ds->session, BROWSE_ARTIST, id, 1, 
-                           despotify_artist_callback, ds);
+                           despotify_gzip_callback, ds);
  
     if (error) {
         DSFYDEBUG("cmd_browse() failed with %d\n", error);
@@ -800,6 +747,11 @@ struct artist* despotify_get_artist(struct despotify_session* ds,
     pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
     pthread_mutex_unlock(&ds->sync_mutex);
  
+    struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
+    if (b) {
+        playlist_parse_artist(ds->artist, b->ptr, b->len);
+        buf_free(b);
+    }
     buf_free(ds->response);
 
     return ds->artist;
