@@ -9,7 +9,8 @@
 struct track
 {
 	int id;
-	int has_meta_data;
+	bool has_meta_data;
+	bool playable;
 	unsigned char track_id[33];
 	unsigned char file_id[41];
 	unsigned char album_id[33];

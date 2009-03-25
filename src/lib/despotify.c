@@ -102,7 +102,7 @@ bool despotify_authenticate(struct despotify_session* ds,
     }
     DSFYDEBUG("%s", "do_auth() completed\n");
 
-    pthread_create( &ds->thread, NULL, &despotify_thread, ds);
+    pthread_create(&ds->thread, NULL, &despotify_thread, ds);
     
     /* wait until login is ready */
     pthread_mutex_lock(&ds->session->login_mutex);

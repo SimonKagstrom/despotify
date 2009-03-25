@@ -28,9 +28,14 @@ void print_list_of_lists(struct playlist* rootlist)
 void print_playlist(struct playlist* pl)
 {
     int count = 1;
-    for (struct track* t = pl->tracks; t; t = t->next)
-        printf("%2d: %-40s %2d:%02d %s\n", count++, t->title,
-               t->length / 60000, t->length % 60000 / 1000, t->artist);
+    for (struct track* t = pl->tracks; t; t = t->next) {
+        if (t->has_meta_data)
+            printf("%3d: %-40s %2d:%02d %-20s %s\n", count++, t->title,
+                   t->length / 60000, t->length % 60000 / 1000, t->artist,
+                   (t->playable ? "" : "(Unplayable)"));
+        else
+            printf("%3d: N/A\n", count++);
+    }
 }
 
 void print_help(void)

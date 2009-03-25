@@ -116,13 +116,16 @@ static int parse_tracks(ezxml_t xml, struct track* t)
         ezxml_t file = ezxml_get(track, "files",0, "file",-1);
         if (file) {
             char* id = (char*)ezxml_attr(file, "id");
-            if (id)
+            if (id) {
                 DSFYstrncpy(t->file_id, id, sizeof t->file_id);
+                t->playable = true;
+            }
         }
 
         t->year = atoi(ezxml_get(track, "year",-1)->txt);
         t->length = atoi(ezxml_get(track, "length",-1)->txt);
         t->tracknumber = atoi(ezxml_get(track, "track-number",-1)->txt);
+        t->has_meta_data = true;
 
         prev = t;
         t = t->next;
