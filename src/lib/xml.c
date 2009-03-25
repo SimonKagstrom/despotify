@@ -52,13 +52,11 @@ struct playlist* xml_parse_playlist(struct playlist* pl,
     ezxml_t top = ezxml_parse_str(xml, len);
     ezxml_t tmpx = ezxml_get(top, "next-change",0, "change", 0, "ops", 0,
                              "add", 0, "items", -1);
-    char* items;
+    char* items = NULL;
     if (tmpx)
         items = tmpx->txt;
-    else
-        return false;
 
-    while (*items && isspace(*items))
+    while (items && *items && isspace(*items))
         items++;
 
     if (list_of_lists) {
@@ -79,21 +77,22 @@ struct playlist* xml_parse_playlist(struct playlist* pl,
     else {
         /* create list of tracks */
         struct track* prev = NULL;
-        struct track* t = calloc(1, sizeof(struct track));
-        pl->tracks = t;
+        struct track* root = NULL;
+        struct track* t = NULL;
 
         int track_count = 0;
-
         for (char* id = strtok(items, ",\n"); id; id = strtok(NULL, ",\n"))
         {
-            if (prev) {
-                t = calloc(1, sizeof(struct track));
+            t = calloc(1, sizeof(struct track));
+            if (prev)
                 prev->next = t;
-            }
+            else
+                root = t;
             DSFYstrncpy(t->track_id, id, sizeof t->track_id);
             prev = t;
             track_count++;
         }
+        pl->tracks = root;
         pl->num_tracks = track_count;
     }
 

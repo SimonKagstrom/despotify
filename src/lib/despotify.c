@@ -735,7 +735,7 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
     
     int count = 0;
 
-    for (struct playlist* p = metalist; p; p = p->next) {
+    for (struct playlist* p = metalist; p && p->playlist_id[0]; p = p->next) {
         struct playlist* new = despotify_get_playlist(ds, p->playlist_id);
         if (prev)
             prev->next = new;
@@ -746,7 +746,8 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
     }
     despotify_free_playlist(metalist);
 
-    root->num_tracks = count;
+    if (root)
+        root->num_tracks = count;
     return root;
 }
 
