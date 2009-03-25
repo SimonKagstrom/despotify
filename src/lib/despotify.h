@@ -14,7 +14,7 @@ struct track
 	unsigned char file_id[41];
 	unsigned char album_id[33];
 	unsigned char artist_id[33];
-	unsigned char cover_id[33];
+	unsigned char cover_id[41];
 	unsigned char *key;
 	char title[STRING_LENGTH];
 	char artist[STRING_LENGTH];
