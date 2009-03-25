@@ -12,8 +12,8 @@
 
 #include "despotify.h"
 #include "ezxml.h"
-#include "playlist.h"
 #include "util.h"
+#include "xml.h"
 
 void xmlstrncpy(char* dest, int len, ezxml_t xml, ...)
 {
@@ -30,23 +30,10 @@ void xmlstrncpy(char* dest, int len, ezxml_t xml, ...)
     }
 }
 
-void xmlstoreid(char* dest, int len, ezxml_t xml, ...)
-{
-    va_list ap;
-    ezxml_t r;
-
-    va_start(ap, xml);
-    r = ezxml_vget(xml, ap);
-    va_end(ap);
-
-    if (r)
-        hex_ascii_to_bytes(r->txt, dest, len);
-}
-
-struct playlist* playlist_parse_playlist(struct playlist* pl,
-                                         unsigned char* xml,
-                                         int len,
-                                         bool list_of_lists)
+struct playlist* xml_parse_playlist(struct playlist* pl,
+                                    unsigned char* xml,
+                                    int len,
+                                    bool list_of_lists)
 {
     ezxml_t top = ezxml_parse_str(xml, len);
     ezxml_t tmpx = ezxml_get(top, "next-change",0, "change", 0, "ops", 0,
@@ -145,9 +132,9 @@ static int parse_tracks(ezxml_t xml, struct track* t)
     return track_count;
 }
  
-bool playlist_parse_searchlist(struct playlist* pl,
-                               unsigned char* xml,
-                               int len )
+bool xml_parse_searchlist(struct playlist* pl,
+                          unsigned char* xml,
+                          int len )
 {
     if (!pl->tracks)
         pl->tracks = calloc(1, sizeof(struct track));
@@ -161,9 +148,9 @@ bool playlist_parse_searchlist(struct playlist* pl,
     return true;
 }
 
-bool playlist_parse_artist(struct artist* a,
-                           unsigned char* xml,
-                           int len )
+bool xml_parse_artist(struct artist* a,
+                      unsigned char* xml,
+                      int len )
 {
     ezxml_t top = ezxml_parse_str(xml, len);
 
@@ -210,37 +197,4 @@ bool playlist_parse_artist(struct artist* a,
     ezxml_free(top);
         
     return true;
-}
-
-
-struct playlist* playlist_new(void)
-{
-    return calloc(1, sizeof(struct playlist));
-}
-
-void playlist_free(struct playlist* pl)
-{
-    void* next_list = pl;
-    for (struct playlist* p = next_list; next_list; p = next_list) {
-        void* next_track = p->tracks;
-        for (struct track* t = next_track; next_track; t = next_track) {
-            if (t->key)
-                free(t->key);
-            next_track = t->next;
-            free(t);
-        }
-
-        next_list = p->next;
-        free(p);
-    }
-}
-
-void playlist_set_name(struct playlist* pl, char* name)
-{
-    strcpy(pl->name, name);
-}
-
-void playlist_set_author(struct playlist* pl, char* author)
-{
-    strcpy(pl->author, author);
 }

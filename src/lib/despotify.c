@@ -16,10 +16,10 @@
 #include "keyexchange.h"
 #include "network.h"
 #include "packet.h"
-#include "playlist.h"
 #include "session.h"
 #include "sndqueue.h"
 #include "util.h"
+#include "xml.h"
 
 #define BUFFER_SIZE (160*1024 * 5 / 8) /* 160 kbit * 5 seconds */
 #define MAX_BROWSE_REQ 244 /* max entries to load in one browse request */
@@ -557,13 +557,13 @@ struct playlist* despotify_search(struct despotify_session* ds,
                                   char* searchtext)
 {
     ds->response = buf_new();
-    ds->playlist = playlist_new();
+    ds->playlist = calloc(1, sizeof(struct playlist));
 
     char buf[80];
     snprintf(buf, sizeof buf, "Search: %s", searchtext);
     buf[(sizeof buf)-1] = 0;
-    playlist_set_name(ds->playlist, buf);
-    playlist_set_author(ds->playlist, ds->session->username);
+    DSFYstrncpy(ds->playlist->name, buf, sizeof ds->playlist->name);
+    DSFYstrncpy(ds->playlist->author, ds->session->username, sizeof ds->playlist->author);
 
     int ret = cmd_search(ds->session, searchtext, 
                          despotify_gzip_callback, ds);
@@ -580,13 +580,13 @@ struct playlist* despotify_search(struct despotify_session* ds,
     /* Add tracks */
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
-        playlist_parse_searchlist(ds->playlist, b->ptr, b->len);
+        xml_parse_searchlist(ds->playlist, b->ptr, b->len);
         buf_free(b);
     }
     buf_free(ds->response);
 
     if (!ds->playlist->num_tracks) {
-        playlist_free(ds->playlist);
+        despotify_free_playlist(ds->playlist);
         ds->last_error = "No tracks found";
         return NULL;
     }
@@ -600,9 +600,21 @@ struct playlist* despotify_search(struct despotify_session* ds,
  *
  */
 
-void despotify_free_playlist(struct playlist* playlist)
+void despotify_free_playlist(struct playlist* pl)
 {
-    playlist_free(playlist);
+    void* next_list = pl;
+    for (struct playlist* p = next_list; next_list; p = next_list) {
+        void* next_track = p->tracks;
+        for (struct track* t = next_track; next_track; t = next_track) {
+            if (t->key)
+                free(t->key);
+            next_track = t->next;
+            free(t);
+        }
+
+        next_list = p->next;
+        free(p);
+    }
 }
 
 static bool despotify_load_tracks(struct despotify_session *ds)
@@ -640,7 +652,7 @@ static bool despotify_load_tracks(struct despotify_session *ds)
         /* Add tracks */
         struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
         if (b) {
-            playlist_parse_searchlist(ds->playlist, b->ptr, b->len);
+            xml_parse_searchlist(ds->playlist, b->ptr, b->len);
             buf_free(b);
         }
 
@@ -655,7 +667,7 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
                                         unsigned char* playlist_id)
 {
     ds->response = buf_new();
-    ds->playlist = playlist_new();
+    ds->playlist = calloc(1, sizeof(struct playlist));
 
     static const char* load_lists = 
         "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n";
@@ -687,10 +699,10 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
     pthread_mutex_unlock(&ds->sync_mutex);
 
     buf_append_u8(ds->response, 0); /* null terminate xml string */
-    ds->playlist = playlist_parse_playlist(ds->playlist,
-                                           ds->response->ptr,
-                                           ds->response->len,
-                                           ds->list_of_lists);
+    ds->playlist = xml_parse_playlist(ds->playlist,
+                                      ds->response->ptr,
+                                      ds->response->len,
+                                      ds->list_of_lists);
     ds->list_of_lists = false;
     buf_free(ds->response);
 
@@ -724,7 +736,7 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
         prev = new;
         count++;
     }
-    playlist_free(metalist);
+    despotify_free_playlist(metalist);
 
     root->num_tracks = count;
     return root;
@@ -762,7 +774,7 @@ struct artist* despotify_get_artist(struct despotify_session* ds,
  
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
-        playlist_parse_artist(ds->artist, b->ptr, b->len);
+        xml_parse_artist(ds->artist, b->ptr, b->len);
         buf_free(b);
     }
     buf_free(ds->response);

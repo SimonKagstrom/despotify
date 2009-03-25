@@ -3,8 +3,58 @@
 
 #include <pthread.h>
 #include <stdbool.h>
-/* This is for track and playlist structs. */
-#include "playlist.h"
+
+#define STRING_LENGTH 256
+
+struct track
+{
+	int id;
+	int has_meta_data;
+	unsigned char track_id[33];
+	unsigned char file_id[41];
+	unsigned char album_id[33];
+	unsigned char artist_id[33];
+	unsigned char cover_id[33];
+	unsigned char *key;
+	char title[STRING_LENGTH];
+	char artist[STRING_LENGTH];
+	char album[STRING_LENGTH];
+	int length;
+	int tracknumber;
+	int year;
+	struct track *next;
+};
+
+struct playlist
+{
+	char name[STRING_LENGTH];
+	char author[STRING_LENGTH];
+	unsigned char playlist_id[35];
+	int num_tracks;
+	struct track *tracks;
+	struct playlist *next;
+};
+
+struct album {
+    char name[STRING_LENGTH];
+    char id[33];
+    int num_tracks;
+    struct track* tracks;
+    int year;
+    char cover_id[41];
+    struct album* next;
+};
+
+struct artist {
+    char name[STRING_LENGTH];
+    char id[33];
+    char* text;
+    char portrait_id[41];
+    char genres[STRING_LENGTH];
+    char years_active[STRING_LENGTH];
+    int num_albums;
+    struct album* albums;
+};
 
 struct despotify_session
 {
