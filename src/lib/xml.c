@@ -120,7 +120,8 @@ static int parse_tracks(ezxml_t xml, struct track* t)
             xmlstrncpy(tid, sizeof tid, track, "id", -1);
             struct track* tt;
             for (tt = root; tt; tt = tt->next)
-                if (!strncmp(tt->track_id, tid, sizeof tt->track_id))
+                if (!tt->has_meta_data &&
+                    !strncmp(tt->track_id, tid, sizeof tt->track_id))
                     break;
             if (!tt) {
                 DSFYDEBUG("!!! error: track id not found: %s\n", tid);

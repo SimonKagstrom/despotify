@@ -666,6 +666,24 @@ static bool despotify_load_tracks(struct despotify_session *ds)
         buf_free(ds->response);
     }
     free(tracklist);
+
+    /* tracks that still lack meta data are likely duplicates */
+    if (track_count < pl->num_tracks) {
+        for (t = pl->tracks; t; t = t->next) {
+            if (!t->has_meta_data) {
+                struct track* tt;
+                for (tt = pl->tracks; tt; tt = tt->next) {
+                    if (tt->has_meta_data &&
+                        !strncmp(tt->track_id, t->track_id, sizeof tt->track_id)) {
+                        memcpy (&t->has_meta_data,
+                                &tt->has_meta_data,
+                                sizeof(struct track) - sizeof t->id - sizeof t->next);
+                        track_count++;
+                    }
+                }
+            }
+        }
+    }
     pl->num_tracks = track_count;
 
     return true;
