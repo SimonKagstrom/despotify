@@ -109,13 +109,30 @@ static int parse_tracks(ezxml_t xml, struct track* t)
 {
     int track_count = 0;
     struct track* prev = NULL;
+    struct track* root = t;
 
     for (ezxml_t track = ezxml_get(xml, "track",-1); track; track = track->next)
     {
-        if (!t) {
-            t = calloc(1, sizeof(struct track));
-            prev->next = t;
+        /* is this an ordered list? in that case we have to find the
+           right track struct for every track id */
+        if (root) {
+            char tid[64];
+            xmlstrncpy(tid, sizeof tid, track, "id", -1);
+            struct track* tt;
+            for (tt = root; tt; tt = tt->next)
+                if (!strncmp(tt->track_id, tid, sizeof tt->track_id))
+                    break;
+            if (!tt) {
+                DSFYDEBUG("!!! error: track id not found: %s\n", tid);
+                continue;
+            }
+            t = tt;
         }
+        else
+            if (!t) {
+                t = calloc(1, sizeof(struct track));
+                prev->next = t;
+            }
 
         xmlstrncpy(t->title, sizeof t->title, track, "title",-1);
         xmlstrncpy(t->album, sizeof t->album, track, "album",-1);
