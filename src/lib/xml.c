@@ -132,20 +132,16 @@ static int parse_tracks(ezxml_t xml, struct track* t)
     return track_count;
 }
  
-bool xml_parse_searchlist(struct playlist* pl,
+int xml_parse_searchlist(struct track* firsttrack,
                           unsigned char* xml,
                           int len )
 {
-    if (!pl->tracks)
-        pl->tracks = calloc(1, sizeof(struct track));
-    struct track* t = pl->tracks;
-
     ezxml_t top = ezxml_parse_str(xml, len);
     ezxml_t tracks = ezxml_get(top, "tracks",-1);
-    pl->num_tracks = parse_tracks(tracks, t);
+    int num_tracks = parse_tracks(tracks, firsttrack);
     ezxml_free(top);
 
-    return true;
+    return num_tracks;
 }
 
 bool xml_parse_artist(struct artist* a,

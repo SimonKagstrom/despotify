@@ -578,9 +578,12 @@ struct playlist* despotify_search(struct despotify_session* ds,
     pthread_mutex_unlock(&ds->sync_mutex);
     
     /* Add tracks */
+    if (!ds->playlist->tracks)
+        ds->playlist->tracks = calloc(1, sizeof(struct track));
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
-        xml_parse_searchlist(ds->playlist, b->ptr, b->len);
+        ds->playlist->num_tracks = xml_parse_searchlist(ds->playlist->tracks,
+                                                        b->ptr, b->len);
         buf_free(b);
     }
     buf_free(ds->response);
@@ -620,17 +623,21 @@ void despotify_free_playlist(struct playlist* pl)
 static bool despotify_load_tracks(struct despotify_session *ds)
 {
     struct playlist* pl = ds->playlist;
+
+    if (!pl->tracks)
+        pl->tracks = calloc(1, sizeof(struct track));
     struct track* t = pl->tracks;
 
     /* construct an array of 16-byte track ids */
     char* tracklist = malloc(MAX_BROWSE_REQ * 16);
+    int track_count = 0;
  
     /* don't request too many tracks at once */
     int count;
     for (int totcount=0; totcount < pl->num_tracks; totcount += count) {
-
         ds->response = buf_new();
  
+        struct track* firsttrack = t;
         for (count = 0; t && count < MAX_BROWSE_REQ; t = t->next, count++)
             hex_ascii_to_bytes(t->track_id, tracklist + count * 16, 16);
  
@@ -649,16 +656,17 @@ static bool despotify_load_tracks(struct despotify_session *ds)
         pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
         pthread_mutex_unlock(&ds->sync_mutex);
  
-        /* Add tracks */
+        /* add tracks to playlist */
         struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
         if (b) {
-            xml_parse_searchlist(ds->playlist, b->ptr, b->len);
+            track_count += xml_parse_searchlist(firsttrack, b->ptr, b->len);
             buf_free(b);
         }
 
         buf_free(ds->response);
     }
     free(tracklist);
+    pl->num_tracks = track_count;
 
     return true;
 }
