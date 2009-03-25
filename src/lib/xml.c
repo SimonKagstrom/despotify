@@ -30,6 +30,20 @@ void xmlstrncpy(char* dest, int len, ezxml_t xml, ...)
     }
 }
 
+void xmlatoi(int* dest, ezxml_t xml, ...)
+{
+    va_list ap;
+    ezxml_t r;
+
+    va_start(ap, xml);
+    r = ezxml_vget(xml, ap);
+    va_end(ap);
+
+    if (r) {
+        *dest = atoi(r->txt);
+    }
+}
+
 struct playlist* xml_parse_playlist(struct playlist* pl,
                                     unsigned char* xml,
                                     int len,
@@ -122,9 +136,9 @@ static int parse_tracks(ezxml_t xml, struct track* t)
             }
         }
 
-        t->year = atoi(ezxml_get(track, "year",-1)->txt);
-        t->length = atoi(ezxml_get(track, "length",-1)->txt);
-        t->tracknumber = atoi(ezxml_get(track, "track-number",-1)->txt);
+        xmlatoi(&t->year, track, "year", -1);
+        xmlatoi(&t->length, track, "length", -1);
+        xmlatoi(&t->tracknumber, track, "track-number", -1);
         t->has_meta_data = true;
 
         prev = t;
@@ -182,18 +196,26 @@ bool xml_parse_artist(struct artist* a,
         xmlstrncpy(album->name, sizeof album->name, xalb, "name", -1);
         xmlstrncpy(album->id, sizeof album->id, xalb, "id", -1);
         xmlstrncpy(album->cover_id, sizeof album->cover_id, xalb, "cover", -1);
-        album->year = atoi(ezxml_get(xalb, "year",-1)->txt);
+        xmlatoi(&album->year, xalb, "year", -1);
 
         /* TODO: support multiple discs per album  */
         album->tracks = calloc(1, sizeof(struct track));
-        ezxml_t disc = ezxml_get(xalb, "discs",0,"disc"-1);
+        ezxml_t disc = ezxml_get(xalb, "discs",0,"disc", -1);
         parse_tracks(disc, album->tracks);
+
+        /* Copy missing metadata from album to tracks */
+        for (struct track *t = album->tracks; t; t = t->next) {
+            DSFYstrncpy(t->album, album->name, sizeof t->album);
+            DSFYstrncpy(t->album_id, album->id, sizeof t->album_id);
+            DSFYstrncpy(t->cover_id, album->cover_id, sizeof t->cover_id);
+            t->year = album->year;
+        }
 
         prev = album;
         album_count++;
     }
     a->num_albums = album_count;
     ezxml_free(top);
-        
+
     return true;
 }
