@@ -65,6 +65,8 @@ struct track *despotify_get_current_track(struct despotify_session *ds);
 struct artist* despotify_get_artist(struct despotify_session* ds,
                                     char* artist_id);
 void despotify_free_artist(struct artist* a);
+void* despotify_get_image(struct despotify_session* ds,
+                          char* image_id, int* len);
 
 /* We need to determine if there is any / enough info to warrant this:
  * user despotify_get_user_info(struct despotify_session *ds); */

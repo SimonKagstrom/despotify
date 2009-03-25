@@ -790,3 +790,31 @@ void despotify_free_artist(struct artist* a)
     }
     free(a);
 }
+
+void* despotify_get_image(struct despotify_session* ds, char* image_id, int* len)
+{
+    ds->response = buf_new();
+
+    unsigned char id[20];
+    hex_ascii_to_bytes(image_id, id, sizeof id);
+    int error = cmd_request_image(ds->session, id,
+                                  despotify_plain_callback, ds);
+    if (error) {
+        DSFYDEBUG("cmd_request_image() failed with %d\n", error);
+        ds->last_error = "Network error.";
+        session_disconnect(ds->session);
+        return false;
+    }
+ 
+    /* wait until image fetch is ready */
+    pthread_mutex_lock(&ds->sync_mutex);
+    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
+    pthread_mutex_unlock(&ds->sync_mutex);
+ 
+    void* image = ds->response->ptr;
+    if (len)
+        *len = ds->response->len;
+    free(ds->response); /* free() instead of buf_free() since ptr must
+                           remain allocated */
+    return image;
+}

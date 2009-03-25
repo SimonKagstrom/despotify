@@ -41,6 +41,7 @@ void print_help(void)
            "artist [num]         Show information about artist for track [num]\n"
            "play [num]           Play track [num] in the last viewed list\n"
            "stop, pause, resume  Control playback\n"
+           "portrait [num]       Save artist portrait to portrait.jpg\n"
            "help                 This text\n"
            "quit                 Quit\n");
 }
@@ -133,6 +134,41 @@ void command_loop(struct despotify_session* ds)
                    a->name, a->genres, a->years_active, a->num_albums);
             for (struct album* al = a->albums; al; al = al->next)
                 printf(" %s (%d)\n", al->name, al->year);
+            despotify_free_artist(a);
+        }
+        
+        /* portrait */
+        else if (!strncmp(buf, "portrait", 8)) {
+            int num = atoi(buf + 9);
+            if (!num) {
+                printf("usage: portrait [num]\n");
+                continue;
+            }
+            if (!lastlist) {
+                printf("No playlist\n");
+                continue;
+            }
+
+            /* find the requested artist */
+            struct track* t = lastlist->tracks;
+            for (int i=1; i<num; i++)
+                t = t->next;
+            struct artist* a = despotify_get_artist(ds, t->artist_id);
+            if (a && a->portrait_id[0]) {
+                int len;
+                void* portrait = despotify_get_image(ds, a->portrait_id, &len);
+                if (portrait && len) {
+                    printf("Writing %d bytes into portrait.jpg\n", len);
+                    FILE* f = fopen("portrait.jpg", "w");
+                    if (f) {
+                        fwrite(portrait, len, 1, f);
+                        fclose(f);
+                    }
+                    free(portrait);
+                }
+            }
+            else
+                printf("Artist %s has no portrait.\n", a->name);
             despotify_free_artist(a);
         }
         
