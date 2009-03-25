@@ -86,8 +86,7 @@ install: libdespotify.la
 	$(LT) --mode=install install -D libdespotify.la $(INSTALL_PREFIX)/lib/libdespotify.la
 	ldconfig -n $(INSTALL_PREFIX)/lib
 	
-	install -d $(INSTALL_PREFIX)/include/despotify 
-	install playlist.h despotify.h $(INSTALL_PREFIX)/include/despotify
+	install despotify.h $(INSTALL_PREFIX)/include/
 	
 	install -D despotify.pc $(INSTALL_PREFIX)/lib/pkgconfig/despotify.pc
 

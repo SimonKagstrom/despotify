@@ -1,7 +1,7 @@
 prefix=${pcfiledir}/../..
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
-includedir=${prefix}/include/despotify
+includedir=${prefix}/include
 
 Name: libdespotify
 Description: Spotify client library
