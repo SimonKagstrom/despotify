@@ -38,8 +38,8 @@ int gw_search (SPOTIFYSESSION * s, char *searchtext)
 	s->output = dctx;
 	s->output_len = 0;
 
-	return cmd_search (s->session, searchtext, gw_search_result_callback,
-			   (void *) s);
+	return cmd_search (s->session, searchtext, 0, 100,
+			   gw_search_result_callback, (void *) s);
 }
 
 static int gw_search_result_callback (CHANNEL * ch, unsigned char *buf,

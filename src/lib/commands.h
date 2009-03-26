@@ -55,7 +55,8 @@ int cmd_send_cache_hash (SESSION *);
 int cmd_token_notify (SESSION *);
 int cmd_aeskey (SESSION *, unsigned char *, unsigned char *, channel_callback,
 		void *);
-int cmd_search (SESSION *, char *, channel_callback, void *);
+int cmd_search (SESSION *, char *, unsigned int, unsigned int, channel_callback,
+		void *);
 int cmd_requestad (SESSION *, unsigned char);
 int cmd_request_image (SESSION *, unsigned char *, channel_callback, void *);
 int cmd_action (SESSION *, unsigned char *, unsigned char *);

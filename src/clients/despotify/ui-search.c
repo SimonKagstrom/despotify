@@ -45,7 +45,8 @@ int gui_search (SESSION * ctx, WINDOW * w, char *searchtext)
 
 	mvwprintw (w, 1, 1, " ");
 
-	return cmd_search (ctx, searchtext, gui_search_result_callback, r);
+	return cmd_search (ctx, searchtext, 0, 100,
+			   gui_search_result_callback, r);
 }
 
 static int gui_search_result_callback (CHANNEL * ch, unsigned char *buf,

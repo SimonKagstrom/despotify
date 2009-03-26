@@ -126,13 +126,15 @@ int cmd_request_image (SESSION * session, unsigned char *hash,
  * The response comes as compressed XML
  *
  */
-int cmd_search (SESSION * session, char *searchtext,
-		channel_callback callback, void *private)
+int cmd_search (SESSION * session, char *searchtext, unsigned int offset,
+		unsigned int limit, channel_callback callback, void *private)
 {
 	CHANNEL *ch;
 	int ret;
 	char buf[100];
 	unsigned char searchtext_length;
+
+	assert (limit);
 
 	struct buf* b = buf_new();
 
@@ -143,8 +145,8 @@ int cmd_search (SESSION * session, char *searchtext,
 		   ch->channel_id, searchtext);
 
 	buf_append_u16(b, ch->channel_id);
-	buf_append_u32(b, 0);
-        buf_append_u32(b, 0xffffffff);
+	buf_append_u32(b, offset);
+	buf_append_u32(b, limit);
 	buf_append_u16(b, 0);
 
 	searchtext_length = (unsigned char) strlen (searchtext);
