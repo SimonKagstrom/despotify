@@ -583,7 +583,7 @@ struct playlist* despotify_search(struct despotify_session* ds,
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
         ds->playlist->num_tracks = xml_parse_searchlist(ds->playlist->tracks,
-                                                        b->ptr, b->len);
+                                                        b->ptr, b->len, false);
         buf_free(b);
     }
     buf_free(ds->response);
@@ -659,7 +659,7 @@ static bool despotify_load_tracks(struct despotify_session *ds)
         /* add tracks to playlist */
         struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
         if (b) {
-            track_count += xml_parse_searchlist(firsttrack, b->ptr, b->len);
+            track_count += xml_parse_searchlist(firsttrack, b->ptr, b->len, true);
             buf_free(b);
         }
 

@@ -105,7 +105,7 @@ struct playlist* xml_parse_playlist(struct playlist* pl,
     return pl;
 }
 
-static int parse_tracks(ezxml_t xml, struct track* t)
+static int parse_tracks(ezxml_t xml, struct track* t, bool ordered)
 {
     int track_count = 0;
     struct track* prev = NULL;
@@ -115,7 +115,7 @@ static int parse_tracks(ezxml_t xml, struct track* t)
     {
         /* is this an ordered list? in that case we have to find the
            right track struct for every track id */
-        if (root) {
+        if (ordered) {
             char tid[64];
             xmlstrncpy(tid, sizeof tid, track, "id", -1);
             struct track* tt;
@@ -167,12 +167,13 @@ static int parse_tracks(ezxml_t xml, struct track* t)
 }
  
 int xml_parse_searchlist(struct track* firsttrack,
-                          unsigned char* xml,
-                          int len )
+                         unsigned char* xml,
+                         int len,
+                         bool ordered)
 {
     ezxml_t top = ezxml_parse_str(xml, len);
     ezxml_t tracks = ezxml_get(top, "tracks",-1);
-    int num_tracks = parse_tracks(tracks, firsttrack);
+    int num_tracks = parse_tracks(tracks, firsttrack, ordered);
     ezxml_free(top);
 
     return num_tracks;
@@ -218,7 +219,7 @@ bool xml_parse_artist(struct artist* a,
         /* TODO: support multiple discs per album  */
         album->tracks = calloc(1, sizeof(struct track));
         ezxml_t disc = ezxml_get(xalb, "discs",0,"disc", -1);
-        parse_tracks(disc, album->tracks);
+        parse_tracks(disc, album->tracks, false);
 
         /* Copy missing metadata from album to tracks */
         for (struct track *t = album->tracks; t; t = t->next) {

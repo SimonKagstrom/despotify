@@ -15,7 +15,8 @@ struct playlist* xml_parse_playlist(struct playlist* pl,
 
 int xml_parse_searchlist(struct track* firsttrack,
                          unsigned char* xml,
-                         int len );
+                         int len,
+                         bool ordered);
 
 bool xml_parse_artist(struct artist* a,
                       unsigned char* xml,
