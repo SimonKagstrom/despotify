@@ -44,6 +44,20 @@ void xmlatoi(int* dest, ezxml_t xml, ...)
     }
 }
 
+void xmlatof(float* dest, ezxml_t xml, ...)
+{
+    va_list ap;
+    ezxml_t r;
+
+    va_start(ap, xml);
+    r = ezxml_vget(xml, ap);
+    va_end(ap);
+
+    if (r) {
+        *dest = (float)atof(r->txt);
+    }
+}
+
 struct playlist* xml_parse_playlist(struct playlist* pl,
                                     unsigned char* xml,
                                     int len,
@@ -183,6 +197,7 @@ static int parse_tracks(ezxml_t xml, struct track* t, bool ordered)
         xmlatoi(&t->year, track, "year", -1);
         xmlatoi(&t->length, track, "length", -1);
         xmlatoi(&t->tracknumber, track, "track-number", -1);
+        xmlatof(&t->popularity, track, "popularity", -1);
         t->has_meta_data = true;
 
         prev = t;
@@ -214,6 +229,7 @@ static void parse_album(ezxml_t top, struct album* a)
     xmlstrncpy(a->id, sizeof a->id, top, "id", -1);
     xmlstrncpy(a->cover_id, sizeof a->cover_id, top, "cover", -1);
     xmlatoi(&a->year, top, "year", -1);
+    xmlatof(&a->popularity, top, "popularity", -1);
 
     /* TODO: support multiple discs per album  */
     a->tracks = calloc(1, sizeof(struct track));
@@ -257,6 +273,7 @@ bool xml_parse_artist(struct artist* a,
     xmlstrncpy(a->id, sizeof a->id, top, "id", -1);
     xmlstrncpy(a->portrait_id, sizeof a->portrait_id, top,
                "portrait", 0, "id", -1);
+    xmlatof(&a->popularity, top, "popularity", -1);
 
     ezxml_t x = ezxml_get(top, "bios",0,"bio",0,"text",-1);
     if (x) {

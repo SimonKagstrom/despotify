@@ -22,6 +22,7 @@ struct track
     int length;
     int tracknumber;
     int year;
+    float popularity;
     struct track *next; /* in case of multiple tracks
                            in an album or playlist struct */
 };
@@ -43,6 +44,7 @@ struct album {
     struct track* tracks;
     int year;
     char cover_id[41];
+    float popularity;
     struct album* next; /* in case of multiple albums in an artist struct */
 };
 
@@ -53,6 +55,7 @@ struct artist {
     char portrait_id[41];
     char genres[STRING_LENGTH];
     char years_active[STRING_LENGTH];
+    float popularity;
     int num_albums;
     struct album* albums;
     struct artist* next; /* in case of multiple artists in a track struct */
