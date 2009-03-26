@@ -134,8 +134,7 @@ void command_loop(struct despotify_session* ds)
             for (int i=1; i<num; i++)
                 t = t->next;
 
-            struct artist* aptr = t->artist;
-            do {
+            for (struct artist* aptr = t->artist; aptr; aptr = aptr->next) {
                 struct artist* a = despotify_get_artist(ds, aptr->id);
                 printf("\nName: %s\n"
                        "Genres: %s\n"
@@ -145,8 +144,7 @@ void command_loop(struct despotify_session* ds)
                 for (struct album* al = a->albums; al; al = al->next)
                     printf(" %s (%d)\n", al->name, al->year);
                 despotify_free_artist(a);
-                aptr = aptr->next;
-            } while (aptr);
+            }
         }
         
         /* portrait */
