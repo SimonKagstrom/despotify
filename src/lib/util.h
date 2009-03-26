@@ -11,7 +11,7 @@
 #include <unistd.h>
 
 #ifdef DEBUG
-#define DSFYDEBUG(...) { FILE *fd = fopen("/tmp/gui.log","at"); fprintf(fd, "%ld %lx %s:%d %s() ", times(NULL), pthread_self(), __FILE__, __LINE__, __func__); fprintf(fd, __VA_ARGS__); fclose(fd); }
+#define DSFYDEBUG(...) { FILE *fd = fopen("/tmp/gui.log","at"); fprintf(fd, "%s:%d %s() ", __FILE__, __LINE__, __func__); fprintf(fd, __VA_ARGS__); fclose(fd); }
 #else
 #define DSFYDEBUG(...)
 #endif
