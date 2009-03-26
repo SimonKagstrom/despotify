@@ -152,7 +152,7 @@ static int parse_tracks(ezxml_t xml, struct track* t, bool ordered)
             if (!tt) {
                 char rid[33];
                 for (ezxml_t re = ezxml_child(track, "redirect"); re; re = re->next) {
-                    xmlstrncpy(rid, sizeof rid, re, "", -1);
+                    strncpy(rid, re->txt, sizeof rid);
                     for (tt = root; tt; tt = tt->next) {
                         /* update to new id */
                         if (!tt->has_meta_data &&
