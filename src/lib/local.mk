@@ -6,6 +6,7 @@ LIB_OBJS = aes.lo audio.lo auth.lo buf.lo channel.lo commands.lo dns.lo ezxml.lo
 
 CFLAGS += -Igstapp/
 LDFLAGS += -rpath /usr/lib
+LDCONFIG = ldconfig
 
 .PHONY: all clean install uninstall
 
@@ -15,6 +16,7 @@ all: libdespotify.la
 ifeq ($(shell uname -s),Darwin)
     LIB_OBJS += coreaudio.lo
     LDFLAGS += -lresolv -framework CoreAudio
+    LDCONFIG = true
 endif
 
 # Windows specifics
@@ -83,12 +85,13 @@ clean:
 	$(LT) --mode=clean rm -f $(LIB_OBJS) Makefile.dep
 
 install: libdespotify.la
-	$(LT) --mode=install install -D libdespotify.la $(INSTALL_PREFIX)/lib/libdespotify.la
-	ldconfig -n $(INSTALL_PREFIX)/lib
+	install -d $(INSTALL_PREFIX)/lib/pkgconfig
+	 
+	$(LT) --mode=install install libdespotify.la $(INSTALL_PREFIX)/lib/libdespotify.la
+	$(LDCONFIG) -n $(INSTALL_PREFIX)/lib
 	
 	install despotify.h $(INSTALL_PREFIX)/include/
-	
-	install -D despotify.pc $(INSTALL_PREFIX)/lib/pkgconfig/despotify.pc
+	install despotify.pc $(INSTALL_PREFIX)/lib/pkgconfig/despotify.pc
 
 uninstall:
 	$(LT) --mode=uninstall rm -f $(INSTALL_PREFIX)/lib/libdespotify.la
