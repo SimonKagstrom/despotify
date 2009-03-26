@@ -659,25 +659,16 @@ static bool despotify_load_tracks(struct despotify_session *ds)
                 for (tt = pl->tracks; tt; tt = tt->next) {
                     if (tt->has_meta_data &&
                         !strncmp(tt->track_id, t->track_id, sizeof tt->track_id)) {
-                        memcpy(&t->playable, &tt->playable, sizeof t->playable);
-                        memcpy(t->track_id, tt->track_id, sizeof t->track_id);
-                        memcpy(t->file_id, tt->file_id, sizeof t->file_id);
-                        memcpy(t->album_id, tt->album_id, sizeof t->album_id);
-                        memcpy(t->cover_id, tt->cover_id, sizeof t->cover_id);
-                        memcpy(t->title, tt->title, sizeof t->title);
-                        memcpy(t->album, tt->album, sizeof t->album);
-                        memcpy(&t->length, &tt->length, sizeof t->length);
-                        memcpy(&t->tracknumber, &tt->tracknumber, sizeof t->tracknumber);
-                        memcpy(&t->year, &tt->year, sizeof t->year);
-                        memcpy(&t->popularity, &tt->popularity, sizeof t->popularity);
+                        struct track* next = t->next;
+                        *t = *tt;
+                        t->next = next;
 
                         /* deep copy of artist list */
                         struct artist* a = calloc(1, sizeof(struct artist));
                         t->artist = a;
                         struct artist* ta;
                         for (ta = tt->artist; ta; ta = ta->next) {
-                            memcpy(a->id, ta->id, sizeof a->id);
-                            memcpy(a->name, ta->name, sizeof a->name);
+                            *a = *ta;
                             if (ta->next)
                                 a = a->next = calloc(1, sizeof(struct artist));
                         }
