@@ -137,12 +137,29 @@ static int parse_tracks(ezxml_t xml, struct track* t, bool ordered)
 
         xmlstrncpy(t->title, sizeof t->title, track, "title",-1);
         xmlstrncpy(t->album, sizeof t->album, track, "album",-1);
-        xmlstrncpy(t->artist, sizeof t->artist, track, "artist",-1);
 
         xmlstrncpy(t->track_id, sizeof t->track_id, track, "id", -1);
         xmlstrncpy(t->cover_id, sizeof t->cover_id, track, "cover", -1);
         xmlstrncpy(t->album_id, sizeof t->album_id, track, "album-id", -1);
-        xmlstrncpy(t->artist_id, sizeof t->artist_id, track, "artist-id", -1);
+
+        /* create list of artists */
+        struct artist* preva = NULL;
+        struct artist* artist = calloc(1, sizeof(struct artist));
+        t->artist = artist;
+        ezxml_t xid = ezxml_get(track, "artist-id", -1);
+        for (ezxml_t xa = ezxml_get(track, "artist", -1); xa; xa = xa->next) {
+            if (preva) {
+                artist = calloc(1, sizeof(struct artist));
+                preva->next = artist;
+            }
+            DSFYstrncpy(artist->name, xa->txt, sizeof artist->name);
+
+            if (xid) {
+                DSFYstrncpy(artist->id, xid->txt, sizeof artist->id);
+                xid = xid->next;
+            }
+            preva = artist;
+        }
 
         ezxml_t file = ezxml_get(track, "files",0, "file",-1);
         if (file) {

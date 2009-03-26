@@ -299,8 +299,7 @@ static int despotify_snd_data_callback(void* arg)
                           200 * 1000, /* unknown, static value */
                           despotify_substream_callback, ds))
     {
-        DSFYDEBUG("cmd_getsubstreams() failed for %s - %s\n",
-                  ds->track->title, ds->track->artist);
+        DSFYDEBUG("cmd_getsubstreams() failed for %s\n", ds->track->title);
         return -1;
     }
 
@@ -380,7 +379,7 @@ bool despotify_play(struct despotify_session* ds,
 
     int error = cmd_aeskey(ds->session, fid, tid, despotify_aes_callback, ds);
     if (error) {
-        DSFYDEBUG("cmd_aeskey() failed for %s - %s\n", t->title, t->artist);
+        DSFYDEBUG("cmd_aeskey() failed for %s\n", t->title);
         return false;
     }
 
@@ -611,6 +610,13 @@ void despotify_free_playlist(struct playlist* pl)
         for (struct track* t = next_track; next_track; t = next_track) {
             if (t->key)
                 free(t->key);
+
+            void* next_artist = t->artist;
+            for (struct artist* a = next_artist; next_artist; a = next_artist) {
+                next_artist = a->next;
+                free(a);
+            }
+
             next_track = t->next;
             free(t);
         }
@@ -809,25 +815,29 @@ struct artist* despotify_get_artist(struct despotify_session* ds,
     return ds->artist;
 }
 
-void despotify_free_artist(struct artist* a)
+void despotify_free_artist(struct artist* artist)
 {
-    if (a->text)
-        free(a->text);
+    struct artist* next_artist = artist;
+    for (struct artist* a = next_artist; next_artist; a = next_artist) {
+        if (a->text)
+            free(a->text);
     
-    void* next_album = a->albums;
-    for (struct album* al = next_album; next_album; al = next_album) {
-        void* next_track = al->tracks;
-        for (struct track* t = next_track; next_track; t = next_track) {
-            if (t->key)
-                free(t->key);
-            next_track = t->next;
-            free(t);
-        }
+        void* next_album = a->albums;
+        for (struct album* al = next_album; next_album; al = next_album) {
+            void* next_track = al->tracks;
+            for (struct track* t = next_track; next_track; t = next_track) {
+                if (t->key)
+                    free(t->key);
+                next_track = t->next;
+                free(t);
+            }
 
-        next_album = al->next;
-        free(al);
+            next_album = al->next;
+            free(al);
+        }
+        next_artist = a->next;
+        free(a);
     }
-    free(a);
 }
 
 void* despotify_get_image(struct despotify_session* ds, char* image_id, int* len)

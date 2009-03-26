@@ -29,10 +29,13 @@ void print_playlist(struct playlist* pl)
 {
     int count = 1;
     for (struct track* t = pl->tracks; t; t = t->next) {
-        if (t->has_meta_data)
-            printf("%3d: %-40s %2d:%02d %-20s %s\n", count++, t->title,
-                   t->length / 60000, t->length % 60000 / 1000, t->artist,
-                   (t->playable ? "" : "(Unplayable)"));
+        if (t->has_meta_data) {
+            printf("%3d: %-40s %2d:%02d ", count++, t->title,
+                   t->length / 60000, t->length % 60000 / 1000);
+            for (struct artist* a = t->artist; a; a = a->next)
+                printf("%s%s", a->name, a->next ? ", " : "");
+            printf(" %s\n", (t->playable ? "" : "(Unplayable)"));
+        }
         else
             printf("%3d: N/A\n", count++);
     }
@@ -126,20 +129,24 @@ void command_loop(struct despotify_session* ds)
                 continue;
             }
 
-            /* find the requested artist */
+            /* find the requested track */
             struct track* t = lastlist->tracks;
             for (int i=1; i<num; i++)
                 t = t->next;
 
-            struct artist* a = despotify_get_artist(ds, t->artist_id);
-            printf("Name: %s\n"
-                   "Genres: %s\n"
-                   "Years active: %s\n"
-                   "%d albums:\n",                   
-                   a->name, a->genres, a->years_active, a->num_albums);
-            for (struct album* al = a->albums; al; al = al->next)
-                printf(" %s (%d)\n", al->name, al->year);
-            despotify_free_artist(a);
+            struct artist* aptr = t->artist;
+            do {
+                struct artist* a = despotify_get_artist(ds, aptr->id);
+                printf("\nName: %s\n"
+                       "Genres: %s\n"
+                       "Years active: %s\n"
+                       "%d albums:\n",                   
+                       a->name, a->genres, a->years_active, a->num_albums);
+                for (struct album* al = a->albums; al; al = al->next)
+                    printf(" %s (%d)\n", al->name, al->year);
+                despotify_free_artist(a);
+                aptr = aptr->next;
+            } while (aptr);
         }
         
         /* portrait */
@@ -158,7 +165,7 @@ void command_loop(struct despotify_session* ds)
             struct track* t = lastlist->tracks;
             for (int i=1; i<num; i++)
                 t = t->next;
-            struct artist* a = despotify_get_artist(ds, t->artist_id);
+            struct artist* a = despotify_get_artist(ds, t->artist->id);
             if (a && a->portrait_id[0]) {
                 int len;
                 void* portrait = despotify_get_image(ds, a->portrait_id, &len);
