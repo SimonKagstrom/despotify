@@ -589,7 +589,7 @@ struct playlist* despotify_search(struct despotify_session* ds,
     buf_free(ds->response);
 
     if (!ds->playlist->num_tracks) {
-        despotify_free_playlist(ds->playlist);
+        xml_free_playlist(ds->playlist);
         ds->last_error = "No tracks found";
         return NULL;
     }
@@ -602,30 +602,6 @@ struct playlist* despotify_search(struct despotify_session* ds,
  *  Playlists
  *
  */
-
-void despotify_free_playlist(struct playlist* pl)
-{
-    void* next_list = pl;
-    for (struct playlist* p = next_list; next_list; p = next_list) {
-        void* next_track = p->tracks;
-        for (struct track* t = next_track; next_track; t = next_track) {
-            if (t->key)
-                free(t->key);
-
-            void* next_artist = t->artist;
-            for (struct artist* a = next_artist; next_artist; a = next_artist) {
-                next_artist = a->next;
-                free(a);
-            }
-
-            next_track = t->next;
-            free(t);
-        }
-
-        next_list = p->next;
-        free(p);
-    }
-}
 
 static bool despotify_load_tracks(struct despotify_session *ds)
 {
@@ -751,6 +727,12 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
     return ds->playlist;
 }
 
+void despotify_free_playlist(struct playlist* p)
+{
+    xml_free_playlist(p);
+}
+
+
 struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
 {
     /* load list of lists */
@@ -769,7 +751,7 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
         prev = new;
         count++;
     }
-    despotify_free_playlist(metalist);
+    xml_free_playlist(metalist);
 
     if (root)
         root->num_tracks = count;
@@ -816,29 +798,9 @@ struct artist* despotify_get_artist(struct despotify_session* ds,
     return ds->artist;
 }
 
-void despotify_free_artist(struct artist* artist)
+void despotify_free_artist(struct artist* a)
 {
-    struct artist* next_artist = artist;
-    for (struct artist* a = next_artist; next_artist; a = next_artist) {
-        if (a->text)
-            free(a->text);
-    
-        void* next_album = a->albums;
-        for (struct album* al = next_album; next_album; al = next_album) {
-            void* next_track = al->tracks;
-            for (struct track* t = next_track; next_track; t = next_track) {
-                if (t->key)
-                    free(t->key);
-                next_track = t->next;
-                free(t);
-            }
-
-            next_album = al->next;
-            free(al);
-        }
-        next_artist = a->next;
-        free(a);
-    }
+    xml_free_artist(a);
 }
 
 void* despotify_get_image(struct despotify_session* ds, char* image_id, int* len)
@@ -867,4 +829,42 @@ void* despotify_get_image(struct despotify_session* ds, char* image_id, int* len
     free(ds->response); /* free() instead of buf_free() since ptr must
                            remain allocated */
     return image;
+}
+
+struct album* despotify_get_album(struct despotify_session* ds,
+                                  char* album_id)
+{
+    ds->response = buf_new();
+    ds->album = calloc(1, sizeof(struct artist));
+
+    unsigned char id[16];
+    hex_ascii_to_bytes(album_id, id, sizeof id);
+    int error = cmd_browse(ds->session, BROWSE_ALBUM, id, 1, 
+                           despotify_gzip_callback, ds);
+ 
+    if (error) {
+        DSFYDEBUG("cmd_browse() failed with %d\n", error);
+        ds->last_error = "Network error.";
+        session_disconnect(ds->session);
+        return false;
+    }
+ 
+    /* wait until track fetch is ready */
+    pthread_mutex_lock(&ds->sync_mutex);
+    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
+    pthread_mutex_unlock(&ds->sync_mutex);
+ 
+    struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
+    if (b) {
+        xml_parse_album(ds->album, b->ptr, b->len);
+        buf_free(b);
+    }
+    buf_free(ds->response);
+
+    return ds->album;
+}
+
+void despotify_free_album(struct album* a)
+{
+    xml_free_album(a);
 }

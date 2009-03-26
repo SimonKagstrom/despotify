@@ -25,10 +25,10 @@ void print_list_of_lists(struct playlist* rootlist)
 }
 
 
-void print_playlist(struct playlist* pl)
+void print_tracks(struct track* head)
 {
     int count = 1;
-    for (struct track* t = pl->tracks; t; t = t->next) {
+    for (struct track* t = head; t; t = t->next) {
         if (t->has_meta_data) {
             printf("%3d: %-40s %2d:%02d ", count++, t->title,
                    t->length / 60000, t->length % 60000 / 1000);
@@ -47,6 +47,7 @@ void print_help(void)
            "list [num]           List stored playlists\n"
            "search [string]      Search tracks\n"
            "artist [num]         Show information about artist for track [num]\n"
+           "album [num]          List album for track [num]\n"
            "play [num]           Play track [num] in the last viewed list\n"
            "stop, pause, resume  Control playback\n"
            "portrait [num]       Save artist portrait to portrait.jpg\n"
@@ -85,7 +86,7 @@ void command_loop(struct despotify_session* ds)
                     p = p->next;
 
                 if (p) {
-                    print_playlist(p);
+                    print_tracks(p->tracks);
                     lastlist = p;
                 }
                 else
@@ -112,7 +113,7 @@ void command_loop(struct despotify_session* ds)
                 }
             }
             if (searchlist) {
-                print_playlist(searchlist);
+                print_tracks(searchlist->tracks);
                 lastlist = searchlist;
             }
         }
@@ -121,7 +122,7 @@ void command_loop(struct despotify_session* ds)
         else if (!strncmp(buf, "artist", 6)) {
             int num = atoi(buf + 7);
             if (!num) {
-                printf("usage: list [num]\n");
+                printf("usage: artist [num]\n");
                 continue;
             }
             if (!lastlist) {
@@ -146,7 +147,38 @@ void command_loop(struct despotify_session* ds)
                 despotify_free_artist(a);
             }
         }
-        
+
+        /* album */
+        else if (!strncmp(buf, "album", 5)) {
+            int num = atoi(buf + 6);
+            if (!num) {
+                printf("usage: album [num]\n");
+                continue;
+            }
+            if (!lastlist) {
+                printf("No playlist\n");
+                continue;
+            }
+
+            /* find the requested track */
+            struct track* t = lastlist->tracks;
+            for (int i=1; i<num; i++)
+                t = t->next;
+
+            if (t) {
+                struct album* a = despotify_get_album(ds, t->album_id);
+                if (a) {
+                    printf("\nName: %s\n"
+                           "Year: %d\n",
+                           a->name, a->year);
+                    print_tracks(a->tracks);
+                    despotify_free_album(a);
+                }
+                else
+                    printf("Got no album for id %s\n", t->album_id);
+            }
+        }
+
         /* portrait */
         else if (!strncmp(buf, "portrait", 8)) {
             int num = atoi(buf + 9);

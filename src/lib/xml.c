@@ -105,6 +105,16 @@ struct playlist* xml_parse_playlist(struct playlist* pl,
     return pl;
 }
 
+void xml_free_playlist(struct playlist* pl)
+{
+    void* next_list = pl;
+    for (struct playlist* p = next_list; next_list; p = next_list) {
+        xml_free_track(p->tracks);
+        next_list = p->next;
+        free(p);
+    }
+}
+
 static int parse_tracks(ezxml_t xml, struct track* t, bool ordered)
 {
     int track_count = 0;
@@ -182,7 +192,46 @@ static int parse_tracks(ezxml_t xml, struct track* t, bool ordered)
 
     return track_count;
 }
+
+void xml_free_track(struct track* head)
+{
+    void* next_track = head;
+    for (struct track* t = next_track; next_track; t = next_track) {
+        if (t->key)
+            free(t->key);
+
+        xml_free_artist(t->artist);
+
+        next_track = t->next;
+        free(t);
+    }
+}
+
  
+static void parse_album(ezxml_t top, struct album* a)
+{
+    xmlstrncpy(a->name, sizeof a->name, top, "name", -1);
+    xmlstrncpy(a->id, sizeof a->id, top, "id", -1);
+    xmlstrncpy(a->cover_id, sizeof a->cover_id, top, "cover", -1);
+    xmlatoi(&a->year, top, "year", -1);
+
+    /* TODO: support multiple discs per album  */
+    a->tracks = calloc(1, sizeof(struct track));
+    ezxml_t disc = ezxml_get(top, "discs",0,"disc", -1);
+    a->num_tracks = parse_tracks(disc, a->tracks, false);
+
+    /* Copy missing metadata from album to tracks */
+    int count = 0;
+    for (struct track *t = a->tracks; t; t = t->next) {
+        DSFYstrncpy(t->album, a->name, sizeof t->album);
+        DSFYstrncpy(t->album_id, a->id, sizeof t->album_id);
+        DSFYstrncpy(t->cover_id, a->cover_id, sizeof t->cover_id);
+        t->year = a->year;
+        count++;
+    }
+}
+
+
 int xml_parse_searchlist(struct track* firsttrack,
                          unsigned char* xml,
                          int len,
@@ -228,23 +277,7 @@ bool xml_parse_artist(struct artist* a,
             prev->next = album;
         }
 
-        xmlstrncpy(album->name, sizeof album->name, xalb, "name", -1);
-        xmlstrncpy(album->id, sizeof album->id, xalb, "id", -1);
-        xmlstrncpy(album->cover_id, sizeof album->cover_id, xalb, "cover", -1);
-        xmlatoi(&album->year, xalb, "year", -1);
-
-        /* TODO: support multiple discs per album  */
-        album->tracks = calloc(1, sizeof(struct track));
-        ezxml_t disc = ezxml_get(xalb, "discs",0,"disc", -1);
-        parse_tracks(disc, album->tracks, false);
-
-        /* Copy missing metadata from album to tracks */
-        for (struct track *t = album->tracks; t; t = t->next) {
-            DSFYstrncpy(t->album, album->name, sizeof t->album);
-            DSFYstrncpy(t->album_id, album->id, sizeof t->album_id);
-            DSFYstrncpy(t->cover_id, album->cover_id, sizeof t->cover_id);
-            t->year = album->year;
-        }
+        parse_album(xalb, album);
 
         prev = album;
         album_count++;
@@ -253,4 +286,37 @@ bool xml_parse_artist(struct artist* a,
     ezxml_free(top);
 
     return true;
+}
+
+void xml_free_artist(struct artist* artist)
+{
+    struct artist* next_artist = artist;
+    for (struct artist* a = next_artist; next_artist; a = next_artist) {
+        if (a->text)
+            free(a->text);
+    
+        xml_free_album(a->albums);
+
+        next_artist = a->next;
+        free(a);
+    }
+}
+
+bool xml_parse_album(struct album* a, unsigned char* xml, int len )
+{
+    ezxml_t top = ezxml_parse_str(xml, len);
+    parse_album(top, a);
+    ezxml_free(top);
+
+    return true;
+}
+
+void xml_free_album(struct album* album)
+{
+    struct album* next_album = album;
+    for (struct album* a = next_album; next_album; a = next_album) {
+        xml_free_track(a->tracks);
+        next_album = a->next;
+        free(a);
+    }
 }

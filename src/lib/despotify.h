@@ -22,7 +22,8 @@ struct track
     int length;
     int tracknumber;
     int year;
-    struct track *next;
+    struct track *next; /* in case of multiple tracks
+                           in an album or playlist struct */
 };
 
 struct playlist
@@ -32,7 +33,7 @@ struct playlist
     unsigned char playlist_id[35];
     int num_tracks;
     struct track *tracks;
-    struct playlist *next;
+    struct playlist *next; /* in case of multiple playlists in the root list */
 };
 
 struct album {
@@ -42,7 +43,7 @@ struct album {
     struct track* tracks;
     int year;
     char cover_id[41];
-    struct album* next;
+    struct album* next; /* in case of multiple albums in an artist struct */
 };
 
 struct artist {
@@ -54,7 +55,7 @@ struct artist {
     char years_active[STRING_LENGTH];
     int num_albums;
     struct album* albums;
-    struct artist* next; /* in case of multiple artists on a track */
+    struct artist* next; /* in case of multiple artists in a track struct */
 };
 
 struct despotify_session
@@ -115,7 +116,10 @@ const char *despotify_get_error(struct despotify_session *ds);
 struct track *despotify_get_current_track(struct despotify_session *ds);
 struct artist* despotify_get_artist(struct despotify_session* ds,
                                     char* artist_id);
+struct album* despotify_get_album(struct despotify_session* ds,
+                                  char* album_id);
 void despotify_free_artist(struct artist* a);
+void despotify_free_album(struct album* a);
 void* despotify_get_image(struct despotify_session* ds,
                           char* image_id, int* len);
 
@@ -127,24 +131,6 @@ struct playlist* despotify_search(struct despotify_session *ds,
                                   char *searchtext);
 
 struct playlist* despotify_get_stored_playlists(struct despotify_session *ds);
-bool despotify_append_song(struct despotify_session *ds, 
-                           struct playlist *playlist, 
-                           struct track *song);
-
-bool despotify_remove_song(struct despotify_session *ds, 
-                           struct playlist *playlist, 
-                           struct track *song);
-
-bool despotify_delete_playlist(struct despotify_session *ds,
-                               struct playlist *playlist);
-
-struct playlist * despotify_create_playlist(struct despotify_session *ds,
-                          const char *name);
-
-bool despotify_rename_playlist(struct despotify_session *ds,
-                               struct playlist *playlist, 
-                               const char *new_name);
-
 void despotify_free_playlist(struct playlist* playlist);
 
 /* Playback control. */
