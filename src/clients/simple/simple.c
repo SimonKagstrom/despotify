@@ -27,6 +27,11 @@ void print_list_of_lists(struct playlist* rootlist)
 
 void print_tracks(struct track* head)
 {
+    if (!head) {
+        printf(" <empty playlist>\n");
+        return;
+    }
+
     int count = 1;
     for (struct track* t = head; t; t = t->next) {
         if (t->has_meta_data) {

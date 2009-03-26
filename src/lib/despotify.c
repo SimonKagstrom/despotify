@@ -607,8 +607,9 @@ static bool despotify_load_tracks(struct despotify_session *ds)
 {
     struct playlist* pl = ds->playlist;
 
-    if (!pl->tracks)
-        pl->tracks = calloc(1, sizeof(struct track));
+    if (!pl->num_tracks)
+        return true;
+
     struct track* t = pl->tracks;
 
     /* construct an array of 16-byte track ids */
