@@ -140,16 +140,35 @@ static int parse_tracks(ezxml_t xml, struct track* t, bool ordered)
         /* is this an ordered list? in that case we have to find the
            right track struct for every track id */
         if (ordered) {
-            char tid[64];
+            char tid[33];
             xmlstrncpy(tid, sizeof tid, track, "id", -1);
             struct track* tt;
             for (tt = root; tt; tt = tt->next)
                 if (!tt->has_meta_data &&
                     !strncmp(tt->track_id, tid, sizeof tt->track_id))
                     break;
+            /* if we didn't find the id, check if an old, redirected
+               id is used */
             if (!tt) {
-                DSFYDEBUG("!!! error: track id not found: %s\n", tid);
-                continue;
+                char rid[33];
+                for (ezxml_t re = ezxml_child(track, "redirect"); re; re = re->next) {
+                    xmlstrncpy(rid, sizeof rid, re, "", -1);
+                    for (tt = root; tt; tt = tt->next) {
+                        /* update to new id */
+                        if (!tt->has_meta_data &&
+                            !strncmp(tt->track_id, rid, sizeof tt->track_id)) {
+                            memcpy (tt->track_id, tid, sizeof tt->track_id);
+                            break;
+                        }
+                    }
+                    if (tt)
+                        break;
+                }
+                /* we've wasted enough cpu cycles on this track now */
+                if (!tt) {
+                    DSFYDEBUG("!!! error: track id not found: %s\n", tid);
+                    continue;
+                }
             }
             t = tt;
         }
@@ -159,8 +178,8 @@ static int parse_tracks(ezxml_t xml, struct track* t, bool ordered)
                 prev->next = t;
             }
 
-        xmlstrncpy(t->title, sizeof t->title, track, "title",-1);
-        xmlstrncpy(t->album, sizeof t->album, track, "album",-1);
+        xmlstrncpy(t->title, sizeof t->title, track, "title", -1);
+        xmlstrncpy(t->album, sizeof t->album, track, "album", -1);
 
         xmlstrncpy(t->track_id, sizeof t->track_id, track, "id", -1);
         xmlstrncpy(t->cover_id, sizeof t->cover_id, track, "cover", -1);
