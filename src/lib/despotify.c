@@ -868,3 +868,56 @@ void despotify_free_album(struct album* a)
 {
     xml_free_album(a);
 }
+
+/*****************************************************************
+ *
+ *  Misc functions
+ *
+ */
+
+static void baseconvert(char *src, char *dest,
+                      int frombase, int tobase, int padlen)
+{
+    static const char alphabet[] =
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
+    int number[128];
+    int i, len, newlen, divide;
+ 
+    len = strlen(src);
+ 
+    for (i = 0; i < len; i++)
+        number[i] = strchr(alphabet, src[i]) - alphabet;
+ 
+    memset(dest, '0', padlen);
+    dest[padlen] = 0;
+ 
+    padlen--;
+ 
+    do {
+        divide = 0;
+        newlen = 0;
+ 
+        for (i = 0; i < len; i++) {
+            divide = divide * frombase + number[i];
+            if (divide >= tobase) {
+                number[newlen++] = divide / tobase;
+                divide = divide % tobase;
+            } else if (newlen > 0) {
+                number[newlen++] = 0;
+            }
+        }
+        len = newlen;
+ 
+        dest[padlen--] = alphabet[divide];
+    } while (newlen != 0);
+}
+
+void despotify_id2uri(char* id, char* uri)
+{
+    baseconvert(id, uri, 16, 62, 22);
+}
+
+void despotify_uri2id(char* uri, char* id)
+{
+    baseconvert(uri, id, 62, 16, 32);
+}

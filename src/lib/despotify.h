@@ -144,5 +144,7 @@ bool despotify_stop(struct despotify_session *ds);
 bool despotify_pause(struct despotify_session *ds);
 bool despotify_resume(struct despotify_session *ds);
 
+void despotify_id2uri(char* id, char* uri);
+void despotify_uri2id(char* uri, char* id);
 
 #endif
