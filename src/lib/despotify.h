@@ -27,6 +27,15 @@ struct track
                            in an album or playlist struct */
 };
 
+struct search_result
+{
+    unsigned char query[STRING_LENGTH];
+    unsigned char suggestion[STRING_LENGTH];
+    int total_artists;
+    int total_albums;
+    int total_tracks;
+};
+
 struct playlist
 {
     char name[STRING_LENGTH];
@@ -34,6 +43,7 @@ struct playlist
     unsigned char playlist_id[35];
     int num_tracks;
     struct track *tracks;
+    struct search_result *search; /* in case the playlist is a search result */
     struct playlist *next; /* in case of multiple playlists in the root list */
 };
 
@@ -130,8 +140,10 @@ void* despotify_get_image(struct despotify_session* ds,
  * user despotify_get_user_info(struct despotify_session *ds); */
 
 /* Playlist handling. */
-struct playlist* despotify_search(struct despotify_session *ds, 
+struct playlist* despotify_search(struct despotify_session *ds,
                                   char *searchtext);
+struct playlist* despotify_search_more(struct despotify_session *ds,
+                                       struct playlist *playlist);
 
 struct playlist* despotify_get_stored_playlists(struct despotify_session *ds);
 void despotify_free_playlist(struct playlist* playlist);

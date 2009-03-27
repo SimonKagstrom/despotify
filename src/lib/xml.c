@@ -270,9 +270,19 @@ static void parse_album(ezxml_t top, struct album* a)
 int xml_parse_searchlist(struct track* firsttrack,
                          unsigned char* xml,
                          int len,
-                         bool ordered)
+                         bool ordered,
+                         struct search_result* search)
 {
     ezxml_t top = ezxml_parse_str(xml, len);
+
+    if (search) {
+        xmlstrncpy(search->suggestion, sizeof search->suggestion,
+                   top, "did-you-mean", -1);
+        xmlatoi(&search->total_artists, top, "total-artists", -1);
+        xmlatoi(&search->total_albums, top, "total-albums", -1);
+        xmlatoi(&search->total_tracks, top, "total-tracks", -1);
+    }
+
     ezxml_t tracks = ezxml_get(top, "tracks",-1);
     int num_tracks = parse_tracks(tracks, firsttrack, ordered);
     ezxml_free(top);

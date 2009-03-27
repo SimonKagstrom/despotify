@@ -590,8 +590,12 @@ struct playlist* despotify_search(struct despotify_session* ds,
         ds->playlist->tracks = calloc(1, sizeof(struct track));
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
+        struct search_result *search = calloc(1, sizeof(struct search_result));
+        DSFYstrncpy(search->query, searchtext, sizeof search->query);
+        ds->playlist->search = search;
         ds->playlist->num_tracks = xml_parse_searchlist(ds->playlist->tracks,
-                                                        b->ptr, b->len, false);
+                                                        b->ptr, b->len, false,
+                                                        search);
         buf_free(b);
     }
     buf_free(ds->response);
@@ -603,6 +607,50 @@ struct playlist* despotify_search(struct despotify_session* ds,
     }
 
     return ds->playlist;
+}
+
+struct playlist* despotify_search_more(struct despotify_session *ds,
+                                       struct playlist *playlist)
+{
+    if (!playlist || !playlist->search)
+        return NULL;
+
+    if (playlist->num_tracks >= playlist->search->total_tracks)
+        return playlist;
+
+    ds->response = buf_new();
+
+    int ret = cmd_search(ds->session, playlist->search->query,
+                         playlist->num_tracks, MAX_SEARCH_LIM,
+                         despotify_gzip_callback, ds);
+    if (ret) {
+        ds->last_error = "cmd_search() failed";
+        return NULL;
+    }
+
+    /* wait until search is ready */
+    pthread_mutex_lock(&ds->sync_mutex);
+    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
+    pthread_mutex_unlock(&ds->sync_mutex);
+
+    struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
+    if (b) {
+        /* append at end of list */
+        struct track *t;
+        for (t = ds->playlist->tracks; t; t = t->next)
+            if (!t->next)
+                break;
+
+        t = t->next = calloc(1, sizeof(struct track));
+
+        ds->playlist->num_tracks += xml_parse_searchlist(t, b->ptr, b->len,
+                                                         false, NULL);
+        buf_free(b);
+    }
+
+    buf_free(ds->response);
+
+    return playlist;
 }
 
 /**************************************************************
@@ -651,7 +699,8 @@ static bool despotify_load_tracks(struct despotify_session *ds)
         /* add tracks to playlist */
         struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
         if (b) {
-            track_count += xml_parse_searchlist(firsttrack, b->ptr, b->len, true);
+            track_count += xml_parse_searchlist(firsttrack, b->ptr, b->len,
+                                                true, NULL);
             buf_free(b);
         }
 
@@ -754,6 +803,7 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
 
 void despotify_free_playlist(struct playlist* p)
 {
+    free(p->search);
     xml_free_playlist(p);
 }
 

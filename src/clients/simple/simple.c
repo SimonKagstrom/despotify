@@ -50,7 +50,7 @@ void print_help(void)
 {
     printf("\nAvailable commands:\n"
            "list [num]           List stored playlists\n"
-           "search [string]      Search tracks\n"
+           "search [string]      Search for [string] or get next 100 results\n"
            "artist [num]         Show information about artist for track [num]\n"
            "album [num]          List album for track [num]\n"
            "play [num]           Play track [num] in the last viewed list\n"
@@ -117,10 +117,22 @@ void command_loop(struct despotify_session* ds)
                     continue;
                 }
             }
+            else if (searchlist && (searchlist->num_tracks < searchlist->search->total_tracks))
+                if (!despotify_search_more(ds, searchlist)) {
+                    printf("Search failed: %s\n", despotify_get_error(ds));
+                    continue;
+                }
+
             if (searchlist) {
+                printf("Total tracks: %d (got %d)\n",
+                        searchlist->search->total_tracks, searchlist->num_tracks);
+                if (searchlist->search->suggestion[0])
+                    printf("Did you mean \"%s\"?\n", searchlist->search->suggestion);
                 print_tracks(searchlist->tracks);
                 lastlist = searchlist;
             }
+            else
+                printf("No previous search\n");
         }
 
         /* artist */
