@@ -29,8 +29,10 @@ cdef class Album(SessionStruct):
     cdef bint take_owner
 
 cdef class Artist(SessionStruct):
+    cdef fetch(self)
     cdef artist* data
     cdef bint take_owner
+    cdef bint fetched
 
 cdef class SearchResult(SessionStruct):
     cdef search_result* data

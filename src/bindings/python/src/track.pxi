@@ -24,13 +24,7 @@ cdef class Track:
 
     property artists:
         def __get__(self):
-            cdef list artists
-
-            if self._artists is None:
-                artists = self.artists_to_list(self.data.artist)
-                self._artists = [self.create_artist(despotify_get_artist(self.ds, a.id), True) for a in artists]
-
-            return self._artists
+            return self.artists_to_list(self.data.artist)
 
     property album:
         def __get__(self):

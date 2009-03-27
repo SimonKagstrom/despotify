@@ -33,6 +33,7 @@ cdef class SessionStruct:
         instance.ds = self.ds
         instance.data = artist
         instance.take_owner = take_owner
+        instance.fetched = False
         return instance
 
     cdef SearchResult create_search_result(self, search_result* result):
