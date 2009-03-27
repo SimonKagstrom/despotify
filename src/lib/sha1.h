@@ -9,6 +9,8 @@
 #ifndef _SHA1_H
 #define _SHA1_H
 
+#include <sys/types.h>
+
 typedef struct {
     u_int32_t state[5];
     u_int32_t count[2];
