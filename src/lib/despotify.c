@@ -409,6 +409,11 @@ bool despotify_resume(struct despotify_session* ds)
     return true;
 }
 
+struct track *despotify_get_current_track(struct despotify_session *ds) {
+	if (ds->track)
+		return ds->track;
+	return NULL;
+}
 
 static struct buf* despotify_inflate(unsigned char* data, int len)
 {

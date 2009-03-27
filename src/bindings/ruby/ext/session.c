@@ -175,7 +175,7 @@ Init_despotify_session(VALUE mDespotify) {
 	rb_define_method(c, "stop", rb_despotify_session_stop, 0);
 	rb_define_method(c, "pause", rb_despotify_session_pause, 0);
 	rb_define_method(c, "resume", rb_despotify_session_resume, 0);
-/*	rb_define_method(c, "current_track", rb_despotify_session_current_track, 0);*/
+	rb_define_method(c, "current_track", rb_despotify_session_current_track, 0);
 
 	/* Shortcuts */
 	rb_define_method(c, "playlist", rb_despotify_session_playlist, 1);

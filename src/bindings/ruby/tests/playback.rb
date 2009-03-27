@@ -26,9 +26,11 @@ track = pls.tracks[2]
 
 pp track.metadata
 
+pp despotify.current_track
 
 puts 'Playing'
 puts despotify.play(pls, track)
+pp despotify.current_track
 
 sleep 5
 
