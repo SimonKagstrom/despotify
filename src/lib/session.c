@@ -114,9 +114,12 @@ int session_connect (SESSION * session)
 	int port;
 
 	/* Lookup service hosts in DNS */
-	if ((service_list =
-	     dns_srv_list ("_spotify-client._tcp.spotify.com")) == NULL)
-		return -1;
+        service_list = dns_srv_list ("_spotify-client._tcp.spotify.com");
+	if (!service_list) {
+            DSFYDEBUG("service lookup failed. falling back to ap.spotify.com\n");
+            service_list = malloc(200);
+            strcpy(service_list, "ap.spotify.com:4070\n");
+        }
 
 	for (service = service_list; *service;) {
 		if (sscanf (service, "%[^:]:%d\n", host, &port) != 2)
