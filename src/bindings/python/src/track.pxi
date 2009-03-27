@@ -6,11 +6,11 @@ cdef class Track:
 
     property track_id:
         def __get__(self):
-            return str(<char*>self.data.track_id)
+            return <char*>self.data.track_id
 
     property file_id:
         def __get__(self):
-            return str(<char*>self.data.file_id)
+            return <char*>self.data.file_id
 
     def has_meta_data(self):
         return bool(self.data.has_meta_data)
@@ -28,7 +28,7 @@ cdef class Track:
 
             if self._artists is None:
                 artists = self.artists_to_list(self.data.artist)
-                self._artists = [self._create_artist(despotify_get_artist(self.ds, a.id), True) for a in artists]
+                self._artists = [self.create_artist(despotify_get_artist(self.ds, a.id), True) for a in artists]
 
             return self._artists
 
@@ -52,6 +52,5 @@ cdef class Track:
         def __get__(self):
             return self.data.popularity
 
-    def __str__(self):
-        return '<Track: %s - %s - %s>' % (", ".join([a.name for a in self.artists]), self.title, self.album)
-
+    def __repr__(self):
+        return '<Track: %s - %s - %s (%s)>' % (", ".join([a.name for a in self.artists]), self.title, self.album, self.track_id)

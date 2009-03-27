@@ -32,5 +32,5 @@ cdef class Album(SessionStruct):
         if self.take_owner:
             despotify_free_album(self.data)
 
-    def __str__(self):
-        return '<Album: %s>' % (self.name)
+    def __repr__(self):
+        return '<Album: %s (%s)>' % (self.name, self.id)

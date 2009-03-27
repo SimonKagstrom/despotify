@@ -4,13 +4,14 @@
 cdef extern from "spytify.h":
     cdef Album NEW_ALBUM "PY_NEW" (object t)
     cdef Artist NEW_ARTIST "PY_NEW" (object t)
+    cdef SearchResult NEW_SEARCHRESULT "PY_NEW" (object t)
     cdef Playlist NEW_PLAYLIST "PY_NEW" (object t)
     cdef RootList NEW_ROOTLIST "PY_NEW" (object t)
     cdef Track NEW_TRACK "PY_NEW" (object t)
 
 
 cdef class SessionStruct:
-    cdef Album _create_album(self, album* album, bint take_owner=False):
+    cdef Album create_album(self, album* album, bint take_owner=False):
         cdef Album instance
 
         if not album:
@@ -22,7 +23,7 @@ cdef class SessionStruct:
         instance.take_owner = take_owner
         return instance
 
-    cdef Artist _create_artist(self, artist* artist, bint take_owner=False):
+    cdef Artist create_artist(self, artist* artist, bint take_owner=False):
         cdef Artist instance
 
         if not artist:
@@ -34,8 +35,16 @@ cdef class SessionStruct:
         instance.take_owner = take_owner
         return instance
 
+    cdef SearchResult create_search_result(self, search_result* result):
+        cdef SearchResult instance
 
-    cdef Playlist _create_playlist(self, playlist* playlist, bint take_owner=False):
+        instance = NEW_SEARCHRESULT(SearchResult)
+        instance.ds = self.ds
+        instance.data = result
+
+        return instance
+
+    cdef Playlist create_playlist(self, playlist* playlist, bint take_owner=False):
         cdef Playlist instance
 
         if not playlist:
@@ -48,7 +57,7 @@ cdef class SessionStruct:
 
         return instance
 
-    cdef RootList _create_rootlist(self):
+    cdef RootList create_rootlist(self):
         cdef RootList instance
 
         instance = NEW_ROOTLIST(RootList)
@@ -58,7 +67,7 @@ cdef class SessionStruct:
 
         return instance
 
-    cdef Track _create_track(self, track* track):
+    cdef Track create_track(self, track* track):
         cdef Track instance
 
         if not track:
@@ -73,7 +82,7 @@ cdef class SessionStruct:
     cdef list albums_to_list(self, album* albums):
         cdef list l = []
         while albums:
-            l.append(self._create_album(albums))
+            l.append(self.create_album(albums))
             albums = albums.next
 
         return l
@@ -81,7 +90,7 @@ cdef class SessionStruct:
     cdef list artists_to_list(self, artist* artists):
         cdef list l = []
         while artists:
-            l.append(self._create_artist(artists))
+            l.append(self.create_artist(artists))
             artists = artists.next
 
         return l
@@ -89,7 +98,7 @@ cdef class SessionStruct:
     cdef list playlists_to_list(self, playlist* playlists):
         cdef list l = []
         while playlists:
-            l.append(self._create_playlist(playlists))
+            l.append(self.create_playlist(playlists))
             playlists = playlists.next
 
         return l
@@ -97,7 +106,7 @@ cdef class SessionStruct:
     cdef list tracks_to_list(self, track* tracks):
         cdef list l = []
         while tracks:
-            l.append(self._create_track(tracks))
+            l.append(self.create_track(tracks))
             tracks = tracks.next
 
         return l

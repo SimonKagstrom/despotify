@@ -36,6 +36,6 @@ cdef class Artist:
         if self.take_owner:
             despotify_free_artist(self.data)
 
-    def __str__(self):
-        return '<Artist: %s>' % (self.name)
+    def __repr__(self):
+        return '<Artist: %s (%s)>' % (self.name, self.id)
 

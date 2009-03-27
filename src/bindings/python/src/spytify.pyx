@@ -23,14 +23,14 @@ cdef class Spytify:
             raise SpytifyError(despotify_get_error(self.ds))
 
     def stored_playlists(self):
-        return self._create_rootlist()
+        return self.create_rootlist()
 
     def search(self, str searchtext):
         cdef playlist* search = despotify_search(self.ds, searchtext)
         if not search:
             return None
         else:
-            return self._create_playlist(search, True)
+            return self.create_playlist(search, True)
 
     def play(self, Playlist playlist, Track track):
         if not despotify_play(self.ds, playlist.data, track.data):
