@@ -23,7 +23,6 @@
 
 #define BUFFER_SIZE (160*1024 * 5 / 8) /* 160 kbit * 5 seconds */
 #define MAX_BROWSE_REQ 244 /* max entries to load in one browse request */
-#define MAX_SEARCH_LIM 100 /* max search results per request */
 
 bool despotify_init()
 {
@@ -573,7 +572,7 @@ struct playlist* despotify_search(struct despotify_session* ds,
     DSFYstrncpy(ds->playlist->name, buf, sizeof ds->playlist->name);
     DSFYstrncpy(ds->playlist->author, ds->session->username, sizeof ds->playlist->author);
 
-    int ret = cmd_search(ds->session, searchtext, 0, MAX_SEARCH_LIM,
+    int ret = cmd_search(ds->session, searchtext, 0, MAX_SEARCH_RESULTS,
                          despotify_gzip_callback, ds);
     if (ret) {
         ds->last_error = "cmd_search() failed";
@@ -621,7 +620,7 @@ struct playlist* despotify_search_more(struct despotify_session *ds,
     ds->response = buf_new();
 
     int ret = cmd_search(ds->session, playlist->search->query,
-                         playlist->num_tracks, MAX_SEARCH_LIM,
+                         playlist->num_tracks, MAX_SEARCH_RESULTS,
                          despotify_gzip_callback, ds);
     if (ret) {
         ds->last_error = "cmd_search() failed";

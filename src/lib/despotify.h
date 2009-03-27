@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #define STRING_LENGTH 256
+#define MAX_SEARCH_RESULTS 100 /* max search results per request */
 
 struct track
 {
