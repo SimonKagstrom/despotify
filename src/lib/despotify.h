@@ -8,7 +8,6 @@
 
 struct track
 {
-    int id;
     bool has_meta_data;
     bool playable;
     unsigned char track_id[33];
