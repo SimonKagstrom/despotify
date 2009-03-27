@@ -12,6 +12,8 @@ include "playlist.pxi"
 
 cdef class Spytify:
     def __init__(self, str user, str pw):
+        self._stored_playlists = None
+
         self.ds = despotify_init_client()
         if not self.ds:
             raise SpytifyError(despotify_get_error(self.ds))
@@ -22,8 +24,11 @@ cdef class Spytify:
         if not despotify_authenticate(self.ds, user, pw):
             raise SpytifyError(despotify_get_error(self.ds))
 
-    def stored_playlists(self):
-        return self.create_rootlist()
+    def stored_playlists(self, clear=False):
+        if clear or self._stored_playlists is None:
+            self._stored_playlists = self.create_rootlist()
+
+        return self._stored_playlists
 
     def search(self, str searchtext):
         cdef playlist* search = despotify_search(self.ds, searchtext)

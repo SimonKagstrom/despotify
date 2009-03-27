@@ -22,7 +22,7 @@ cdef class SessionStruct:
     cdef list tracks_to_list(self, track* tracks)
 
 cdef class Spytify(SessionStruct):
-    pass
+    cdef RootList _stored_playlists
 
 cdef class Album(SessionStruct):
     cdef album* data
@@ -38,6 +38,7 @@ cdef class SearchResult(SessionStruct):
 cdef class Playlist(SessionStruct):
     cdef playlist* data
     cdef bint take_owner
+    cdef list _tracks
 
 cdef class RootList(SessionStruct):
     cdef fetch(self)

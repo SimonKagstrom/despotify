@@ -54,6 +54,7 @@ cdef class SessionStruct:
         instance.ds = self.ds
         instance.data = playlist
         instance.take_owner = take_owner
+        instance._tracks = None
 
         return instance
 
@@ -89,9 +90,11 @@ cdef class SessionStruct:
 
     cdef list artists_to_list(self, artist* artists):
         cdef list l = []
-        while artists:
-            l.append(self.create_artist(artists))
-            artists = artists.next
+        cdef artist* a = artists
+
+        while a:
+            l.append(self.create_artist(a))
+            a = a.next
 
         return l
 

@@ -52,7 +52,9 @@ cdef class Playlist:
 
     property tracks:
         def __get__(self):
-            return self.tracks_to_list(self.data.tracks)
+            if self._tracks is None:
+                self._tracks = self.tracks_to_list(self.data.tracks)
+            return self._tracks
 
     def __dealloc__(self):
         if self.take_owner:
