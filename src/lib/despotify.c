@@ -733,6 +733,10 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
                                       ds->response->ptr,
                                       ds->response->len,
                                       ds->list_of_lists);
+
+    if (! ds->list_of_lists && playlist_id)
+        DSFYstrncpy(ds->playlist->playlist_id, playlist_id, sizeof ds->playlist->playlist_id);
+
     ds->list_of_lists = false;
     buf_free(ds->response);
 
