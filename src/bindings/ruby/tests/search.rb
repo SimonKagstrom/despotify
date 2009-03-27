@@ -17,9 +17,12 @@ despotify = Despotify::Session.new
 begin
 	despotify.authenticate(username, password)
 rescue Despotify::DespotifyError
-	puts 'Failed to authenticate user: %s' % despotify.get_error
+	puts 'Failed to authenticate user: %s' % @despotify.get_error
 	exit
 end
 
-pls = despotify.playlist 'd10d32140807f5260d045384117734c002'
-pp pls
+search = despotify.search 'britney spears'
+searchtimes = (search.search_info['total_tracks'].to_f / Despotify::MAX_SEARCH_RESULTS).ceil
+searchtimes.times { search.search_more }
+
+pp search.tracks.size

@@ -13,13 +13,13 @@ if not (username and password)
 	exit
 end
 
+despotify = Despotify::Session.new
 begin
-	despotify = Despotify::Session.new(username, password)
+	despotify.authenticate(username, password)
 rescue Despotify::DespotifyError
-	puts 'Failed to authenticate user'
+	puts 'Failed to authenticate user: %s' % despotify.get_error
 	exit
 end
-
 
 pls = despotify.search 'machinae'
 track = pls.tracks[2]

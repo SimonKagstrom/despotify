@@ -15,7 +15,9 @@
 
 #define SESSION_METHOD_HEADER \
 	rb_despotify_session *session; \
-	VALUE2SESSION(self, session);
+	VALUE2SESSION(self, session); \
+	if (!session->connected) \
+		rb_raise(eDespotifyError, "session is not connected");
 
 
 static void
@@ -41,20 +43,30 @@ rb_despotify_session_alloc(VALUE klass) {
 
 
 static VALUE
-rb_despotify_session_new(VALUE self, VALUE username, VALUE password) {
-	SESSION_METHOD_HEADER
+rb_despotify_session_new(VALUE self) {
+	rb_despotify_session *session;
+	VALUE2SESSION(self, session);
 
 	if (!(session->real = despotify_init_client())) {
 		rb_raise(rb_eNoMemError, "failed to allocate memory");
 		return Qnil;
 	}
 	session->rootpl = NULL;
+	session->connected = false;
+
+	return self;
+}
+
+static VALUE
+rb_despotify_session_authenticate(VALUE self, VALUE username, VALUE password) {
+	rb_despotify_session *session;
+	VALUE2SESSION(self, session);
 
 	if (!despotify_authenticate(session->real, StringValuePtr(username),
-	                            StringValuePtr(password))) {
-		rb_raise(eDespotifyError, despotify_get_error(session->real));
-		return Qnil;
-	}
+	                            StringValuePtr(password)))
+		rb_raise(eDespotifyError, session->real->last_error);
+	else
+		session->connected = true;
 
 	return self;
 }
@@ -66,7 +78,7 @@ rb_despotify_session_search(VALUE self, VALUE searchtext) {
 
 	pl = despotify_search(session->real, StringValuePtr(searchtext));
 
-	return rb_despotify_playlist_new_from_pl(pl, 1);
+	return rb_despotify_playlist_new_from_pl(self, pl, 1);
 }
 
 static VALUE
@@ -84,7 +96,7 @@ rb_despotify_session_playlists(VALUE self) {
 		return playlists;
 
 	for (pl = session->rootpl; pl; pl = pl->next) {
-		rb_ary_push(playlists, rb_despotify_playlist_new_from_pl(pl, 0));
+		rb_ary_push(playlists, rb_despotify_playlist_new_from_pl(self, pl, 0));
 	}
 
 	return playlists;
@@ -143,6 +155,15 @@ rb_despotify_session_current_track(VALUE self) {
 	return rb_despotify_track_new_from_track(despotify_get_current_track(session->real));
 }
 
+static VALUE
+rb_despotify_session_get_error(VALUE self) {
+	SESSION_METHOD_HEADER
+
+	if (session->real->last_error)
+		return rb_str_new2(session->real->last_error);
+
+	return Qnil;
+}
 
 static VALUE
 rb_despotify_session_playlist(VALUE self, VALUE id) {
@@ -166,10 +187,12 @@ Init_despotify_session(VALUE mDespotify) {
 	/* Despotify::Session */
 	c = rb_define_class_under(mDespotify, "Session", rb_cObject);
 	rb_define_alloc_func (c, rb_despotify_session_alloc);
-	rb_define_method(c, "initialize", rb_despotify_session_new, 2);
+	rb_define_method(c, "initialize", rb_despotify_session_new, 0);
+	rb_define_method(c, "authenticate", rb_despotify_session_authenticate, 2);
 	rb_define_method(c, "search", rb_despotify_session_search, 1);
 	rb_define_method(c, "playlists", rb_despotify_session_playlists, 0);
 	rb_define_method(c, "get_image", rb_despotify_session_get_image, 1);
+	rb_define_method(c, "get_error", rb_despotify_session_get_error, 0);
 
 	rb_define_method(c, "play", rb_despotify_session_play, 2);
 	rb_define_method(c, "stop", rb_despotify_session_stop, 0);

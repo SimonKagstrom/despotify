@@ -21,6 +21,11 @@ typedef struct album despotify_album;
 
 #define BOOL2VALUE(exp) exp ? Qtrue : Qfalse
 
+
+#define HASH_VALUE_ADD(hash, key, val) \
+	rb_hash_aset(hash, rb_str_new2((key)), (val))
+
+
 #define CHECKIDLEN(str, len) \
 	if(strlen((str)) != len) \
 		rb_raise (eDespotifyError, "expecting id length of %d", (len))

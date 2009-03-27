@@ -8,6 +8,7 @@
 typedef struct {
 	despotify_session *real;
 	despotify_playlist *rootpl;
+	bool connected;
 } rb_despotify_session;
 
 VALUE Init_despotify_session(VALUE mDespotify);

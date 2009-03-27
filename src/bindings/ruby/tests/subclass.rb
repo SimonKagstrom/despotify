@@ -7,9 +7,10 @@ require 'pp'
 
 
 class Simple < Despotify::Session
-	def initialize(username, password)
+	def initialize
 		puts 'init'
-		super(username, password)
+
+		super
 	end
 end
 
@@ -31,7 +32,13 @@ if not (username and password)
 	exit
 end
 
-c = Simple.new(username, password)
+despotify = Simple.new
+begin
+	despotify.authenticate(username, password)
+rescue Despotify::DespotifyError
+	puts 'Failed to authenticate user: %s' % despotify.get_error
+	exit
+end
 
-pls = SuperPlaylist.new(c, 'd10d32140807f5260d045384117734c002')
+pls = SuperPlaylist.new(despotify, 'd10d32140807f5260d045384117734c002')
 pls.dump

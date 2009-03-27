@@ -51,8 +51,8 @@ class Rubify < Despotify::Session
 		"quit                 Quit"
 
 
-	def initialize(username, password)
-		@ds = Despotify::Session.new(username, password)
+	def initialize(ds)
+		@ds = ds
 
 		@playlists = []
 		@curpls = nil
@@ -133,7 +133,7 @@ class Rubify < Despotify::Session
 		puts 'Searching for: %s' % s
 		results = @ds.search(s)
 
-		if results.tracks.size > 0
+		if results
 			results.display
 
 			@playlists << results
@@ -201,11 +201,13 @@ if not (username and password)
 	exit
 end
 
+ds = Despotify::Session.new
 begin
-	rubify = Rubify.new(username, password)
+	ds.authenticate(username, password)
 rescue Despotify::DespotifyError
-	puts 'Failed to authenticate user'
+	puts 'Failed to authenticate user: %s' % ds.get_error
 	exit
 end
 
+rubify = Rubify.new(ds)
 rubify.run

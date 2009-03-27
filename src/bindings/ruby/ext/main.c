@@ -37,7 +37,6 @@ rb_despotify_uri2id(VALUE self, VALUE uri) {
 	return rb_str_new2(buf);
 }
 
-
 void
 Init_despotify(void) {
 	if (!despotify_init()) {
@@ -49,6 +48,7 @@ Init_despotify(void) {
 
 	rb_define_singleton_method(mDespotify, "id2uri", rb_despotify_id2uri, 1);
 	rb_define_singleton_method(mDespotify, "uri2id", rb_despotify_uri2id, 1);
+	rb_define_const(mDespotify, "MAX_SEARCH_RESULTS", INT2NUM(MAX_SEARCH_RESULTS));
 
 	cSession = Init_despotify_session(mDespotify);
 	cPlaylist = Init_despotify_playlist(mDespotify);
