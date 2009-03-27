@@ -1,95 +1,69 @@
 # vim: set fileencoding=utf-8 filetype=pyrex :
 
-cdef list playlist_to_list(playlist* playlists):
-    cdef list l = []
-    while playlists:
-        l.append(_create_playlist(playlists))
-        playlists = playlists.next
-
-    return l
-
-cdef list tracks_to_list(track* tracks):
-    cdef list l = []
-    while tracks:
-        l.append(_create_track(tracks))
-        tracks = tracks.next
-
-    return l
-
-cdef class Track:
-    def __init__(self):
-        raise TypeError("This class cannot be instantiated from Python")
-
-    property id:
-        def __get__(self):
-            return self.track.id
-
-    def has_meta_data(self):
-        return bool(self.track.has_meta_data)
-
-    property title:
-        def __get__(self):
-            return self.track.title
-
-    property artist:
-        def __get__(self):
-            return self.track.artist
-
-    property album:
-        def __get__(self):
-            return self.track.album
-
-    property length:
-        def __get__(self):
-            return self.track.length
-
-    def __str__(self):
-        return '<Track: %s - %s - %s>' % (self.artist, self.title, self.album)
-
 cdef class Playlist:
     def __init__(self):
         raise TypeError("This class cannot be instantiated from Python")
 
     property tracks:
         def __get__(self):
-            return tracks_to_list(self.playlist.tracks)
+            return self.tracks_to_list(self.data.tracks)
 
     property author:
         def __get__(self):
-            return self.playlist.author
+            return self.data.author
 
     property name:
         def __get__(self):
-            return self.playlist.name
+            return self.data.name
 
     def __dealloc__(self):
-        if self.playlist:
-            playlist_free(self.playlist, 1) # Is this right? 1 means "free tracks."
+        if self.take_owner:
+            despotify_free_playlist(self.data)
 
     def __str__(self):
         return '<Playlist: %s by %s>' % (self.name, self.author)
 
-# Based on http://wiki.cython.org/FAQ#CanCythongenerateCcodeforclasses.3F
-cdef extern from "spytify.h":
-    cdef Track NEW_TRACK "PY_NEW" (object t)
-    cdef Playlist NEW_PLAYLIST "PY_NEW" (object t)
+cdef class RootIterator:
+    def __init__(self, parent):
+        self.parent = parent
+        self.i = 0
 
-cdef Playlist _create_playlist(playlist* playlist):
-    cdef Playlist instance
+    def __iter__(self):
+        return self
 
-    if not playlist:
-        raise SpytifyError("Tried creating a NULL-playlist.")
-    
-    instance = NEW_PLAYLIST(Playlist)
-    instance.playlist = playlist
-    return instance
+    def next(self):
+        if i >= len(self.parent):
+            raise StopIteration()
 
-cdef Track _create_track(track* track):
-    cdef Track instance
+        retval = self.parent.get(i)
+        i = i + 1
+        return retval
 
-    if not track:
-        raise SpytifyError("Tried creating a NULL-track.")
+cdef class RootList:
+    def __init__(self):
+        raise TypeError("This class cannot be instantiated from Python")
 
-    instance = NEW_TRACK(Track)
-    instance.track = track
-    return instance
+    cdef fetch(self):
+        if self._list is None:
+            self.data = despotify_get_stored_playlists(self.ds)
+            self._list = self.playlists_to_list(self.data)
+
+    def __getitem__(self, item):
+        self.fetch()
+        return self._list[item]
+
+    def __len__(self):
+        self.fetch()
+        return len(self._list)
+
+    def __contains__(self, item):
+        self.fetch()
+        return item in self._list
+
+    def __iter__(self):
+        self.fetch()
+        return RootIterator(self)
+
+    def __dealloc__(self):
+        if self.data:
+            despotify_free_playlist(self.data)

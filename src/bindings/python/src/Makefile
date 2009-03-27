@@ -6,7 +6,7 @@ CYTHON = cython
 
 all: $(OUTS)
 
-spytify.c: despotify.pxd playlist.pxd playlist.pxi
+spytify.c: album.pxi artist.pxi despotify.pxd playlist.pxi sessionstruct.pxi spytify.pxd spytify.pyx track.pxi
 
 %.c: %.pyx
 	$(CYTHON) `pkg-config --cflags-only-I despotify` -o $@ $< 

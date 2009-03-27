@@ -1,17 +1,44 @@
 from despotify cimport *
-from playlist cimport *
 
-cdef class Spytify:
+
+cdef class Album
+cdef class Artist
+cdef class Playlist
+cdef class RootList
+cdef class Track
+
+cdef class SessionStruct:
     cdef despotify_session* ds
+    cdef Album _create_album(self, album* album, bint take_owner=?)
+    cdef Artist _create_artist(self, artist* artist, bint take_owner=?)
+    cdef Playlist _create_playlist(self, playlist* playlist, bint take_owner=?)
+    cdef RootList _create_rootlist(self)
+    cdef Track _create_track(self, track* track)
+    cdef list albums_to_list(self, album* albums)
+    cdef list artists_to_list(self, artist* artists)
+    cdef list playlists_to_list(self, playlist* playlists)
+    cdef list tracks_to_list(self, track* tracks)
 
-cdef class Track:
-    cdef track* track
+cdef class Spytify(SessionStruct):
+    pass
 
-cdef class Playlist:
-    cdef playlist* playlist
+cdef class RootList(SessionStruct):
+    cdef fetch(self)
+    cdef playlist* data 
+    cdef list _list
 
-cdef list playlist_to_list(playlist* playlists)
-cdef list tracks_to_list(track* tracks)
+cdef class Album(SessionStruct):
+    cdef album* data
+    cdef bint take_owner
 
-cdef Track _create_track(track* track)
-cdef Playlist _create_playlist(playlist* playlist)
+cdef class Artist(SessionStruct):
+    cdef artist* data
+    cdef bint take_owner
+
+cdef class Track(SessionStruct):
+    cdef track* data
+    cdef list _artists
+
+cdef class Playlist(SessionStruct):
+    cdef playlist* data
+    cdef bint take_owner

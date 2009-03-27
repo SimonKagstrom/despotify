@@ -3,6 +3,11 @@ import atexit
 class SpytifyError(Exception):
     pass
 
+include "sessionstruct.pxi"
+
+include "album.pxi"
+include "artist.pxi"
+include "track.pxi"
 include "playlist.pxi"
 
 cdef class Spytify:
@@ -18,17 +23,17 @@ cdef class Spytify:
             raise SpytifyError(despotify_get_error(self.ds))
 
     def stored_playlists(self):
-        return playlist_to_list(despotify_get_stored_playlists(self.ds))
+        return self._create_rootlist()
 
     def search(self, str searchtext):
         cdef playlist* search = despotify_search(self.ds, searchtext)
         if not search:
             return None
         else:
-            return _create_playlist(search)
+            return self._create_playlist(search, True)
 
     def play(self, Playlist playlist, Track track):
-        if not despotify_play(self.ds, playlist.playlist, track.track):
+        if not despotify_play(self.ds, playlist.data, track.data):
             raise SpytifyError(despotify_get_error(self.ds))
 
     def pause(self):
