@@ -27,9 +27,7 @@ pp artist
 pp artist.name
 pp artist.metadata
 
-albums = artist.albums
-
-albums.each do |album|
+artist.albums.each do |album|
 	pp album.name
 	pp album.metadata
 #	album.tracks.each do |track|

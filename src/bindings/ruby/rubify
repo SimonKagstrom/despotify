@@ -76,12 +76,15 @@ class Rubify < Despotify::Session
 
 		loop do
 			line = Readline::readline(create_prompt)
-			Readline::HISTORY.push(line)
+
+			break if line.nil?
+			next if line.size == 0
 
 			args = line.split
 			cmd = args.shift
 
-			next if line.size == 0
+			Readline::HISTORY.push(line)
+
 			break if cmd == 'quit'
 
 			begin
@@ -131,7 +134,10 @@ class Rubify < Despotify::Session
 	def cmd_search(*args)
 		s = args.join(' ')
 		puts 'Searching for: %s' % s
+
 		results = @ds.search(s)
+		searchtimes = (results.search_info['total_tracks'].to_f / Despotify::MAX_SEARCH_RESULTS).ceil
+		searchtimes.times { results.search_more }
 
 		if results
 			results.display
@@ -147,17 +153,19 @@ class Rubify < Despotify::Session
 		name = args.join(' ')
 		results = @ds.search(name)
 
-		artist = nil
-		results.tracks.each do |track|
-			track['artist'].each_index do |i|
-				if name.downcase == track['artist'][i].downcase
-					artist = Despotify::Artist.new(@ds, track['artist_id'][i])
+		if results then
+			artist = nil
+			results.tracks.each do |track|
+				track['artist'].each_index do |i|
+					if name.downcase == track['artist'][i].downcase
+						artist = Despotify::Artist.new(@ds, track['artist_id'][i])
+					end
 				end
+				break if artist
 			end
-			break if artist
-		end
 
-		artist.display if artist
+			artist.display if artist
+		end
 	end
 
 	def cmd_play(id = 0)

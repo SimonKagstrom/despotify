@@ -8,8 +8,6 @@
 typedef struct {
 	despotify_playlist *real;
 	int needfree;
-
-	VALUE session;
 } rb_despotify_playlist;
 
 

@@ -78,69 +78,52 @@ rb_despotify_artist_new(VALUE self, VALUE session, VALUE id) {
 static VALUE
 rb_despotify_artist_albums(VALUE self) {
 	ARTIST_METHOD_HEADER
-	despotify_album *a = NULL;
-	VALUE albums;
 
-	albums = rb_ary_new();
+	if (rb_iv_get(self, "albums") == Qnil) {
+		VALUE albums = rb_ary_new();
+		despotify_album *a;
 
-	for(a = artist->real->albums; a; a = a->next) {
-		rb_ary_push(albums, rb_despotify_album_new_from_album(a));
+		for(a = artist->real->albums; a; a = a->next) {
+			rb_ary_push(albums, rb_despotify_album_new_from_album(a));
+		}
+
+		rb_iv_set(self, "albums", albums);
 	}
 
-	return albums;
+	return rb_iv_get(self, "albums");
+}
+
+static VALUE
+rb_despotify_artist_metadata(VALUE self) {
+	ARTIST_METHOD_HEADER
+
+	if (rb_iv_get(self, "metadata") == Qnil) {
+		VALUE metadata = rb_hash_new();
+
+		HASH_VALUE_ADD(metadata, "name", rb_str_new2(artist->real->name));
+		HASH_VALUE_ADD(metadata, "id", rb_str_new2(artist->real->id));
+		if(artist->real->text)
+			HASH_VALUE_ADD(metadata, "text", rb_str_new2(artist->real->text));
+		HASH_VALUE_ADD(metadata, "portrait_id", rb_str_new2(artist->real->portrait_id));
+		HASH_VALUE_ADD(metadata, "genres", rb_str_new2(artist->real->genres));
+		HASH_VALUE_ADD(metadata, "years_active", rb_str_new2(artist->real->years_active));
+		HASH_VALUE_ADD(metadata, "num_albums", INT2NUM(artist->real->num_albums));
+		HASH_VALUE_ADD(metadata, "popularity", rb_float_new(artist->real->popularity));
+
+		rb_iv_set(self, "metadata", metadata);
+	}
+
+	return rb_iv_get(self, "metadata");
 }
 
 static VALUE
 rb_despotify_artist_lookup(VALUE self, VALUE key) {
 	ARTIST_METHOD_HEADER
-	char *keyval = NULL;
-
-	keyval = StringValuePtr(key);
-
-	if (!strcmp(keyval, "name"))
-		return rb_str_new2(artist->real->name);
-	else if (!strcmp(keyval, "id"))
-		return rb_str_new2(artist->real->id);
-	else if (!strcmp(keyval, "text")) {
-		if(artist->real->text)
-			return rb_str_new2(artist->real->text);
-	} else if (!strcmp(keyval, "portrait_id"))
-		return rb_str_new2(artist->real->portrait_id);
-	else if (!strcmp(keyval, "genres"))
-		return rb_str_new2(artist->real->genres);
-	else if (!strcmp(keyval, "years_active"))
-		return rb_str_new2(artist->real->years_active);
-	else if (!strcmp(keyval, "num_albums"))
-		return INT2NUM(artist->real->num_albums);
-	else if (!strcmp(keyval, "popularity"))
-		return rb_float_new(artist->real->popularity);
-
-	return Qnil;
-}
-
-
-#define ARTIST_METADATA_ADD(hash, key) \
-	keyval = rb_str_new2(key); \
-	rb_hash_aset(hash, keyval, rb_despotify_artist_lookup(self, keyval))
-
-static VALUE
-rb_despotify_artist_metadata(VALUE self) {
-	ARTIST_METHOD_HEADER
 	VALUE metadata;
-	VALUE keyval;
 
-	metadata = rb_hash_new();
-	ARTIST_METADATA_ADD(metadata, "name");
-	ARTIST_METADATA_ADD(metadata, "id");
-	ARTIST_METADATA_ADD(metadata, "text");
-	ARTIST_METADATA_ADD(metadata, "portrait_id");
-	ARTIST_METADATA_ADD(metadata, "genres");
-	ARTIST_METADATA_ADD(metadata, "years_active");
-	ARTIST_METADATA_ADD(metadata, "num_albums");
-	ARTIST_METADATA_ADD(metadata, "popularity");
+	metadata = rb_despotify_artist_metadata(self);
 
-
-	return metadata;
+	return rb_hash_aref(metadata, key);
 }
 
 

@@ -34,6 +34,7 @@ pls = @despotify.search('machinae')
 track = pls.tracks[0]
 
 pp track.metadata
-
+pp track.metadata.object_id
+pp track.metadata.object_id
 
 #dump_cover(track, 'test.jpg')

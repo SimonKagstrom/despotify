@@ -48,77 +48,49 @@ rb_despotify_track_new_from_track(despotify_track *t) {
 }
 
 static VALUE
-rb_despotify_track_lookup(VALUE self, VALUE key) {
-	TRACK_METHOD_HEADER
-	char *keyval = NULL;
-
-	keyval = StringValuePtr(key);
-
-	if (!strcmp(keyval, "artist")) {
-		VALUE artists = rb_ary_new();
-		despotify_artist *a;
-		for (a = track->real->artist; a; a = a->next)
-			rb_ary_push(artists, rb_str_new2(a->name));
-
-		return artists;
-	} else if(!strcmp(keyval, "album"))
-		return rb_str_new2(track->real->album);
-	else if(!strcmp(keyval, "title"))
-		return rb_str_new2(track->real->title);
-	else if(!strcmp(keyval, "length"))
-		return INT2NUM(track->real->length);
-	else if(!strcmp(keyval, "tracknumber"))
-		return INT2NUM(track->real->tracknumber);
-	else if(!strcmp(keyval, "year"))
-		return INT2NUM(track->real->year);
-	else if(!strcmp(keyval, "id"))
-	    return rb_str_new2(track->real->track_id);
-	else if(!strcmp(keyval, "artist_id")) {
-		VALUE ids = rb_ary_new();
-		despotify_artist *a;
-		for (a = track->real->artist; a; a = a->next)
-			rb_ary_push(ids, rb_str_new2(a->id));
-
-		return ids;
-	} else if(!strcmp(keyval, "file_id"))
-	    return rb_str_new2(track->real->file_id);
-	else if(!strcmp(keyval, "album_id"))
-	    return rb_str_new2(track->real->album_id);
-	else if(!strcmp(keyval, "cover_id"))
-	    return rb_str_new2(track->real->cover_id);
-	else if(!strcmp(keyval, "playable"))
-		return BOOL2VALUE(track->real->playable);
-	else if(!strcmp(keyval, "popularity"))
-		return rb_float_new(track->real->popularity);
-
-	return Qnil;
-}
-
-#define TRACK_METADATA_ADD(hash, key) \
-	keyval = rb_str_new2(key); \
-	rb_hash_aset(hash, keyval, rb_despotify_track_lookup(self, keyval))
-
-static VALUE
 rb_despotify_track_metadata(VALUE self) {
 	TRACK_METHOD_HEADER
+
+	if (rb_iv_get(self, "metadata") == Qnil) {
+		VALUE metadata = rb_hash_new();
+		VALUE artists = rb_ary_new();
+		VALUE artistids = rb_ary_new();
+		despotify_artist *a;
+
+		for (a = track->real->artist; a; a = a->next) {
+			rb_ary_push(artistids, rb_str_new2(a->id));
+			rb_ary_push(artists, rb_str_new2(a->name));
+		}
+
+		HASH_VALUE_ADD(metadata, "id", rb_str_new2(track->real->track_id));
+		HASH_VALUE_ADD(metadata, "artist", artists);
+		HASH_VALUE_ADD(metadata, "artist_id", artistids);
+		HASH_VALUE_ADD(metadata, "album", rb_str_new2(track->real->album));
+		HASH_VALUE_ADD(metadata, "title", rb_str_new2(track->real->title));
+		HASH_VALUE_ADD(metadata, "length", INT2NUM(track->real->length));
+		HASH_VALUE_ADD(metadata, "tracknumber", INT2NUM(track->real->tracknumber));
+		HASH_VALUE_ADD(metadata, "year", INT2NUM(track->real->year));
+		HASH_VALUE_ADD(metadata, "file_id", rb_str_new2(track->real->file_id));
+		HASH_VALUE_ADD(metadata, "album_id", rb_str_new2(track->real->album_id));
+		HASH_VALUE_ADD(metadata, "cover_id", rb_str_new2(track->real->cover_id));
+		HASH_VALUE_ADD(metadata, "playable", BOOL2VALUE(track->real->playable));
+		HASH_VALUE_ADD(metadata, "popularity", rb_float_new(track->real->popularity));
+
+		rb_iv_set(self, "metadata", metadata);
+	}
+
+	return rb_iv_get(self, "metadata");
+}
+
+static VALUE
+rb_despotify_track_lookup(VALUE self, VALUE key) {
+	TRACK_METHOD_HEADER
+
 	VALUE metadata;
-	VALUE keyval;
 
-	metadata = rb_hash_new();
-	TRACK_METADATA_ADD(metadata, "artist");
-	TRACK_METADATA_ADD(metadata, "album");
-	TRACK_METADATA_ADD(metadata, "title");
-	TRACK_METADATA_ADD(metadata, "length");
-	TRACK_METADATA_ADD(metadata, "tracknumber");
-	TRACK_METADATA_ADD(metadata, "year");
-	TRACK_METADATA_ADD(metadata, "id");
-	TRACK_METADATA_ADD(metadata, "artist_id");
-	TRACK_METADATA_ADD(metadata, "album_id");
-	TRACK_METADATA_ADD(metadata, "file_id");
-	TRACK_METADATA_ADD(metadata, "cover_id");
-	TRACK_METADATA_ADD(metadata, "playable");
+	metadata = rb_despotify_track_metadata(self);
 
-	return metadata;
+	return rb_hash_aref(metadata, key);
 }
 
 
