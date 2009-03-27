@@ -31,12 +31,12 @@ cdef class RootIterator:
     def __iter__(self):
         return self
 
-    def next(self):
-        if i >= len(self.parent):
+    def __next__(self):
+        if self.i >= len(self.parent):
             raise StopIteration()
 
-        retval = self.parent.get(i)
-        i = i + 1
+        retval = self.parent[self.i]
+        self.i = self.i + 1
         return retval
 
 cdef class RootList:

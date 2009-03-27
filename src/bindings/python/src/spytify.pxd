@@ -1,11 +1,11 @@
 from despotify cimport *
 
-
-cdef class Album
-cdef class Artist
-cdef class Playlist
-cdef class RootList
-cdef class Track
+cdef class SessionStruct
+cdef class Album(SessionStruct)
+cdef class Artist(SessionStruct)
+cdef class Playlist(SessionStruct)
+cdef class RootList(SessionStruct)
+cdef class Track(SessionStruct)
 
 cdef class SessionStruct:
     cdef despotify_session* ds
@@ -26,6 +26,10 @@ cdef class RootList(SessionStruct):
     cdef fetch(self)
     cdef playlist* data 
     cdef list _list
+
+cdef class RootIterator:
+    cdef RootList parent
+    cdef int i
 
 cdef class Album(SessionStruct):
     cdef album* data

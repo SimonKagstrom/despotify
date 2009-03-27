@@ -51,6 +51,9 @@ cdef class Spytify:
     def close(self):
         despotify_exit(self.ds)
 
+def bytestr_to_hexstr(str bytes):
+    return ''.join(["%02x" % ord(c) for c in bytes])
+
 # Wrapper for despotify_cleanup.
 def _cleanup():
     assert(despotify_cleanup())

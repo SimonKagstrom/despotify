@@ -4,12 +4,19 @@ cdef class Track:
     def __init__(self):
         raise TypeError("This class cannot be instantiated from Python")
 
-    property id:
+    property track_id:
         def __get__(self):
-            return self.data.id
+            return str(<char*>self.data.track_id)
+
+    property file_id:
+        def __get__(self):
+            return str(<char*>self.data.file_id)
 
     def has_meta_data(self):
         return bool(self.data.has_meta_data)
+
+    def is_playable(self):
+        return bool(self.data.playable)
 
     property title:
         def __get__(self):
@@ -33,6 +40,18 @@ cdef class Track:
         def __get__(self):
             return self.data.length
 
+    property tracknumber:
+        def __get__(self):
+            return self.data.tracknumber
+
+    property year:
+        def __get__(self):
+            return self.data.year
+
+    property popularity:
+        def __get__(self):
+            return self.data.popularity
+
     def __str__(self):
-        return '<Track: %s - %s - %s>' % (self.artist, self.title, self.album)
+        return '<Track: %s - %s - %s>' % (", ".join([a.name for a in self.artists]), self.title, self.album)
 

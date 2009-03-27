@@ -15,9 +15,9 @@ def print_track(track):
     if track.has_meta_data():
         has_metadata = ""
 
-    print "  > %03d %s - %s (%s), length: %d [%splayable]" % (track.id, track.artist,
-                                                              track.title, track.album,
-                                                              track.length, has_metadata)
+    print "  > %s - %s (%s), length: %d [%splayable]" % (", ".join((a.name for a in track.artists)),
+                                                         track.title, track.album,
+                                                         track.length, has_metadata)
 
 def main():
     print "Enter your username: ",

@@ -1,6 +1,4 @@
 cdef extern from "despotify.h":
-    ctypedef int dbool
-
     cdef struct album
 
     cdef struct artist:
@@ -16,9 +14,8 @@ cdef extern from "despotify.h":
         artist * next
 
     cdef struct track:
-        int id
-        dbool has_meta_data
-        dbool playable
+        bint has_meta_data
+        bint playable
         unsigned char * track_id
         unsigned char * file_id
         unsigned char * album_id
@@ -74,7 +71,7 @@ cdef extern from "despotify.h":
         pass
 
     cdef struct despotify_session:
-        dbool initialized
+        bint initialized
         session * session
         snd_session * snd_session
         char * last_error
@@ -85,11 +82,11 @@ cdef extern from "despotify.h":
         playlist * playlist
         buf * response
         int offset
-        dbool list_of_lists
+        bint list_of_lists
 
     album * despotify_get_album(despotify_session *, char *)
-    dbool despotify_stop(despotify_session *)
-    dbool despotify_resume(despotify_session *)
+    bint despotify_stop(despotify_session *)
+    bint despotify_resume(despotify_session *)
     void despotify_free_album(album *)
     void despotify_exit(despotify_session *)
     void despotify_free_artist(artist *)
@@ -97,17 +94,17 @@ cdef extern from "despotify.h":
     playlist * despotify_search(despotify_session *, char *)
     void despotify_uri2id(char *, char *)
     char * despotify_get_error(despotify_session *)
-    dbool despotify_authenticate(despotify_session *, char *, char *)
+    bint despotify_authenticate(despotify_session *, char *, char *)
     playlist * despotify_search_more(despotify_session *, playlist *)
-    dbool despotify_pause(despotify_session *)
-    dbool despotify_cleanup()
+    bint despotify_pause(despotify_session *)
+    bint despotify_cleanup()
     artist * despotify_get_artist(despotify_session *, char *)
-    dbool despotify_play(despotify_session *, playlist *, track *)
+    bint despotify_play(despotify_session *, playlist *, track *)
     void despotify_free_playlist(playlist *)
-    void despotify_free(despotify_session *, dbool)
+    void despotify_free(despotify_session *, bint)
     void * despotify_get_image(despotify_session *, char *, int *)
     void despotify_id2uri(char *, char *)
-    dbool despotify_init()
+    bint despotify_init()
     playlist * despotify_get_stored_playlists(despotify_session *)
     track * despotify_get_current_track(despotify_session *)
 
