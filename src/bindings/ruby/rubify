@@ -1,0 +1,211 @@
+#!/usr/bin/env ruby
+# $Id$
+# Rubify is the example client for libdespotify-ruby.
+
+
+# allow running from source tree without installing
+$LOAD_PATH << 'build'
+
+
+require 'despotify'
+require 'readline'
+require 'pp'
+
+module Despotify
+	class Playlist
+		def display
+			puts 'Playlist name: %s' % name
+			i = 0
+			tracks.each do |track|
+				puts '%2d: %s - %s (%d:%02d)' % [i += 1, track['artist'].join(', '), track['title'],
+				                                 (track['length'] / 60000), (track['length'] % 60000 / 1000)]
+			end
+			puts ''
+		end
+	end
+
+	class Artist
+		def display
+			puts 'Name: %s' % metadata['name']
+			puts 'Genres: %s' % metadata['genres']
+			puts 'Years active: %s' % metadata['years_active']
+
+			puts '%d albums:' % metadata['num_albums']
+			albums.each do |album|
+				puts ' %s (%d)' % [album['name'], album['year']]
+			end
+			puts ''
+		end
+	end
+end
+
+
+class Rubify < Despotify::Session
+		HelpText = "Available commands:\n" +
+		"list [num]           List stored playlists\n" +
+		"search <string>      Search tracks\n" +
+		"artist <string>      Show information about artist\n" +
+		"play [num]           Play track [num] in the last viewed list or resumes if currently playing\n" +
+		"stop, pause          Control playback\n" +
+		"help                 This text\n" +
+		"quit                 Quit"
+
+
+	def initialize(username, password)
+		@ds = Despotify::Session.new(username, password)
+
+		@playlists = []
+		@curpls = nil
+		@haslists = false
+		@ispaused = false
+	end
+
+	def create_prompt
+		if @curpls
+			name = @curpls.name
+			name = name[0..15] + '...' if name.length > 15
+
+			return '%s> ' % name
+		else
+			return 'rubify> '
+		end
+	end
+
+	def run
+		puts HelpText
+
+		loop do
+			line = Readline::readline(create_prompt)
+			Readline::HISTORY.push(line)
+
+			args = line.split
+			cmd = args.shift
+
+			next if line.size == 0
+			break if cmd == 'quit'
+
+			begin
+				funcname = 'cmd_' + cmd
+				func = method(funcname)
+			rescue
+				puts 'Unknown command: %s. Type "help" for a list of commands.' % cmd
+				next
+			end
+
+			begin
+				func.call(*args)
+			rescue ArgumentError
+				puts 'Incorrect amount of arguments to command: %s' % cmd
+			end
+		end
+	end
+
+	def cache_lists
+		if not @haslists
+			@playlists += @ds.playlists
+			@haslists = true
+		end
+	end
+
+	def cmd_list(id = 0)
+		id = id.to_i
+
+		cache_lists
+
+		if id > 0 and id <= @playlists.size
+			pls = @playlists[id - 1]
+			pls.display
+			@curpls = pls
+		else
+			if @playlists.size > 0
+				i = 0
+				@playlists.each do |pls|
+					puts "%2d %s" % [i += 1, pls.name]
+				end
+			else
+				puts 'No playlists available'
+			end
+		end
+	end
+
+	def cmd_search(*args)
+		s = args.join(' ')
+		puts 'Searching for: %s' % s
+		results = @ds.search(s)
+
+		if results.tracks.size > 0
+			results.display
+
+			@playlists << results
+			@curpls = results
+		else
+			puts 'Nothing found'
+		end
+	end
+
+	def cmd_artist(*args)
+		name = args.join(' ')
+		results = @ds.search(name)
+
+		artist = nil
+		results.tracks.each do |track|
+			track['artist'].each_index do |i|
+				if name.downcase == track['artist'][i].downcase
+					artist = Despotify::Artist.new(@ds, track['artist_id'][i])
+				end
+			end
+			break if artist
+		end
+
+		artist.display if artist
+	end
+
+	def cmd_play(id = 0)
+		id = id.to_i
+
+		if id == 0
+			if @ispaused
+				return @ds.resume
+			else
+				id = 1
+			end
+		end
+
+		if @curpls and id <= @curpls.tracks.size
+			@ds.play(@curpls, @curpls.tracks[id - 1])
+			@ispaused = false
+		end
+	end
+
+	def cmd_pause
+		@ds.pause
+		@ispaused = true
+	end
+
+	def cmd_stop
+		@ds.stop
+		@ispaused = false
+	end
+
+	def cmd_help
+		puts HelpText
+	end
+end
+
+
+username = ARGV.shift
+password = ARGV.shift
+
+if not (username and password)
+	puts 'Usage: rubyify <username> <password>'
+	exit
+end
+
+begin
+	rubify = Rubify.new(username, password)
+rescue Despotify::DespotifyError
+	puts 'Failed to authenticate user'
+	exit
+end
+
+rubify.run
