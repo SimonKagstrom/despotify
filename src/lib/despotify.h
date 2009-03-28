@@ -41,6 +41,7 @@ struct playlist
     char name[STRING_LENGTH];
     char author[STRING_LENGTH];
     unsigned char playlist_id[35];
+    int is_collaborative;
     int num_tracks;
     struct track *tracks;
     struct search_result *search; /* in case the playlist is a search result */
