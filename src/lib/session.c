@@ -87,23 +87,29 @@ SESSION *session_init_client (void)
 
 	session->ap_sock = -1;
 	session->username[0] = 0;
-	session->country[0] = 0;
 	session->server_host[0] = 0;
 	session->server_port = 0;
 
 	session->key_recv_IV = 0;
 	session->key_send_IV = 0;
 
+	session->user_info.username[0] = 0;
+	session->user_info.country[0] = 0;
+	session->user_info.server_host[0] = 0;
+	session->user_info.server_port = 0;
+
 	return session;
 }
 
 void session_auth_set (SESSION * session, const char *username, const char *password)
 {
-	strncpy (session->username, username, sizeof (session->username) - 1);
+	DSFYstrncpy (session->user_info.username, username,
+		     sizeof session->user_info.username);
+	DSFYstrncpy (session->username, username, sizeof session->username);
 	session->username[sizeof (session->username) - 1] = 0;
 	session->username_len = strlen (session->username);
 
-	strncpy (session->password, password, sizeof (session->password) - 1);
+	DSFYstrncpy (session->password, password, sizeof session->password);
 	session->password[sizeof (session->password) - 1] = 0;
 }
 
@@ -153,10 +159,12 @@ int session_connect (SESSION * session)
 	 * Save for later use in ConnectionInfo message
 	 * (too lazy to do getpeername() later ;)
 	 */
-	strncpy (session->server_host, host,
-		 sizeof (session->server_host) - 1);
-	session->server_host[sizeof (session->server_host) - 1] = 0;
+	DSFYstrncpy (session->server_host, host, sizeof session->server_host);
 	session->server_port = port;
+
+	DSFYstrncpy (session->user_info.server_host, host,
+		     sizeof session->user_info.server_host);
+	session->user_info.server_port = port;
 
 	return 0;
 }
@@ -170,7 +178,11 @@ void session_disconnect (SESSION * session)
 
 	session->key_recv_IV = 0;
 	session->key_send_IV = 0;
-	session->country[0] = 0;
+
+	session->user_info.username[0] = 0;
+	session->user_info.country[0] = 0;
+	session->user_info.server_host[0] = 0;
+	session->user_info.server_port = 0;
 }
 
 void session_free (SESSION * session)

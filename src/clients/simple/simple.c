@@ -46,6 +46,27 @@ void print_tracks(struct track* head)
     }
 }
 
+void print_info(struct despotify_session* ds)
+{
+    struct user_info* user = ds->user_info;
+    printf("Username       : %s\n", user->username);
+    printf("Country        : %s\n", user->country);
+    printf("Account type   : %s\n", user->type);
+    printf("Account expiry : %s", ctime(&user->expiry));
+    printf("Host           : %s:%d\n", user->server_host, user->server_port);
+    printf("Last ping      : %s", ctime(&user->last_ping));
+
+    if (strncmp(user->type, "premium", 7)) {
+        printf("\n=================================================\n"
+               "                  N O T I C E\n"
+               "       You do not have a premium account.\n"
+               "  Playback and playlists will not be available.\n"
+               "=================================================\n");
+    }
+}
+
+
+
 void print_help(void)
 {
     printf("\nAvailable commands:\n"
@@ -56,6 +77,7 @@ void print_help(void)
            "play [num]           Play track [num] in the last viewed list\n"
            "stop, pause, resume  Control playback\n"
            "portrait [num]       Save artist portrait to portrait.jpg\n"
+           "info                 Details about your account and current connection\n"
            "help                 This text\n"
            "quit                 Quit\n");
 }
@@ -263,6 +285,11 @@ void command_loop(struct despotify_session* ds)
         else if (!strncmp(buf, "resume", 5)) {
             despotify_resume(ds);
         }
+
+        /* info */
+        else if (!strncmp(buf, "info", 4)) {
+            print_info(ds);
+        }
         
         /* help */
         else if (!strncmp(buf, "help", 4)) {
@@ -306,6 +333,8 @@ int main(int argc, char** argv)
         despotify_exit(ds);
         return 1;
     }
+
+    print_info(ds);
 
     command_loop(ds);
 

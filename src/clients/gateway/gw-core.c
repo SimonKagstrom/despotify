@@ -486,8 +486,8 @@ int rest_fsm (RESTSESSION * r)
 		else if (!strcmp (r->command, "country")) {
 			r->state = REST_STATE_LOAD_COMMAND;
 			sprintf (msg, "200 %zd OK Assigned country below\n%s",
-				 strlen (r->client->session->country),
-				 r->client->session->country);
+				 strlen (r->client->session->user_info.country),
+				 r->client->session->user_info.country);
 			block_write (r->socket, msg, strlen (msg));
 		}
 		else if (!strncmp (r->command, "browseartist ", 13)) {
@@ -944,19 +944,8 @@ SPOTIFYSESSION *spotify_find_http_client (void)
 void app_packet_callback (SESSION * s, int cmd, unsigned char *payload,
 			  int len)
 {
-
-	switch (cmd) {
-	case CMD_COUNTRYCODE:{
-			int i;
-
-			for (i = 0; i < len
-					&& i < (int) sizeof (s->country) - 1;
-					i++)
-				s->country[i] = payload[i];
-
-			s->country[i] = 0;
-			break;
-		}
-	}
-
+	(void) s;
+	(void) cmd;
+	(void) payload;
+	(void) len;
 }

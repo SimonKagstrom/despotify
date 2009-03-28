@@ -16,6 +16,7 @@
 #include "commands.h"
 #include "packet.h"
 #include "util.h"
+#include "xml.h"
 
 int handle_secret_block (SESSION * session, unsigned char *payload, int len)
 {
@@ -55,10 +56,14 @@ int handle_secret_block (SESSION * session, unsigned char *payload, int len)
 	return cmd_send_cache_hash (session);
 }
 
-int handle_ping (SESSION * session)
+int handle_ping (SESSION * session, unsigned char *payload, int len)
 {
 
-	/* Ignore the timestamp but respond to the request */
+	/* Store timestamp and respond to the request */
+	time_t t;
+	assert (len == 4);
+	memcpy (&t, payload, 4);
+	session->user_info.last_ping = ntohl (t);
 
 	return cmd_ping_reply (session);
 }
@@ -99,6 +104,21 @@ int handle_aeskey (unsigned char *payload, int len)
 	return ret;
 }
 
+static int handle_countrycode (SESSION * session, unsigned char *payload, int len)
+{
+	int i;
+	for (i = 0; i < len && i < (int)sizeof session->user_info.country; i++)
+		session->user_info.country[i] = payload[i];
+	session->user_info.country[i] = 0;
+	return 0;
+}
+
+static int handle_prodinfo (SESSION * session, unsigned char *payload, int len)
+{
+	xml_parse_prodinfo(&session->user_info, payload, len);
+	return 0;
+}
+
 static int handle_welcome (SESSION * session)
 {
     /* signal "login complete" */
@@ -119,7 +139,7 @@ int handle_packet (SESSION * session,
 		break;
 
 	case CMD_PING:
-		error = handle_ping (session);
+		error = handle_ping (session, payload, len);
 		break;
 
 	case CMD_CHANNELDATA:
@@ -138,6 +158,7 @@ int handle_packet (SESSION * session,
 		break;
 
 	case CMD_COUNTRYCODE:
+		error = handle_countrycode (session, payload, len);
 		break;
 
 	case CMD_P2P_INITBLK:
@@ -150,6 +171,7 @@ int handle_packet (SESSION * session,
 
 	case CMD_PRODINFO:
 		/* Payload is uncompressed XML */
+		error = handle_prodinfo (session, payload, len);
 		break;
 
 	case CMD_WELCOME:
@@ -157,9 +179,9 @@ int handle_packet (SESSION * session,
 		break;
 
 	case CMD_PAUSE:
-                /* TODO: No GUI events in here.
+		/* TODO: No GUI events in here.
 		event_msg_post (MSG_CLASS_GUI, MSG_GUI_PAUSE, NULL);
-                */
+		*/
 		break;
 	}
 

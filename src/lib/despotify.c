@@ -69,6 +69,8 @@ struct despotify_session* despotify_init_client()
 
     pthread_cond_init(&ds->sync_cond, NULL);
     pthread_mutex_init(&ds->sync_mutex, NULL);
+
+    ds->user_info = &ds->session->user_info;
     
     return ds;
 }

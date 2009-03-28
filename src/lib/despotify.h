@@ -3,6 +3,7 @@
 
 #include <pthread.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define STRING_LENGTH 256
 #define MAX_SEARCH_RESULTS 100 /* max search results per request */
@@ -48,7 +49,8 @@ struct playlist
     struct playlist *next; /* in case of multiple playlists in the root list */
 };
 
-struct album {
+struct album
+{
     char name[STRING_LENGTH];
     char id[33];
     int num_tracks;
@@ -59,7 +61,8 @@ struct album {
     struct album* next; /* in case of multiple albums in an artist struct */
 };
 
-struct artist {
+struct artist
+{
     char name[STRING_LENGTH];
     char id[33];
     char* text;
@@ -72,10 +75,22 @@ struct artist {
     struct artist* next; /* in case of multiple artists in a track struct */
 };
 
+struct user_info
+{
+    char username[STRING_LENGTH];
+    char country[4];
+    char type[16];
+    time_t expiry;
+    char server_host[STRING_LENGTH];
+    short server_port;
+    time_t last_ping;
+};
+
 struct despotify_session
 {
     bool initialized;
     struct session* session;
+    struct user_info* user_info;
     struct snd_session* snd_session;
     const char *last_error;
 

@@ -369,3 +369,13 @@ void xml_free_album(struct album* album)
         free(a);
     }
 }
+
+void xml_parse_prodinfo(struct user_info* u, unsigned char* xml, int len)
+{
+    ezxml_t top = ezxml_parse_str(xml, len);
+    xmlstrncpy(u->type, sizeof u->type, top, "product", 0, "type", -1);
+    unsigned int expiry;
+    xmlatoi(&expiry, top, "product", 0, "expiry", -1);
+    u->expiry = expiry;
+    ezxml_free(top);
+}

@@ -27,4 +27,6 @@ void xml_free_track(struct track* head);
 void xml_free_artist(struct artist* artist);
 void xml_free_album(struct album* album);
 
+void xml_parse_prodinfo(struct user_info* u, unsigned char* xml, int len);
+
 #endif

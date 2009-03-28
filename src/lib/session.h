@@ -11,6 +11,7 @@
 #include <openssl/dh.h>
 #include <openssl/rsa.h>
 
+#include "despotify.h" /* struct user_info declaration */
 #include "shn.h"
 
 
@@ -115,8 +116,8 @@ typedef struct session
 
 	unsigned char cache_hash[20];
 
-	/* Assigned country */
-	char country[4];
+	/* General user info exposed by the API */
+	struct user_info user_info;
 
         /* login synchronization */
         pthread_mutex_t login_mutex;
