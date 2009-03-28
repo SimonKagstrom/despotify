@@ -54,6 +54,9 @@ rb_despotify_session_new(VALUE self) {
 	session->rootpl = NULL;
 	session->connected = false;
 
+	if (rb_block_given_p())
+		rb_yield(self);
+
 	return self;
 }
 

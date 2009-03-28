@@ -71,6 +71,9 @@ rb_despotify_artist_new(VALUE self, VALUE session, VALUE id) {
 
 	artist->real = a;
 
+	if (rb_block_given_p())
+		rb_yield(self);
+
 	return self;
 }
 

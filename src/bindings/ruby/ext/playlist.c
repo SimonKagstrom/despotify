@@ -77,6 +77,9 @@ rb_despotify_playlist_new(VALUE self, VALUE session, VALUE id) {
 
 	rb_iv_set(self, "session", session);
 
+	if (rb_block_given_p())
+		rb_yield(self);
+
 	return self;
 }
 

@@ -55,6 +55,9 @@ rb_despotify_album_new(VALUE self, VALUE session, VALUE id) {
 	album->real = a;
 	album->ischild = false;
 
+	if (rb_block_given_p())
+		rb_yield(self);
+
 	return self;
 }
 
