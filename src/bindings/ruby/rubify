@@ -11,16 +11,64 @@ require 'despotify'
 require 'readline'
 require 'pp'
 
+class String
+	def trim(max)
+		return self[0..(max-5)] + '...' if self.length > max
+		return self
+	end
+end
+
+class ColumnArray < Array
+	def set_headers(*headers)
+		@headers = headers
+	end
+
+	def set_sizes(*sizes)
+		@sizes = sizes
+	end
+
+	def display
+		termwidth = (ENV['COLUMNS'] || 80).to_i
+		widths = []
+		format = ''
+
+		@sizes.each do |p|
+			width = (termwidth * p) / 100
+			widths << width
+			format += "%-#{width}s"
+		end
+
+		puts format % @headers
+		each do |t|
+			trimmed = []
+			t.each_index { |i| trimmed <<  t[i].to_s.trim(widths[i]) }
+			puts format % trimmed
+		end
+
+		print "\n"
+	end
+end
+
 module Despotify
 	class Playlist
 		def display
 			puts 'Playlist name: %s' % name
-			i = 0
+			puts 'Playlist author: %s' % author
+			print "\n"
+
+			col = ColumnArray.new
+			col.set_headers 'Index', 'Title', 'Artist', 'Length', 'Album'
+			col.set_sizes 5, 30, 25, 10, 25
+
+
 			tracks.each do |track|
-				puts '%2d: %s - %s (%d:%02d)' % [i += 1, track['artist'].join(', '), track['title'],
-				                                 (track['length'] / 60000), (track['length'] % 60000 / 1000)]
+				length = '%02d:%02d' % [(track['length'] / 60000), (track['length'] % 60000 / 1000)]
+				index = tracks.index(track) + 1
+
+				col << [index, track['title'], track['artist'].join(', '), length, track['album']]
 			end
-			puts ''
+
+			col.display
 		end
 	end
 
@@ -29,174 +77,264 @@ module Despotify
 			puts 'Name: %s' % metadata['name']
 			puts 'Genres: %s' % metadata['genres']
 			puts 'Years active: %s' % metadata['years_active']
+			puts 'Albums:' % metadata['num_albums']
+			print "\n"
 
-			puts '%d albums:' % metadata['num_albums']
+			col = ColumnArray.new
+			col.set_headers 'Name', 'Tracks', 'Year'
+			col.set_sizes 50, 10, 10
+
 			albums.each do |album|
-				puts ' %s (%d)' % [album['name'], album['year']]
+				col << [album['name'], album['num_tracks'], album['year']]
 			end
-			puts ''
+
+			col.display
 		end
 	end
 end
 
+module Rubify
+	COMMANDS = []
 
-class Rubify < Despotify::Session
-		HelpText = "Available commands:\n" +
-		"list [num]           List stored playlists\n" +
-		"search <string>      Search tracks\n" +
-		"artist <string>      Show information about artist\n" +
-		"play [num]           Play track [num] in the last viewed list or resumes if currently playing\n" +
-		"stop, pause          Control playback\n" +
-		"help                 This text\n" +
-		"quit                 Quit"
+	class Command
+		def initialize(rubify)
+			@rubify = rubify
+			@ds = rubify.ds
+		end
 
-
-	def initialize(ds)
-		@ds = ds
-
-		@playlists = []
-		@curpls = nil
-		@haslists = false
-		@ispaused = false
-	end
-
-	def create_prompt
-		if @curpls
-			name = @curpls.name
-			name = name[0..15] + '...' if name.length > 15
-
-			return '%s> ' % name
-		else
-			return 'rubify> '
+		def call(*args)
 		end
 	end
 
-	def run
-		puts HelpText
+	class List < Command
+		def call(id = 0)
+			@rubify.cache_lists
 
-		loop do
-			line = Readline::readline(create_prompt)
+			id = id.to_i
+			playlists = @rubify.playlists
 
-			break if line.nil?
-			next if line.size == 0
-
-			args = line.split
-			cmd = args.shift
-
-			Readline::HISTORY.push(line)
-
-			break if cmd == 'quit'
-
-			begin
-				funcname = 'cmd_' + cmd
-				func = method(funcname)
-			rescue
-				puts 'Unknown command: %s. Type "help" for a list of commands.' % cmd
-				next
-			end
-
-			begin
-				func.call(*args)
-			rescue ArgumentError
-				puts 'Incorrect amount of arguments to command: %s' % cmd
+			if id > 0 and id <= playlists.size
+				list(playlists[id - 1])
+			else
+				lists(playlists)
 			end
 		end
-	end
 
-	def cache_lists
-		if not @haslists
-			@playlists += @ds.playlists
-			@haslists = true
+		def list(playlist)
+			playlist.display
+
+			@rubify.playlist = playlist
 		end
-	end
 
-	def cmd_list(id = 0)
-		id = id.to_i
+		def lists(playlists)
+			if playlists.size > 0
+				col = ColumnArray.new
+				col.set_headers 'Index', 'Name', 'Tracks', 'Author'
+				col.set_sizes 5, 50, 6, 30
 
-		cache_lists
+				playlists.each do |playlist|
+					index = playlists.index(playlist) + 1
 
-		if id > 0 and id <= @playlists.size
-			pls = @playlists[id - 1]
-			pls.display
-			@curpls = pls
-		else
-			if @playlists.size > 0
-				i = 0
-				@playlists.each do |pls|
-					puts "%2d %s" % [i += 1, pls.name]
+					col << [index, playlist.name, playlist.tracks.size, playlist.author]
 				end
+
+				col.display
 			else
 				puts 'No playlists available'
 			end
 		end
 	end
+	COMMANDS << [List,	'list [num]', 'List stored playlists']
 
-	def cmd_search(*args)
-		s = args.join(' ')
-		puts 'Searching for: %s' % s
 
-		results = @ds.search(s)
-		searchtimes = (results.search_info['total_tracks'].to_f / Despotify::MAX_SEARCH_RESULTS).ceil
-		searchtimes.times { results.search_more }
+	class Search < Command
+		def call(*args)
+			searchterm = args.join(' ')
+			puts 'Searching for: %s' % searchterm
 
-		if results
-			results.display
+			results = @ds.search(searchterm)
 
-			@playlists << results
-			@curpls = results
-		else
-			puts 'Nothing found'
-		end
-	end
+			if results
+				searchtimes = (results.search_info['total_tracks'].to_f / Despotify::MAX_SEARCH_RESULTS).ceil
+				searchtimes.times { results.search_more }
 
-	def cmd_artist(*args)
-		name = args.join(' ')
-		results = @ds.search(name)
+				results.display
 
-		if results then
-			artist = nil
-			results.tracks.each do |track|
-				track['artist'].each_index do |i|
-					if name.downcase == track['artist'][i].downcase
-						artist = Despotify::Artist.new(@ds, track['artist_id'][i])
-					end
-				end
-				break if artist
-			end
-
-			artist.display if artist
-		end
-	end
-
-	def cmd_play(id = 0)
-		id = id.to_i
-
-		if id == 0
-			if @ispaused
-				return @ds.resume
+				@rubify.playlists << results
+				@rubify.playlist = results
 			else
-				id = 1
+				puts 'Nothing found'
+			end
+		end
+	end
+	COMMANDS << [Search, 'search <string>',	'Search tracks']
+
+
+	class Artist < Command
+		def call(*args)
+			name = args.join(' ')
+
+			results = @ds.search(name)
+
+			if results then
+				artist = nil
+
+				results.tracks.each do |track|
+					track['artist'].each_index do |i|
+						if name.downcase == track['artist'][i].downcase
+							artist = @ds.artist(track['artist_id'][i])
+						end
+					end
+					break if artist
+				end
+
+				artist.display if artist
+			end
+		end
+	end
+	COMMANDS << [Artist, 'artist <string>',	'Show information about artist']
+
+
+	class Play < Command
+		def call(id = 0)
+			id = id.to_i
+
+			if id == 0
+				if @rubify.paused
+					return @ds.resume
+				else
+					id = 1
+				end
+			end
+
+			playlist = @rubify.playlist
+			if playlist and id <= playlist.tracks.size
+				track = playlist.tracks[id - 1]
+				@ds.play(playlist, track)
+				@rubify.paused = false
+			end
+		end
+	end
+	COMMANDS << [Play, 'play [num]', 'Play track [num] in the last viewed list or resumes if currently playing']
+
+
+	class Stop < Command
+		def call(*args)
+			@ds.stop
+			@rubify.paused = false
+		end
+	end
+	COMMANDS << [Stop, 'stop', 'Stop playback']
+
+
+	class Pause < Command
+		def call(*args)
+			@ds.pause
+			@rubify.paused = true
+		end
+	end
+	COMMANDS << [Pause, 'pause', 'Pause playback']
+
+	class User < Command
+		def call(*args)
+			info = @ds.user_info
+
+			puts 'Username: %s' % info['username']
+			puts 'Account type: %s' % info['type']
+			puts 'Account expires: %s' % Time.at(info['expiry'])
+			puts 'Country: %s' % info['country']
+			puts 'Currently connected to %s' % info['server_host']
+		end
+	end
+	COMMANDS << [User, 'user', 'Display information about currently logged in user']
+
+	class Help < Command
+		def call(*args)
+			puts 'Available commands:'
+			COMMANDS.each do |cmd|
+				puts '%-20s %s' % [cmd[1], cmd[2]]
+			end
+		end
+	end
+	COMMANDS << [Help, 'help', 'This help text']
+
+
+	class Quit < Command
+		def call(*args)
+			exit
+		end
+	end
+	COMMANDS << [Quit, 'quit', 'Quit Rubify']
+
+
+	class CLI
+		attr_accessor :ds, :haslists, :paused, :playlist, :playlists
+		def initialize(ds)
+			@ds = ds
+
+			@playlists = []
+			@playlist = nil
+			@haslists = false
+			@paused = false
+		end
+
+		def create_prompt
+			if @playlist
+				name = @playlist.name
+				name = name[0..20] + '...' if name.length > 20
+
+				return '%s> ' % name
+			else
+				return 'rubify> '
 			end
 		end
 
-		if @curpls and id <= @curpls.tracks.size
-			@ds.play(@curpls, @curpls.tracks[id - 1])
-			@ispaused = false
+		def run
+			do_cmd 'help'
+
+			loop do
+				line = Readline::readline(create_prompt)
+
+				break if line.nil?
+				next if line.size == 0
+
+				Readline::HISTORY.push(line)
+				args = line.split
+				cmd = args.shift
+
+
+				do_cmd(cmd, *args)
+			end
 		end
-	end
 
-	def cmd_pause
-		@ds.pause
-		@ispaused = true
-	end
+		def do_cmd(name, *args)
+			command = nil
 
-	def cmd_stop
-		@ds.stop
-		@ispaused = false
-	end
+			COMMANDS.each do |cmd|
+				if cmd[0].inspect.downcase == 'rubify::' + name.downcase
+					command = cmd[0].new(self)
+					break
+				end
+			end
 
-	def cmd_help
-		puts HelpText
+			if command
+				begin
+					command.call(*args)
+				rescue ArgumentError
+					puts 'Incorrect amount of arguments to command: %s' % name
+				end
+			else
+				puts 'Unknown command: %s. Type "help" for a list of commands.' % name
+			end
+
+		end
+
+		def cache_lists
+			if not @haslists
+				@playlists += @ds.playlists
+				@haslists = true
+			end
+		end
 	end
 end
 
@@ -209,13 +347,19 @@ if not (username and password)
 	exit
 end
 
-ds = Despotify::Session.new
-begin
-	ds.authenticate(username, password)
-rescue Despotify::DespotifyError
-	puts 'Failed to authenticate user: %s' % ds.get_error
-	exit
-end
+Despotify::Session.new do |ds|
+	begin
+		ds.authenticate(username, password)
+	rescue Despotify::DespotifyError
+		puts 'Failed to authenticate user: %s' % ds.get_error
+		exit
+	end
 
-rubify = Rubify.new(ds)
-rubify.run
+	if ds.user_info['type'] != 'premium'
+		puts 'You need a premium account to user Rubify!'
+		exit
+	end
+
+	rubify = Rubify::CLI.new(ds)
+	rubify.run
+end

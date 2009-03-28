@@ -18,6 +18,7 @@ typedef struct playlist despotify_playlist;
 typedef struct track despotify_track;
 typedef struct artist despotify_artist;
 typedef struct album despotify_album;
+typedef struct user_info despotify_user_info;
 
 #define BOOL2VALUE(exp) exp ? Qtrue : Qfalse
 

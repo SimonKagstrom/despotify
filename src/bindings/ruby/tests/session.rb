@@ -23,3 +23,5 @@ end
 
 pls = despotify.playlist 'd10d32140807f5260d045384117734c002'
 pp pls
+
+pp despotify.user_info

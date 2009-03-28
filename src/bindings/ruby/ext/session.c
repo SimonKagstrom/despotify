@@ -78,10 +78,16 @@ static VALUE
 rb_despotify_session_search(VALUE self, VALUE searchtext) {
 	SESSION_METHOD_HEADER
 	despotify_playlist *pl;
+	VALUE playlist;
 
 	pl = despotify_search(session->real, StringValuePtr(searchtext));
 
-	return rb_despotify_playlist_new_from_pl(self, pl, false);
+	playlist = rb_despotify_playlist_new_from_pl(self, pl, false);
+
+	if (rb_block_given_p())
+		rb_yield(playlist);
+
+	return playlist;
 }
 
 static VALUE
@@ -128,6 +134,28 @@ rb_despotify_session_play(VALUE self, VALUE playlist, VALUE track) {
 	VALUE2TRACK(track, t);
 
 	return BOOL2VALUE(despotify_play(session->real, pls->real, t->real));
+}
+
+static VALUE
+rb_despotify_session_user_info(VALUE self) {
+	SESSION_METHOD_HEADER
+	VALUE userinfo;
+	despotify_user_info *info = NULL;
+
+	info = session->real->user_info;
+	userinfo = rb_hash_new();
+
+	if (info) {
+		HASH_VALUE_ADD(userinfo, "username", rb_str_new2(info->username));
+		HASH_VALUE_ADD(userinfo, "country", rb_str_new2(info->country));
+		HASH_VALUE_ADD(userinfo, "type", rb_str_new2(info->type));
+		HASH_VALUE_ADD(userinfo, "expiry", INT2NUM(info->expiry));
+		HASH_VALUE_ADD(userinfo, "server_host", rb_str_new2(info->server_host));
+		HASH_VALUE_ADD(userinfo, "server_port", INT2NUM(info->server_port));
+		HASH_VALUE_ADD(userinfo, "last_ping", INT2NUM(info->last_ping));
+	}
+
+	return userinfo;
 }
 
 static VALUE
@@ -204,6 +232,7 @@ Init_despotify_session(VALUE mDespotify) {
 	rb_define_method(c, "playlists", rb_despotify_session_playlists, 0);
 	rb_define_method(c, "get_image", rb_despotify_session_get_image, 1);
 	rb_define_method(c, "get_error", rb_despotify_session_get_error, 0);
+	rb_define_method(c, "user_info", rb_despotify_session_user_info, 0);
 
 	rb_define_method(c, "play", rb_despotify_session_play, 2);
 	rb_define_method(c, "stop", rb_despotify_session_stop, 0);

@@ -34,4 +34,8 @@ Despotify::Session.new do |despotify|
 	despotify.album 'c4ee36e89d3a45cb98c44159ab04dc66' do |album|
 		pp album
 	end
+
+	despotify.search 'machinae' do |search|
+		pp search
+	end
 end
