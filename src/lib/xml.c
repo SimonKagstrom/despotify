@@ -114,7 +114,9 @@ struct playlist* xml_parse_playlist(struct playlist* pl,
                "next-change",0, "change", 0, "user", -1);
     xmlstrncpy(pl->name, sizeof pl->name, top,
                "next-change",0, "change", 0, "ops",0, "name", -1);
-    xmlatoi(&pl->is_collaborative, top, "next-change", 0, "change", 0, "ops", 0, "pub", -1);
+    int collab;
+    xmlatoi(&collab, top, "next-change", 0, "change", 0, "ops", 0, "pub", -1);
+    pl->is_collaborative = collab;
 
     ezxml_free(top);
     return pl;

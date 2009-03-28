@@ -20,10 +20,10 @@ void print_list_of_lists(struct playlist* rootlist)
     else {
         int count=1;
         for (struct playlist* p = rootlist; p; p = p->next)
-            printf("%2d: %-40s %s\n", count++, p->name, p->author);
+            printf("%2d: %-40s %3d %c %s\n", count++, p->name, p->num_tracks,
+                   p->is_collaborative ? '*' : ' ', p->author);
     }
 }
-
 
 void print_tracks(struct track* head)
 {
@@ -39,7 +39,7 @@ void print_tracks(struct track* head)
                    t->length / 60000, t->length % 60000 / 1000);
             for (struct artist* a = t->artist; a; a = a->next)
                 printf("%s%s", a->name, a->next ? ", " : "");
-            printf(" %s\n", (t->playable ? "" : "(Unplayable)"));
+            printf(" %s\n", t->playable ? "" : "(Unplayable)");
         }
         else
             printf("%3d: N/A\n", count++);

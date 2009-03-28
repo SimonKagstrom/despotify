@@ -806,7 +806,6 @@ void despotify_free_playlist(struct playlist* p)
     xml_free_playlist(p);
 }
 
-
 struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
 {
     /* load list of lists */
@@ -814,8 +813,6 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
     struct playlist* root = NULL;
     struct playlist* prev = NULL;
     
-    int count = 0;
-
     for (struct playlist* p = metalist; p && p->playlist_id[0]; p = p->next) {
         struct playlist* new = despotify_get_playlist(ds, p->playlist_id);
         if (prev)
@@ -823,15 +820,11 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
         else
             root = new;
         prev = new;
-        count++;
     }
     xml_free_playlist(metalist);
 
-    if (root)
-        root->num_tracks = count;
     return root;
 }
-
 
 /*****************************************************************
  *
