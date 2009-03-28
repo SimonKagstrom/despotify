@@ -19,7 +19,7 @@
 
 static void
 rb_despotify_playlist_free(rb_despotify_playlist *pl) {
-	if (pl->real && pl->needfree)
+	if (!pl->ischild)
 		despotify_free_playlist(pl->real);
 
 	free(pl);
@@ -36,7 +36,7 @@ rb_despotify_playlist_alloc(VALUE klass) {
 }
 
 VALUE
-rb_despotify_playlist_new_from_pl(VALUE session, despotify_playlist *pl, int needfree) {
+rb_despotify_playlist_new_from_pl(VALUE session, despotify_playlist *pl, bool ischild) {
 	VALUE obj;
 	rb_despotify_playlist *pls;
 
@@ -47,7 +47,7 @@ rb_despotify_playlist_new_from_pl(VALUE session, despotify_playlist *pl, int nee
 	VALUE2PLAYLIST(obj, pls);
 
 	pls->real = pl;
-	pls->needfree = needfree;
+	pls->ischild = ischild;
 
 	rb_iv_set(obj, "session", session);
 
@@ -73,7 +73,7 @@ rb_despotify_playlist_new(VALUE self, VALUE session, VALUE id) {
 		return Qnil;
 
 	pls->real = pl;
-	pls->needfree = 1;
+	pls->ischild = false;
 
 	rb_iv_set(self, "session", session);
 

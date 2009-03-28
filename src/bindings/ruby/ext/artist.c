@@ -84,7 +84,7 @@ rb_despotify_artist_albums(VALUE self) {
 		despotify_album *a;
 
 		for(a = artist->real->albums; a; a = a->next) {
-			rb_ary_push(albums, rb_despotify_album_new_from_album(a));
+			rb_ary_push(albums, rb_despotify_album_new_from_album(a, true));
 		}
 
 		rb_iv_set(self, "albums", albums);

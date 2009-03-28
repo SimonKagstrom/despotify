@@ -21,8 +21,7 @@ rescue Despotify::DespotifyError
 	exit
 end
 
-despotify.playlists.each do |pls|
-	pp pls.id
-	pp pls.name
-	pp pls.tracks
-end
+album = Despotify::Album.new(despotify, 'c4ee36e89d3a45cb98c44159ab04dc66')
+
+pp album.name
+pp album.metadata

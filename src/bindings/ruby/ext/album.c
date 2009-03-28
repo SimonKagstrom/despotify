@@ -16,23 +16,50 @@
 	rb_despotify_album *album; \
 	VALUE2ALBUM(self, album);
 
+static VALUE
+rb_despotify_album_free(rb_despotify_album *album) {
+	if (!album->ischild)
+		despotify_free_album(album->real);
+
+	free(album);
+}
 
 static VALUE
 rb_despotify_album_alloc(VALUE klass) {
-	rb_despotify_album *track;
+	rb_despotify_album *album;
 	VALUE obj = Data_Make_Struct(klass, rb_despotify_album,
-	                             NULL, free, track);
+	                             NULL, rb_despotify_album_free, album);
 
 	return obj;
 }
 
 static VALUE
-rb_despotify_album_new(VALUE self) {
+rb_despotify_album_new(VALUE self, VALUE session, VALUE id) {
+	rb_despotify_album *album;
+	rb_despotify_session *sessionptr;
+
+	despotify_album *a;
+	char *album_id;
+
+	VALUE2ALBUM(self, album);
+	VALUE2SESSION(session, sessionptr);
+	album_id = StringValuePtr(id);
+
+	CHECKIDLEN(album_id, 32);
+
+	a = (despotify_album *) despotify_get_album(sessionptr->real, album_id);
+
+	if (!a)
+		return Qnil;
+
+	album->real = a;
+	album->ischild = false;
+
 	return self;
 }
 
 VALUE
-rb_despotify_album_new_from_album(despotify_album *a) {
+rb_despotify_album_new_from_album(despotify_album *a, bool ischild) {
 	VALUE obj;
 	rb_despotify_album *album;
 
@@ -43,6 +70,7 @@ rb_despotify_album_new_from_album(despotify_album *a) {
 	VALUE2ALBUM(obj, album);
 
 	album->real = a;
+	album->ischild = ischild;
 
 	return obj;
 }
@@ -116,12 +144,11 @@ VALUE
 Init_despotify_album(VALUE mDespotify) {
 	VALUE c;
 
-	/* Despotify::Track */
+	/* Despotify::Album */
 	c = rb_define_class_under(mDespotify, "Album", rb_cObject);
+	rb_define_alloc_func (c, rb_despotify_album_alloc);
 
-	/* Remove new function until we can request album by id */
-	rb_undef_method (rb_singleton_class(c), "new");
-
+	rb_define_method(c, "initialize", rb_despotify_album_new, 2);
 	rb_define_method(c, "name", rb_despotify_album_name, 0);
 	rb_define_method(c, "id", rb_despotify_album_id, 0);
 	rb_define_method(c, "tracks", rb_despotify_album_tracks, 0);

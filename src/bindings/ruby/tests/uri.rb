@@ -13,11 +13,11 @@ if not (username and password)
 	exit
 end
 
-despotify = Despotify::Session.new
+@despotify = Despotify::Session.new
 begin
-	despotify.authenticate(username, password)
+	@despotify.authenticate(username, password)
 rescue Despotify::DespotifyError
-	puts 'Failed to authenticate user: %s' % despotify.get_error
+	puts 'Failed to authenticate user: %s' % @despotify.get_error
 	exit
 end
 
@@ -46,18 +46,19 @@ class Despotify::Session
 				return Despotify::Artist.new(self, Despotify.uri2id(args[2]))
 			end
 		elsif cmd == 'album'
+			if args[2].length == 22
+				return Despotify::Album.new(self, Despotify.uri2id(args[2]))
+			end
 		end
-
-
-		pp args
 	end
 end
 
-pls = despotify.uri 'spotify:user:chripppa:playlist:6EUwMKcf7weEP4JsLmKJKR'
-pp pls.name
+def testuri(uri)
+	puts '%s => %s' % [uri, @despotify.uri(uri).inspect]
+end
 
-search = despotify.uri 'spotify:search:mono'
-pp search.name
-
-artist = despotify.uri 'spotify:artist:2sDfbgbPqK8cnEDV5bCyby'
-pp artist.name
+testuri 'spotify:user:chripppa:playlist:6EUwMKcf7weEP4JsLmKJKR'
+testuri 'spotify:search:mono'
+testuri 'spotify:artist:2sDfbgbPqK8cnEDV5bCyby'
+testuri 'spotify:album:2SfDMhAX5dmall6oGPGtp5'
+testuri 'spotify:track:26b0ZNVmaWQWuKAEchHog5'

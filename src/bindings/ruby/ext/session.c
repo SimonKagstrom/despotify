@@ -78,7 +78,7 @@ rb_despotify_session_search(VALUE self, VALUE searchtext) {
 
 	pl = despotify_search(session->real, StringValuePtr(searchtext));
 
-	return rb_despotify_playlist_new_from_pl(self, pl, 1);
+	return rb_despotify_playlist_new_from_pl(self, pl, false);
 }
 
 static VALUE
@@ -96,7 +96,7 @@ rb_despotify_session_playlists(VALUE self) {
 		return playlists;
 
 	for (pl = session->rootpl; pl; pl = pl->next) {
-		rb_ary_push(playlists, rb_despotify_playlist_new_from_pl(self, pl, 0));
+		rb_ary_push(playlists, rb_despotify_playlist_new_from_pl(self, pl, true));
 	}
 
 	return playlists;
@@ -157,7 +157,8 @@ rb_despotify_session_current_track(VALUE self) {
 
 static VALUE
 rb_despotify_session_get_error(VALUE self) {
-	SESSION_METHOD_HEADER
+	rb_despotify_session *session;
+	VALUE2SESSION(self, session);
 
 	if (session->real->last_error)
 		return rb_str_new2(session->real->last_error);
@@ -177,6 +178,13 @@ rb_despotify_session_artist(VALUE self, VALUE id) {
 	VALUE args[2] = { self, id };
 
 	return rb_class_new_instance (2, args, cArtist);
+}
+
+static VALUE
+rb_despotify_session_album(VALUE self, VALUE id) {
+	VALUE args[2] = { self, id };
+
+	return rb_class_new_instance (2, args, cAlbum);
 }
 
 
@@ -203,6 +211,7 @@ Init_despotify_session(VALUE mDespotify) {
 	/* Shortcuts */
 	rb_define_method(c, "playlist", rb_despotify_session_playlist, 1);
 	rb_define_method(c, "artist", rb_despotify_session_artist, 1);
+	rb_define_method(c, "album", rb_despotify_session_album, 1);
 
 
 	return c;
