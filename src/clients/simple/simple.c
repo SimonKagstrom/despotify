@@ -65,8 +65,6 @@ void print_info(struct despotify_session* ds)
     }
 }
 
-
-
 void print_help(void)
 {
     printf("\nAvailable commands:\n"

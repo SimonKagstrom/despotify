@@ -394,18 +394,27 @@ bool despotify_play(struct despotify_session* ds,
 
 bool despotify_stop(struct despotify_session* ds)
 {
+    if (!ds->snd_session)
+        return false;
+
     snd_stop(ds->snd_session);
     return true;
 }
 
 bool despotify_pause(struct despotify_session* ds)
 {
+    if (!ds->snd_session)
+        return false;
+
     audio_pause(ds->snd_session->actx);
     return true;
 }
 
 bool despotify_resume(struct despotify_session* ds)
 {
+    if (!ds->snd_session)
+        return false;
+
     audio_resume(ds->snd_session->actx);
     return true;
 }
