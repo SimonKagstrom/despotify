@@ -12,6 +12,26 @@
 #include <unistd.h>
 #include "despotify.h"
 
+struct playlist* get_playlist(struct playlist* rootlist, int num)
+{
+    struct playlist* p = rootlist;
+
+    if (!p) {
+        printf("Stored lists not loaded. Run 'list' without parameter to load.\n");
+    }
+    else {
+        /* skip to playlist number <num> */
+        for (int i = 1; i < num && p; i++)
+            p = p->next;
+
+
+        if (!p)
+            printf("Invalid playlist number %d\n", num);
+    }
+
+    return p;
+}
+
 void print_list_of_lists(struct playlist* rootlist)
 {
     if (!rootlist) {
@@ -67,15 +87,19 @@ void print_info(struct despotify_session* ds)
 
 void print_help(void)
 {
-    printf("\nAvailable commands:\n"
+    printf("\nAvailable commands:\n\n"
            "list [num]              List stored playlists\n"
            "rename [num] [string]   Rename playlist\n"
+           "collab [num]            Toggle playlist collaboration\n"
+           "\n"
            "search [string]         Search for [string] or get next 100 results\n"
            "artist [num]            Show information about artist for track [num]\n"
            "album [num]             List album for track [num]\n"
+           "portrait [num]          Save artist portrait to portrait.jpg\n"
+           "\n"
            "play [num]              Play track [num] in the last viewed list\n"
            "stop, pause, resume     Control playback\n"
-           "portrait [num]          Save artist portrait to portrait.jpg\n"
+           "\n"
            "info                    Details about your account and current connection\n"
            "help                    This text\n"
            "quit                    Quit\n");
@@ -102,22 +126,12 @@ void command_loop(struct despotify_session* ds)
         if (!strncmp(buf, "list", 4)) {
             int num = atoi(buf + 5);
             if (num) {
-                if (!rootlist) {
-                    printf("Stored lists not loaded. Run 'list' without parameter to load.\n");
-                    continue;
-                }
-
-                /* skip to playlist number <num> */
-                struct playlist* p = rootlist;
-                for (int i=1; i<num && p; i++)
-                    p = p->next;
+                struct playlist* p = get_playlist(rootlist, num);
 
                 if (p) {
                     print_tracks(p->tracks);
                     lastlist = p;
                 }
-                else
-                    printf("Invalid playlist number %d\n", num);
             }
             else {
                 if (!rootlist)
@@ -136,15 +150,7 @@ void command_loop(struct despotify_session* ds)
             }
 
             if (num && name && name[0]) {
-                if (!rootlist) {
-                    printf("Stored lists not loaded. Run 'list' without parameter to load.\n");
-                    continue;
-                }
-
-                /* skip to playlist number <num> */
-                struct playlist* p = rootlist;
-                for (int i=1; i<num && p; i++)
-                    p = p->next;
+                struct playlist* p = get_playlist(rootlist, num);
 
                 if (p) {
                     if (despotify_rename_playlist(ds, p, name))
@@ -152,12 +158,31 @@ void command_loop(struct despotify_session* ds)
                     else
                         printf("Rename failed: %s\n", despotify_get_error(ds));
                 }
-                else
-                    printf("Invalid playlist number %d\n", num);
             }
-            else {
+            else
                 printf("Usage: rename [num] [string]\n");
+        }
+
+        /* collab */
+        else if (!strncmp(buf, "collab", 6)) {
+            int num = 0;
+            if (strlen(buf) > 7)
+                num = atoi(buf + 7);
+
+            if (num) {
+                struct playlist* p = get_playlist(rootlist, num);
+
+                if (p) {
+                    if (despotify_set_playlist_collaboration(ds, p, !p->is_collaborative))
+                        printf("Changed playlist %d collaboration to %s.\n",
+                                num, p->is_collaborative ? "ON" : "OFF");
+                    else
+                        printf("Setting playlist collaboration state failed: %s\n",
+                                despotify_get_error(ds));
+                }
             }
+            else
+                printf("Usage: collab [num]\n");
         }
 
         /* search */

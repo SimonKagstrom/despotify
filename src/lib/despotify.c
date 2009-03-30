@@ -894,6 +894,62 @@ bool despotify_rename_playlist(struct despotify_session *ds,
     return confirm;
 }
 
+bool despotify_set_playlist_collaboration(struct despotify_session *ds,
+                                          struct playlist *playlist,
+                                          bool collaborative)
+{
+    if (strcmp(playlist->author, ds->user_info->username)) {
+        ds->last_error = "Not your playlist.";
+        return false;
+    }
+
+    ds->response = buf_new();
+    char xml[512];
+    char* usertag = xml_gen_tag("user", ds->user_info->username);
+    snprintf(xml, sizeof xml, "<change><ops><pub>%u</pub></ops>"
+                              "<time>%u</time>%s</change>"
+                              "<version>%010u,%010u,%010u,%u</version>",
+                              collaborative, (unsigned int)time(NULL),
+                              usertag, playlist->revision + 1,
+                              playlist->num_tracks, playlist->checksum,
+                              playlist->is_collaborative);
+    free(usertag);
+
+    unsigned char pid[17];
+    hex_ascii_to_bytes(playlist->playlist_id, pid, 17);
+    int error = cmd_changeplaylist(ds->session, pid, xml, playlist->revision,
+                                   playlist->num_tracks, playlist->checksum,
+                                   playlist->is_collaborative,
+                                   despotify_plain_callback, ds);
+
+    if (error) {
+        DSFYDEBUG("Failed getting playlists\n");
+        ds->last_error = "Network error.";
+        session_disconnect(ds->session);
+        return false;
+    }
+
+    /* wait until server responds */
+    pthread_mutex_lock(&ds->sync_mutex);
+    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
+    pthread_mutex_unlock(&ds->sync_mutex);
+
+    buf_append_u8(ds->response, 0); /* null terminate xml string */
+
+    bool confirm = xml_parse_confirm(playlist, ds->response->ptr, ds->response->len);
+    if (confirm) {
+        /* success, update local collaboration state */
+        playlist->is_collaborative = collaborative;
+    }
+    else {
+        ds->last_error = "Failed setting playlist collabor";
+        DSFYDEBUG("%s (response: \"%s\")", ds->last_error, ds->response->ptr);
+    }
+
+    buf_free(ds->response);
+    return confirm;
+}
+
 /*****************************************************************
  *
  *  Artist / album information

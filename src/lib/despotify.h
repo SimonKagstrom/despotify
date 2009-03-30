@@ -166,6 +166,9 @@ struct playlist* despotify_search_more(struct despotify_session *ds,
 struct playlist* despotify_get_stored_playlists(struct despotify_session *ds);
 bool despotify_rename_playlist(struct despotify_session *ds,
                                struct playlist *playlist, char *name);
+bool despotify_set_playlist_collaboration(struct despotify_session *ds,
+                                          struct playlist *playlist,
+                                          bool collaborative);
 void despotify_free_playlist(struct playlist* playlist);
 
 /* Playback control. */
