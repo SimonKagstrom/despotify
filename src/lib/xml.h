@@ -13,6 +13,10 @@ struct playlist* xml_parse_playlist(struct playlist* pl,
                                          int len,
                                          bool list_of_lists);
 
+bool xml_parse_confirm(struct playlist* pl,
+                       unsigned char* xml,
+                       int len);
+
 int xml_parse_searchlist(struct track* firsttrack,
                          unsigned char* xml,
                          int len,
@@ -28,5 +32,7 @@ void xml_free_artist(struct artist* artist);
 void xml_free_album(struct album* album);
 
 void xml_parse_prodinfo(struct user_info* u, unsigned char* xml, int len);
+
+char* xml_gen_tag(char* name, char* content);
 
 #endif

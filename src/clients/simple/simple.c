@@ -68,16 +68,17 @@ void print_info(struct despotify_session* ds)
 void print_help(void)
 {
     printf("\nAvailable commands:\n"
-           "list [num]           List stored playlists\n"
-           "search [string]      Search for [string] or get next 100 results\n"
-           "artist [num]         Show information about artist for track [num]\n"
-           "album [num]          List album for track [num]\n"
-           "play [num]           Play track [num] in the last viewed list\n"
-           "stop, pause, resume  Control playback\n"
-           "portrait [num]       Save artist portrait to portrait.jpg\n"
-           "info                 Details about your account and current connection\n"
-           "help                 This text\n"
-           "quit                 Quit\n");
+           "list [num]              List stored playlists\n"
+           "rename [num] [string]   Rename playlist\n"
+           "search [string]         Search for [string] or get next 100 results\n"
+           "artist [num]            Show information about artist for track [num]\n"
+           "album [num]             List album for track [num]\n"
+           "play [num]              Play track [num] in the last viewed list\n"
+           "stop, pause, resume     Control playback\n"
+           "portrait [num]          Save artist portrait to portrait.jpg\n"
+           "info                    Details about your account and current connection\n"
+           "help                    This text\n"
+           "quit                    Quit\n");
 }
 
 void command_loop(struct despotify_session* ds)
@@ -95,6 +96,7 @@ void command_loop(struct despotify_session* ds)
         fflush(stdout);
         bzero(buf, sizeof buf);
         fgets(buf, sizeof buf -1, stdin);
+        buf[strlen(buf) - 1] = 0; /* remove newline */
 
         /* list */
         if (!strncmp(buf, "list", 4)) {
@@ -121,6 +123,40 @@ void command_loop(struct despotify_session* ds)
                 if (!rootlist)
                     rootlist = despotify_get_stored_playlists(ds);
                 print_list_of_lists(rootlist);
+            }
+        }
+
+        /* rename */
+        else if (!strncmp(buf, "rename", 6)) {
+            int num = 0;
+            char *name = 0;
+            if (strlen(buf) > 9) {
+                num = atoi(buf + 7);
+                name = strchr(buf + 7, ' ') + 1;
+            }
+
+            if (num && name && name[0]) {
+                if (!rootlist) {
+                    printf("Stored lists not loaded. Run 'list' without parameter to load.\n");
+                    continue;
+                }
+
+                /* skip to playlist number <num> */
+                struct playlist* p = rootlist;
+                for (int i=1; i<num && p; i++)
+                    p = p->next;
+
+                if (p) {
+                    if (despotify_rename_playlist(ds, p, name))
+                        printf("Renamed playlist %d to \"%s\".\n", num, name);
+                    else
+                        printf("Rename failed: %s\n", despotify_get_error(ds));
+                }
+                else
+                    printf("Invalid playlist number %d\n", num);
+            }
+            else {
+                printf("Usage: rename [num] [string]\n");
             }
         }
 

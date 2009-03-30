@@ -44,6 +44,8 @@ struct playlist
     unsigned char playlist_id[35];
     bool is_collaborative;
     int num_tracks;
+    unsigned int revision;
+    unsigned int checksum;
     struct track *tracks;
     struct search_result *search; /* in case the playlist is a search result */
     struct playlist *next; /* in case of multiple playlists in the root list */
@@ -162,6 +164,8 @@ struct playlist* despotify_search_more(struct despotify_session *ds,
                                        struct playlist *playlist);
 
 struct playlist* despotify_get_stored_playlists(struct despotify_session *ds);
+bool despotify_rename_playlist(struct despotify_session *ds,
+                               struct playlist *playlist, char *name);
 void despotify_free_playlist(struct playlist* playlist);
 
 /* Playback control. */

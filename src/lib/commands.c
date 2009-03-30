@@ -325,7 +325,7 @@ int cmd_getsubstreams (SESSION * session, unsigned char *file_id,
 }
 
 /*
- * Get metadata for an artist (kind=1) or a list of tracks (kind=3)
+ * Get metadata for an artist (kind=1), an album (kind=2)  or a list of tracks (kind=3)
  * The response comes as compressed XML
  *
  */
@@ -336,7 +336,8 @@ int cmd_browse (SESSION * session, unsigned char kind, unsigned char *idlist,
 	char buf[256];
 	int i, ret;
 
-	assert (((kind == 1 || kind == 2) && num == 1) || kind == 3);
+	assert (((kind == BROWSE_ARTIST || kind == BROWSE_ALBUM) && num == 1)
+		|| kind == BROWSE_TRACK);
 
 	strcpy (buf, "browse-");
 	hex_bytes_to_ascii(idlist, buf + 7, 16);
@@ -349,7 +350,7 @@ int cmd_browse (SESSION * session, unsigned char kind, unsigned char *idlist,
 	for (i = 0; i < num; i++)
 		buf_append_data(b, idlist + i * 16, 16);
 
-	if (kind == 0x01) {
+	if (kind == BROWSE_ARTIST) {
 		assert (num == 1);
 		buf_append_u32(b, 0);
 	}
@@ -372,7 +373,7 @@ int cmd_browse (SESSION * session, unsigned char kind, unsigned char *idlist,
  *
  */
 int cmd_getplaylist (SESSION * session, unsigned char *playlist_id,
-		     int unknown, channel_callback callback, void *private)
+		     int revision, channel_callback callback, void *private)
 {
 	CHANNEL *ch;
 	char buf[256];
@@ -386,13 +387,13 @@ int cmd_getplaylist (SESSION * session, unsigned char *playlist_id,
 	struct buf* b = buf_new();
 	buf_append_u16(b, ch->channel_id);
 	buf_append_data(b, playlist_id, 17);
-	buf_append_u32(b, unknown);
+	buf_append_u32(b, revision);
 	buf_append_u32(b, 0);
 	buf_append_u32(b, 0xffffffff);
 	buf_append_u8(b, 0x1);
 
 	if ((ret =
-	     packet_write (session, CMD_PLAYLIST, b->ptr, b->len)) != 0) {
+	     packet_write (session, CMD_GETPLAYLIST, b->ptr, b->len)) != 0) {
 		DSFYDEBUG
 			("cmd_getplaylist(): packet_write(cmd=0x35) returned %d, aborting!\n",
 			 ret);
@@ -400,6 +401,45 @@ int cmd_getplaylist (SESSION * session, unsigned char *playlist_id,
 
 	buf_free(b);
 	
+	return ret;
+}
+
+/*
+ * Modify playlist
+ * The response comes as plain XML
+ */
+int cmd_changeplaylist (SESSION * session, unsigned char *playlist_id,
+			char *xml, int revision, int num_tracks, int checksum,
+			int collaborative, channel_callback callback,
+			void *private)
+{
+	CHANNEL *ch;
+	char buf[256];
+	int ret;
+
+	strcpy (buf, "chplaylist-");
+	hex_bytes_to_ascii (playlist_id, buf + 11, 17);
+	buf[11 + 2 * 17] = 0;
+	ch = channel_register (buf, callback, private);
+
+	struct buf* b = buf_new();
+	buf_append_u16(b, ch->channel_id);
+	buf_append_data(b, playlist_id, 17);
+	buf_append_u32(b, revision);
+	buf_append_u32(b, num_tracks);
+	buf_append_u32(b, checksum);	/* -1=create playlist */
+	buf_append_u8(b, collaborative);
+	buf_append_u8(b, 3);		/* Unknown */
+        buf_append_data(b, xml, strlen(xml));
+
+	if ((ret =
+	     packet_write (session, CMD_CHANGEPLAYLIST, b->ptr, b->len)) != 0) {
+		DSFYDEBUG ("cmd_changeplaylist(): packet_write(cmd=0x36) "
+			   "returned %d, aborting!\n", ret);
+	}
+
+	buf_free(b);
+
 	return ret;
 }
 

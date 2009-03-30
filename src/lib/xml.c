@@ -58,6 +58,28 @@ void xmlatof(float* dest, ezxml_t xml, ...)
     }
 }
 
+void xml_parse_version(struct playlist* pl, ezxml_t xml, ...)
+{
+    va_list ap;
+    ezxml_t r;
+
+    va_start(ap, xml);
+    r = ezxml_vget(xml, ap);
+    va_end(ap);
+
+    if (r) {
+        char ver[64];
+        strncpy(ver, r->txt, sizeof ver);
+        ver[sizeof ver-1] = 0;
+        int collab;
+        if (sscanf(ver, "%u,%u,%u,%u", &pl->revision, &pl->num_tracks,
+                    &pl->checksum, &collab) != 4) {
+            DSFYDEBUG("!!! List version parsing failed (%s)\n", ver);
+        }
+        pl->is_collaborative = collab;
+    }
+}
+
 struct playlist* xml_parse_playlist(struct playlist* pl,
                                     unsigned char* xml,
                                     int len,
@@ -107,19 +129,33 @@ struct playlist* xml_parse_playlist(struct playlist* pl,
             track_count++;
         }
         pl->tracks = root;
-        pl->num_tracks = track_count;
+        pl->num_tracks = track_count; // FIXME: <version> parsing overwrites track_count
     }
 
     xmlstrncpy(pl->author, sizeof pl->author, top,
                "next-change",0, "change", 0, "user", -1);
     xmlstrncpy(pl->name, sizeof pl->name, top,
                "next-change",0, "change", 0, "ops",0, "name", -1);
-    int collab;
-    xmlatoi(&collab, top, "next-change", 0, "change", 0, "ops", 0, "pub", -1);
-    pl->is_collaborative = collab;
+    xml_parse_version(pl, top, "next-change", 0, "version", -1);
 
     ezxml_free(top);
     return pl;
+}
+
+bool xml_parse_confirm(struct playlist* pl,
+                       unsigned char* xml,
+                       int len)
+{
+    ezxml_t top = ezxml_parse_str(xml, len);
+
+    bool confirm = !strncmp(top->name, "confirm", 7);
+
+    if (confirm) {
+        xml_parse_version(pl, top, "version", -1);
+    }
+
+    ezxml_free(top);
+    return confirm;
 }
 
 void xml_free_playlist(struct playlist* pl)
@@ -158,6 +194,7 @@ static int parse_tracks(ezxml_t xml, struct track* t, bool ordered)
                     strncpy(rid, re->txt, sizeof rid);
                     for (tt = root; tt; tt = tt->next) {
                         /* update to new id */
+                        /* FIXME: This invalidates the playlist checksum */
                         if (!tt->has_meta_data &&
                             !strncmp(tt->track_id, rid, sizeof tt->track_id)) {
                             memcpy (tt->track_id, tid, sizeof tt->track_id);
@@ -378,4 +415,15 @@ void xml_parse_prodinfo(struct user_info* u, unsigned char* xml, int len)
     xmlatoi(&expiry, top, "product", 0, "expiry", -1);
     u->expiry = expiry;
     ezxml_free(top);
+}
+
+/* Generate a tag with escaped character content. */
+char* xml_gen_tag(char* name, char* content)
+{
+    ezxml_t tag = ezxml_new(name);
+    ezxml_set_txt(tag, content);
+    char* ret = ezxml_toxml(tag);
+    ezxml_free(tag);
+
+    return ret;
 }

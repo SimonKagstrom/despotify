@@ -772,8 +772,8 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
         memset(pid, 0, sizeof pid);
     }
         
-    int error = cmd_getplaylist(ds->session, pid,
-                                -1, despotify_plain_callback, ds);
+    int error = cmd_getplaylist(ds->session, pid, PLAYLIST_CURRENT,
+                                despotify_plain_callback, ds);
     if (error) {
         DSFYDEBUG("Failed getting playlists\n");
         ds->last_error = "Network error.";
@@ -835,6 +835,63 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
     xml_free_playlist(metalist);
 
     return root;
+}
+
+bool despotify_rename_playlist(struct despotify_session *ds,
+                               struct playlist *playlist, char *name)
+{
+    if (strcmp(playlist->author, ds->user_info->username)) {
+        ds->last_error = "Not your playlist.";
+        return false;
+    }
+
+    ds->response = buf_new();
+    char xml[512];
+    char* nametag = xml_gen_tag("name", name);
+    char* usertag = xml_gen_tag("user", ds->user_info->username);
+    snprintf(xml, sizeof xml, "<change><ops>%s</ops>"
+                              "<time>%u</time>%s</change>"
+                              "<version>%010u,%010u,%010u,%u</version>",
+                              nametag, (unsigned int)time(NULL),
+                              usertag, playlist->revision + 1,
+                              playlist->num_tracks, playlist->checksum,
+                              playlist->is_collaborative);
+    free(nametag);
+    free(usertag);
+
+    unsigned char pid[17];
+    hex_ascii_to_bytes(playlist->playlist_id, pid, 17);
+    int error = cmd_changeplaylist(ds->session, pid, xml, playlist->revision,
+                                   playlist->num_tracks, playlist->checksum,
+                                   playlist->is_collaborative,
+                                   despotify_plain_callback, ds);
+
+    if (error) {
+        DSFYDEBUG("Failed getting playlists\n");
+        ds->last_error = "Network error.";
+        session_disconnect(ds->session);
+        return false;
+    }
+
+    /* wait until server responds */
+    pthread_mutex_lock(&ds->sync_mutex);
+    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
+    pthread_mutex_unlock(&ds->sync_mutex);
+
+    buf_append_u8(ds->response, 0); /* null terminate xml string */
+
+    bool confirm = xml_parse_confirm(playlist, ds->response->ptr, ds->response->len);
+    if (confirm) {
+        /* success, update local name */
+        DSFYstrncpy(playlist->name, name, sizeof playlist->name);
+    }
+    else {
+         ds->last_error = "Failed renaming playlist";
+         DSFYDEBUG("%s (response: \"%s\")", ds->last_error, ds->response->ptr);
+    }
+
+    buf_free(ds->response);
+    return confirm;
 }
 
 /*****************************************************************

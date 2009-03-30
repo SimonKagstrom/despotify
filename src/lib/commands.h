@@ -29,9 +29,10 @@
 #define CMD_P2P_INITBLK	0x21
 
 /* Search and meta data */
-#define CMD_BROWSE	0x30
-#define CMD_SEARCH	0x31
-#define CMD_PLAYLIST	0x35
+#define CMD_BROWSE		0x30
+#define CMD_SEARCH		0x31
+#define CMD_GETPLAYLIST		0x35
+#define CMD_CHANGEPLAYLIST	0x36
 
 /* Session management */
 #define CMD_NOTIFY	0x42
@@ -51,6 +52,9 @@
 #define BROWSE_ALBUM   2
 #define BROWSE_TRACK   3
 
+/* special playlist revision */
+#define PLAYLIST_CURRENT	~0
+
 int cmd_send_cache_hash (SESSION *);
 int cmd_token_notify (SESSION *);
 int cmd_aeskey (SESSION *, unsigned char *, unsigned char *, channel_callback,
@@ -66,5 +70,7 @@ int cmd_browse (SESSION *, unsigned char, unsigned char *, int,
 		channel_callback, void *);
 int cmd_getplaylist (SESSION *, unsigned char *, int, channel_callback,
 		     void *);
+int cmd_changeplaylist (SESSION *, unsigned char *, char*, int, int, int, int,
+			channel_callback, void *);
 int cmd_ping_reply (SESSION *);
 #endif

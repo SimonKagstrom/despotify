@@ -28,7 +28,7 @@ int gw_getplaylist (SPOTIFYSESSION * s, char *playlist_hex_id)
 			   "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n",
 			   51);
 
-	return cmd_getplaylist (s->session, id, -1,
+	return cmd_getplaylist (s->session, id, PLAYLIST_CURRENT,
 				gw_getplaylist_result_callback, (void *) s);
 }
 
