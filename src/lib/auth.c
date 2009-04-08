@@ -80,6 +80,11 @@ int do_auth (SESSION * session)
 		return -1;
 	}
 
+        if (session->init_client_packet)
+            buf_free(session->init_client_packet);
+        if (session->init_server_packet)
+            buf_free(session->init_server_packet);
+        
 	return 0;
 }
 
@@ -89,17 +94,16 @@ void auth_generate_auth_hmac (SESSION * session, unsigned char *auth_hmac,
         (void)mac_len;
         struct buf* buf = buf_new();
 	
-	buf_append_data (buf, session->client_random_16,
-                         sizeof (session->client_random_16));
-	buf_append_data (buf, session->server_random_16,
-			   sizeof (session->server_random_16));
-	buf_append_data (buf, session->my_pub_key, 96);
-	buf_append_data (buf, session->remote_pub_key, 96);
-	buf_append_data (buf, session->rsa_pub_exp,
-			   sizeof (session->rsa_pub_exp));
-	buf_append_data (buf, &session->username_len, 1);
-	buf_append_data (buf, session->username, session->username_len);
-	buf_append_data (buf, "\x01\x40", 2);
+	buf_append_data(buf, session->init_client_packet->ptr,
+                        session->init_client_packet->len);
+	buf_append_data(buf,  session->init_server_packet->ptr,
+                        session->init_server_packet->len);
+        buf_append_u8(buf, 0); /* random data length */
+        buf_append_u8(buf, 0); /* unknown */
+        buf_append_u16(buf, 8); /* puzzle solution length */
+        buf_append_u32(buf, 0); /* unknown */
+        /* <-- random data would go here */
+        buf_append_data(buf, session->puzzle_solution, 8);
 
 #ifdef DEBUG_LOGIN
 	hexdump8x32 ("auth_generate_auth_hmac, HMAC message", buf->ptr,
@@ -124,30 +128,21 @@ int send_client_auth (SESSION * session)
 	int ret;
         struct buf* buf = buf_new();
 
-	buf_append_data (buf, session->puzzle_solution,
-                         sizeof (session->puzzle_solution));
-	buf_append_data (buf, session->auth_hmac,
-                         sizeof (session->auth_hmac));
-
-	/*
-	 * Unknown
-	 *
-	 */
-	buf_append_u8 (buf, 0x0);
-
-	/*
-	 * Payload length (including length byte itself) and payload
-	 * The payload can be anything and doesn't appear to be used.
-	 *
-	 */
-	buf_append_u8(buf, 0x1); /* zero payload */
+	buf_append_data(buf, session->auth_hmac, 20);
+        buf_append_u8(buf, 0); /* random data length */
+        buf_append_u8(buf, 0); /* unknown */
+        buf_append_u16(buf, 8); /* puzzle solution length */
+        buf_append_u32(buf, 0);
+        /* <-- random data would go here */
+	buf_append_data (buf, session->puzzle_solution, 8);
 
 #ifdef DEBUG_LOGIN
 	hexdump8x32 ("send_client_auth, second client packet", buf->ptr,
 		     buf->len);
 #endif
 
-	if ((ret = sock_send (session->ap_sock, buf->ptr, buf->len)) <= 0) {
+        ret = sock_send(session->ap_sock, buf->ptr, buf->len);
+	if (ret <= 0) {
 		printf ("send_client_auth(): connection lost\n");
 		buf_free(buf);
 		return -1;
@@ -170,27 +165,28 @@ int read_server_auth_response (SESSION * session)
 	unsigned char payload_len;
 	int ret;
 
-	if ((ret = block_read (session->ap_sock, buf, 2)) != 2) {
-		printf ("read_server_initial_packet(): Failed to read 'status' + length byte, got %d bytes\n", ret);
-		return -1;
+        ret = block_read(session->ap_sock, buf, 2);
+	if (ret != 2) {
+            DSFYDEBUG("Failed to read 'status' + length byte, got %d bytes\n", ret);
+            return -1;
 	}
 
 	if (buf[0] != 0x00) {
-		printf ("read_server_auth_response(): Authentication failed with error 0x%02x, bad password?\n", buf[1]);
-		return -1;
+            DSFYDEBUG("Authentication failed with error 0x%02x, bad password?\n", buf[1]);
+            return -1;
 	}
 
 	/* Payload length + this byte must not be zero(?) */
 	assert (buf[1] > 0);
 
-	payload_len = buf[1] - 1;
-	if ((ret =
-	     block_read (session->ap_sock, buf,
-			 payload_len)) != payload_len) {
-		printf ("read_server_initial_packet(): Failed to read 'payload', got %d of %u bytes\n", ret, payload_len);
-		return -1;
-	}
+	payload_len = buf[1];
 
+        ret = block_read (session->ap_sock, buf, payload_len);
+	if (ret != payload_len) {
+            DSFYDEBUG("Failed to read 'payload', got %d of %u bytes\n",
+                      ret, payload_len);
+            return -1;
+	}
 #ifdef DEBUG_LOGIN
 	hexdump8x32 ("read_server_auth_response, payload", buf, payload_len);
 #endif

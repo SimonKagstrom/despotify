@@ -55,6 +55,9 @@ typedef struct session
 	char password[256];
 	char salt[10];
 
+        struct buf* init_client_packet;
+        struct buf* init_server_packet;
+
 	/*
 	 * Computed as SHA(salt || " " || password)
 	 *
@@ -105,6 +108,7 @@ typedef struct session
 	 */
 	unsigned char puzzle_denominator;
 	unsigned char puzzle_solution[8];
+        int puzzle_magic;
 
 	/*
 	 * HMAC over random data, public keys

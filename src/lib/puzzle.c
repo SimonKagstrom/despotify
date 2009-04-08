@@ -61,7 +61,7 @@ void puzzle_solve (SESSION * session)
 		*nominator_from_hash = htonl (*nominator_from_hash);
 
 		/* XOR with a fancy magic */
-		*nominator_from_hash ^= 0xb9671267;
+		*nominator_from_hash ^= session->puzzle_magic;
 	} while (*nominator_from_hash & denominator);
 
 #ifdef DEBUG_LOGIN

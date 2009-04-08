@@ -88,14 +88,14 @@ bool despotify_authenticate(struct despotify_session* ds,
         ds->last_error = "Could not connect to server.";
         return false;
     }
-    DSFYDEBUG("%s", "session_connect() completed\n");
+    DSFYDEBUG("session_connect() completed\n");
 
     if (do_key_exchange(ds->session) < 0)
     {
         ds->last_error = "Key exchange failed.";
         return false;
     }
-    DSFYDEBUG("%s", "do_key_exchange() completed\n");
+    DSFYDEBUG("do_key_exchange() completed\n");
 
     auth_generate_auth_hash(ds->session);
     key_init(ds->session);
@@ -109,11 +109,6 @@ bool despotify_authenticate(struct despotify_session* ds,
 
     pthread_create(&ds->thread, NULL, &despotify_thread, ds);
     
-    /* wait until login is ready */
-    pthread_mutex_lock(&ds->session->login_mutex);
-    pthread_cond_wait(&ds->session->login_cond, &ds->session->login_mutex);
-    pthread_mutex_unlock(&ds->session->login_mutex);
-
     return true;
 }
 

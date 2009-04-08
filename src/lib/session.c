@@ -44,10 +44,9 @@ SESSION *session_init_client (void)
 	if ((session = (SESSION *) calloc (1, sizeof (SESSION))) == NULL)
 		return NULL;
 
-	/* Spotify 0.3.11, r42849 on Windows */
 	session->client_OS = 0x00;	/* 0x00 == Windows, 0x01 == Mac OS X */
-	memcpy (session->client_id, "\x01\x09\x10\x01", 4);
-	session->client_revision = 43065;	/* 0.3.11 testing, r42849 */
+	memcpy(session->client_id, "\x01\x04\x01\x01", 4);
+	session->client_revision = 44764;
 	
 	/*
 	 * Client and server generate 16 random bytes each.
