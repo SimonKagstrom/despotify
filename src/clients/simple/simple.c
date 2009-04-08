@@ -112,6 +112,7 @@ void command_loop(struct despotify_session* ds)
     struct playlist* rootlist = NULL;
     struct playlist* searchlist = NULL;
     struct playlist* lastlist = NULL;
+    struct search_result *search = NULL;
 
     print_help();
 
@@ -188,28 +189,44 @@ void command_loop(struct despotify_session* ds)
         /* search */
         else if (!strncmp(buf, "search", 6)) {
             if (buf[7]) {
-                if (searchlist)
-                    despotify_free_playlist(searchlist);
+                if (search)
+                    despotify_free_search(search);
 
                 despotify_stop(ds); /* since we replace the list */
-                searchlist = despotify_search(ds, buf + 7);
-                if (!searchlist) {
+                search = despotify_search(ds, buf + 7, MAX_SEARCH_RESULTS);
+                if (!search) {
                     printf("Search failed: %s\n", despotify_get_error(ds));
                     continue;
                 }
+                searchlist = search->playlist;
             }
-            else if (searchlist && (searchlist->num_tracks < searchlist->search->total_tracks))
-                if (!despotify_search_more(ds, searchlist)) {
+            else if (searchlist && (searchlist->num_tracks < search->total_tracks))
+                if (!despotify_search_more(ds, search, searchlist->num_tracks, MAX_SEARCH_RESULTS)) {
                     printf("Search failed: %s\n", despotify_get_error(ds));
                     continue;
                 }
 
             if (searchlist) {
-                printf("Total tracks: %d (got %d)\n",
-                        searchlist->search->total_tracks, searchlist->num_tracks);
-                if (searchlist->search->suggestion[0])
-                    printf("Did you mean \"%s\"?\n", searchlist->search->suggestion);
-                print_tracks(searchlist->tracks);
+                if (search->suggestion[0])
+                    printf("Did you mean \"%s\"?\n", search->suggestion);
+
+                if (search->total_artists > 0) {
+                    printf("Artists found (%d):\n", search->total_artists);
+                    for (struct artist* artist = search->artists; artist; artist = artist->next)
+                        printf(" %s\n", artist->name);
+                }
+
+                if (search->total_albums > 0) {
+                    printf("\nAlbums found (%d):\n", search->total_albums);
+                    for (struct album* album = search->albums; album; album = album->next)
+                        printf(" %s\n", album->name);
+                }
+
+                if (search->total_tracks > 0) {
+                    printf("\nTracks found (%d/%d):\n", searchlist->num_tracks, search->total_tracks);
+                    print_tracks(search->tracks);
+                }
+
                 lastlist = searchlist;
             }
             else
@@ -234,15 +251,15 @@ void command_loop(struct despotify_session* ds)
                 t = t->next;
 
             for (struct artist* aptr = t->artist; aptr; aptr = aptr->next) {
-                struct artist* a = despotify_get_artist(ds, aptr->id);
+                struct artist_browse* a = despotify_get_artist(ds, aptr->id);
                 printf("\nName: %s\n"
                        "Genres: %s\n"
                        "Years active: %s\n"
-                       "%d albums:\n",                   
+                       "%d albums:\n",
                        a->name, a->genres, a->years_active, a->num_albums);
-                for (struct album* al = a->albums; al; al = al->next)
+                for (struct album_browse* al = a->albums; al; al = al->next)
                     printf(" %s (%d)\n", al->name, al->year);
-                despotify_free_artist(a);
+                despotify_free_artist_browse(a);
             }
         }
 
@@ -264,13 +281,13 @@ void command_loop(struct despotify_session* ds)
                 t = t->next;
 
             if (t) {
-                struct album* a = despotify_get_album(ds, t->album_id);
+                struct album_browse* a = despotify_get_album(ds, t->album_id);
                 if (a) {
                     printf("\nName: %s\n"
                            "Year: %d\n",
                            a->name, a->year);
                     print_tracks(a->tracks);
-                    despotify_free_album(a);
+                    despotify_free_album_browse(a);
                 }
                 else
                     printf("Got no album for id %s\n", t->album_id);
@@ -293,7 +310,7 @@ void command_loop(struct despotify_session* ds)
             struct track* t = lastlist->tracks;
             for (int i=1; i<num; i++)
                 t = t->next;
-            struct artist* a = despotify_get_artist(ds, t->artist->id);
+            struct artist_browse* a = despotify_get_artist(ds, t->artist->id);
             if (a && a->portrait_id[0]) {
                 int len;
                 void* portrait = despotify_get_image(ds, a->portrait_id, &len);
@@ -309,7 +326,7 @@ void command_loop(struct despotify_session* ds)
             }
             else
                 printf("Artist %s has no portrait.\n", a->name);
-            despotify_free_artist(a);
+            despotify_free_artist_browse(a);
         }
         
         /* play */
@@ -364,8 +381,8 @@ void command_loop(struct despotify_session* ds)
     if (rootlist)
         despotify_free_playlist(rootlist);
 
-    if (searchlist)
-        despotify_free_playlist(searchlist);
+    if (search)
+        despotify_free_search(search);
 }
 
 int main(int argc, char** argv)
