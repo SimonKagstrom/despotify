@@ -40,13 +40,12 @@ int do_key_exchange (SESSION * session)
 
 int send_client_initial_packet (SESSION * session)
 {
-	unsigned char num_random_bytes;
 	int ret;
 	unsigned int len_idx;
 	
 	struct buf* b = buf_new();
 
-	buf_append_u16 (b, 3);
+	buf_append_u16 (b, 3); /* protocol version */
 
 	len_idx = b->len;
 	buf_append_u16(b, 0); /* packet length - updated later */
@@ -69,7 +68,7 @@ int send_client_initial_packet (SESSION * session)
         /* <-- random data would go here */
 	buf_append_data (b, (unsigned char *) session->username,
 			   session->username_len);
-	buf_append_u8 (b, num_random_bytes);
+	buf_append_u8 (b, 0x40); /* unknown */
 
 	/*
 	 * Update length bytes
