@@ -442,13 +442,16 @@ struct track *despotify_get_current_track(struct despotify_session *ds) {
 
 static struct buf* despotify_inflate(unsigned char* data, int len)
 {
+    if (!len)
+        return NULL;
+
     struct z_stream_s z;
     memset(&z, 0, sizeof z);
 
     int rc = inflateInit2(&z, -MAX_WBITS);
     if (rc != Z_OK) {
         DSFYDEBUG("error: inflateInit() returned %d\n", rc);
-        return false;
+        return NULL;
     }
 
     z.next_in = data;
@@ -488,8 +491,11 @@ static struct buf* despotify_inflate(unsigned char* data, int len)
                 break;
         }
     }
-    b->len = b->size - z.avail_out;
-    buf_append_u8(b, 0); /* null terminate string */
+
+    if (b) {
+        b->len = b->size - z.avail_out;
+        buf_append_u8(b, 0); /* null terminate string */
+    }
 
     inflateEnd(&z);
 

@@ -80,7 +80,7 @@ void print_info(struct despotify_session* ds)
         printf("\n=================================================\n"
                "                  N O T I C E\n"
                "       You do not have a premium account.\n"
-               "  Playback and playlists will not be available.\n"
+               "     Spotify services will not be available.\n"
                "=================================================\n");
     }
 }
