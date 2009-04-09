@@ -98,6 +98,7 @@ void print_help(void)
            "portrait [num]          Save artist portrait to portrait.jpg\n"
            "\n"
            "play [num]              Play track [num] in the last viewed list\n"
+           "playalbum [num]         Play album for track [num]\n"
            "stop, pause, resume     Control playback\n"
            "\n"
            "info                    Details about your account and current connection\n"
@@ -113,6 +114,7 @@ void command_loop(struct despotify_session* ds)
     struct playlist* searchlist = NULL;
     struct playlist* lastlist = NULL;
     struct search_result *search = NULL;
+    struct album_browse* playalbum = NULL;
 
     print_help();
 
@@ -294,6 +296,38 @@ void command_loop(struct despotify_session* ds)
             }
         }
 
+        /* playalbum */
+        else if (!strncmp(buf, "playalbum", 9)) {
+            int num = atoi(buf + 10);
+            if (!num) {
+                printf("usage: playalbum [num]\n");
+                continue;
+            }
+            if (!lastlist) {
+                printf("No playlist\n");
+                continue;
+            }
+
+            /* find the requested track */
+            struct track* t = lastlist->tracks;
+            for (int i=1; i<num; i++)
+                t = t->next;
+
+
+            if (t) {
+                if (playalbum)
+                    despotify_free_album_browse(playalbum);
+
+				despotify_stop(ds);
+                playalbum = despotify_get_album(ds, t->album_id);
+
+                if (playalbum)
+                    despotify_play(ds, playalbum->tracks, true);
+                else
+                    printf("Got no album for id %s\n", t->album_id);
+            }
+        }
+
         /* portrait */
         else if (!strncmp(buf, "portrait", 8)) {
             int num = atoi(buf + 9);
@@ -383,6 +417,9 @@ void command_loop(struct despotify_session* ds)
 
     if (search)
         despotify_free_search(search);
+
+    if (playalbum)
+        despotify_free_album_browse(playalbum);
 }
 
 int main(int argc, char** argv)
