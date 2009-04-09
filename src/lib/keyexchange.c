@@ -26,13 +26,14 @@ int read_server_initial_packet (SESSION *);
 int do_key_exchange (SESSION * session)
 {
 	if (send_client_initial_packet (session)) {
-		printf ("do_key_exchange(): send_client_initial_packet() failed\n");
+		DSFYDEBUG("send_client_initial_packet() failed\n");
 		return -1;
 	}
 
-	if (read_server_initial_packet (session)) {
-		printf ("do_key_exchange(): read_server_initial_packet() failed\n");
-		return -1;
+	int ret = read_server_initial_packet(session);
+	if (ret < 0) {
+		DSFYDEBUG("read_server_initial_packet() failed\n");
+		return ret;
 	}
 
 	return 0;
@@ -124,24 +125,24 @@ int read_server_initial_packet (SESSION * session)
 #endif
 
         if (session->server_random_16[0] != 0) {
-            switch (session->server_random_16[0]) {
-                case 0: /* all ok */
-                    break;
-                    
+            DSFYDEBUG("Bad response: %#02x %#02x\n",
+                      session->server_random_16[0],
+                      session->server_random_16[1]);
+            switch (session->server_random_16[1]) {
                 case 1: /* client upgrade required */
-                    return -1;
+                    return -11;
                     
                 case 3: /* user not found */
-                    return -3;
+                    return -13;
                     
                 case 4: /* account has been disabled */
-                    return -4;
+                    return -14;
                     
                 case 6: /* you need to complete your account details */
-                    return -6;
+                    return -16;
                     
                 case 9: /* country mismatch */
-                    return -9;
+                    return -19;
                     
                 default: /* unknown error */
                     return -91;

@@ -90,10 +90,34 @@ bool despotify_authenticate(struct despotify_session* ds,
     }
     DSFYDEBUG("session_connect() completed\n");
 
-    if (do_key_exchange(ds->session) < 0)
+    switch (do_key_exchange(ds->session))
     {
-        ds->last_error = "Key exchange failed.";
-        return false;
+        case 0: /* all ok */
+            break;
+
+        case -11:
+            ds->last_error = "Client upgrade required";
+            return false;
+
+        case -13:
+            ds->last_error = "User not found";
+            return false;
+
+        case -14:
+            ds->last_error = "Account has been disabled";
+            return false;
+
+        case -16:
+            ds->last_error = "You need to complete your account details";
+            return false;
+
+        case -19:
+            ds->last_error = "Account/use country mismatch";
+            return false;
+
+        default:
+            ds->last_error = "Key exchanged failed";
+            return false;
     }
     DSFYDEBUG("do_key_exchange() completed\n");
 
@@ -102,7 +126,7 @@ bool despotify_authenticate(struct despotify_session* ds,
 
     if (do_auth(ds->session) < 0)
     {
-        ds->last_error = "Authentication failed.";
+        ds->last_error = "Authentication failed. Wrong password?";
         return false;
     }
     DSFYDEBUG("%s", "do_auth() completed\n");
@@ -365,7 +389,7 @@ bool despotify_play(struct despotify_session* ds,
 
     /* notify server we're starting playback */
     if (packet_write(ds->session, CMD_TOKENNOTIFY, NULL, 0)) {
-        printf("packet_write(CMD_TOKENNOTIFY) failed\n");
+        DSFYDEBUG("packet_write(CMD_TOKENNOTIFY) failed\n");
         return false;
     }
     
