@@ -346,15 +346,10 @@ static int despotify_snd_end_callback(void* arg)
     snd_stop(ds->snd_session);
     snd_reset(ds->snd_session);
     ds->offset = 0;
-
-    /* Select the next available track in the playlist */
-    struct track* t;
-    for (t = ds->playlist->tracks; t && t != ds->track; t = t->next);
-    if (t)
-        ds->track = t->next;
+    ds->track = ds->track->next;
 
     int error = 0;
-    if (ds->track) {
+    if (ds->track && ds->play_as_list) {
         char fid[20], tid[16];
         hex_ascii_to_bytes(ds->track->file_id, fid, sizeof fid);
         hex_ascii_to_bytes(ds->track->track_id, tid, sizeof tid);
@@ -374,11 +369,8 @@ static void despotify_snd_timetell_callback(snd_SESSION* snd, int t)
 }
 
 bool despotify_play(struct despotify_session* ds,
-                    struct playlist* pl,
-                    struct track* t)
+                    struct track* t, bool play_as_list)
 {
-    //DSFYDEBUG("pl=%p, t=%p\n", pl, t);
-
     if (ds->snd_session) {
         snd_stop(ds->snd_session);
         snd_reset(ds->snd_session);
@@ -399,7 +391,7 @@ bool despotify_play(struct despotify_session* ds,
     snd_set_timetell_callback(ds->snd_session, despotify_snd_timetell_callback);
 
     ds->track = t;
-    ds->playlist = pl;
+    ds->play_as_list = play_as_list;
 
     char fid[20], tid[16];
     hex_ascii_to_bytes(ds->track->file_id, fid, sizeof fid);

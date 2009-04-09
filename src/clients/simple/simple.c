@@ -342,7 +342,7 @@ void command_loop(struct despotify_session* ds)
             for (int i=1; i<num && t; i++)
                 t = t->next;
             if (t)
-                despotify_play(ds, lastlist, t);
+                despotify_play(ds, t, true);
             else
                 printf("Invalid track number %d\n", num);
         }

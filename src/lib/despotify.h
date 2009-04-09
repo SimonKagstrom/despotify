@@ -139,6 +139,7 @@ struct despotify_session
     pthread_cond_t  sync_cond;
 
     bool list_of_lists;
+    bool play_as_list;
 };
 
 /* Global init / deinit library. */
@@ -197,8 +198,8 @@ void despotify_free_playlist(struct playlist* playlist);
 
 /* Playback control. */
 bool despotify_play(struct despotify_session *ds,
-                    struct playlist* playlist,
-                    struct track *song);
+                    struct track *song,
+                    bool play_as_list);
 bool despotify_stop(struct despotify_session *ds);
 bool despotify_pause(struct despotify_session *ds);
 bool despotify_resume(struct despotify_session *ds);
