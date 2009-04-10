@@ -193,10 +193,10 @@ static int despotify_aes_callback(CHANNEL* ch,
         memcpy(t->key, buf, len);
 
         /* Expand file key */
-	rijndaelKeySetupEnc (ds->aes.state, t->key, 128);
+    rijndaelKeySetupEnc (ds->aes.state, t->key, 128);
 
-	/* Set initial IV */
-	memcpy(ds->aes.IV,
+    /* Set initial IV */
+    memcpy(ds->aes.IV,
                "\x72\xe0\x67\xfb\xdd\xcb\xcf\x77"
                "\xeb\xe8\xbc\x64\x3f\x63\x0d\x93",
                16);
@@ -216,11 +216,11 @@ static int despotify_substream_callback(CHANNEL * ch,
     struct despotify_session* ds = ch->private;
 
     switch (ch->state) {
-	case CHANNEL_HEADER:
+    case CHANNEL_HEADER:
             DSFYDEBUG("CHANNEL_HEADER\n");
             break;
             
-	case CHANNEL_DATA: {
+    case CHANNEL_DATA: {
             int block;
 
             DSFYDEBUG("id=%d: CHANNEL_DATA with %d bytes of song data (previously processed a total of %d bytes)\n",
@@ -275,13 +275,13 @@ static int despotify_substream_callback(CHANNEL * ch,
             break;
         }
 
-	case CHANNEL_ERROR:
+    case CHANNEL_ERROR:
             DSFYDEBUG("got CHANNEL_ERROR\n");
             /* XXX - handle cleanly */
             exit (1);
             break;
 
-	case CHANNEL_END:
+    case CHANNEL_END:
             DSFYDEBUG("got CHANNEL_END, processed %d bytes data\n",
                       ch->total_data_len);
 
@@ -306,7 +306,7 @@ static int despotify_substream_callback(CHANNEL * ch,
 
             break;
 
-	default:
+    default:
             break;
     }
 
@@ -435,9 +435,9 @@ bool despotify_resume(struct despotify_session* ds)
 }
 
 struct track *despotify_get_current_track(struct despotify_session *ds) {
-	if (ds->track)
-		return ds->track;
-	return NULL;
+    if (ds->track)
+        return ds->track;
+    return NULL;
 }
 
 static struct buf* despotify_inflate(unsigned char* data, int len)
@@ -510,20 +510,20 @@ static int despotify_plain_callback(CHANNEL *ch,
     bool done = false;
 
     switch (ch->state) {
-	case CHANNEL_DATA:
+    case CHANNEL_DATA:
             buf_append_data(ds->response, buf, len);
             break;
 
-	case CHANNEL_ERROR:
+    case CHANNEL_ERROR:
             DSFYDEBUG("!!! channel error\n");
             done = true;
             break;
 
-	case CHANNEL_END:
+    case CHANNEL_END:
             done = true;
             break;
 
-	default:
+    default:
             break;
     }
 
@@ -548,14 +548,14 @@ static int despotify_gzip_callback(CHANNEL*  ch,
         case CHANNEL_DATA:
             /* Skip a minimal gzip header */
             if (ch->total_data_len < 10) {
-		int skip_len = 10 - ch->total_data_len;
-		while (skip_len && len) {
+        int skip_len = 10 - ch->total_data_len;
+        while (skip_len && len) {
                     skip_len--;
                     len--;
                     buf++;
-		}
+        }
 
-		if (len == 0)
+        if (len == 0)
                     return 0;
             }
 
@@ -689,10 +689,10 @@ struct search_result* despotify_search_more(struct despotify_session *ds,
 }
 
 void despotify_free_search(struct search_result *search) {
-	despotify_free_playlist(search->playlist);
-	xml_free_album(search->albums);
-	xml_free_artist(search->artists);
-	free(search);
+    despotify_free_playlist(search->playlist);
+    xml_free_album(search->albums);
+    xml_free_artist(search->artists);
+    free(search);
 }
 
 /**************************************************************
@@ -983,7 +983,7 @@ bool despotify_set_playlist_collaboration(struct despotify_session *ds,
 
 /*****************************************************************
  *
- *  Artist / album information
+ *  Artist / album / track information
  *
  */
 
@@ -1090,6 +1090,63 @@ void despotify_free_album_browse(struct album_browse* a)
 {
     xml_free_album_browse(a);
 }
+
+struct track* despotify_get_tracks(struct despotify_session* ds, char* track_ids[], int num_tracks)
+{
+
+    if (num_tracks > MAX_BROWSE_REQ) {
+        ds->last_error = "Too many ids in track browse request";
+        return NULL;
+    }
+
+    /* construct an array of 16-byte track ids */
+    char* tracklist = malloc(num_tracks * 16);
+    struct track* first = calloc(1, sizeof(struct track));
+    ds->response = buf_new();
+
+    for (int i = 0; i < num_tracks; i++)
+        hex_ascii_to_bytes(track_ids[i], tracklist + i * 16, 16);
+
+    int error = cmd_browse(ds->session, BROWSE_TRACK, tracklist, num_tracks,
+                           despotify_gzip_callback, ds);
+
+    if (error) {
+        DSFYDEBUG("cmd_browse() failed with %d\n", error);
+        ds->last_error = "Network error.";
+        session_disconnect(ds->session);
+        return NULL;
+    }
+
+    /* wait until track fetch is ready */
+    pthread_mutex_lock(&ds->sync_mutex);
+    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
+    pthread_mutex_unlock(&ds->sync_mutex);
+
+    struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
+    if (b) {
+        xml_parse_tracklist(first, b->ptr, b->len, false);
+        buf_free(b);
+    }
+
+    buf_free(ds->response);
+    free(tracklist);
+
+    return first;
+}
+
+struct track* despotify_get_track(struct despotify_session* ds, char* track_id)
+{
+	char* track_ids[1];
+	track_ids[0] = track_id;
+
+	return despotify_get_tracks(ds, track_ids, 1);
+}
+
+void despotify_free_track(struct track* t)
+{
+	xml_free_track(t);
+}
+
 
 /*****************************************************************
  *

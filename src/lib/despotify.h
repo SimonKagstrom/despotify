@@ -167,15 +167,19 @@ void despotify_free(struct despotify_session *ds, bool should_disconnect);
 const char *despotify_get_error(struct despotify_session *ds);
 
 /* Information. */
-struct track *despotify_get_current_track(struct despotify_session *ds);
+struct track* despotify_get_current_track(struct despotify_session* ds);
 struct artist_browse* despotify_get_artist(struct despotify_session* ds,
-                                    char* artist_id);
+                                           char* artist_id);
 struct album_browse* despotify_get_album(struct despotify_session* ds,
-                                  char* album_id);
-void despotify_free_artist_browse(struct artist_browse* a);
-void despotify_free_album_browse(struct album_browse* a);
+                                         char* album_id);
+struct track* despotify_get_tracks(struct despotify_session* ds, char* track_ids[], int num_tracks);
+struct track* despotify_get_track(struct despotify_session* ds, char* track_id);
 void* despotify_get_image(struct despotify_session* ds,
                           char* image_id, int* len);
+
+void despotify_free_artist_browse(struct artist_browse* a);
+void despotify_free_album_browse(struct album_browse* a);
+void despotify_free_track(struct track* t);
 
 /* We need to determine if there is any / enough info to warrant this:
  * user despotify_get_user_info(struct despotify_session *ds); */
