@@ -66,6 +66,71 @@ void print_tracks(struct track* head)
     }
 }
 
+void print_track_full(struct track* t)
+{
+    if(t->has_meta_data) {
+        printf("\nTitle: %s\nAlbum: %s\nArtist(s): ",
+               t->title, t->album);
+
+        for (struct artist* a = t->artist; a; a = a->next)
+            printf("%s%s", a->name, a->next ? ", " : "");
+
+        printf("\nYear: %d\nLength: %02d:%02d\n\n",
+               t->year, t->length / 60000, t->length % 60000 / 1000);
+    } else {
+        printf(" <track has no metadata>\n");
+    }
+}
+
+void print_album(struct album_browse* a)
+{
+    printf("\nName: %s\nYear: %d\n",
+            a->name, a->year);
+    print_tracks(a->tracks);
+}
+
+void print_artist(struct artist_browse* a)
+{
+    printf("\nName: %s\n"
+           "Genres: %s\n"
+           "Years active: %s\n"
+           "%d albums:\n",
+           a->name, a->genres, a->years_active, a->num_albums);
+    for (struct album_browse* al = a->albums; al; al = al->next)
+        printf(" %s (%d)\n", al->name, al->year);
+}
+
+void print_playlist(struct playlist* pls)
+{
+    printf("\nName: %s\nAuthor: %s\n",
+           pls->name, pls->author);
+    print_tracks(pls->tracks);
+}
+
+void print_search(struct search_result *search)
+{
+    if (search->suggestion[0])
+        printf("\nDid you mean \"%s\"?\n", search->suggestion);
+
+    if (search->total_artists > 0) {
+        printf("\nArtists found (%d):\n", search->total_artists);
+
+        for (struct artist* artist = search->artists; artist; artist = artist->next)
+            printf(" %s\n", artist->name);
+    }
+
+    if (search->total_albums > 0) {
+        printf("\nAlbums found (%d):\n", search->total_albums);
+        for (struct album* album = search->albums; album; album = album->next)
+            printf(" %s\n", album->name);
+    }
+
+    if (search->total_tracks > 0) {
+        printf("\nTracks found (%d/%d):\n", search->playlist->num_tracks, search->total_tracks);
+        print_tracks(search->tracks);
+    }
+}
+
 void print_info(struct despotify_session* ds)
 {
     struct user_info* user = ds->user_info;
@@ -95,6 +160,7 @@ void print_help(void)
            "search [string]         Search for [string] or get next 100 results\n"
            "artist [num]            Show information about artist for track [num]\n"
            "album [num]             List album for track [num]\n"
+           "info [string]           Display info about Spotify URI\n"
            "portrait [num]          Save artist portrait to portrait.jpg\n"
            "\n"
            "play [num]              Play track [num] in the last viewed list\n"
@@ -209,25 +275,8 @@ void command_loop(struct despotify_session* ds)
                 }
 
             if (searchlist) {
-                if (search->suggestion[0])
-                    printf("Did you mean \"%s\"?\n", search->suggestion);
+                print_search(search);
 
-                if (search->total_artists > 0) {
-                    printf("Artists found (%d):\n", search->total_artists);
-                    for (struct artist* artist = search->artists; artist; artist = artist->next)
-                        printf(" %s\n", artist->name);
-                }
-
-                if (search->total_albums > 0) {
-                    printf("\nAlbums found (%d):\n", search->total_albums);
-                    for (struct album* album = search->albums; album; album = album->next)
-                        printf(" %s\n", album->name);
-                }
-
-                if (search->total_tracks > 0) {
-                    printf("\nTracks found (%d/%d):\n", searchlist->num_tracks, search->total_tracks);
-                    print_tracks(search->tracks);
-                }
 
                 lastlist = searchlist;
             }
@@ -254,13 +303,7 @@ void command_loop(struct despotify_session* ds)
 
             for (struct artist* aptr = t->artist; aptr; aptr = aptr->next) {
                 struct artist_browse* a = despotify_get_artist(ds, aptr->id);
-                printf("\nName: %s\n"
-                       "Genres: %s\n"
-                       "Years active: %s\n"
-                       "%d albums:\n",
-                       a->name, a->genres, a->years_active, a->num_albums);
-                for (struct album_browse* al = a->albums; al; al = al->next)
-                    printf(" %s (%d)\n", al->name, al->year);
+                print_artist(a);
                 despotify_free_artist_browse(a);
             }
         }
@@ -285,10 +328,7 @@ void command_loop(struct despotify_session* ds)
             if (t) {
                 struct album_browse* a = despotify_get_album(ds, t->album_id);
                 if (a) {
-                    printf("\nName: %s\n"
-                           "Year: %d\n",
-                           a->name, a->year);
-                    print_tracks(a->tracks);
+                    print_album(a);
                     despotify_free_album_browse(a);
                 }
                 else
@@ -318,7 +358,7 @@ void command_loop(struct despotify_session* ds)
                 if (playalbum)
                     despotify_free_album_browse(playalbum);
 
-				despotify_stop(ds);
+                despotify_stop(ds);
                 playalbum = despotify_get_album(ds, t->album_id);
 
                 if (playalbum)
@@ -326,6 +366,69 @@ void command_loop(struct despotify_session* ds)
                 else
                     printf("Got no album for id %s\n", t->album_id);
             }
+        }
+
+        /* info */
+        else if (!strncmp(buf, "info", 4)) {
+            char *uri = buf + 5;
+            if(strlen(uri) == 0) {
+                printf("usage: info <uri>\n");
+                continue;
+            }
+
+            struct link* link = despotify_link_from_uri(uri);
+            struct album_browse* al;
+            struct artist_browse* ar;
+            struct playlist* pls;
+            struct search_result* s;
+            struct track* t;
+
+            switch(link->type) {
+                case LINK_TYPE_ALBUM:
+                    al = despotify_link_get_album(ds, link);
+                    if(al) {
+                        print_album(al);
+                        despotify_free_album_browse(al);
+                    }
+                    break;
+
+                case LINK_TYPE_ARTIST:
+                    ar = despotify_link_get_artist(ds, link);
+                    if(ar) {
+                        print_artist(ar);
+                        despotify_free_artist_browse(ar);
+                    }
+                    break;
+
+                case LINK_TYPE_PLAYLIST:
+                    pls = despotify_link_get_playlist(ds, link);
+                    if(pls) {
+                        print_playlist(pls);
+                        despotify_free_playlist(pls);
+                    }
+                    break;
+
+                case LINK_TYPE_SEARCH:
+                    s = despotify_link_get_search(ds, link);
+                    if(s) {
+                        print_search(s);
+                        despotify_free_search(s);
+                    }
+                    break;
+
+                case LINK_TYPE_TRACK:
+                    t = despotify_link_get_track(ds, link);
+                    if(t) {
+                        print_track_full(t);
+                        despotify_free_track(t);
+                    }
+                    break;
+
+                default:
+                    printf("%s is a invalid Spotify URI\n", uri);
+            }
+
+            despotify_free_link(link);
         }
 
         /* portrait */
@@ -362,7 +465,7 @@ void command_loop(struct despotify_session* ds)
                 printf("Artist %s has no portrait.\n", a->name);
             despotify_free_artist_browse(a);
         }
-        
+
         /* play */
         else if (!strncmp(buf, "play", 4)) {
             if (!lastlist) {
@@ -400,7 +503,7 @@ void command_loop(struct despotify_session* ds)
         else if (!strncmp(buf, "info", 4)) {
             print_info(ds);
         }
-        
+
         /* help */
         else if (!strncmp(buf, "help", 4)) {
             print_help();
@@ -440,7 +543,7 @@ int main(int argc, char** argv)
         printf("despotify_init_client() failed\n");
         return 1;
     }
-    
+
     if (!despotify_authenticate(ds, argv[1], argv[2])) {
         printf( "Authentication failed: %s\n", despotify_get_error(ds));
         despotify_exit(ds);

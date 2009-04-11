@@ -71,7 +71,7 @@ struct despotify_session* despotify_init_client()
     pthread_mutex_init(&ds->sync_mutex, NULL);
 
     ds->user_info = &ds->session->user_info;
-    
+
     return ds;
 }
 
@@ -136,7 +136,7 @@ bool despotify_authenticate(struct despotify_session* ds,
     pthread_mutex_lock(&ds->session->login_mutex);
     pthread_cond_wait(&ds->session->login_cond, &ds->session->login_mutex);
     pthread_mutex_unlock(&ds->session->login_mutex);
-    
+
     return true;
 }
 
@@ -193,10 +193,10 @@ static int despotify_aes_callback(CHANNEL* ch,
         memcpy(t->key, buf, len);
 
         /* Expand file key */
-    rijndaelKeySetupEnc (ds->aes.state, t->key, 128);
+        rijndaelKeySetupEnc (ds->aes.state, t->key, 128);
 
-    /* Set initial IV */
-    memcpy(ds->aes.IV,
+        /* Set initial IV */
+        memcpy(ds->aes.IV,
                "\x72\xe0\x67\xfb\xdd\xcb\xcf\x77"
                "\xeb\xe8\xbc\x64\x3f\x63\x0d\x93",
                16);
@@ -219,7 +219,7 @@ static int despotify_substream_callback(CHANNEL * ch,
     case CHANNEL_HEADER:
             DSFYDEBUG("CHANNEL_HEADER\n");
             break;
-            
+
     case CHANNEL_DATA: {
             int block;
 
@@ -357,7 +357,7 @@ static int despotify_snd_end_callback(void* arg)
         /* request key for next track */
         error = cmd_aeskey(ds->session, fid, tid, despotify_aes_callback, ds);
     }
-    
+
     return error;
 }
 
@@ -384,7 +384,7 @@ bool despotify_play(struct despotify_session* ds,
         DSFYDEBUG("packet_write(CMD_TOKENNOTIFY) failed\n");
         return false;
     }
-    
+
     /* TODO: change to static callbacks */
     snd_set_data_callback(ds->snd_session, despotify_snd_data_callback, ds);
     snd_set_end_callback(ds->snd_session, despotify_snd_end_callback, ds);
@@ -537,7 +537,7 @@ static int despotify_plain_callback(CHANNEL *ch,
     return 0;
 }
 
-static int despotify_gzip_callback(CHANNEL*  ch, 
+static int despotify_gzip_callback(CHANNEL*  ch,
                                    unsigned char* buf,
                                    unsigned short len)
 {
@@ -561,7 +561,7 @@ static int despotify_gzip_callback(CHANNEL*  ch,
 
             buf_append_data(ds->response, buf, len);
             break;
-            
+
         case CHANNEL_END:
             done = true;
             break;
@@ -713,36 +713,36 @@ static bool despotify_load_tracks(struct despotify_session *ds)
     /* construct an array of 16-byte track ids */
     char* tracklist = malloc(MAX_BROWSE_REQ * 16);
     int track_count = 0;
- 
+
     /* don't request too many tracks at once */
     int count;
     for (int totcount=0; totcount < pl->num_tracks; totcount += count) {
         ds->response = buf_new();
- 
+
         struct track* firsttrack = t;
         for (count = 0; t && count < MAX_BROWSE_REQ; t = t->next, count++)
             hex_ascii_to_bytes(t->track_id, tracklist + count * 16, 16);
- 
+
         int error = cmd_browse(ds->session, BROWSE_TRACK, tracklist, count, 
                                despotify_gzip_callback, ds);
- 
+
         if (error) {
             DSFYDEBUG("cmd_browse() failed with %d\n", error);
             ds->last_error = "Network error.";
             session_disconnect(ds->session);
             return false;
         }
- 
+
         /* wait until track fetch is ready */
         pthread_mutex_lock(&ds->sync_mutex);
         pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
         pthread_mutex_unlock(&ds->sync_mutex);
- 
+
         /* add tracks to playlist */
         struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
         if (b) {
             track_count += xml_parse_tracklist(firsttrack, b->ptr, b->len,
-                                                true);
+                                               true);
             buf_free(b);
         }
 
@@ -785,12 +785,12 @@ static bool despotify_load_tracks(struct despotify_session *ds)
 }
 
 struct playlist* despotify_get_playlist(struct despotify_session *ds,
-                                        unsigned char* playlist_id)
+                                        char* playlist_id)
 {
     ds->response = buf_new();
     ds->playlist = calloc(1, sizeof(struct playlist));
 
-    static const char* load_lists = 
+    static const char* load_lists =
         "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n";
 
     buf_append_data(ds->response, (char*)load_lists, strlen(load_lists));
@@ -803,7 +803,7 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
         ds->list_of_lists = true;
         memset(pid, 0, sizeof pid);
     }
-        
+
     int error = cmd_getplaylist(ds->session, pid, PLAYLIST_CURRENT,
                                 despotify_plain_callback, ds);
     if (error) {
@@ -854,7 +854,7 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
     struct playlist* metalist = despotify_get_playlist(ds, NULL);
     struct playlist* root = NULL;
     struct playlist* prev = NULL;
-    
+
     for (struct playlist* p = metalist; p && p->playlist_id[0]; p = p->next) {
         struct playlist* new = despotify_get_playlist(ds, p->playlist_id);
         if (prev)
@@ -995,21 +995,21 @@ struct artist_browse* despotify_get_artist(struct despotify_session* ds,
 
     unsigned char id[16];
     hex_ascii_to_bytes(artist_id, id, sizeof id);
-    int error = cmd_browse(ds->session, BROWSE_ARTIST, id, 1, 
+    int error = cmd_browse(ds->session, BROWSE_ARTIST, id, 1,
                            despotify_gzip_callback, ds);
- 
+
     if (error) {
         DSFYDEBUG("cmd_browse() failed with %d\n", error);
         ds->last_error = "Network error.";
         session_disconnect(ds->session);
         return false;
     }
- 
+
     /* wait until track fetch is ready */
     pthread_mutex_lock(&ds->sync_mutex);
     pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
     pthread_mutex_unlock(&ds->sync_mutex);
- 
+
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
         xml_parse_browse_artist(ds->artist_browse, b->ptr, b->len);
@@ -1039,12 +1039,12 @@ void* despotify_get_image(struct despotify_session* ds, char* image_id, int* len
         session_disconnect(ds->session);
         return false;
     }
- 
+
     /* wait until image fetch is ready */
     pthread_mutex_lock(&ds->sync_mutex);
     pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
     pthread_mutex_unlock(&ds->sync_mutex);
- 
+
     void* image = ds->response->ptr;
     if (len)
         *len = ds->response->len;
@@ -1061,21 +1061,21 @@ struct album_browse* despotify_get_album(struct despotify_session* ds,
 
     unsigned char id[16];
     hex_ascii_to_bytes(album_id, id, sizeof id);
-    int error = cmd_browse(ds->session, BROWSE_ALBUM, id, 1, 
+    int error = cmd_browse(ds->session, BROWSE_ALBUM, id, 1,
                            despotify_gzip_callback, ds);
- 
+
     if (error) {
         DSFYDEBUG("cmd_browse() failed with %d\n", error);
         ds->last_error = "Network error.";
         session_disconnect(ds->session);
         return false;
     }
- 
+
     /* wait until track fetch is ready */
     pthread_mutex_lock(&ds->sync_mutex);
     pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
     pthread_mutex_unlock(&ds->sync_mutex);
- 
+
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
         xml_parse_browse_album(ds->album_browse, b->ptr, b->len);
@@ -1136,15 +1136,15 @@ struct track* despotify_get_tracks(struct despotify_session* ds, char* track_ids
 
 struct track* despotify_get_track(struct despotify_session* ds, char* track_id)
 {
-	char* track_ids[1];
-	track_ids[0] = track_id;
+    char* track_ids[1];
+    track_ids[0] = track_id;
 
-	return despotify_get_tracks(ds, track_ids, 1);
+    return despotify_get_tracks(ds, track_ids, 1);
 }
 
 void despotify_free_track(struct track* t)
 {
-	xml_free_track(t);
+    xml_free_track(t);
 }
 
 
@@ -1161,21 +1161,21 @@ static void baseconvert(char *src, char *dest,
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
     int number[128];
     int i, len, newlen, divide;
- 
+
     len = strlen(src);
- 
+
     for (i = 0; i < len; i++)
         number[i] = strchr(alphabet, src[i]) - alphabet;
- 
+
     memset(dest, '0', padlen);
     dest[padlen] = 0;
- 
+
     padlen--;
- 
+
     do {
         divide = 0;
         newlen = 0;
- 
+
         for (i = 0; i < len; i++) {
             divide = divide * frombase + number[i];
             if (divide >= tobase) {
@@ -1186,7 +1186,7 @@ static void baseconvert(char *src, char *dest,
             }
         }
         len = newlen;
- 
+
         dest[padlen--] = alphabet[divide];
     } while (newlen != 0);
 }
@@ -1199,4 +1199,163 @@ void despotify_id2uri(char* id, char* uri)
 void despotify_uri2id(char* uri, char* id)
 {
     baseconvert(uri, id, 62, 16, 32);
+}
+
+
+struct link* despotify_link_from_uri(char *uri)
+{
+    struct link* link = calloc(1, sizeof(struct link));
+
+    link->type = LINK_TYPE_INVALID;
+    link->uri = uri;
+
+    if (!strncmp(uri, "spotify:album:", 13)) {
+        char* id = uri + 14;
+
+        if (strlen(id) != 22) /* id must be 22 chars */
+            return link;
+
+        link->type = LINK_TYPE_ALBUM;
+        link->arg = id;
+
+    } else if (!strncmp(uri, "spotify:artist:", 14)) {
+        char* id = uri + 15;
+
+        if (strlen(id) != 22) /* id must be 22 chars */
+            return link;
+
+        link->type = LINK_TYPE_ARTIST;
+        link->arg = id;
+
+    } else if (!strncmp(uri, "spotify:search:", 14)) {
+        char* searcharg = uri + 15;
+
+        if (strlen(searcharg) == 0) /* must search for something */
+            return link;
+
+        link->type = LINK_TYPE_SEARCH;
+        link->arg = searcharg;
+
+    } else if (!strncmp(uri, "spotify:user:", 12)) {
+        int userlen = strchr(uri + 13, ':') - (uri + 13);
+        char *id = uri + userlen + 23;
+
+        if (strlen(id) != 22) /* id must be 22 chars */
+            return link;
+
+        link->type = LINK_TYPE_PLAYLIST;
+        link->arg = id;
+
+    } else if (!strncmp(uri, "spotify:track:", 13)) {
+        char* id = uri + 14;
+
+        if (strlen(id) != 22) /* id must be 22 chars */
+            return link;
+
+        link->type = LINK_TYPE_TRACK;
+        link->arg = id;
+    }
+
+    return link;
+}
+
+struct album_browse* despotify_link_get_album(struct despotify_session* ds, struct link* link)
+{
+    char buf[33];
+
+    despotify_uri2id(link->arg, buf);
+
+    return despotify_get_album(ds, buf);
+}
+
+struct artist_browse* despotify_link_get_artist(struct despotify_session* ds, struct link* link)
+{
+    char buf[33];
+
+    despotify_uri2id(link->arg, buf);
+
+    return despotify_get_artist(ds, buf);
+}
+
+struct search_result* despotify_link_get_search(struct despotify_session* ds, struct link* link)
+{
+    return despotify_search(ds, link->arg, MAX_SEARCH_RESULTS);
+}
+
+struct playlist* despotify_link_get_playlist(struct despotify_session* ds, struct link* link)
+{
+    char buf[35];
+
+    despotify_uri2id(link->arg, buf);
+    strncat(buf, "02", 2); /* Playlist uris are missing the last 2 chars of the id */
+
+    return despotify_get_playlist(ds, buf);
+}
+
+struct track* despotify_link_get_track(struct despotify_session* ds, struct link* link)
+{
+    char buf[33];
+
+    despotify_uri2id(link->arg, buf);
+
+    return despotify_get_track(ds, buf);
+}
+
+void despotify_free_link(struct link* link)
+{
+    free(link);
+}
+
+char* despotify_album_to_uri(struct album_browse* album, char* dest)
+{
+    char uri[23];
+
+    despotify_id2uri(album->id, uri);
+    sprintf(dest, "spotify:album:%s", uri);
+
+    return dest;
+}
+
+char* despotify_artist_to_uri(struct artist_browse* artist, char* dest)
+{
+    char uri[23];
+
+    despotify_id2uri(artist->id, uri);
+    sprintf(dest, "spotify:artist:%s", uri);
+
+    return dest;
+}
+
+char* despotify_playlist_to_uri(struct playlist* playlist, char* dest)
+{
+    char uri[23];
+    char id[33];
+
+    /* remove two last chars before creating a uri */
+    strncpy(id, playlist->playlist_id, 32);
+    id[32] = '\0';
+    despotify_id2uri(id, uri);
+
+    sprintf(dest, "spotify:user:%s:playlist:%s", playlist->author, uri);
+
+    return dest;
+}
+
+
+char* despotify_search_to_uri(struct search_result* search, char* dest)
+{
+    sprintf(dest, "spotify:search:%s", search->query);
+
+    return dest;
+}
+
+
+char* despotify_track_to_uri(struct track* track, char* dest)
+{
+    char uri[23];
+
+    despotify_id2uri(track->track_id, uri);
+    sprintf(dest, "spotify:track:%s", uri);
+
+    return dest;
 }

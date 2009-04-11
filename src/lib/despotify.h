@@ -110,6 +110,21 @@ struct user_info
     time_t last_ping;
 };
 
+enum link_type {
+    LINK_TYPE_INVALID,
+    LINK_TYPE_ALBUM,
+    LINK_TYPE_ARTIST,
+    LINK_TYPE_PLAYLIST,
+    LINK_TYPE_SEARCH,
+    LINK_TYPE_TRACK
+};
+
+struct link {
+    char* uri;
+    char* arg;
+    enum link_type type;
+};
+
 struct despotify_session
 {
     bool initialized;
@@ -166,8 +181,7 @@ void despotify_free(struct despotify_session *ds, bool should_disconnect);
 
 const char *despotify_get_error(struct despotify_session *ds);
 
-/* Information. */
-struct track* despotify_get_current_track(struct despotify_session* ds);
+/* Browse functions.  */
 struct artist_browse* despotify_get_artist(struct despotify_session* ds,
                                            char* artist_id);
 struct album_browse* despotify_get_album(struct despotify_session* ds,
@@ -184,7 +198,7 @@ void despotify_free_track(struct track* t);
 /* We need to determine if there is any / enough info to warrant this:
  * user despotify_get_user_info(struct despotify_session *ds); */
 
-/* Playlist handling. */
+/* Search */
 struct search_result* despotify_search(struct despotify_session *ds,
                                        char *searchtext, int maxresults);
 struct search_result* despotify_search_more(struct despotify_session *ds,
@@ -192,6 +206,10 @@ struct search_result* despotify_search_more(struct despotify_session *ds,
                                             int offset, int maxresults);
 void despotify_free_search(struct search_result *search);
 
+
+/* Playlist handling. */
+struct playlist* despotify_get_playlist(struct despotify_session *ds,
+                                        char* playlist_id);
 struct playlist* despotify_get_stored_playlists(struct despotify_session *ds);
 bool despotify_rename_playlist(struct despotify_session *ds,
                                struct playlist *playlist, char *name);
@@ -207,6 +225,25 @@ bool despotify_play(struct despotify_session *ds,
 bool despotify_stop(struct despotify_session *ds);
 bool despotify_pause(struct despotify_session *ds);
 bool despotify_resume(struct despotify_session *ds);
+struct track* despotify_get_current_track(struct despotify_session* ds);
+
+
+/* URI utils */
+struct link* despotify_link_from_uri(char* uri);
+
+struct album_browse* despotify_link_get_album(struct despotify_session* ds, struct link* link);
+struct artist_browse* despotify_link_get_artist(struct despotify_session* ds, struct link* link);
+struct playlist* despotify_link_get_playlist(struct despotify_session* ds, struct link* link);
+struct search_result* despotify_link_get_search(struct despotify_session* ds, struct link* link);
+struct track* despotify_link_get_track(struct despotify_session* ds, struct link* link);
+
+void despotify_free_link(struct link* link);
+
+char* despotify_album_to_uri(struct album_browse* album, char* dest);
+char* despotify_artist_to_uri(struct artist_browse* album, char* dest);
+char* despotify_playlist_to_uri(struct playlist* album, char* dest);
+char* despotify_search_to_uri(struct search_result* album, char* dest);
+char* despotify_track_to_uri(struct track* album, char* dest);
 
 void despotify_id2uri(char* id, char* uri);
 void despotify_uri2id(char* uri, char* id);
