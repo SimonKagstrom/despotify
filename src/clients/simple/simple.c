@@ -5,11 +5,13 @@
  *
  */
 
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
+#include <wchar.h>
 #include "despotify.h"
 
 struct playlist* get_playlist(struct playlist* rootlist, int num)
@@ -17,7 +19,7 @@ struct playlist* get_playlist(struct playlist* rootlist, int num)
     struct playlist* p = rootlist;
 
     if (!p) {
-        printf("Stored lists not loaded. Run 'list' without parameter to load.\n");
+        wprintf(L"Stored lists not loaded. Run 'list' without parameter to load.\n");
     }
     else {
         /* skip to playlist number <num> */
@@ -26,7 +28,7 @@ struct playlist* get_playlist(struct playlist* rootlist, int num)
 
 
         if (!p)
-            printf("Invalid playlist number %d\n", num);
+            wprintf(L"Invalid playlist number %d\n", num);
     }
 
     return p;
@@ -35,12 +37,12 @@ struct playlist* get_playlist(struct playlist* rootlist, int num)
 void print_list_of_lists(struct playlist* rootlist)
 {
     if (!rootlist) {
-        printf(" <no stored playlists>\n");
+        wprintf(L" <no stored playlists>\n");
     }
     else {
         int count=1;
         for (struct playlist* p = rootlist; p; p = p->next)
-            printf("%2d: %-40s %3d %c %s\n", count++, p->name, p->num_tracks,
+            wprintf(L"%2d: %-40s %3d %c %s\n", count++, p->name, p->num_tracks,
                    p->is_collaborative ? '*' : ' ', p->author);
     }
 }
@@ -48,61 +50,61 @@ void print_list_of_lists(struct playlist* rootlist)
 void print_tracks(struct track* head)
 {
     if (!head) {
-        printf(" <empty playlist>\n");
+        wprintf(L" <empty playlist>\n");
         return;
     }
 
     int count = 1;
     for (struct track* t = head; t; t = t->next) {
         if (t->has_meta_data) {
-            printf("%3d: %-40s %2d:%02d ", count++, t->title,
+            wprintf(L"%3d: %-40s %2d:%02d ", count++, t->title,
                    t->length / 60000, t->length % 60000 / 1000);
             for (struct artist* a = t->artist; a; a = a->next)
-                printf("%s%s", a->name, a->next ? ", " : "");
-            printf(" %s\n", t->playable ? "" : "(Unplayable)");
+                wprintf(L"%s%s", a->name, a->next ? ", " : "");
+            wprintf(L" %s\n", t->playable ? "" : "(Unplayable)");
         }
         else
-            printf("%3d: N/A\n", count++);
+            wprintf(L"%3d: N/A\n", count++);
     }
 }
 
 void print_track_full(struct track* t)
 {
     if(t->has_meta_data) {
-        printf("\nTitle: %s\nAlbum: %s\nArtist(s): ",
+        wprintf(L"\nTitle: %s\nAlbum: %s\nArtist(s): ",
                t->title, t->album);
 
         for (struct artist* a = t->artist; a; a = a->next)
-            printf("%s%s", a->name, a->next ? ", " : "");
+            wprintf(L"%s%s", a->name, a->next ? ", " : "");
 
-        printf("\nYear: %d\nLength: %02d:%02d\n\n",
+        wprintf(L"\nYear: %d\nLength: %02d:%02d\n\n",
                t->year, t->length / 60000, t->length % 60000 / 1000);
     } else {
-        printf(" <track has no metadata>\n");
+        wprintf(L" <track has no metadata>\n");
     }
 }
 
 void print_album(struct album_browse* a)
 {
-    printf("\nName: %s\nYear: %d\n",
+    wprintf(L"\nName: %s\nYear: %d\n",
             a->name, a->year);
     print_tracks(a->tracks);
 }
 
 void print_artist(struct artist_browse* a)
 {
-    printf("\nName: %s\n"
+    wprintf(L"\nName: %s\n"
            "Genres: %s\n"
            "Years active: %s\n"
            "%d albums:\n",
            a->name, a->genres, a->years_active, a->num_albums);
     for (struct album_browse* al = a->albums; al; al = al->next)
-        printf(" %s (%d)\n", al->name, al->year);
+        wprintf(L" %s (%d)\n", al->name, al->year);
 }
 
 void print_playlist(struct playlist* pls)
 {
-    printf("\nName: %s\nAuthor: %s\n",
+    wprintf(L"\nName: %s\nAuthor: %s\n",
            pls->name, pls->author);
     print_tracks(pls->tracks);
 }
@@ -110,23 +112,23 @@ void print_playlist(struct playlist* pls)
 void print_search(struct search_result *search)
 {
     if (search->suggestion[0])
-        printf("\nDid you mean \"%s\"?\n", search->suggestion);
+        wprintf(L"\nDid you mean \"%s\"?\n", search->suggestion);
 
     if (search->total_artists > 0) {
-        printf("\nArtists found (%d):\n", search->total_artists);
+        wprintf(L"\nArtists found (%d):\n", search->total_artists);
 
         for (struct artist* artist = search->artists; artist; artist = artist->next)
-            printf(" %s\n", artist->name);
+            wprintf(L" %s\n", artist->name);
     }
 
     if (search->total_albums > 0) {
-        printf("\nAlbums found (%d):\n", search->total_albums);
+        wprintf(L"\nAlbums found (%d):\n", search->total_albums);
         for (struct album* album = search->albums; album; album = album->next)
-            printf(" %s\n", album->name);
+            wprintf(L" %s\n", album->name);
     }
 
     if (search->total_tracks > 0) {
-        printf("\nTracks found (%d/%d):\n", search->playlist->num_tracks, search->total_tracks);
+        wprintf(L"\nTracks found (%d/%d):\n", search->playlist->num_tracks, search->total_tracks);
         print_tracks(search->tracks);
     }
 }
@@ -134,15 +136,15 @@ void print_search(struct search_result *search)
 void print_info(struct despotify_session* ds)
 {
     struct user_info* user = ds->user_info;
-    printf("Username       : %s\n", user->username);
-    printf("Country        : %s\n", user->country);
-    printf("Account type   : %s\n", user->type);
-    printf("Account expiry : %s", ctime(&user->expiry));
-    printf("Host           : %s:%d\n", user->server_host, user->server_port);
-    printf("Last ping      : %s", ctime(&user->last_ping));
+    wprintf(L"Username       : %s\n", user->username);
+    wprintf(L"Country        : %s\n", user->country);
+    wprintf(L"Account type   : %s\n", user->type);
+    wprintf(L"Account expiry : %s", ctime(&user->expiry));
+    wprintf(L"Host           : %s:%d\n", user->server_host, user->server_port);
+    wprintf(L"Last ping      : %s", ctime(&user->last_ping));
 
     if (strncmp(user->type, "premium", 7)) {
-        printf("\n=================================================\n"
+        wprintf(L"\n=================================================\n"
                "                  N O T I C E\n"
                "       You do not have a premium account.\n"
                "     Spotify services will not be available.\n"
@@ -152,7 +154,7 @@ void print_info(struct despotify_session* ds)
 
 void print_help(void)
 {
-    printf("\nAvailable commands:\n\n"
+    wprintf(L"\nAvailable commands:\n\n"
            "list [num]              List stored playlists\n"
            "rename [num] [string]   Rename playlist\n"
            "collab [num]            Toggle playlist collaboration\n"
@@ -185,7 +187,7 @@ void command_loop(struct despotify_session* ds)
     print_help();
 
     do {
-        printf("\n> ");
+        wprintf(L"\n> ");
         fflush(stdout);
         bzero(buf, sizeof buf);
         fgets(buf, sizeof buf -1, stdin);
@@ -223,13 +225,13 @@ void command_loop(struct despotify_session* ds)
 
                 if (p) {
                     if (despotify_rename_playlist(ds, p, name))
-                        printf("Renamed playlist %d to \"%s\".\n", num, name);
+                        wprintf(L"Renamed playlist %d to \"%s\".\n", num, name);
                     else
-                        printf("Rename failed: %s\n", despotify_get_error(ds));
+                        wprintf(L"Rename failed: %s\n", despotify_get_error(ds));
                 }
             }
             else
-                printf("Usage: rename [num] [string]\n");
+                wprintf(L"Usage: rename [num] [string]\n");
         }
 
         /* collab */
@@ -243,15 +245,15 @@ void command_loop(struct despotify_session* ds)
 
                 if (p) {
                     if (despotify_set_playlist_collaboration(ds, p, !p->is_collaborative))
-                        printf("Changed playlist %d collaboration to %s.\n",
+                        wprintf(L"Changed playlist %d collaboration to %s.\n",
                                 num, p->is_collaborative ? "ON" : "OFF");
                     else
-                        printf("Setting playlist collaboration state failed: %s\n",
+                        wprintf(L"Setting playlist collaboration state failed: %s\n",
                                 despotify_get_error(ds));
                 }
             }
             else
-                printf("Usage: collab [num]\n");
+                wprintf(L"Usage: collab [num]\n");
         }
 
         /* search */
@@ -263,14 +265,14 @@ void command_loop(struct despotify_session* ds)
                 despotify_stop(ds); /* since we replace the list */
                 search = despotify_search(ds, buf + 7, MAX_SEARCH_RESULTS);
                 if (!search) {
-                    printf("Search failed: %s\n", despotify_get_error(ds));
+                    wprintf(L"Search failed: %s\n", despotify_get_error(ds));
                     continue;
                 }
                 searchlist = search->playlist;
             }
             else if (searchlist && (searchlist->num_tracks < search->total_tracks))
                 if (!despotify_search_more(ds, search, searchlist->num_tracks, MAX_SEARCH_RESULTS)) {
-                    printf("Search failed: %s\n", despotify_get_error(ds));
+                    wprintf(L"Search failed: %s\n", despotify_get_error(ds));
                     continue;
                 }
 
@@ -281,18 +283,18 @@ void command_loop(struct despotify_session* ds)
                 lastlist = searchlist;
             }
             else
-                printf("No previous search\n");
+                wprintf(L"No previous search\n");
         }
 
         /* artist */
         else if (!strncmp(buf, "artist", 6)) {
             int num = atoi(buf + 7);
             if (!num) {
-                printf("usage: artist [num]\n");
+                wprintf(L"usage: artist [num]\n");
                 continue;
             }
             if (!lastlist) {
-                printf("No playlist\n");
+                wprintf(L"No playlist\n");
                 continue;
             }
 
@@ -312,11 +314,11 @@ void command_loop(struct despotify_session* ds)
         else if (!strncmp(buf, "album", 5)) {
             int num = atoi(buf + 6);
             if (!num) {
-                printf("usage: album [num]\n");
+                wprintf(L"usage: album [num]\n");
                 continue;
             }
             if (!lastlist) {
-                printf("No playlist\n");
+                wprintf(L"No playlist\n");
                 continue;
             }
 
@@ -332,7 +334,7 @@ void command_loop(struct despotify_session* ds)
                     despotify_free_album_browse(a);
                 }
                 else
-                    printf("Got no album for id %s\n", t->album_id);
+                    wprintf(L"Got no album for id %s\n", t->album_id);
             }
         }
 
@@ -340,11 +342,11 @@ void command_loop(struct despotify_session* ds)
         else if (!strncmp(buf, "playalbum", 9)) {
             int num = atoi(buf + 10);
             if (!num) {
-                printf("usage: playalbum [num]\n");
+                wprintf(L"usage: playalbum [num]\n");
                 continue;
             }
             if (!lastlist) {
-                printf("No playlist\n");
+                wprintf(L"No playlist\n");
                 continue;
             }
 
@@ -364,7 +366,7 @@ void command_loop(struct despotify_session* ds)
                 if (playalbum)
                     despotify_play(ds, playalbum->tracks, true);
                 else
-                    printf("Got no album for id %s\n", t->album_id);
+                    wprintf(L"Got no album for id %s\n", t->album_id);
             }
         }
 
@@ -372,7 +374,7 @@ void command_loop(struct despotify_session* ds)
         else if (!strncmp(buf, "info", 4)) {
             char *uri = buf + 5;
             if(strlen(uri) == 0) {
-                printf("usage: info <uri>\n");
+                wprintf(L"usage: info <uri>\n");
                 continue;
             }
 
@@ -425,7 +427,7 @@ void command_loop(struct despotify_session* ds)
                     break;
 
                 default:
-                    printf("%s is a invalid Spotify URI\n", uri);
+                    wprintf(L"%s is a invalid Spotify URI\n", uri);
             }
 
             despotify_free_link(link);
@@ -435,11 +437,11 @@ void command_loop(struct despotify_session* ds)
         else if (!strncmp(buf, "portrait", 8)) {
             int num = atoi(buf + 9);
             if (!num) {
-                printf("usage: portrait [num]\n");
+                wprintf(L"usage: portrait [num]\n");
                 continue;
             }
             if (!lastlist) {
-                printf("No playlist\n");
+                wprintf(L"No playlist\n");
                 continue;
             }
 
@@ -452,7 +454,7 @@ void command_loop(struct despotify_session* ds)
                 int len;
                 void* portrait = despotify_get_image(ds, a->portrait_id, &len);
                 if (portrait && len) {
-                    printf("Writing %d bytes into portrait.jpg\n", len);
+                    wprintf(L"Writing %d bytes into portrait.jpg\n", len);
                     FILE* f = fopen("portrait.jpg", "w");
                     if (f) {
                         fwrite(portrait, len, 1, f);
@@ -462,14 +464,14 @@ void command_loop(struct despotify_session* ds)
                 }
             }
             else
-                printf("Artist %s has no portrait.\n", a->name);
+                wprintf(L"Artist %s has no portrait.\n", a->name);
             despotify_free_artist_browse(a);
         }
 
         /* play */
         else if (!strncmp(buf, "play", 4)) {
             if (!lastlist) {
-                printf("No list to play from. Use 'list' or 'search' to select a list.\n");
+                wprintf(L"No list to play from. Use 'list' or 'search' to select a list.\n");
                 continue;
             }
 
@@ -481,7 +483,7 @@ void command_loop(struct despotify_session* ds)
             if (t)
                 despotify_play(ds, t, true);
             else
-                printf("Invalid track number %d\n", num);
+                wprintf(L"Invalid track number %d\n", num);
         }
 
         /* stop */
@@ -527,20 +529,22 @@ void command_loop(struct despotify_session* ds)
 
 int main(int argc, char** argv)
 {
+    setlocale(LC_ALL, "");
+
     if (argc < 3) {
-        printf("Usage: %s <username> <password>\n", argv[0]);
+        wprintf(L"Usage: %s <username> <password>\n", argv[0]);
         return 1;
     }
 
     if (!despotify_init())
     {
-        printf("despotify_init() failed\n");
+        wprintf(L"despotify_init() failed\n");
         return 1;
     }
 
     struct despotify_session* ds = despotify_init_client();
     if (!ds) {
-        printf("despotify_init_client() failed\n");
+        wprintf(L"despotify_init_client() failed\n");
         return 1;
     }
 
@@ -558,7 +562,7 @@ int main(int argc, char** argv)
 
     if (!despotify_cleanup())
     {
-        printf("despotify_cleanup() failed\n");
+        wprintf(L"despotify_cleanup() failed\n");
         return 1;
     }
 
