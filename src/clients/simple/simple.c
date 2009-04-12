@@ -162,7 +162,7 @@ void print_help(void)
            "search [string]         Search for [string] or get next 100 results\n"
            "artist [num]            Show information about artist for track [num]\n"
            "album [num]             List album for track [num]\n"
-           "info [string]           Display info about Spotify URI\n"
+           "uri [string]            Display info about Spotify URI\n"
            "portrait [num]          Save artist portrait to portrait.jpg\n"
            "\n"
            "play [num]              Play track [num] in the last viewed list\n"
@@ -370,9 +370,9 @@ void command_loop(struct despotify_session* ds)
             }
         }
 
-        /* info */
-        else if (!strncmp(buf, "info", 4)) {
-            char *uri = buf + 5;
+        /* uri */
+        else if (!strncmp(buf, "uri", 3)) {
+            char *uri = buf + 4;
             if(strlen(uri) == 0) {
                 wprintf(L"usage: info <uri>\n");
                 continue;
