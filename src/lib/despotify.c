@@ -346,7 +346,11 @@ static int despotify_snd_end_callback(void* arg)
     snd_stop(ds->snd_session);
     snd_reset(ds->snd_session);
     ds->offset = 0;
-    ds->track = ds->track->next;
+
+    /* find next playable track */
+    do {
+        ds->track = ds->track->next;
+    } while (ds->track && !ds->track->playable);
 
     int error = 0;
     if (ds->track && ds->play_as_list) {
