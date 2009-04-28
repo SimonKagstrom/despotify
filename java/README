@@ -1,6 +1,7 @@
 Despotify Java Edition.
 
-Based on Jotify that was based on the Despotify C edition.
+Based on Jotify by Felix Bruns <felixbruns@web.de>
+that was based on the Despotify C edition.
 
 You need Maven 2 in order to build, test and install this project,
 which can be downloaded here: http://maven.apache.org/download.html
@@ -18,4 +19,4 @@ or pass the VM parameters -Ddespotify.username and -Ddepostify.password
 
 The test cases use a bit of memory, I give it -Xmx1g
 
-The docs is poor but the tests should be an easy study. 
+The docs is poor but the tests should be an easy study.
