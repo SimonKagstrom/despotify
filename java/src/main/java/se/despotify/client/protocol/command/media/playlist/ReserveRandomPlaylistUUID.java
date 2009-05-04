@@ -6,7 +6,7 @@ import se.despotify.client.protocol.Protocol;
 import se.despotify.client.protocol.command.Command;
 import se.despotify.domain.Store;
 import se.despotify.domain.User;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 
 import java.util.Random;
@@ -36,7 +36,7 @@ public class ReserveRandomPlaylistUUID extends Command<byte[]> {
   /**
    * @return uuid
    */
-  public byte[] send(Protocol protocol) throws ProtocolException {
+  public byte[] send(Protocol protocol) throws DespotifyException {
     int counter = 0; // avoid eternal looping
 
     while (true) {

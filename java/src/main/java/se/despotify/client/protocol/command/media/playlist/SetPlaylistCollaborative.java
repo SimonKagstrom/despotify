@@ -7,7 +7,7 @@ import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.domain.media.Playlist;
 import se.despotify.domain.User;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XMLElement;
 import se.despotify.util.XML;
 
@@ -15,10 +15,15 @@ import java.util.Date;
 import java.nio.charset.Charset;
 import java.nio.ByteBuffer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @since 2009-apr-27 21:11:36
  */
 public class SetPlaylistCollaborative extends Command<Boolean> {
+
+  private static Logger log = LoggerFactory.getLogger(SetPlaylistCollaborative.class);
 
   private User user;
   private Playlist playlist;
@@ -30,7 +35,7 @@ public class SetPlaylistCollaborative extends Command<Boolean> {
     this.value = value;
   }
 
-  public Boolean send(Protocol protocol) throws ProtocolException {
+  public Boolean send(Protocol protocol) throws DespotifyException {
 
     if (!playlist.getAuthor().equals(user.getName())) {
       throw new RuntimeException("user " + user.getName() + " != author " + playlist.getAuthor());
@@ -74,11 +79,15 @@ public class SetPlaylistCollaborative extends Command<Boolean> {
     /* Get response. */
     byte[] data = callback.getData(value ? "set playlist collaborative flag true response" : "set playlist collaborative flag false reponse");
 
-    XMLElement playlistElement = XML.load(
-        "<?xml version=\"1.0\" encoding=\"utf-8\" ?><playlist>" +
+
+    xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><playlist>" +
             new String(data, Charset.forName("UTF-8")) +
-            "</playlist>"
-    );
+            "</playlist>";
+    if (log.isDebugEnabled()) {
+      log.debug(xml);
+    }
+    XMLElement playlistElement = XML.load(xml);
+
 
     if (playlistElement.hasChild("confirm")) {
       /* Split version string into parts. */

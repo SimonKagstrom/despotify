@@ -1,5 +1,8 @@
 package se.despotify.domain.media;
 
+import se.despotify.util.XMLElement;
+import se.despotify.domain.Store;
+
 import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -37,6 +40,9 @@ public class Image extends Media {
     throw new UnsupportedOperationException();
   }
 
+  private int width;
+  private int height;
+
   private byte[] bytes;
 
   public byte[] getBytes() {
@@ -47,6 +53,24 @@ public class Image extends Media {
     this.bytes = bytes;
   }
 
+  public int getWidth() {
+    return width;
+  }
+
+  public void setWidth(int width) {
+    this.width = width;
+  }
+
+  public int getHeight() {
+    return height;
+  }
+
+  public void setHeight(int height) {
+    this.height = height;
+  }
+
+
+
   public java.awt.Image toAwtImage() {
     try {
       return ImageIO.read(new ByteArrayInputStream(getBytes()));
@@ -54,5 +78,25 @@ public class Image extends Media {
     catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static Image fromXMLElement(XMLElement imageNode, Store store) {
+    Image image = null;
+
+    if (imageNode.hasChild("id")) {
+      store.getImage(imageNode.getChildText("id"));
+    } else {
+      throw new RuntimeException("Image UUID missing in XML node");
+    }
+
+    if (imageNode.hasChild("height")) {
+      image.setWidth(Integer.valueOf(imageNode.getChildText("height")));
+    }
+
+    if (imageNode.hasChild("width")) {
+      image.setHeight(Integer.valueOf(imageNode.getChildText("width")));
+    }
+
+    return image;
   }
 }

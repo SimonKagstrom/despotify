@@ -5,7 +5,7 @@ import se.despotify.client.protocol.Protocol;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.domain.media.Image;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 
 import java.nio.ByteBuffer;
 
@@ -20,7 +20,7 @@ public class LoadImage extends Command<Boolean> {
     this.image = image;
   }
 
-  public Boolean send(Protocol protocol) throws ProtocolException {
+  public Boolean send(Protocol protocol) throws DespotifyException {
     /* Data buffer. */
     byte[] data;
 

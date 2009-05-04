@@ -9,7 +9,7 @@ import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.command.Command;
 import se.despotify.domain.Store;
 import se.despotify.domain.media.Result;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.GZIP;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
@@ -44,7 +44,7 @@ public class Search extends Command<Result> {
     this.maxResults = maxResults;
   }
 
-  public Result send(Protocol protocol) throws ProtocolException {
+  public Result send(Protocol protocol) throws DespotifyException {
     /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
 
@@ -75,7 +75,7 @@ public class Search extends Command<Result> {
     protocol.sendPacket(PacketType.search, buffer, "search");
 
     /* Get data and inflate it. */
-    byte[] data = GZIP.inflate(callback.getData(log.isDebugEnabled() ? "gzipped search response" : null));
+    byte[] data = GZIP.inflate(callback.getData("gzipped search response"));
 
     if (log.isInfoEnabled()) {
       log.info("received search response packet, " + data.length + " uncompressed bytes:\n" + Hex.log(data, log));
@@ -85,12 +85,15 @@ public class Search extends Command<Result> {
     /* Cut off that last 0xFF byte... */
     data = Arrays.copyOfRange(data, 0, data.length - 1);
 
-    /* Load XML. */
-    XMLElement resultElement = XML.load(data, Charset.forName("UTF-8"));
+    String xml = new String(data, Charset.forName("UTF-8"));
+    if (log.isDebugEnabled()) {
+      log.debug(xml);
+    }
+    XMLElement root = XML.load(xml);
 
     /* Create result from XML. */
 
-    return Result.fromXMLElement(resultElement, store);
+    return Result.fromXMLElement(root, store);
 
   }
 }

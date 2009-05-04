@@ -9,7 +9,7 @@ import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.command.Command;
 import se.despotify.domain.Store;
 import se.despotify.domain.User;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
@@ -64,7 +64,7 @@ public class ReservePlaylistUUID extends Command<Boolean> {
   /**
    * @return uuid
    */
-  public Boolean send(Protocol protocol) throws ProtocolException {
+  public Boolean send(Protocol protocol) throws DespotifyException {
 
     if (user.getPlaylists() == null) {
       log.warn("user playlists not loaded yet! should it be? loading..");
@@ -115,8 +115,8 @@ public class ReservePlaylistUUID extends Command<Boolean> {
         new String(data, Charset.forName("UTF-8")) +
         "\n</playlist>";
 
-    if (log.isInfoEnabled()) {
-      log.info(xml.replaceAll("\\s+", ""));
+    if (log.isDebugEnabled()) {
+      log.debug(xml);
     }
 
     XMLElement reponseElement = XML.load(xml);

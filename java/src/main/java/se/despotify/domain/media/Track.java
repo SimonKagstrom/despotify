@@ -4,8 +4,7 @@ import se.despotify.domain.Store;
 import se.despotify.util.SpotifyURI;
 import se.despotify.util.XMLElement;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Track extends Media implements Visitable {
 	private String       title;
@@ -18,6 +17,8 @@ public class Track extends Media implements Visitable {
 	private List<String> files;
 	private String       cover;
 	private Float        popularity;
+
+  private Restrictions restrictions;
 
   public Track() {
   }
@@ -53,7 +54,6 @@ public class Track extends Media implements Visitable {
 		this.title       = title;
 		this.artist      = artist;
 		this.album       = album;
-		this.files       = new ArrayList<String>();
 	}
 	
 
@@ -200,16 +200,14 @@ public class Track extends Media implements Visitable {
 		
 		/* Set files. */
 		if(trackElement.hasChild("files")){
-      if (track.files == null) {
-        track.files = new ArrayList<String>();
-      }
+
+      List<String> fileUUIDs = new ArrayList<String>();
+
 			for(XMLElement fileElement : trackElement.getChild("files").getChildren()){
-        String fileUUID = fileElement.getAttribute("id");
-        if (!track.files.contains(fileUUID)) {
-          track.files.add(fileUUID);
-        }
+        fileUUIDs.add(fileElement.getAttribute("id"));
 			}
-      // todo remove deleted?
+
+      track.setFiles(fileUUIDs);
 		}
 		
 		/* Set cover. */
@@ -226,6 +224,12 @@ public class Track extends Media implements Visitable {
 			track.popularity = Float.parseFloat(trackElement.getChildText("popularity"));
 		}
 
+    
+    XMLElement restrictionsNode = trackElement.getChild("restrictions");
+    if (restrictionsNode != null) {
+        track.restrictions = Restrictions.fromXMLElement(restrictionsNode);
+    }
+
     return track;
 		
 	}
@@ -238,20 +242,21 @@ public class Track extends Media implements Visitable {
 	}
 
 
-
   @Override
   public String toString() {
     return "Track{" +
-        "UUID='" + getHexUUID() + '\'' +
+        "hexUUID='" + getHexUUID() + '\'' +
         ", title='" + title + '\'' +
         ", artist=" + artist +
-        ", album=" + (album != null ? "\"spotify:album:" + SpotifyURI.toURI(album.getUUID()) + "\"": null) +
+        ", album=" + album +
         ", year=" + year +
+        ", discNumber=" + discNumber +
         ", trackNumber=" + trackNumber +
         ", length=" + length +
         ", files=" + files +
         ", cover='" + cover + '\'' +
         ", popularity=" + popularity +
+        ", restrictions=" + restrictions +
         '}';
   }
 }

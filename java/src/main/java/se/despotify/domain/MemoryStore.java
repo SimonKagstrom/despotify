@@ -18,7 +18,6 @@ public class MemoryStore extends Store {
   public Map<String, Image> images = new HashMap<String, Image>();
 
 
-
   @Override
   public Playlist getPlaylist(byte[] UUID) {
     String hexUUID = Hex.toHex(UUID);

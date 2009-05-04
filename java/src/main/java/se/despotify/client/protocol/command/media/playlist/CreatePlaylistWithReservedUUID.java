@@ -12,7 +12,9 @@ import se.despotify.domain.Store;
 import se.despotify.domain.User;
 import se.despotify.domain.media.Playlist;
 import se.despotify.domain.media.PlaylistContainer;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.domain.media.Track;
+import se.despotify.domain.media.MediaList;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
@@ -93,14 +95,9 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
     this.user = user;
   }
 
-  private static final byte[] sixteenBytes = new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-  static {
-    assert sixteenBytes.length == 16;
-  }
 
   @Override
-  public Boolean send(Protocol protocol) throws ProtocolException {
+  public Boolean send(Protocol protocol) throws DespotifyException {
 
 
     if (playlist.isCollaborative() == null) {
@@ -165,8 +162,8 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
         new String(data, Charset.forName("UTF-8")) +
         "\n</playlists>";
 
-    if (log.isInfoEnabled()) {
-      log.info(xml.replaceAll("\\s+", ""));
+    if (log.isDebugEnabled()) {
+      log.debug(xml);
     }
     XMLElement response = XML.load(xml);
 
@@ -184,7 +181,6 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
 
     playlists.setRevision(Long.parseLong(versionTagValues[0]));
     playlists.setChecksum(Long.parseLong(versionTagValues[2]));
-    playlist.setRevision(1l);
 
     if (playlists.getItems().size() != Long.parseLong(versionTagValues[1])) {
       throw new RuntimeException("Size missmatch");
@@ -196,6 +192,10 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
     if (playlist.isCollaborative() != (Integer.parseInt(versionTagValues[3]) == 1)) {
       throw new RuntimeException("Collaborative flag missmatch");
     }
+
+    playlist.setRevision(1l);
+    playlist.setTracks(new MediaList<Track>());
+    playlist.setChecksum(1l);
 
     return true;
   }

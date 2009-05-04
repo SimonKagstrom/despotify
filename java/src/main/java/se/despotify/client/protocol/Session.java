@@ -6,7 +6,7 @@ import se.despotify.crypto.RSA.RSAKeyPair;
 import se.despotify.domain.User;
 import se.despotify.exceptions.AuthenticationException;
 import se.despotify.exceptions.ConnectionException;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 
 import javax.crypto.interfaces.DHPublicKey;
 import java.nio.ByteBuffer;
@@ -172,7 +172,7 @@ public class Session {
 		return this.rsaClientKeyPair.getPublicKey();
 	}
 	
-	public Protocol authenticate(String username, String password) throws ConnectionException, AuthenticationException {
+	public Protocol authenticate(String username, String password) throws DespotifyException {
 		/* Set username and password. */
 		this.username = username.getBytes();
 		this.password = password.getBytes();
@@ -181,13 +181,9 @@ public class Session {
 		this.protocol.connect();
 
 		/* Send and receive inital packets. */
-		try{
-			this.protocol.sendInitialPacket();
-			this.protocol.receiveInitialPacket();
-		}
-		catch(ProtocolException e){
-			throw new AuthenticationException(e.getMessage());
-		}
+    this.protocol.sendInitialPacket();
+    this.protocol.receiveInitialPacket();
+
 
     user.setName(username);
 		
@@ -259,7 +255,7 @@ public class Session {
 			this.protocol.sendAuthenticationPacket();
 			this.protocol.receiveAuthenticationPacket();
 		}
-		catch(ProtocolException e){
+		catch(DespotifyException e){
 			throw new AuthenticationException(e.getMessage());
 		}
 		

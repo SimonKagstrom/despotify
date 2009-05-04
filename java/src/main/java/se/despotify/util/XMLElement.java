@@ -39,9 +39,12 @@ import java.util.List;
  * @author Janni Kovacs
  */
 public class XMLElement {
+
+
+
 	private Element e;
 
-	/**
+  /**
 	 * Creates a new wrapper around the given {@link Element}.
 	 *
 	 * @param elem An w3c Element
@@ -86,13 +89,14 @@ public class XMLElement {
 		NodeList list = e.getElementsByTagName(name);
 		for (int i = 0, j = list.getLength(); i < j; i++) {
 			Node item = list.item(i);
-			if (item.getParentNode() == e)
-				return true;
+			if (item.getParentNode() == e) {
+  			return true;
+      }
 		}
-		return false;
+  	return false;
 	}
 
-	/**
+  /**
 	 * Returns the child element with the given name or <code>null</code> if it doesn't exist.
 	 *
 	 * @param name The child's name

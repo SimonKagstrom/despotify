@@ -2,11 +2,10 @@ package se.despotify.domain.media;
 
 import se.despotify.domain.Store;
 import se.despotify.util.ChecksumCalculator;
-import se.despotify.util.Hex;
 import se.despotify.util.SpotifyURI;
 import se.despotify.util.XMLElement;
 import se.despotify.client.protocol.command.ChecksumException;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 
 import java.util.Iterator;
 
@@ -132,7 +131,7 @@ public class Playlist extends Media implements Iterable<Track>, Visitable {
 		return this.tracks.iterator();
 	}
 
-	public static void fromXMLElement(XMLElement playlistElement, Store store, Playlist playlist) throws ProtocolException {
+	public static void fromXMLElement(XMLElement playlistElement, Store store, Playlist playlist) throws DespotifyException {
 
 		/* Get "change" element. */
 		XMLElement changeElement = playlistElement.getChild("next-change").getChild("change");
@@ -151,41 +150,44 @@ public class Playlist extends Media implements Iterable<Track>, Visitable {
         playlist.tracks = new MediaList<Track>();
       }
 
+
+
       /* Add track items. */
       int position = 0;
-      for (String trackData : items.split(",")) {
+      String[] split = items.split(",");
+
+      MediaList<Track> tracks = new MediaList<Track>(split.length);
+
+
+      for (String trackData : split) {
         trackData = trackData.trim();
         final String trackHexUUID;
         if (trackData.length() != 34) {
           if (SpotifyURI.isHex(trackData)) {
             // not sure why playlist UUID is send sometimes. notice it is lacking UUID prefix byte
-            assert trackData.equals(playlist.getHexUUID());
+            if (!trackData.equals(playlist.getHexUUID())) {
+              throw new DespotifyException("32 byte hex UUID does not equal the playlist UUID!");
+            }
             continue;
           } else {
             throw new RuntimeException(trackData + " is not a valid 32 byte hex UUID!");
           }
         } else if (trackData.length() == 34) {
           trackHexUUID = trackData.substring(0, 32);
-          assert "01".equals(trackData.substring(32, 34));
+          if (!"01".equals(trackData.substring(32, 34))) {
+            throw new DespotifyException("Expected hex UUID type suffix 01, got " +  trackData.substring(32, 34));
+          }
         } else {
           throw new RuntimeException("track UUID was not 16+1 or 16 byte!");
         }
-        byte[] trackUUID = Hex.toBytes(trackHexUUID);
 
-        if (playlist.getTracks().get(trackUUID) == null) {
-          Track track = store.getTrack(trackHexUUID);
-          if (!playlist.getTracks().contains(track)) {
-            playlist.tracks.add(track);
-          } else {
-            if (log.isInfoEnabled()) {
-              log.info("track " + track.getHexUUID() + " already in list.");
-            }
-          }
+        Track track = store.getTrack(trackHexUUID);
+        tracks.add(track);
 
-          // todo remove deleted?
-        }
         position++; // perhaps we should use this to syncronize any discrepancy
       }
+
+      playlist.setTracks(tracks);
     }
 		
 		/* Get "version" element. */

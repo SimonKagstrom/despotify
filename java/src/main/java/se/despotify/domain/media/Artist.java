@@ -4,11 +4,19 @@ import se.despotify.domain.Store;
 import se.despotify.util.SpotifyURI;
 import se.despotify.util.XMLElement;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
+
 public class Artist extends Media implements Visitable {
-	private String       name;
-	private String       portrait;
-	private Float        popularity;
-	private MediaList<Artist> similarArtists;
+  private String name;
+  private Image portrait;
+  private Float popularity;
+  private MediaList<Artist> similarArtists;
+  private List<Biography> biographies;
+  private List<String> generes;
+  private List<String> yearsActive;
+  private MediaList<Album> albums;
 
   public Artist() {
     super();
@@ -49,11 +57,11 @@ public class Artist extends Media implements Visitable {
     this.name = name;
   }
 
-  public String getPortrait() {
+  public Image getPortrait() {
     return portrait;
   }
 
-  public void setPortrait(String portrait) {
+  public void setPortrait(Image portrait) {
     this.portrait = portrait;
   }
 
@@ -73,55 +81,123 @@ public class Artist extends Media implements Visitable {
     this.similarArtists = similarArtists;
   }
 
-  public static Artist fromXMLElement(XMLElement artistElement, Store store){
-		Artist artist = store.getArtist(artistElement.getChildText("id"));
+  public List<Biography> getBiographies() {
+    return biographies;
+  }
 
-		/* Set name. */
-		if(artistElement.hasChild("name")){
-			artist.name = artistElement.getChildText("name");
-		}
-		
-		/* Set portrait. */
-		if(artistElement.hasChild("portrait") && artistElement.getChild("portrait").hasChild("id")){
-			artist.portrait = artistElement.getChild("portrait").getChildText("id");
-		}
-		
-		/* Set popularity. */
-		if(artistElement.hasChild("popularity")){
-			artist.popularity = Float.parseFloat(artistElement.getChildText("popularity"));
-		}
-		
-		/* Set similar artists. */
-		if(artistElement.hasChild("similar-artists")){
-      if (artist.similarArtists == null) {
-        artist.similarArtists = new MediaList<Artist>();
+  public void setBiographies(List<Biography> biographies) {
+    this.biographies = biographies;
+  }
+
+  public List<String> getGeneres() {
+    return generes;
+  }
+
+  public void setGeneres(List<String> generes) {
+    this.generes = generes;
+  }
+
+  public List<String> getYearsActive() {
+    return yearsActive;
+  }
+
+  public void setYearsActive(List<String> yearsActive) {
+    this.yearsActive = yearsActive;
+  }
+
+  public MediaList<Album> getAlbums() {
+    return albums;
+  }
+
+  public void setAlbums(MediaList<Album> albums) {
+    this.albums = albums;
+  }
+
+  public static Artist fromXMLElement(XMLElement artistNode, Store store) {
+    Artist artist = store.getArtist(artistNode.getChildText("id"));
+
+    /* Set name. */
+    if (artistNode.hasChild("name")) {
+      artist.name = artistNode.getChildText("name");
+    }
+
+    /* Set portrait. */
+    if (artistNode.hasChild("portrait")) {
+      artist.portrait = Image.fromXMLElement(artistNode.getChild("portrait"), store);
+    }
+
+    /* Set popularity. */
+    if (artistNode.hasChild("popularity")) {
+      artist.popularity = Float.parseFloat(artistNode.getChildText("popularity"));
+    }
+
+    /* Set similar artists. */
+    if (artistNode.hasChild("similar-artists")) {
+
+      MediaList<Artist> similarArtists = new MediaList<Artist>();
+
+      for (XMLElement similarArtistElement : artistNode.getChild("similar-artists").getChildren()) {
+        similarArtists.add(Artist.fromXMLElement(similarArtistElement, store));
       }
-			for(XMLElement similarArtistElement : artistElement.getChild("similar-artists").getChildren()){
-        Artist similarArtist = Artist.fromXMLElement(similarArtistElement, store);
-        if (!artist.getSimilarArtists().contains(similarArtist)) {
-          artist.getSimilarArtists().add(similarArtist);
+
+      artist.setSimilarArtists(similarArtists);
+    }
+
+    XMLElement biosNode = artistNode.getChild("bios");
+    if (biosNode != null) {
+
+      List<Biography> biographies = new ArrayList<Biography>();
+
+      for (XMLElement bioNode : biosNode.getChildren()) {
+        if (!"bio".equals(bioNode.getElement().getNodeName())) {
+          log.warn("Unknown bios child node " + bioNode.getElement().getNodeName());
+        } else {
+          Biography biography = new Biography();
+          biography.setText(bioNode.getChildText("text"));
+          if (bioNode.hasChild("portraits")) {
+            biography.setPortraits(new MediaList<Image>());
+            for (XMLElement portraitNode : bioNode.getChild("portraits").getChildren()) {
+              biography.getPortraits().add(Image.fromXMLElement(portraitNode, store));
+            }
+          }
         }
+        artist.biographies = biographies;
       }
-      // todo remove deleted?
-		}
-		
-		/* TODO bios, genres, years-active, albums, ... */
+    }
+
+    if (artistNode.hasChild("years-active")) {
+      artist.yearsActive = new ArrayList<String>(Arrays.asList(artistNode.getChildText("years-active").split(",")));
+    }
+
+    if (artistNode.hasChild("genres")) {
+      artist.yearsActive = new ArrayList<String>(Arrays.asList(artistNode.getChildText("generes").split(",")));
+    }
+
+    XMLElement albumsNode = artistNode.getChild("albums");
+    if (albumsNode != null) {
+      MediaList<Album> albums = new MediaList<Album>();
+      for (XMLElement albumNode : albumsNode.getChildren())  {
+        albums.add(Album.fromXMLElement(albumNode, store));
+      }
+      artist.albums = albums;
+    }
 
     return artist;
-	}
+  }
 
-	public static Artist fromURI(String uri) {
-		Artist artist = new Artist();
-		
-		artist.setUUID(SpotifyURI.toHex(uri));
-		
-		return artist;
-	}
+
+  public static Artist fromURI(String uri) {
+    Artist artist = new Artist();
+
+    artist.setUUID(SpotifyURI.toHex(uri));
+
+    return artist;
+  }
 
   @Override
   public String toString() {
     return "Artist{" +
-        "id='" + getHexUUID()+ '\'' +
+        "id='" + getHexUUID() + '\'' +
         ", name='" + name + '\'' +
         ", portrait='" + portrait + '\'' +
         ", popularity=" + popularity +

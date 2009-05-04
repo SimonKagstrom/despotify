@@ -7,12 +7,13 @@ import se.despotify.client.protocol.Protocol;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.command.Command;
+import se.despotify.client.protocol.command.ChecksumException;
 import se.despotify.domain.Store;
 import se.despotify.domain.User;
 import se.despotify.domain.media.MediaList;
 import se.despotify.domain.media.Playlist;
 import se.despotify.domain.media.Track;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
 
@@ -48,10 +49,10 @@ public class AddTrackToPlaylist extends Command<Boolean> {
 
 
   @Override
-  public Boolean send(Protocol protocol) throws ProtocolException {
+  public Boolean send(Protocol protocol) throws DespotifyException {
 
     if (!playlist.isCollaborative() && !playlist.getAuthor().equals(user.getName())) {
-      throw new ProtocolException("Playlist must be collaborative or owned by the current user!");
+      throw new DespotifyException("Playlist must be collaborative or owned by the current user!");
     }
 
     if (user.getPlaylists() == null) {
@@ -121,7 +122,7 @@ public class AddTrackToPlaylist extends Command<Boolean> {
     xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n" +
         new String(data, Charset.forName("UTF-8")) +
         "\n</playlist>";
-    log.info(xml.replaceAll("\\s+", ""));
+    log.debug(xml);
     XMLElement response = XML.load(xml);
 
     if (response.hasChild("confirm")) {
@@ -129,10 +130,17 @@ public class AddTrackToPlaylist extends Command<Boolean> {
       String[] versionTagValues = response.getChild("confirm").getChildText("version").split(",", 4);
 
       playlist.setRevision(Long.parseLong(versionTagValues[0]));
-      assert playlist.size() == Long.parseLong(versionTagValues[1]);
       playlist.setChecksum(Long.parseLong(versionTagValues[2]));
-      assert playlist.getChecksum() == playlist.calculateChecksum();
-      assert playlist.isCollaborative() == (Integer.parseInt(versionTagValues[3]) == 1);
+
+      if (playlist.size() != Long.parseLong(versionTagValues[1])) {
+        throw new RuntimeException("Size mismatch");
+      }
+      if(playlist.getChecksum() != playlist.calculateChecksum()) {
+        throw new ChecksumException(playlist.getChecksum(), playlist.calculateChecksum());
+      }
+      if(playlist.isCollaborative() != (Integer.parseInt(versionTagValues[3]) == 1)) {
+        throw new RuntimeException(); 
+      }
 
       return true;
     } else {

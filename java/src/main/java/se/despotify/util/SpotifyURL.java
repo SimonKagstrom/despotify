@@ -7,7 +7,7 @@ import se.despotify.client.protocol.command.media.LoadTracks;
 import se.despotify.client.protocol.command.media.playlist.LoadPlaylist;
 import se.despotify.domain.Store;
 import se.despotify.domain.media.*;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,7 +75,7 @@ public class SpotifyURL {
         Track track = store.getTrack(SpotifyURI.toHex(URI));
         try {
           new LoadTracks(store, track).send(connection.getProtocol());
-        } catch (ProtocolException e) {
+        } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }
         return track;
@@ -85,7 +85,7 @@ public class SpotifyURL {
         Album album = store.getAlbum(SpotifyURI.toHex(URI));
         try {
           new LoadAlbum(store, album).send(connection.getProtocol());
-        } catch (ProtocolException e) {
+        } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }
         return album;
@@ -95,7 +95,7 @@ public class SpotifyURL {
         Artist artist = store.getArtist(SpotifyURI.toHex(URI));
         try {
           new LoadArtist(store, artist).send(connection.getProtocol());
-        } catch (ProtocolException e) {
+        } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }
         return artist;
@@ -105,7 +105,7 @@ public class SpotifyURL {
         Playlist playlist = store.getPlaylist(SpotifyURI.toHex(URI));
         try {
           new LoadPlaylist(store, playlist).send(connection.getProtocol());
-        } catch (ProtocolException e) {
+        } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }
         return playlist;

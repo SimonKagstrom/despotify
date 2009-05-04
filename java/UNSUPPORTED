@@ -1,8 +1,6 @@
 
+  1. Remove multiple playlists from a user does not work as it should. The testcase Clean.java only
+     removes one playlist although it should remove multiple. Not sure what the problem is, removing
+     a single playlist seems to work fine though.
 
-  1. Checksum calculation of playlist tracks doesn't add upp when "they are large and had a bunch of changes".
-     This makes TestLoadUserPlaylists fail if your account contains any such playlists. 
-
-  2. Remove playlist form user does not seem to work. TestAddTracksToPlaylist should fail here, but it doesn't!
-
-  
+     

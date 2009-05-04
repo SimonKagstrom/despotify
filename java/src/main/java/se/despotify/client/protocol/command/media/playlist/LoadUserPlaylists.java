@@ -10,7 +10,7 @@ import se.despotify.client.protocol.command.Command;
 import se.despotify.domain.Store;
 import se.despotify.domain.User;
 import se.despotify.domain.media.PlaylistContainer;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
@@ -37,7 +37,7 @@ public class LoadUserPlaylists extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Protocol protocol) throws ProtocolException {
+  public Boolean send(Protocol protocol) throws DespotifyException {
 
     ChannelCallback callback = new ChannelCallback();
 
@@ -50,20 +50,24 @@ public class LoadUserPlaylists extends Command<Boolean> {
     buffer.putInt(-1); // playlist history. -1: current. 0: changes since version 0, 1: since version 1, etc. 
     buffer.putInt(0);  // unknown
     buffer.putInt(-1); // unknown
-    buffer.put((byte)0x00); // 00 = get track ids, 01 = do not get track ids?
+    buffer.put((byte)0x00); // 00 = get playlist ids, 01 = do not get playlist ids?
     buffer.flip();
 
     Channel.register(channel);
     protocol.sendPacket(PacketType.getPlaylist, buffer, "request list of user playlists");
     byte[] data = callback.getData("user playlists response");
 
+    if (data.length == 0) {
+      throw new DespotifyException("received an empty response!");
+    }
+
     String xml =
       "<?xml version=\"1.0\" encoding=\"utf-8\" ?><playlist>" +
       new String(data, Charset.forName("UTF-8")) +
       "</playlist>";
 
-    if (log.isInfoEnabled()) {
-      log.info(xml.replaceAll("\\s+",""));
+    if (log.isDebugEnabled()) {
+      log.debug(xml);
     }
 
     XMLElement playlistElement = XML.load(xml);

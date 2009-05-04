@@ -3,7 +3,7 @@ package se.despotify.client.protocol.command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.client.protocol.Protocol;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 
 /**
  *
@@ -14,6 +14,6 @@ public abstract class Command<T> {
   private static Logger log = LoggerFactory.getLogger(Command.class);
 
 
-  public abstract T send(Protocol protocol) throws ProtocolException;
+  public abstract T send(Protocol protocol) throws DespotifyException;
 
 }

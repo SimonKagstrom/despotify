@@ -22,13 +22,8 @@ public class TestCreatePlaylist extends DespotifyClientTest {
   @Test
   public void testCreatePlaylist() throws Exception {
 
-    long seed = System.currentTimeMillis();
-    Random random = new Random(seed);
-
-    byte[] playlistNameBytes = new byte[8];
-    random.nextBytes(playlistNameBytes);
-    String playlistName = "despotify_TestCreatePlaylist_" + Hex.toHex(playlistNameBytes);
-
+    String playlistName = randomPlaylistName();
+    
     log.info("\n\n\n\n\n\n\n           create playlist named "+playlistName+"\n\n\n\n\n\n\n\n\n");
 
     Playlist originalPlaylist = new CreatePlaylist(new MemoryStore(), user, playlistName, false).send(connection.getProtocol());
@@ -41,8 +36,7 @@ public class TestCreatePlaylist extends DespotifyClientTest {
     Playlist loadedPlaylist = store.getPlaylist(originalPlaylist.getUUID());
     new LoadPlaylist(store, loadedPlaylist).send(connection.getProtocol());
 
-    assertTrue("different stores means different instances", loadedPlaylist != originalPlaylist);
-    assertNull(originalPlaylist.getChecksum());
+    assertTrue("different stores means different instances", loadedPlaylist != originalPlaylist);   
     assertEquals(loadedPlaylist.getChecksum().longValue(), loadedPlaylist.calculateChecksum());
     assertEquals(originalPlaylist.getHexUUID(), loadedPlaylist.getHexUUID());
     // todo assert the rest

@@ -14,13 +14,8 @@ public class TestCreatePlaylistUUID extends DespotifyClientTest {
   @Test
   public void test() throws Exception {
 
-    long seed = System.currentTimeMillis();
-    Random random = new Random(seed);
-
-    byte[] playlistNameBytes = new byte[8];
-    random.nextBytes(playlistNameBytes);
-    String playlistName = "despotify_TestCreatePlaylistUUID_" + Hex.toHex(playlistNameBytes);
-
+    String playlistName = randomPlaylistName();
+    
 
     byte[] UUID = new ReserveRandomPlaylistUUID(store, user, playlistName, false).send(connection.getProtocol());
     assertNotNull(UUID);

@@ -88,7 +88,7 @@ public class ChannelCallback implements ChannelListener {
     long started = System.currentTimeMillis();
 
     try {
-      /* Wait for data to become available. */
+      // wait for data to become available.
       if (!this.done.tryAcquire(timeout, timeoutUnit)) {
         throw new TimeoutException(System.currentTimeMillis() - started);
       }
@@ -106,8 +106,10 @@ public class ChannelCallback implements ChannelListener {
 
     byte[] arr = data.array();
 
+    long millisecondsSpent = System.currentTimeMillis() - started;
+
     if (packetDescription != null && log.isInfoEnabled()) {
-      log.info("received " + packetDescription + ", " + arr.length + " bytes:\n" + Hex.log(arr, log));
+      log.info("received " + packetDescription + " containing" + arr.length + " bytes in " + millisecondsSpent + " milliseconds:\n" + Hex.log(arr, log));
     }
 
 		/* Return data bytes. */

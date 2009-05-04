@@ -2,14 +2,14 @@ package se.despotify.client.protocol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.despotify.BrowseType;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelListener;
 import se.despotify.crypto.DH;
 import se.despotify.domain.media.Playlist;
 import se.despotify.domain.media.Track;
 import se.despotify.exceptions.ConnectionException;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
+import se.despotify.exceptions.AuthenticationException;
 import se.despotify.util.DNS;
 import se.despotify.util.Hex;
 import se.despotify.util.IntegerUtilities;
@@ -20,7 +20,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 // FIXED: cleaned up the code
@@ -96,7 +95,7 @@ public class Protocol {
 	}
 
 	/* Send initial packet (key exchange). */
-	public void sendInitialPacket() throws ProtocolException {
+	public void sendInitialPacket() throws DespotifyException {
 		ByteBuffer buffer = ByteBuffer.allocate(
         // 2 + 2 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 16 + 96 + 128 + 1 + 1 + 2 + 0 + this.session.username.length + 1
         277 + this.session.username.length
@@ -137,7 +136,7 @@ public class Protocol {
 	}
 
 	/* Receive initial packet (key exchange). */
-	public void receiveInitialPacket() throws ProtocolException {
+	public void receiveInitialPacket() throws DespotifyException {
 		byte[] buffer = new byte[512];
 		int ret, paddingLength, usernameLength;
 
@@ -146,12 +145,14 @@ public class Protocol {
 
 		/* Read server random (first 2 bytes). */
 		if((ret = this.receive(this.session.serverRandom, 0, 2, "server random packet")) == -1){
-			throw new ProtocolException("Failed to read server random.");
+			throw new DespotifyException("Failed to read server random.");
 		}
 
 		/* Check if we got a status message. */
-    // FIXED: cleaned up, use StringBuilder
 		if(this.session.serverRandom[0] != 0x00 || ret != 2){
+
+      int errorCode;
+
 			/*
 			 * Substatuses:
 			 * 0x01    : Client upgrade required.
@@ -193,12 +194,12 @@ public class Protocol {
 
       message.append(" (").append(String.valueOf(ret)).append(")");
 
-			throw new ProtocolException(message.toString());
+			throw new AuthenticationException(message.toString());
 		}
 
 		/* Read server random (next 14 bytes). */
 		if((ret = this.receive(this.session.serverRandom, 2, 14, "14 random  server bytes")) != 14){
-			throw new ProtocolException("Failed to read server random. ("+ret+")");
+			throw new DespotifyException("Failed to read server random. ("+ret+")");
 		}
 
 		/* Save server random to packet buffer. */
@@ -206,7 +207,7 @@ public class Protocol {
 
 		/* Read server public key (Diffie Hellman key exchange). */
 		if((ret = this.receive(buffer, 96, "public server key")) != 96){
-			throw new ProtocolException("Failed to read server public key. ("+ret+")");
+			throw new DespotifyException("Failed to read server public key. ("+ret+")");
 		}
 
 		/* Save DH public key to packet buffer. */
@@ -224,7 +225,7 @@ public class Protocol {
 
 		/* Read server blob (256 bytes). */
 		if((ret = this.receive(this.session.serverBlob, 0, 256, "server blob")) != 256){
-			throw new ProtocolException("Failed to read server blob. ("+ret+")");
+			throw new DespotifyException("Failed to read server blob. ("+ret+")");
 		}
 
 		/* Save RSA signature to packet buffer. */
@@ -232,7 +233,7 @@ public class Protocol {
 
 		/* Read salt (10 bytes). */
 		if((ret = this.receive(this.session.salt, 0, 10, "salt")) != 10){
-			throw new ProtocolException("Failed to read salt. ("+ret+")");
+			throw new DespotifyException("Failed to read salt. ("+ret+")");
 		}
 
 		/* Save salt to packet buffer. */
@@ -240,7 +241,7 @@ public class Protocol {
 
 		/* Read padding length (1 byte). */
 		if((paddingLength = this.receive("padding length")) == -1){
-			throw new ProtocolException("Failed to read paddling length.");
+			throw new DespotifyException("Failed to read paddling length.");
 		}
 
 		/* Save padding length to packet buffer. */
@@ -248,12 +249,12 @@ public class Protocol {
 
 		/* Check if padding length is valid. */
 		if(paddingLength <= 0){
-			throw new ProtocolException("Padding length is negative or zero.");
+			throw new DespotifyException("Padding length is negative or zero.");
 		}
 
 		/* Read username length. */
 		if((usernameLength = this.receive("")) == -1){
-			throw new ProtocolException("Failed to read username length.");
+			throw new DespotifyException("Failed to read username length.");
 		}
 
 		/* Save username length to packet buffer. */
@@ -274,7 +275,7 @@ public class Protocol {
 
 		/* Read padding. */
 		if((ret = this.receive(buffer, paddingLength, "padding")) != paddingLength){
-			throw new ProtocolException("Failed to read padding. (" + ret + ")");
+			throw new DespotifyException("Failed to read padding. (" + ret + ")");
 		}
 
 		/* Save padding (random bytes) to packet buffer. */
@@ -282,7 +283,7 @@ public class Protocol {
 
 		/* Read username into buffer and copy it to 'session.username'. */
 		if((ret = this.receive(buffer, usernameLength, "username")) != usernameLength){
-			throw new ProtocolException("Failed to read username. (" + ret + ")");
+			throw new DespotifyException("Failed to read username. (" + ret + ")");
 		}
 
 		/* Save username to packet buffer. */
@@ -315,12 +316,12 @@ public class Protocol {
 			this.session.puzzleMagic       = dataBuffer.getInt();
 		}
 		else{
-			throw new ProtocolException("Unexpected puzzle challenge.");
+			throw new DespotifyException("Unexpected puzzle challenge.");
 		}
 	}
 
 	/* Send authentication packet (puzzle solution, HMAC). */
-	public void sendAuthenticationPacket() throws ProtocolException {
+	public void sendAuthenticationPacket() throws DespotifyException {
 		ByteBuffer buffer = ByteBuffer.allocate(20 + 1 + 1 + 4 + 2 + 15 + 8);
 
 		/* Append fields to buffer. */
@@ -338,39 +339,39 @@ public class Protocol {
 	}
 
 	/* Receive authentication packet (status). */
-	public void receiveAuthenticationPacket() throws ProtocolException {
+	public void receiveAuthenticationPacket() throws DespotifyException {
 		byte[] buffer = new byte[512];
 		int payloadLength;
 
 		/* Read status and length. */
 		if(this.receive(buffer, 2, "authentification status and length") != 2){
-			throw new ProtocolException("Failed to read status and length bytes.");
+			throw new DespotifyException("Failed to read status and length bytes.");
 		}
 
 		/* Check status. */
 		if(buffer[0] != 0x00){
-			throw new ProtocolException("Authentication failed! (Error " + buffer[1] + ")");
+			throw new DespotifyException("Authentication failed! (Error " + buffer[1] + ")");
 		}
 
 		/* Check payload length. AND with 0x00FF so we don't get a negative integer. */
 		if((payloadLength = buffer[1] & 0xFF) <= 0){
-			throw new ProtocolException("Payload length is negative or zero.");
+			throw new DespotifyException("Payload length is negative or zero.");
 		}
 
 		/* Read payload. */
 		if(this.receive(buffer, payloadLength,"authentification payload") != payloadLength){
-			throw new ProtocolException("Failed to read payload.");
+			throw new DespotifyException("Failed to read payload.");
 		}
 	}
 
   @Deprecated
   /** @deprecated not really, just a reminder to set a static description to all packets so the log can be read. */
-  public synchronized void sendPacket(PacketType packetType, ByteBuffer payload) throws ProtocolException {
+  public synchronized void sendPacket(PacketType packetType, ByteBuffer payload) throws DespotifyException {
     sendPacket(packetType, payload, "anonymous " + packetType.toString() + " command packet");
   }
 
 	/* Send command with payload (will be encrypted with stream cipher). */
-	public synchronized void sendPacket(PacketType packetType, ByteBuffer payload, String packetDescription) throws ProtocolException {
+	public synchronized void sendPacket(PacketType packetType, ByteBuffer payload, String packetDescription) throws DespotifyException {
 		ByteBuffer buffer = ByteBuffer.allocate(1 + 2 + payload.remaining());
 
 		/* Set IV. */
@@ -406,24 +407,24 @@ public class Protocol {
 	}
 
   @Deprecated
-	public void sendPacket(PacketType packetType) throws ProtocolException {
+	public void sendPacket(PacketType packetType) throws DespotifyException {
     this.sendPacket(packetType, ByteBuffer.allocate(0));
   }
 
 	/* Send a command without payload. */
-	public void sendPacket(PacketType packetType, String packetDescription) throws ProtocolException {
+	public void sendPacket(PacketType packetType, String packetDescription) throws DespotifyException {
 		this.sendPacket(packetType, ByteBuffer.allocate(0), packetDescription);
 	}
 
 	/* Receive a packet (will be decrypted with stream cipher). */
-	public void receivePacket() throws ProtocolException {
+	public void receivePacket() throws DespotifyException {
 		byte[] header = new byte[3];
 		PacketType packetType;
     int payloadLength, headerLength = 3, macLength = 4;
 
 		/* Read header. */
 		if(this.receive(header, headerLength, log.isDebugEnabled() ? "packet header" : null) != headerLength){
-			throw new ProtocolException("Failed to read header.");
+			throw new DespotifyException("Failed to read header.");
 		}
 
 		/* Set IV. */
@@ -456,7 +457,7 @@ public class Protocol {
 			for(int n = payloadLength, r; n > 0 && (r = this.channel.read(buffer)) > 0; n -= r);
 		}
 		catch(IOException e){
-			throw new ProtocolException("Failed to read payload: " + e.getMessage());
+			throw new DespotifyException("Failed to read payload: " + e.getMessage());
 		}
 
 		/* Extend it again to payload and mac length. */
@@ -466,7 +467,7 @@ public class Protocol {
 			for(int n = macLength, r; n > 0 && (r = this.channel.read(buffer)) > 0; n -= r);
 		}
 		catch(IOException e){
-			throw new ProtocolException("Failed to read MAC: " + e.getMessage());
+			throw new DespotifyException("Failed to read MAC: " + e.getMessage());
 		}
 
 		/* Decrypt payload. */
@@ -492,7 +493,7 @@ public class Protocol {
 	}
 
 	/* Send cache hash. */
-	public void sendCacheHash() throws ProtocolException {
+	public void sendCacheHash() throws DespotifyException {
 		ByteBuffer buffer = ByteBuffer.allocate(20);
 
 		buffer.put(this.session.cacheHash);
@@ -502,7 +503,7 @@ public class Protocol {
 	}
 
 	/* Request ads. The response is GZIP compressed XML. */
-	public void sendAdRequest(ChannelListener listener, int type) throws ProtocolException {
+	public void sendAdRequest(ChannelListener listener, int type) throws DespotifyException {
 		/* Create channel and buffer. */
 		Channel    channel = new Channel("Ad-Channel", Channel.Type.TYPE_AD, listener);
 		ByteBuffer buffer  = ByteBuffer.allocate(2 + 1);
@@ -520,7 +521,7 @@ public class Protocol {
 	}
 
 	/* Request image using a 20 byte id. The response is a JPG. */
-	public void sendImageRequest(ChannelListener listener, String id) throws ProtocolException {
+	public void sendImageRequest(ChannelListener listener, String id) throws DespotifyException {
 		/* Create channel and buffer. */
 		Channel    channel = new Channel("Image-Channel", Channel.Type.TYPE_IMAGE, listener);
 		ByteBuffer buffer  = ByteBuffer.allocate(2 + 20);
@@ -538,7 +539,7 @@ public class Protocol {
 	}
 
 	/* Search music. The response comes as GZIP compressed XML. */
-	public void sendSearchQuery(ChannelListener listener, String query, int offset, int limit) throws ProtocolException {
+	public void sendSearchQuery(ChannelListener listener, String query, int offset, int limit) throws DespotifyException {
 		/* Create channel and buffer. */
 		Channel    channel = new Channel("Search-Channel", Channel.Type.TYPE_SEARCH, listener);
 		ByteBuffer buffer  = ByteBuffer.allocate(2 + 4 + 4 + 2 + 1 + query.getBytes().length);
@@ -568,17 +569,17 @@ public class Protocol {
 	}
 
 	/* Search music. The response comes as GZIP compressed XML. */
-	public void sendSearchQuery(ChannelListener listener, String query) throws ProtocolException {
+	public void sendSearchQuery(ChannelListener listener, String query) throws DespotifyException {
 		this.sendSearchQuery(listener, query, 0, -1);
 	}
 
 	/* Notify server we're going to play. */
-	public void sendTokenNotify() throws ProtocolException {
+	public void sendTokenNotify() throws DespotifyException {
 		this.sendPacket(PacketType.tokenNotify);
 	}
 
 	/* Request AES key for a track. */
-	public void sendAesKeyRequest(ChannelListener listener, Track track) throws ProtocolException {
+	public void sendAesKeyRequest(ChannelListener listener, Track track) throws DespotifyException {
 		/* Create channel and buffer. */
 		Channel    channel = new Channel("AES-Key-Channel", Channel.Type.TYPE_AESKEY, listener);
 		ByteBuffer buffer  = ByteBuffer.allocate(20 + 16 + 2 + 2);
@@ -598,7 +599,7 @@ public class Protocol {
 	}
 
 	/* A demo wrapper for playing a track. */
-	public void sendPlayRequest(ChannelListener listener, Track track) throws ProtocolException {
+	public void sendPlayRequest(ChannelListener listener, Track track) throws DespotifyException {
 		/*
 		 * Notify the server about our intention to play music, there by allowing
 		 * it to request other players on the same account to pause.
@@ -618,7 +619,7 @@ public class Protocol {
 	 * with AES key provided and a static IV, incremented for
 	 * each 16 byte data processed.
 	 */
-	public void sendSubstreamRequest(ChannelListener listener, Track track, int offset, int length) throws ProtocolException {
+	public void sendSubstreamRequest(ChannelListener listener, Track track, int offset, int length) throws DespotifyException {
 		/* Create channel and buffer. */
 		Channel    channel = new Channel("Substream-Channel", Channel.Type.TYPE_SUBSTREAM, listener);
 		ByteBuffer buffer  = ByteBuffer.allocate(2 + 2 + 2 + 2 + 2 + 2 + 4 + 20 + 4 + 4);
@@ -664,7 +665,7 @@ public class Protocol {
 
 
 	/* Change playlist. The response comes as plain XML. */
-	public void sendChangePlaylist(ChannelListener listener, Playlist playlist, String xml, String packetDescription) throws ProtocolException {
+	public void sendChangePlaylist(ChannelListener listener, Playlist playlist, String xml, String packetDescription) throws DespotifyException {
 		/* Create channel and buffer. */
 		Channel    channel  = new Channel("Change-Playlist-Channel", Channel.Type.TYPE_PLAYLIST, listener);
     byte[]     xmlBytes = xml.getBytes();
@@ -690,7 +691,7 @@ public class Protocol {
 	}
 
 	/* Ping reply (pong). */
-	public void sendPong() throws ProtocolException {
+	public void sendPong() throws DespotifyException {
 		ByteBuffer buffer = ByteBuffer.allocate(4);
 
 		/* TODO: Append timestamp? */
@@ -706,9 +707,9 @@ public class Protocol {
    *
    * @param buffer buffer to be sent
    * @param packetDescription description of the buffer, sent to logger if not null.
-   * @throws ProtocolException
+   * @throws se.despotify.exceptions.DespotifyException
    */
-	private void send(ByteBuffer buffer, String packetDescription) throws ProtocolException {
+	private void send(ByteBuffer buffer, String packetDescription) throws DespotifyException {
 		try{
 			this.channel.write(buffer);
 
@@ -719,12 +720,12 @@ public class Protocol {
 
 		}
 		catch (IOException e){
-			throw new ProtocolException("Error writing data to socket: " + e.getMessage());
+			throw new DespotifyException("Error writing data to socket: " + e.getMessage());
 		}
 	}
 
 	/* Receive a single byte. */
-	private int receive(String packetDescription) throws ProtocolException {
+	private int receive(String packetDescription) throws DespotifyException {
 		ByteBuffer buffer = ByteBuffer.allocate(1);
 
 		try{
@@ -741,17 +742,17 @@ public class Protocol {
 			return b & 0xff;
 		}
 		catch(IOException e){
-			throw new ProtocolException("Error reading data from socket: " + e.getMessage());
+			throw new DespotifyException("Error reading data from socket: " + e.getMessage());
 		}
 	}
 
 	/* Receive bytes. */
-	private int receive(byte[] buffer, int len, String packetDescription) throws ProtocolException {
+	private int receive(byte[] buffer, int len, String packetDescription) throws DespotifyException {
 		return this.receive(buffer, 0, len, packetDescription);
 	}
 
 	/* Receive bytes. */
-	private int receive(byte[] bytes, int off, int len, String packetDescription) throws ProtocolException {
+	private int receive(byte[] bytes, int off, int len, String packetDescription) throws DespotifyException {
 		ByteBuffer buffer = ByteBuffer.wrap(bytes, off, len);
 		int n = 0;
 
@@ -759,7 +760,7 @@ public class Protocol {
 			for(int r; n < len && (r = this.channel.read(buffer)) > 0; n += r);
 		}
 		catch(IOException e){
-			throw new ProtocolException("Error reading data from socket: " + e.getMessage());
+			throw new DespotifyException("Error reading data from socket: " + e.getMessage());
 		}
 
     if (packetDescription != null && log.isInfoEnabled()) {

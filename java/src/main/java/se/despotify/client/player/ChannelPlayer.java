@@ -5,7 +5,7 @@ import se.despotify.client.protocol.Protocol;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelListener;
 import se.despotify.domain.media.Track;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.MathUtilities;
 
 import javax.crypto.BadPaddingException;
@@ -168,7 +168,7 @@ public class ChannelPlayer implements Runnable, ChannelListener {
 				this.protocol.sendSubstreamRequest(this, this.track, this.streamOffset, this.streamLength);
 			}
 			/* TODO: Handle exception. */
-			catch(ProtocolException e){
+			catch(DespotifyException e){
 				e.printStackTrace();
 				
 				return;
@@ -295,7 +295,7 @@ public class ChannelPlayer implements Runnable, ChannelListener {
 						);
 					}
 					/* TODO: Handle exception. */
-					catch(ProtocolException e){
+					catch(DespotifyException e){
 						return;
 					}
 				}

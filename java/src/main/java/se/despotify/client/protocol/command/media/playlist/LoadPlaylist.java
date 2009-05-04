@@ -10,7 +10,7 @@ import se.despotify.client.protocol.command.ChecksumException;
 import se.despotify.client.protocol.command.Command;
 import se.despotify.domain.Store;
 import se.despotify.domain.media.Playlist;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
 
@@ -18,17 +18,17 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
- input (plaintext):
- 3500200000d34719 ba2533a497c77647 79108572c8020000 0007000000013ca1 [5? ???G??%3???vGy??r??????????<?]
- 062401                                                              [?$?]
- shn_encrypt(ctx=0x8ef490, buf=0xbfffdd60, len=35 [0x0023]) called from 0x000abc35
- input (plaintext):
- 3500200001000000 000000000000002a 6080835044020000 0005000000022108 [5? ????????????*`??PD?????????!?]
- 0f7400                                                              [?t?]
- shn_encrypt(ctx=0x8ef490, buf=0xbfffdd60, len=35 [0x0023]) called from 0x000abc35
- input (plaintext):
- 3500200002f9d56f b062619c842289a4 0520f41770020000 003c000000303438 [5? ????o?ba??"??? ??p????<???048]
- 727d01                                                              [r}?]
+ * input (plaintext):
+ * 3500200000d34719 ba2533a497c77647 79108572c8020000 0007000000013ca1 [5? ???G??%3???vGy??r??????????<?]
+ * 062401                                                              [?$?]
+ * shn_encrypt(ctx=0x8ef490, buf=0xbfffdd60, len=35 [0x0023]) called from 0x000abc35
+ * input (plaintext):
+ * 3500200001000000 000000000000002a 6080835044020000 0005000000022108 [5? ????????????*`??PD?????????!?]
+ * 0f7400                                                              [?t?]
+ * shn_encrypt(ctx=0x8ef490, buf=0xbfffdd60, len=35 [0x0023]) called from 0x000abc35
+ * input (plaintext):
+ * 3500200002f9d56f b062619c842289a4 0520f41770020000 003c000000303438 [5? ????o?ba??"??? ??p????<???048]
+ * 727d01                                                              [r}?]
  */
 public class LoadPlaylist extends Command<Boolean> {
 
@@ -43,46 +43,50 @@ public class LoadPlaylist extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Protocol protocol) throws ProtocolException {
+  public Boolean send(Protocol protocol) throws DespotifyException {
     byte[] data;
 
-    {
-      /* Create channel callback */
-      ChannelCallback callback = new ChannelCallback();
 
-      /* Create channel and buffer. */
-      Channel channel = new Channel("Playlist-Channel", Channel.Type.TYPE_PLAYLIST, callback);
-      ByteBuffer buffer  = ByteBuffer.allocate(2 + 16 + 1 + 4 + 4 + 4 + 1);
+    /* Create channel callback */
+    ChannelCallback callback = new ChannelCallback();
 
-      /* Append channel id, playlist id and some bytes... */
-      buffer.putShort((short)channel.getId());
-      buffer.put(playlist.getUUID()); /// playlist UUID
-      buffer.put((byte)0x02); // playlist UUID type
+    /* Create channel and buffer. */
+    Channel channel = new Channel("Playlist-Channel", Channel.Type.TYPE_PLAYLIST, callback);
+    ByteBuffer buffer = ByteBuffer.allocate(2 + 16 + 1 + 4 + 4 + 4 + 1);
 
-      // todo if getTracks() == null..
-      buffer.putInt(-1); // playlist history. -1: current. 0: changes since version 0, 1: since version 1, etc.
+    /* Append channel id, playlist id and some bytes... */
+    buffer.putShort((short) channel.getId());
+    buffer.put(playlist.getUUID()); /// playlist UUID
+    buffer.put((byte) 0x02); // playlist UUID type
 
-      buffer.putInt(0); // unknown
-      buffer.putInt(-1); // checksum?
-      buffer.put((byte)0x01);
-      buffer.flip();
-      /* Register channel. */
-      Channel.register(channel);
+    // todo if getTracks() == null..
+    buffer.putInt(-1); // playlist history. -1: current. 0: changes since version 0, 1: since version 1, etc.
 
-      /* Send packet. */
-      protocol.sendPacket(PacketType.getPlaylist, buffer, "get playlist");
+    buffer.putInt(0); // unknown
+    buffer.putInt(-1); // checksum?
+    buffer.put((byte) 0x01);
+    buffer.flip();
+    /* Register channel. */
+    Channel.register(channel);
 
-      /* Get data and inflate it. */
-      data = callback.getData("get playlist response");
+    /* Send packet. */
+    protocol.sendPacket(PacketType.getPlaylist, buffer, "get playlist");
 
+    /* Get data and inflate it. */
+    data = callback.getData("get playlist response");
+
+    if (data.length == 0) {
+      throw new DespotifyException("Received an empty response");
     }
 
     /* Load XML. */
     String xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><playlist>" +
-      new String(data, Charset.forName("UTF-8")) +
-      "</playlist>";
+        new String(data, Charset.forName("UTF-8")) +
+        "</playlist>";
     XMLElement playlistElement = XML.load(xml);
-    log.info(xml.replaceAll("\\s+", ""));
+    if (log.isDebugEnabled()) {
+      log.debug(xml);
+    }
     /* Create and return playlist. */
     Playlist.fromXMLElement(playlistElement, store, playlist);
 

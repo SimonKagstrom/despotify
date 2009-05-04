@@ -14,7 +14,7 @@ import se.despotify.crypto.RSA;
 import se.despotify.domain.media.Track;
 import se.despotify.exceptions.AuthenticationException;
 import se.despotify.exceptions.ConnectionException;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
@@ -66,7 +66,7 @@ public class Connection implements Player, CommandListener, Runnable {
    * @throws ConnectionException
    * @throws AuthenticationException
    */
-  public void login(String username, String password) throws ConnectionException, AuthenticationException {
+  public void login(String username, String password) throws DespotifyException {
     /* Authenticate session. */
     this.protocol = this.session.authenticate(username, password);
 
@@ -80,12 +80,7 @@ public class Connection implements Player, CommandListener, Runnable {
    * @throws ConnectionException
    */
   public void close() throws ConnectionException {
-    this.running = true;
-
-    /* This will make receivePacket return immediately. */
-    if (this.protocol != null) {
-      this.protocol.disconnect();
-    }
+    this.running = false;
   }
 
   /**
@@ -97,21 +92,20 @@ public class Connection implements Player, CommandListener, Runnable {
       throw new Error("You need to login first!");
     }
 
-    while (!this.running) {
+    running = true;
+
+    while (this.running) {
       try {
         this.protocol.receivePacket();
-      } catch (ProtocolException e) {
-        log.error("Exception in runnable, executing thread will now stop.", e);
+      } catch (DespotifyException e) {
+        log.error("Exception in when receiving packet.", e);
         if (isFailFast()) {
           break;
-        }        
+        }
       }
 
     }
-
-    // todo notify channel listeners waiting for data!
-
-    /* Disconnect. */
+        
     try {
       this.protocol.disconnect();
     }
@@ -151,7 +145,7 @@ public class Connection implements Player, CommandListener, Runnable {
       try {
         this.protocol.sendCacheHash();
       }
-      catch (ProtocolException e) {
+      catch (DespotifyException e) {
         log.warn("could not send cache hash", e);
       }
 
@@ -161,7 +155,7 @@ public class Connection implements Player, CommandListener, Runnable {
       /* int timestamp = IntegerUtilities.bytesToInteger(payload); */
       try {
         this.protocol.sendPong();
-      } catch (ProtocolException e) {
+      } catch (DespotifyException e) {
         log.warn("could not send pong", e);
       }
 
@@ -300,7 +294,7 @@ public class Connection implements Player, CommandListener, Runnable {
     try {
       this.protocol.sendPlayRequest(callback, track);
     }
-    catch (ProtocolException e) {
+    catch (DespotifyException e) {
       return;
     }
 

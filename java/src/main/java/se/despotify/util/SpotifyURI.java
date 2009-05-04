@@ -20,7 +20,9 @@ public class SpotifyURI {
 	}
 
   public static String toURI(byte[] UUID) {
-    assert UUID.length == 16;
+    if (UUID.length != 16) {
+      throw new IllegalArgumentException("UUID should be 16 bytes");
+    }
     return toURI(Hex.toHex(UUID));
   }
 

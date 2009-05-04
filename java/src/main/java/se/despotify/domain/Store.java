@@ -13,8 +13,8 @@ public abstract class Store {
   public abstract Album getAlbum(byte[] UUID);
   public abstract Artist getArtist(byte[] UUID);
   public abstract Track getTrack(byte[] UUID);
-
   public abstract Image getImage(byte[] UUID);
+
 
   public Image getImage(String hexUUID) {
     return getImage(Hex.toBytes(hexUUID));

@@ -11,7 +11,7 @@ import se.despotify.client.protocol.command.Command;
 import se.despotify.domain.Store;
 import se.despotify.domain.media.Artist;
 import se.despotify.domain.media.Result;
-import se.despotify.exceptions.ProtocolException;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.GZIP;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
@@ -20,6 +20,9 @@ import se.despotify.util.XMLElement;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 /**
  * @since 2009-apr-25 16:28:42
@@ -38,7 +41,7 @@ public class LoadArtist extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Protocol protocol) throws ProtocolException {
+  public Boolean send(Protocol protocol) throws DespotifyException {
 
     /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
@@ -66,7 +69,7 @@ public class LoadArtist extends Command<Boolean> {
 
 
     /* Get data and inflate it. */
-    byte[] data = GZIP.inflate(callback.getData(log.isDebugEnabled() ? "gzipped load artist response" : null));
+    byte[] data = GZIP.inflate(callback.getData("gzipped load artist response"));
 
     if (log.isInfoEnabled()) {
       log.info("load artist response, " + data.length + " uncompressed bytes:\n" + Hex.log(data, log));
@@ -75,12 +78,13 @@ public class LoadArtist extends Command<Boolean> {
 
     /* Cut off that last 0xFF byte... */
     data = Arrays.copyOfRange(data, 0, data.length - 1);
-    /* Load XML. */
 
 
-    XMLElement root = XML.load(data, Charset.forName("UTF-8"));
-
-    // load tracks
+    String xml = new String(data, Charset.forName("UTF-8"));
+    if (log.isDebugEnabled()) {
+      log.debug(xml);
+    }
+    XMLElement root = XML.load(xml);
 
 
     Result.fromXMLElement(root, store);

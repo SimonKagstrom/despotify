@@ -50,7 +50,11 @@ public abstract class Media implements Visitable {
   }
 
   public final void setUUID(byte[] UUID) {
-    assert UUID == null || UUID.length == 16;
+    if (UUID == null) {
+      throw new IllegalArgumentException("UUID must not be null");
+    } else if (UUID.length != 16) {
+      throw new IllegalArgumentException("UUID should be 16 bytes");
+    }
     this.UUID = UUID;
     hexUUID = null; // reset
   }

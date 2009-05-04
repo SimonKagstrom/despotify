@@ -14,12 +14,7 @@ public class TestAddTracksToPlaylist extends DespotifyClientTest {
   @Test
   public void testAddTracksToPlaylist() throws Exception {
 
-    long seed = System.currentTimeMillis();
-    Random random = new Random(seed);
-
-    byte[] playlistNameBytes = new byte[8];
-    random.nextBytes(playlistNameBytes);
-    String playlistName = "despotify_TestAddTracksToPlaylist_" + System.currentTimeMillis();
+    String playlistName = randomPlaylistName();
 
 
     new LoadUserPlaylists(store, user).send(connection.getProtocol());
