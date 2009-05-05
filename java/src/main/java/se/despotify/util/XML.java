@@ -50,13 +50,13 @@ public class XML {
   }
 
   public static XMLElement load(String xml) {
-    try {
-      Writer w = new OutputStreamWriter(new FileOutputStream(new File(System.currentTimeMillis() + ".xml")), "UTF8");
-      w.write(xml);
-      w.close();
-    } catch (Exception e) {
-      //
-    }
+//    try {
+//      Writer w = new OutputStreamWriter(new FileOutputStream(new File(System.currentTimeMillis() + ".xml")), "UTF8");
+//      w.write(xml);
+//      w.close();
+//    } catch (Exception e) {
+//      //
+//    }
     return load(new StringReader(xml));
   }
 

@@ -10,7 +10,6 @@ import se.despotify.client.protocol.command.Command;
 import se.despotify.client.protocol.command.ChecksumException;
 import se.despotify.domain.Store;
 import se.despotify.domain.User;
-import se.despotify.domain.media.MediaList;
 import se.despotify.domain.media.Playlist;
 import se.despotify.domain.media.Track;
 import se.despotify.exceptions.DespotifyException;
@@ -20,6 +19,7 @@ import se.despotify.util.XMLElement;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.ArrayList;
 
 /**
  * @since 2009-apr-26 23:16:55
@@ -191,7 +191,7 @@ shn_decrypt(ctx=0x8523c0, buf=0x81328a, len=2 [0x0002]) called from 0x000adf64
     }
 
     if (playlist.getTracks() == null) {
-      playlist.setTracks(new MediaList<Track>());
+      playlist.setTracks(new ArrayList<Track>());
     }
 
 

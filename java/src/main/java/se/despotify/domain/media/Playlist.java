@@ -8,11 +8,14 @@ import se.despotify.client.protocol.command.ChecksumException;
 import se.despotify.exceptions.DespotifyException;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class Playlist extends Media implements Iterable<Track>, Visitable {
 	private String      name;
 	private String      author;
-	private MediaList<Track>   tracks;
+	private List<Track> tracks;
 	private Long        revision;
 	private Long        checksum;
 	private Boolean     collaborative;
@@ -61,6 +64,16 @@ public class Playlist extends Media implements Iterable<Track>, Visitable {
     return calculator.getValue();
   }
 
+  @Override
+  protected int getUUIDlength() {
+    return 16;
+  }
+
+  @Override
+  protected Pattern getHexUUIDpattern() {
+    return hexUUIDpattern32;
+  }
+  
   public void accept(Visitor visitor) {
     visitor.visit(this);
   }
@@ -95,11 +108,11 @@ public class Playlist extends Media implements Iterable<Track>, Visitable {
     return getTracks() != null ? getTracks().size() : 0;
   }
 
-  public MediaList<Track> getTracks() {
+  public List<Track> getTracks() {
     return tracks;
   }
 
-  public void setTracks(MediaList<Track> tracks) {
+  public void setTracks(List<Track> tracks) {
     this.tracks = tracks;
   }
 
@@ -147,7 +160,7 @@ public class Playlist extends Media implements Iterable<Track>, Visitable {
       String items = changeElement.getChild("ops").getChild("add").getChildText("items");
 
       if (playlist.tracks == null) {
-        playlist.tracks = new MediaList<Track>();
+        playlist.tracks = new ArrayList<Track>();
       }
 
 
@@ -156,7 +169,7 @@ public class Playlist extends Media implements Iterable<Track>, Visitable {
       int position = 0;
       String[] split = items.split(",");
 
-      MediaList<Track> tracks = new MediaList<Track>(split.length);
+      List<Track> tracks = new ArrayList<Track>(split.length);
 
 
       for (String trackData : split) {
@@ -205,7 +218,7 @@ public class Playlist extends Media implements Iterable<Track>, Visitable {
     playlist.collaborative = (Integer.parseInt(parts[3]) == 1);
 
     if (playlist.getTracks() == null) {
-      playlist.setTracks(new MediaList<Track>());
+      playlist.setTracks(new ArrayList<Track>());
     }
     if (playlist.getTracks().size() != Long.parseLong(versionTagValues[1])) {
       throw new RuntimeException("Size missmatch, playlist = " + playlist.getTracks().size() + ", received = " + versionTagValues[1]);
@@ -233,13 +246,13 @@ public class Playlist extends Media implements Iterable<Track>, Visitable {
   @Override
   public String toString() {
     return "Playlist{" +
-        "id='" + getHexUUID() + '\'' +
+        "hexUUID='" + getHexUUID() + '\'' +
         ", name='" + name + '\'' +
         ", author='" + author + '\'' +
+        ", tracks=" + (tracks == null ? null : tracks.size()) +
         ", revision=" + revision +
         ", checksum=" + checksum +
         ", collaborative=" + collaborative +
-        ", tracks=" + tracks +
         '}';
   }
 }

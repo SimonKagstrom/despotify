@@ -158,4 +158,9 @@ public class XMLElement {
 	public String getTagName() {
 		return e.getTagName();
 	}
+
+  @Override
+  public String toString() {
+    return e.getNodeName();
+  }
 }

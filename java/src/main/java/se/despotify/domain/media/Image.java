@@ -1,11 +1,13 @@
 package se.despotify.domain.media;
 
-import se.despotify.util.XMLElement;
 import se.despotify.domain.Store;
+import se.despotify.util.XMLElement;
 
 import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 /**
  * @since 2009-apr-27 18:08:58
@@ -26,6 +28,17 @@ public class Image extends Media {
   public Image(String hexUUID) {
     super(hexUUID);
   }
+
+  @Override
+  protected int getUUIDlength() {
+    return 20;
+  }
+
+  @Override
+  protected Pattern getHexUUIDpattern() {
+    return hexUUIDpattern40;
+  }
+
 
   public void accept(Visitor visitor) {
     visitor.visit(this);
@@ -81,22 +94,34 @@ public class Image extends Media {
   }
 
   public static Image fromXMLElement(XMLElement imageNode, Store store) {
-    Image image = null;
+    Image image;
 
     if (imageNode.hasChild("id")) {
-      store.getImage(imageNode.getChildText("id"));
+      image = store.getImage(imageNode.getChildText("id"));
+    } else if (Media.hexUUIDpattern40.matcher(imageNode.getText()).matches()) {
+      image = store.getImage(imageNode.getText());
     } else {
-      throw new RuntimeException("Image UUID missing in XML node");
+      throw new RuntimeException("Image hexUUID missing in XML node");
     }
 
     if (imageNode.hasChild("height")) {
-      image.setWidth(Integer.valueOf(imageNode.getChildText("height")));
+      image.setHeight(Integer.valueOf(imageNode.getChildText("height")));
     }
 
     if (imageNode.hasChild("width")) {
-      image.setHeight(Integer.valueOf(imageNode.getChildText("width")));
+      image.setWidth(Integer.valueOf(imageNode.getChildText("width")));
     }
 
     return image;
+  }
+
+  @Override
+  public String toString() {
+    return "Image{" +
+        "hexUUID=" + getHexUUID() +
+        ", width=" + width +
+        ", height=" + height +
+        ", bytes=" + (bytes == null ? null : bytes.length) +
+        '}';
   }
 }

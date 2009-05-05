@@ -5,6 +5,7 @@ import se.despotify.util.SpotifyURI;
 import se.despotify.util.XMLElement;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class Track extends Media implements Visitable {
 	private String       title;
@@ -55,7 +56,17 @@ public class Track extends Media implements Visitable {
 		this.artist      = artist;
 		this.album       = album;
 	}
-	
+
+  @Override
+  protected int getUUIDlength() {
+    return 16;
+  }
+
+  @Override
+  protected Pattern getHexUUIDpattern() {
+    return hexUUIDpattern32;
+  }
+  
 
   @Override
   public void accept(Visitor visitor) {
@@ -247,8 +258,8 @@ public class Track extends Media implements Visitable {
     return "Track{" +
         "hexUUID='" + getHexUUID() + '\'' +
         ", title='" + title + '\'' +
-        ", artist=" + artist +
-        ", album=" + album +
+        ", artist=" + (artist == null ? null : artist.getHexUUID()) +
+        ", album=" + (album == null ? null : album.getHexUUID()) +
         ", year=" + year +
         ", discNumber=" + discNumber +
         ", trackNumber=" + trackNumber +

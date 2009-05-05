@@ -3,9 +3,9 @@ package se.despotify.domain.media;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.util.Hex;
-import se.despotify.util.SpotifyURI;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 /**
  * @since 2009-apr-24 14:17:32
@@ -13,6 +13,18 @@ import java.util.Arrays;
 public abstract class Media implements Visitable {
 
   protected static Logger log = LoggerFactory.getLogger(Media.class);
+
+  protected abstract int getUUIDlength();
+  protected abstract Pattern getHexUUIDpattern();
+
+  protected final static Pattern hexUUIDpattern32 = Pattern.compile("^[0-9a-fA-F]{32}$");
+  protected final static Pattern hexUUIDpattern40 = Pattern.compile("^[0-9a-fA-F]{40}$");
+
+
+  protected  boolean isHexUUID(String value) {
+    return getHexUUIDpattern().matcher(value).matches();
+  }
+
 
   private byte[] UUID;
 
@@ -34,26 +46,27 @@ public abstract class Media implements Visitable {
     if (hexUUID == null) {
       throw new NullPointerException("Expected hex UUID");
     }
-    if (!SpotifyURI.isHex(hexUUID)) {
+    if (!isHexUUID(hexUUID)) {
       throw new IllegalArgumentException(hexUUID + " is not a hex UUID");
     }
     this.UUID = Hex.toBytes(hexUUID);
     this.hexUUID = hexUUID;
   }
 
-  public final void setUUID(String UUID) {
-    if (SpotifyURI.isHex(UUID)) {
-      setUUID(Hex.toBytes(UUID));
+  public void setUUID(String hexUUID) {
+    if (isHexUUID(hexUUID)) {
+      this.UUID= Hex.toBytes(hexUUID);
+      this.hexUUID = hexUUID;
     } else {
-      throw new IllegalArgumentException(UUID + " is not a valid UUID.");
+      throw new IllegalArgumentException(hexUUID + " is not a valid UUID.");
     }
   }
 
-  public final void setUUID(byte[] UUID) {
+  public void setUUID(byte[] UUID) {
     if (UUID == null) {
       throw new IllegalArgumentException("UUID must not be null");
-    } else if (UUID.length != 16) {
-      throw new IllegalArgumentException("UUID should be 16 bytes");
+    } else if (UUID.length != getUUIDlength()) {
+      throw new IllegalArgumentException("UUID should be "+getUUIDlength()+" bytes");
     }
     this.UUID = UUID;
     hexUUID = null; // reset

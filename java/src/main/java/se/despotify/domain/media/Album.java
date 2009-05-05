@@ -7,15 +7,16 @@ import se.despotify.util.XMLElement;
 import java.util.zip.Adler32;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class Album extends Media implements Visitable {
   private String name;
   private Artist artist;
   private String cover;
   private Float popularity;
-  private MediaList<Track> tracks;
+  private List<Track> tracks;
   private Restrictions restrictions;
-  private List<String> copyrights;
+  private Copyright copyright;
 
   public Album() {
     super();
@@ -37,6 +38,17 @@ public class Album extends Media implements Visitable {
     super(UUID, hexUUID);
     this.name = name;
     this.artist = artist;
+  }
+
+
+  @Override
+  protected int getUUIDlength() {
+    return 16;
+  }
+
+  @Override
+  protected Pattern getHexUUIDpattern() {
+    return hexUUIDpattern32;
   }
 
   @Override
@@ -87,11 +99,11 @@ public class Album extends Media implements Visitable {
     this.popularity = popularity;
   }
 
-  public MediaList<Track> getTracks() {
+  public List<Track> getTracks() {
     return tracks;
   }
 
-  public void setTracks(MediaList<Track> tracks) {
+  public void setTracks(List<Track> tracks) {
     this.tracks = tracks;
   }
 
@@ -103,12 +115,12 @@ public class Album extends Media implements Visitable {
     this.restrictions = restrictions;
   }
 
-  public List<String> getCopyrights() {
-    return copyrights;
+  public Copyright getCopyright() {
+    return copyright;
   }
 
-  public void setCopyrights(List<String> copyrights) {
-    this.copyrights = copyrights;
+  public void setCopyright(Copyright copyright) {
+    this.copyright = copyright;
   }
 
   public static Album fromXMLElement(XMLElement albumElement, Store store) {
@@ -147,7 +159,7 @@ public class Album extends Media implements Visitable {
     /* Set tracks. */
     if (albumElement.hasChild("discs")) {
 
-      MediaList<Track> tracks = new MediaList<Track>();
+      List<Track> tracks = new ArrayList<Track>();
 
       for (XMLElement discElement : albumElement.getChild("discs").getChildren("disc")) {
 
@@ -165,15 +177,17 @@ public class Album extends Media implements Visitable {
       }
 
       if (albumElement.hasChild("copyright")) {
-        List<String> copyrights = new ArrayList<String>();
+        Copyright copyright = new Copyright();
         for (XMLElement copyrightNode : albumElement.getChild("copyright").getChildren()) {
           if ("c".equals(copyrightNode.getElement().getNodeName())) {
-            copyrights.add(copyrightNode.getText());
+            copyright.setC(copyrightNode.getText());
+          } else if ("p".equals(copyrightNode.getElement().getNodeName())) {
+            copyright.setP(copyrightNode.getText());
           } else {
             log.warn("Unknown copyright type " + copyrightNode.getElement().getNodeName());
           }
         }
-        album.copyrights = copyrights;
+        album.copyright = copyright;
       }
 
       album.setTracks(tracks);
@@ -210,12 +224,12 @@ public class Album extends Media implements Visitable {
     return "Album{" +
         "hexUUID='" + getHexUUID() + '\'' +
         ", name='" + name + '\'' +
-        ", artist=" + artist +
+        ", artist=" + (artist == null ? null : artist.getHexUUID()) +
         ", cover='" + cover + '\'' +
         ", popularity=" + popularity +
-        ", tracks=" + tracks +
+        ", tracks=" + (tracks == null ? null : tracks.size()) +
         ", restrictions=" + restrictions +
-        ", copyrights=" + copyrights +
+        ", copyright=" + copyright +
         '}';
   }
 }

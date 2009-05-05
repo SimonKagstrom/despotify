@@ -3,6 +3,9 @@ package se.despotify.domain.media;
 import se.despotify.domain.Store;
 import se.despotify.util.XMLElement;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class Result {
 	private int          version;
 	private String       query;
@@ -10,9 +13,9 @@ public class Result {
 	private int          totalArtists;
 	private int          totalAlbums;
 	private int          totalTracks;
-	private MediaList<Artist> artists;
-	private MediaList<Album>  albums;
-	private MediaList<Track>  tracks;
+	private List<Artist> artists;
+	private List<Album>  albums;
+	private List<Track>  tracks;
 	
 	public Result(){
 		this.version      = 1;
@@ -21,9 +24,9 @@ public class Result {
 		this.totalArtists = 0;
 		this.totalAlbums  = 0;
 		this.totalTracks  = 0;
-		this.artists      = new MediaList<Artist>();
-		this.albums       = new MediaList<Album>();
-		this.tracks       = new MediaList<Track>();
+		this.artists      = new ArrayList<Artist>();
+		this.albums       = new ArrayList<Album>();
+		this.tracks       = new ArrayList<Track>();
 	}
 	
 	public int getVersion(){
@@ -50,15 +53,15 @@ public class Result {
 		return this.totalTracks;
 	}
 	
-	public MediaList<Artist> getArtists(){
+	public List<Artist> getArtists(){
 		return this.artists;
 	}
 	
-	public MediaList<Album> getAlbums(){
+	public List<Album> getAlbums(){
 		return this.albums;
 	}
 	
-	public MediaList<Track> getTracks(){
+	public List<Track> getTracks(){
 		return this.tracks;
 	}
 	
@@ -99,8 +102,7 @@ public class Result {
 		}
 		if(resultElement.hasChild("tracks")){
 			for(XMLElement trackElement : resultElement.getChild("tracks").getChildren()){
-        Track track = Track.fromXMLElement(trackElement, store);        
-        result.getTracks().add(track);
+        result.getTracks().add(Track.fromXMLElement(trackElement, store));
 			}
 		}
 

@@ -32,7 +32,10 @@ public class TestRemovePlaylist extends DespotifyClientTest {
 
     new LoadUserPlaylists(store, user).send(connection.getProtocol());
     assertEquals(originalSize, user.getPlaylists().getItems().size());
-    assertNull(user.getPlaylists().getItems().get(playlist.getUUID()));
+    for (Playlist playlist2 : user.getPlaylists()) {
+      assertNotSame(playlist.getUUID(), playlist2.getUUID());
+    }
+    
 
     // todo can we still load it?
 

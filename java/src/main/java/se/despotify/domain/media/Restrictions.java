@@ -58,24 +58,20 @@ public class Restrictions {
   public static Restrictions fromXMLElement(XMLElement restrictionsNode) {
     Restrictions restrictions = new Restrictions();
 
-    for (XMLElement restrictionNode : restrictionsNode.getChildren()) {
 
-      if (!"restriction".equals(restrictionNode.getElement().getNodeName())) {
-        log.warn("Unknown restrictions child node " + restrictionNode.getElement().getNodeName());
-      } else {
-
-        if (restrictionNode.hasChild("allowed")) {
-          restrictions.setAllowed(new LinkedHashSet<String>(Arrays.asList(restrictionNode.getChildText("allowed").split(","))));
-        }
-        if (restrictionNode.hasChild("forbidden")) {
-          restrictions.setForbidden(new LinkedHashSet<String>(Arrays.asList(restrictionNode.getChildText("forbidden").split(","))));
-        }
-        if (restrictionNode.hasChild("catalouges")) {
-          restrictions.setCatalogues(new LinkedHashSet<String>(Arrays.asList(restrictionNode.getChildText("catalouges").split(","))));
-        }
-      }
-
+    String tmp;
+    if ((tmp = restrictionsNode.getAttribute("allowed")) != null) {
+      restrictions.setAllowed(new LinkedHashSet<String>(Arrays.asList(tmp.split(","))));
     }
+    if ((tmp = restrictionsNode.getAttribute("forbidden")) != null) {
+      restrictions.setForbidden(new LinkedHashSet<String>(Arrays.asList(tmp.split(","))));
+    }
+    if ((tmp = restrictionsNode.getAttribute("catalouges")) != null) {
+      restrictions.setCatalogues(new LinkedHashSet<String>(Arrays.asList(tmp.split(","))));
+    }
+
+    // todo enumarate all attributes and warn if there are any unknown
+
     return restrictions;
   }
 

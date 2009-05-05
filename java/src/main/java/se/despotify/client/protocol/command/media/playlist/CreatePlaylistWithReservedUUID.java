@@ -13,7 +13,6 @@ import se.despotify.domain.User;
 import se.despotify.domain.media.Playlist;
 import se.despotify.domain.media.PlaylistContainer;
 import se.despotify.domain.media.Track;
-import se.despotify.domain.media.MediaList;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
@@ -22,6 +21,7 @@ import se.despotify.util.XMLElement;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.ArrayList;
 
 /**
  * despotify out
@@ -194,7 +194,7 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
     }
 
     playlist.setRevision(1l);
-    playlist.setTracks(new MediaList<Track>());
+    playlist.setTracks(new ArrayList<Track>());
     playlist.setChecksum(1l);
 
     return true;

@@ -2,11 +2,12 @@ package se.despotify;
 
 import org.junit.Test;
 import se.despotify.domain.User;
-import se.despotify.domain.media.MediaList;
 import se.despotify.domain.media.Playlist;
 import se.despotify.domain.media.PlaylistContainer;
 import se.despotify.domain.media.Track;
 import se.despotify.util.Hex;
+
+import java.util.ArrayList;
 
 
 /**
@@ -34,7 +35,7 @@ public class TestChecksum extends DespotifyClientTest {
     Playlist playlist = new Playlist(Hex.toBytes("473e7d4eef45cd4fa3ee2aaf96c01688"));
     playlist.setName("de");
     
-    playlist.setTracks(new MediaList<Track>(3));
+    playlist.setTracks(new ArrayList<Track>(3));
           
     boolean fail = false;
     for (int i = 0; i < defaultTracks.length; i++) {

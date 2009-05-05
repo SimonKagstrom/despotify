@@ -10,7 +10,6 @@ import se.despotify.client.protocol.command.Command;
 import se.despotify.client.protocol.command.ChecksumException;
 import se.despotify.domain.Store;
 import se.despotify.domain.User;
-import se.despotify.domain.media.MediaList;
 import se.despotify.domain.media.Playlist;
 import se.despotify.domain.media.Track;
 import se.despotify.exceptions.DespotifyException;
@@ -20,6 +19,7 @@ import se.despotify.util.XMLElement;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.ArrayList;
 
 
 public class AddTrackToPlaylist extends Command<Boolean> {
@@ -60,7 +60,7 @@ public class AddTrackToPlaylist extends Command<Boolean> {
     }
 
     if (playlist.getTracks() == null) {
-      playlist.setTracks(new MediaList<Track>());
+      playlist.setTracks(new ArrayList<Track>());
     }
 
 

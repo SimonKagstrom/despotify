@@ -63,9 +63,10 @@ public class FileCache implements Cache {
 	public void store(String category, String hash, byte[] data){
 		try{
 			File file = new File(this.directory, category + "/" + hash);
-			
-			if(!file.getParentFile().exists()){
-				file.getParentFile().mkdirs();
+
+      File directory = file.getParentFile();
+			if(!directory.exists() && ! directory.mkdirs()) {
+        throw new RuntimeException("Could not create directory " + directory.getAbsolutePath());
 			}
 			
 			FileOutputStream output = new FileOutputStream(file);

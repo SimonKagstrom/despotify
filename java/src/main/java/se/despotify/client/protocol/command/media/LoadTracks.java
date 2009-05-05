@@ -20,6 +20,7 @@ import se.despotify.util.XMLElement;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * @since 2009-apr-25 16:28:42
@@ -31,6 +32,10 @@ public class LoadTracks extends Command<Boolean> {
   private Track[] tracks;
   private Store store;
 
+  public LoadTracks(Store store, Collection<Track> tracks) {
+    this(store, tracks.toArray(new Track[tracks.size()]));
+
+  }
 
   public LoadTracks(Store store, Track... tracks) {
     this.store = store;

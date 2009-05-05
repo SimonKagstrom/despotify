@@ -5,16 +5,18 @@ import se.despotify.util.ChecksumCalculator;
 import se.despotify.util.XMLElement;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 public class PlaylistContainer implements Iterable<Playlist> {
 	private String         author;
-	private MediaList<Playlist> items;
+	private List<Playlist> items;
 	private long           revision;
 	private long           checksum;
 
   public PlaylistContainer(){
 		this.author    = null;
-		this.items = new MediaList<Playlist>();
+		this.items = new ArrayList<Playlist>();
 		this.revision  = -1;
 		this.checksum  = -1;
 	}
@@ -35,11 +37,11 @@ public class PlaylistContainer implements Iterable<Playlist> {
 		this.author = author;
 	}
 	
-	public MediaList<Playlist> getItems(){
+	public List<Playlist> getItems(){
 		return this.items;
 	}
 	
-	public void setItems(MediaList<Playlist> items){
+	public void setItems(List<Playlist> items){
 		this.items = items;
 	}
 	
@@ -108,4 +110,14 @@ public class PlaylistContainer implements Iterable<Playlist> {
 
 		return playlists;
 	}
+
+  @Override
+  public String toString() {
+    return "PlaylistContainer{" +
+        "author='" + author + '\'' +
+        ", items=" + (items == null ? null : items.size())  +
+        ", revision=" + revision +
+        ", checksum=" + checksum +
+        '}';
+  }
 }

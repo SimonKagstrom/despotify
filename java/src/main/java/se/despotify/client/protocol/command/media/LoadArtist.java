@@ -12,6 +12,7 @@ import se.despotify.domain.Store;
 import se.despotify.domain.media.Artist;
 import se.despotify.domain.media.Result;
 import se.despotify.exceptions.DespotifyException;
+import se.despotify.exceptions.MissingChildElement;
 import se.despotify.util.GZIP;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
@@ -86,10 +87,14 @@ public class LoadArtist extends Command<Boolean> {
     }
     XMLElement root = XML.load(xml);
 
+    if (root.getElement().getNodeName().equals("artist")) {
+      Artist.fromXMLElement(root, store);
+      return true;
+    } else {
+      throw new DespotifyException("Root element is not named <artist>: " + root.getElement().getNodeName());
+    }
 
-    Result.fromXMLElement(root, store);
 
-    return true;
 
 
   }

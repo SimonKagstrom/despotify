@@ -7,16 +7,17 @@ import se.despotify.util.XMLElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class Artist extends Media implements Visitable {
   private String name;
   private Image portrait;
   private Float popularity;
-  private MediaList<Artist> similarArtists;
+  private List<Artist> similarArtists;
   private List<Biography> biographies;
-  private List<String> generes;
+  private List<String> genres;
   private List<String> yearsActive;
-  private MediaList<Album> albums;
+  private List<Album> albums;
 
   public Artist() {
     super();
@@ -33,6 +34,17 @@ public class Artist extends Media implements Visitable {
   public Artist(String hexUUID) {
     super(hexUUID);
   }
+
+  @Override
+  protected int getUUIDlength() {
+    return 16;
+  }
+
+  @Override
+  protected Pattern getHexUUIDpattern() {
+    return hexUUIDpattern32;
+  }
+  
 
   @Override
   public void accept(Visitor visitor) {
@@ -73,11 +85,11 @@ public class Artist extends Media implements Visitable {
     this.popularity = popularity;
   }
 
-  public MediaList<Artist> getSimilarArtists() {
+  public List<Artist> getSimilarArtists() {
     return similarArtists;
   }
 
-  public void setSimilarArtists(MediaList<Artist> similarArtists) {
+  public void setSimilarArtists(List<Artist> similarArtists) {
     this.similarArtists = similarArtists;
   }
 
@@ -89,12 +101,12 @@ public class Artist extends Media implements Visitable {
     this.biographies = biographies;
   }
 
-  public List<String> getGeneres() {
-    return generes;
+  public List<String> getGenres() {
+    return genres;
   }
 
-  public void setGeneres(List<String> generes) {
-    this.generes = generes;
+  public void setGenres(List<String> genres) {
+    this.genres = genres;
   }
 
   public List<String> getYearsActive() {
@@ -105,11 +117,11 @@ public class Artist extends Media implements Visitable {
     this.yearsActive = yearsActive;
   }
 
-  public MediaList<Album> getAlbums() {
+  public List<Album> getAlbums() {
     return albums;
   }
 
-  public void setAlbums(MediaList<Album> albums) {
+  public void setAlbums(List<Album> albums) {
     this.albums = albums;
   }
 
@@ -123,24 +135,15 @@ public class Artist extends Media implements Visitable {
 
     /* Set portrait. */
     if (artistNode.hasChild("portrait")) {
-      artist.portrait = Image.fromXMLElement(artistNode.getChild("portrait"), store);
+      XMLElement portraitNode  = artistNode.getChild("portrait");
+      if (!"".equals(portraitNode.getText().trim())) {
+        artist.portrait = Image.fromXMLElement(portraitNode, store);
+      }
     }
 
     /* Set popularity. */
     if (artistNode.hasChild("popularity")) {
       artist.popularity = Float.parseFloat(artistNode.getChildText("popularity"));
-    }
-
-    /* Set similar artists. */
-    if (artistNode.hasChild("similar-artists")) {
-
-      MediaList<Artist> similarArtists = new MediaList<Artist>();
-
-      for (XMLElement similarArtistElement : artistNode.getChild("similar-artists").getChildren()) {
-        similarArtists.add(Artist.fromXMLElement(similarArtistElement, store));
-      }
-
-      artist.setSimilarArtists(similarArtists);
     }
 
     XMLElement biosNode = artistNode.getChild("bios");
@@ -155,11 +158,12 @@ public class Artist extends Media implements Visitable {
           Biography biography = new Biography();
           biography.setText(bioNode.getChildText("text"));
           if (bioNode.hasChild("portraits")) {
-            biography.setPortraits(new MediaList<Image>());
+            biography.setPortraits(new ArrayList<Image>());
             for (XMLElement portraitNode : bioNode.getChild("portraits").getChildren()) {
               biography.getPortraits().add(Image.fromXMLElement(portraitNode, store));
             }
           }
+          biographies.add(biography);
         }
         artist.biographies = biographies;
       }
@@ -170,17 +174,30 @@ public class Artist extends Media implements Visitable {
     }
 
     if (artistNode.hasChild("genres")) {
-      artist.yearsActive = new ArrayList<String>(Arrays.asList(artistNode.getChildText("generes").split(",")));
+      artist.genres = new ArrayList<String>(Arrays.asList(artistNode.getChildText("genres").split(",")));
     }
 
     XMLElement albumsNode = artistNode.getChild("albums");
     if (albumsNode != null) {
-      MediaList<Album> albums = new MediaList<Album>();
+      List<Album> albums = new ArrayList<Album>();
       for (XMLElement albumNode : albumsNode.getChildren())  {
         albums.add(Album.fromXMLElement(albumNode, store));
       }
       artist.albums = albums;
     }
+
+    /* Set similar artists. */
+    if (artistNode.hasChild("similar-artists")) {
+
+      List<Artist> similarArtists = new ArrayList<Artist>();
+
+      for (XMLElement similarArtistElement : artistNode.getChild("similar-artists").getChildren()) {
+        similarArtists.add(Artist.fromXMLElement(similarArtistElement, store));
+      }
+
+      artist.setSimilarArtists(similarArtists);
+    }
+
 
     return artist;
   }
@@ -201,7 +218,7 @@ public class Artist extends Media implements Visitable {
         ", name='" + name + '\'' +
         ", portrait='" + portrait + '\'' +
         ", popularity=" + popularity +
-        ", similarArtists=" + similarArtists +
+        ", similarArtists=" + (similarArtists == null ? null : similarArtists.size()) +
         '}';
   }
 }
