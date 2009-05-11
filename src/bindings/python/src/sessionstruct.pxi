@@ -15,33 +15,65 @@ cdef class SessionStruct:
         cdef Album instance
 
         if not album:
-            raise SpytifyError("Tried creating a NULL-album.")
+            return None
 
         instance = NEW_ALBUM(Album)
         instance.ds = self.ds
-        instance.data = album
+        instance.data = AlbumData()
+        instance.data.data = album
+
         instance.take_owner = take_owner
+
+        return instance
+
+    cdef Album create_album_full(self, album_browse* album, bint take_owner=False):
+        cdef Album instance = self.create_album(NULL, take_owner)
+        if instance is None:
+            return instance
+
+        instance.data = AlbumDataFull()
+        instance.full_data = instance.data
+        instance.full_data.browse = album
+
         return instance
 
     cdef Artist create_artist(self, artist* artist, bint take_owner=False):
         cdef Artist instance
 
         if not artist:
-            raise SpytifyError("Tried creating a NULL-artist.")
+            return None
 
         instance = NEW_ARTIST(Artist)
         instance.ds = self.ds
-        instance.data = artist
+        instance.data = ArtistData()
+        instance.data.data = artist
+
         instance.take_owner = take_owner
-        instance.fetched = False
+
         return instance
 
-    cdef SearchResult create_search_result(self, search_result* result):
+    cdef Artist create_artist_full(self, artist_browse* artist, bint take_owner=False):
+        cdef Artist instance = self.create_artist(NULL, take_owner)
+        if instance is None:
+            return instance
+
+        instance.data = ArtistDataFull()
+        instance.full_data = instance.data
+        instance.full_data.browse = artist
+
+        return instance
+
+    cdef SearchResult create_search_result(self, search_result* result, bint take_owner=False):
         cdef SearchResult instance
+
+        if not result:
+            return None
 
         instance = NEW_SEARCHRESULT(SearchResult)
         instance.ds = self.ds
         instance.data = result
+        instance.playlist = self.create_playlist(result.playlist)
+        instance.take_owner = take_owner
 
         return instance
 
@@ -49,7 +81,7 @@ cdef class SessionStruct:
         cdef Playlist instance
 
         if not playlist:
-            raise SpytifyError("Tried creating a NULL-playlist.")
+            return None
                 
         instance = NEW_PLAYLIST(Playlist)
         instance.ds = self.ds
@@ -64,8 +96,8 @@ cdef class SessionStruct:
 
         instance = NEW_ROOTLIST(RootList)
         instance.ds = self.ds
+        instance.data = NULL
         instance._list = None
-        instance.data = <playlist*>0
 
         return instance
 
@@ -73,7 +105,7 @@ cdef class SessionStruct:
         cdef Track instance
 
         if not track:
-            raise SpytifyError("Tried creating a NULL-track.")
+            return None
 
         instance = NEW_TRACK(Track)
         instance.ds = self.ds
@@ -81,21 +113,19 @@ cdef class SessionStruct:
         instance._artists = None
         return instance
     
-    cdef list albums_to_list(self, album* albums):
+    cdef list albums_to_list(self, album_browse* albums):
         cdef list l = []
         while albums:
-            l.append(self.create_album(albums))
+            l.append(self.create_album_full(albums))
             albums = albums.next
 
         return l
 
     cdef list artists_to_list(self, artist* artists):
         cdef list l = []
-        cdef artist* a = artists
-
-        while a:
-            l.append(self.create_artist(a))
-            a = a.next
+        while artists:
+            l.append(self.create_artist(artists))
+            artists = artists.next
 
         return l
 

@@ -40,7 +40,7 @@ def main():
         searchterm = "foo"
 
     print "\nStored playlists:"
-    playlists = s.stored_playlists()
+    playlists = s.stored_playlists
     for playlist in playlists:
         print " %s, by %s" % (playlist.name, playlist.author)
         for track in playlist.tracks:
@@ -52,13 +52,13 @@ def main():
     if not sr:
         print "No search hits."
     else:
-        print " %s, by %s" % (sr.name, sr.author)
-        for track in sr.tracks:
+        print " Search: %s (suggested: %s)" % (sr.query, sr.suggestion)
+        for track in sr.playlist.tracks:
             print_track(track)
 
-        random_track = random.choice(sr.tracks)
+        random_track = random.choice(sr.playlist.tracks)
         print "Playing %s" % random_track
-        s.play(sr, random_track)
+        s.play(random_track)
 
         time.sleep(10)
 
