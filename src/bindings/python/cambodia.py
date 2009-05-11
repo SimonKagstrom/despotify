@@ -188,7 +188,7 @@ class SpotifySession(spytify.Spytify):
         self.logged_in = True
 
         print 'Loading playlists...'
-        self.playlists = self.session.stored_playlists()
+        self.playlists = self.session.stored_playlists
         if not self.playlists:
             self.playlists = []
 
