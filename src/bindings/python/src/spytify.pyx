@@ -79,8 +79,12 @@ cdef class Spytify:
         else:
             return self.create_search_result(search, True)
 
-    def play_list(self, Playlist playlist):
-        if not despotify_play(self.ds, playlist.data.tracks, True):
+    def play_list(self, Playlist playlist, Track starting_track=None):
+        cdef track* starting_track_ptr = playlist.data.tracks
+        if starting_track is not None:
+            starting_track_ptr = starting_track.data
+
+        if not despotify_play(self.ds, starting_track_ptr, True):
             raise SpytifyError(despotify_get_error(self.ds))
 
     def play(self, Track track):
