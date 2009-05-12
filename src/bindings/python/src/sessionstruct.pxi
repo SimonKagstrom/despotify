@@ -87,7 +87,6 @@ cdef class SessionStruct:
         instance.ds = self.ds
         instance.data = playlist
         instance.take_owner = take_owner
-        instance._tracks = None
 
         return instance
 
@@ -97,7 +96,7 @@ cdef class SessionStruct:
         instance = NEW_ROOTLIST(RootList)
         instance.ds = self.ds
         instance.data = NULL
-        instance._list = None
+        instance.playlists = None
 
         return instance
 
@@ -110,7 +109,6 @@ cdef class SessionStruct:
         instance = NEW_TRACK(Track)
         instance.ds = self.ds
         instance.data = track
-        instance._artists = None
         return instance
     
     cdef list albums_to_list(self, album_browse* albums):

@@ -92,12 +92,11 @@ cdef class SearchIterator(SessionStruct):
 cdef class Playlist(SessionStruct):
     cdef playlist* data
     cdef bint take_owner
-    cdef list _tracks
 
 cdef class RootList(SessionStruct):
     cdef fetch(self)
     cdef playlist* data 
-    cdef list _list
+    cdef list playlists
 
 cdef class RootIterator:
     cdef RootList parent
@@ -105,4 +104,3 @@ cdef class RootIterator:
 
 cdef class Track(SessionStruct):
     cdef track* data
-    cdef list _artists

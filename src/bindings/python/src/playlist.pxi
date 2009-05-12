@@ -22,9 +22,7 @@ cdef class Playlist:
 
     property tracks:
         def __get__(self):
-            if self._tracks is None:
-                self._tracks = self.tracks_to_list(self.data.tracks)
-            return self._tracks
+            return self.tracks_to_list(self.data.tracks)
 
     def __dealloc__(self):
         if self.take_owner:
@@ -54,21 +52,21 @@ cdef class RootList:
         raise TypeError("This class cannot be instantiated from Python")
 
     cdef fetch(self):
-        if self._list is None:
+        if self.list is None:
             self.data = despotify_get_stored_playlists(self.ds)
-            self._list = self.playlists_to_list(self.data)
+            self.playlists = self.playlists_to_list(self.data)
 
     def __getitem__(self, item):
         self.fetch()
-        return self._list[item]
+        return self.playlists[item]
 
     def __len__(self):
         self.fetch()
-        return len(self._list)
+        return len(self.playlists)
 
     def __contains__(self, item):
         self.fetch()
-        return item in self._list
+        return item in self.playlists
 
     def __iter__(self):
         self.fetch()
@@ -80,4 +78,4 @@ cdef class RootList:
 
     def __repr__(self):
         self.fetch()
-        return '<RootList: %s>' % self._list
+        return '<RootList: %s>' % self.playlists

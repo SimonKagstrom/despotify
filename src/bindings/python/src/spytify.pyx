@@ -15,16 +15,24 @@ include "playlist.pxi"
 include "searchresult.pxi"
 
 cdef class Spytify:
+    """Class representing a connection to the Spotify service.
+    
+    This should be any scripts "entrypoint" into this module; any other
+    class will most likely be instantiated by this class and returned.
+    """
     def __init__(self, str user, str pw):
+        """Create a new Spytify instance, and connect to Spotify.
+
+        Args:
+            user: Username to authenticate with
+            pw: Password to authenticate with
+        """
         self._stored_playlists = None
 
         self.ds = despotify_init_client()
         if not self.ds:
             raise SpytifyError(despotify_get_error(self.ds))
 
-        self.authenticate(user, pw)
-
-    def authenticate(self, str user, str pw):
         if not despotify_authenticate(self.ds, user, pw):
             raise SpytifyError(despotify_get_error(self.ds))
 
@@ -40,6 +48,7 @@ cdef class Spytify:
             return self.create_track(despotify_get_current_track(self.ds))
 
     def flush_stored_playlists(self):
+        """Clear cached playlists."""
         self._stored_playlists = self.create_rootlist()
 
     def lookup(self, str uri):
@@ -73,6 +82,15 @@ cdef class Spytify:
             raise SpytifyError('URI specifies invalid type: %s' % type)
 
     def search(self, str searchtext, int max_hits=MAX_SEARCH_RESULTS):
+        """Search for a string like the normal Spotify client.
+
+        Args:
+            searchtext: What you want to search for. 
+                (http://www.spotify.com/blog/archives/2008/01/22/searching-spotify/)
+            max_hits: Max number of hits, cannot be higher than MAX_SEARCH_RESULTS in despotify.h.
+
+        Returns: None if search failed, a SearchResult if search was OK.
+        """
         cdef search_result* search = despotify_search(self.ds, searchtext, max_hits)
         if not search:
             return None
@@ -80,6 +98,12 @@ cdef class Spytify:
             return self.create_search_result(search, True)
 
     def play_list(self, Playlist playlist, Track starting_track=None):
+        """Play a playlist, continuing to the next song when finished.
+
+        Args:
+            playlist: Playlist to play from.
+            starting_track: If not None (default), then track to start playback from.
+        """
         cdef track* starting_track_ptr = playlist.data.tracks
         if starting_track is not None:
             starting_track_ptr = starting_track.data
@@ -88,22 +112,31 @@ cdef class Spytify:
             raise SpytifyError(despotify_get_error(self.ds))
 
     def play(self, Track track):
+        """Start playback of a given track.
+
+        Args:
+            track: Play this track.
+        """
         if not despotify_play(self.ds, track.data, False):
             raise SpytifyError(despotify_get_error(self.ds))
 
     def pause(self):
+        """Pause playback."""
         if not despotify_pause(self.ds):
             raise SpytifyError(despotify_get_error(self.ds))
 
     def resume(self):
+        """Resume playback after pausing."""
         if not despotify_resume(self.ds):
             raise SpytifyError(despotify_get_error(self.ds))
 
     def stop(self):
+        """Stop playback."""
         if not despotify_stop(self.ds):
             raise SpytifyError(despotify_get_error(self.ds))
 
     def close(self):
+        """Close the session with the server."""
         despotify_exit(self.ds)
 
 def bytestr_to_hexstr(str bytes):
