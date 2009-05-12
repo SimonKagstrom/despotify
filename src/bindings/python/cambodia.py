@@ -211,7 +211,7 @@ class SpotifySession(spytify.Spytify):
             playing = True
 
     def play(self, playlist, track):
-        self.session.play(playlist, track)
+        self.session.play(track)
         self.started = True
         self.playing = True
 
