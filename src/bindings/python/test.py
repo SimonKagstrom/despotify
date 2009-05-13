@@ -20,8 +20,7 @@ def print_track(track):
                                                          track.length, has_metadata)
 
 def main():
-    print "Enter your username: ",
-    username = sys.stdin.readline().strip()
+    username = raw_input("Enter your username: ").strip()
 
     if not username:
         print >>sys.stderr, "Empty username, exiting."

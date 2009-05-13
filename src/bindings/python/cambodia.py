@@ -15,6 +15,7 @@
 
 import spytify
 
+from getpass import getpass
 import urwid
 import urwid.curses_display
 
@@ -222,13 +223,9 @@ class SpotifySession(spytify.Spytify):
 ################################################################################
 # Manager
 class Manager:
-    def main(self, argv):
-        if len(argv) != 3:
-            print >>sys.stderr, 'Usage:', argv[0], 'username password'
-            return 1
-
+    def main(self, username, password):
         try:
-            self.session = SpotifySession(argv[1], argv[2])
+            self.session = SpotifySession(username, password)
 
             print 'All good, running GUI...'
             self.view = RootView(self.session)
@@ -285,4 +282,15 @@ class Manager:
                     self.session.stop()
 
 if __name__ == '__main__':
-    sys.exit(Manager().main(sys.argv))
+    username = raw_input("Enter your username: ").strip()
+
+    if not username:
+        print >>sys.stderr, "Empty username, exiting."
+        sys.exit(1)
+
+    password = getpass("Enter your password: ").strip()
+    if not password:
+        print >>sys.stderr, "Empty password, exiting."
+        sys.exit(1)
+
+    sys.exit(Manager().main(username, password))
