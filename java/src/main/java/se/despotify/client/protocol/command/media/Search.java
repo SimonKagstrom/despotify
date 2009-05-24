@@ -48,9 +48,11 @@ public class Search extends Command<Result> {
     /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
 
+    byte[] utf8Bytes = query.getBytes(Charset.forName("UTF8"));
+
     /* Create channel and buffer. */
     Channel channel = new Channel("Search-Channel", Channel.Type.TYPE_SEARCH, callback);
-    ByteBuffer buffer = ByteBuffer.allocate(2 + 4 + 4 + 2 + 1 + query.getBytes().length);
+    ByteBuffer buffer = ByteBuffer.allocate(2 + 4 + 4 + 2 + 1 + utf8Bytes.length);
 
     /* Check offset and limit. */
     if (offset < 0) {
@@ -64,7 +66,6 @@ public class Search extends Command<Result> {
     buffer.putInt(offset); /* Result offset. */
     buffer.putInt(maxResults); /* Reply limit. */
     buffer.putShort((short) 0x0000);
-    byte[] utf8Bytes = query.getBytes(Charset.forName("UTF8"));
     buffer.put((byte) utf8Bytes.length);
     buffer.put(utf8Bytes);
     buffer.flip();
