@@ -55,6 +55,8 @@ static void* despotify_thread(void* arg)
             DSFYfree(payload); /* Allocated in packet_read() */
         }
     }
+
+    return NULL;
 }
 
 struct despotify_session* despotify_init_client()
