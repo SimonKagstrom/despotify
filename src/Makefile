@@ -46,6 +46,9 @@ ifeq ($(firstword $(subst ., ,$(shell $(CC) -dumpversion))), 4)
 endif
 
 CLIENTS = clients/simple clients/gateway
+ifneq ($(NOGUI), 1)
+    CLIENTS += clients/maemify
+endif
 SUBDIRS = lib $(CLIENTS)
 
 .PHONY: all clean $(SUBDIRS) install uninstall
