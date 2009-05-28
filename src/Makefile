@@ -45,7 +45,7 @@ ifeq ($(firstword $(subst ., ,$(shell $(CC) -dumpversion))), 4)
     CFLAGS += -Wno-pointer-sign
 endif
 
-CLIENTS = clients/simple clients/gateway
+CLIENTS = clients/simple clients/gateway clients/despotify
 ifneq ($(NOGUI), 1)
     CLIENTS += clients/maemify
 endif
