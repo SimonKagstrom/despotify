@@ -9,7 +9,7 @@
 #include "ui.h"
 
 void sidebar_draw(ui_t *ui);
-int  sidebar_keypress(int ch);
+int  sidebar_keypress(wint_t ch, bool code);
 
 void sidebar_reset();
 

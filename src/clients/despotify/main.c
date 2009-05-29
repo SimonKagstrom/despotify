@@ -68,7 +68,7 @@ int main(int argc, char **argv)
   ui_init();
 
   // Main loop.
-  event_loop(-1);
+  int ret = event_loop(-1);
 
   // Cleanup UI.
   ui_cleanup();
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
   // Cleanup libdespotify.
   sess_cleanup();
 
-  return 0;
+  return ret;
 }
 
 // Main event handler. Reads keyboard input and updates screen output.
@@ -102,11 +102,12 @@ int event_handler(EVENT *e, enum ev_flags ev_kind)
     }
   }
   else if (ev_kind == EV_FD) {
-    int ch = getch();
-    if (ch == ERR)
-      return 1;
+    wint_t ch;
+    int type = get_wch(&ch);
+    if (type == ERR)
+      panic("Keyboard input error");
     else
-      ui_keypress(ch);
+      ui_keypress(ch, type == KEY_CODE_YES);
     event_mark_idle(e);
   }
 

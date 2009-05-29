@@ -8,32 +8,44 @@
 void help_draw(ui_t *ui)
 {
   // TODO: Print arguments.
+  unsigned int line = 0;
   wattron(ui->win, A_BOLD);
-  mvwprintw(ui->win,  0, 2, "Key     Command       Description");
+  mvwprintw(ui->win,   line, 2, "Key     Command         Description");
   wattroff(ui->win, A_BOLD);
 
-  mvwprintw(ui->win,  1, 2, ":                     Open command input");
-  mvwprintw(ui->win,  2, 2, "^D                    Cancel input");
-
-  mvwprintw(ui->win,  4, 2, "c       c/connect     (Re)connect to Spotify");
-  mvwprintw(ui->win,  5, 2, "d       d/disconnect  Disconnect from Spotify");
-  mvwprintw(ui->win,  6, 2, "/       s/search      Search");
-
-  mvwprintw(ui->win,  8, 2, "|       l/log         Display log");
-  mvwprintw(ui->win,  9, 2, "F1      ?/h/help      Display this text");
-  mvwprintw(ui->win, 10, 2, "Space   m/main        Return to main screen");
-
-  mvwprintw(ui->win, 12, 2, "^L      r/redraw      Force screen redraw");
-  mvwprintw(ui->win, 13, 2, "^Q      q/quit        Quit");
+  mvwprintw(ui->win, ++line, 2, ":                        Open command input");
+  mvwprintw(ui->win, ++line, 2, "^D                       Cancel input");
+  ++line;
+  mvwprintw(ui->win, ++line, 2, "c          c/connect     (Re)connect to Spotify");
+  mvwprintw(ui->win, ++line, 2, "d          d/disconnect  Disconnect from Spotify");
+  mvwprintw(ui->win, ++line, 2, "/          s/search      Search");
+  ++line;
+  mvwprintw(ui->win, ++line, 2, "Enter                    Play highlighted track");
+  mvwprintw(ui->win, ++line, 2, "Backspace  t/stop        Stop playback");
+  mvwprintw(ui->win, ++line, 2, "Space      p/pause       Toggle playback pause");
+  ++line;
+  mvwprintw(ui->win, ++line, 2, "|          l/log         Display log");
+  mvwprintw(ui->win, ++line, 2, "F1         ?/h/help      Display this text");
+  mvwprintw(ui->win, ++line, 2, "Esc        m/main        Return to main screen");
+  ++line;
+  mvwprintw(ui->win, ++line, 2, "^L         r/redraw      Force screen redraw");
+  mvwprintw(ui->win, ++line, 2, "^Q         q/quit        Quit");
 }
 
-int help_keypress(int ch)
+int help_keypress(wint_t ch, bool code)
 {
-  // TODO: Scrolling...
-  if (ch == ' ') {
-    ui_show(UI_SET_BROWSER);
-    return 0;
-  }
+  (void)code;
 
-  return ch;
+  // TODO: Scrolling...
+  switch (ch) {
+    case KEY_LEFT:
+    case KEY_RIGHT:
+    case KEY_ESC:
+    case 'D' - '@':
+      ui_show(UI_SET_BROWSER);
+      return 0;
+
+    default:
+      return ch;
+  }
 }

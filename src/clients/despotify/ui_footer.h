@@ -18,7 +18,7 @@ typedef enum input_type {
 } input_type_t;
 
 void footer_draw(ui_t *ui);
-int  footer_keypress(int ch);
+int  footer_keypress(wint_t ch, bool code);
 void footer_input(input_type_t type);
 
 #endif

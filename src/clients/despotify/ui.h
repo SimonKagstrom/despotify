@@ -6,6 +6,8 @@
 #ifndef DESPOTIFY_UI_H
 #define DESPOTIFY_UI_H
 
+
+#define _XOPEN_SOURCE_EXTENDED // wchar_t in ncurses.
 #include <ncurses.h>
 #include <stdbool.h>
 
@@ -41,7 +43,7 @@ typedef enum ui_set {
 
 struct ui;
 typedef void (*ui_draw_cb_t)(struct ui*);
-typedef int  (*ui_keypress_cb_t)(int);
+typedef int  (*ui_keypress_cb_t)(wint_t, bool);
 
 typedef struct ui {
   WINDOW       *win;
@@ -70,6 +72,6 @@ void ui_dirty(ui_elem_t dirty);
 void ui_focus(ui_elem_t focus);
 ui_elem_t ui_focused();
 
-void ui_keypress(int ch);
+void ui_keypress(wint_t ch, bool code);
 
 #endif

@@ -20,16 +20,18 @@ void sidebar_draw(ui_t *ui)
 
   // TODO: Scrolling.
   for (sess_search_t *s = g_session.search; s && line < ui->height; s = s->next) {
-    mvwprintw(ui->win, line, 0, "%.19s", s->res->query);
+    mvwprintw(ui->win, line, 0, "%.24s", s->res->query);
 
     if (line == g_pos)
-      mvwchgat(ui->win, line, 0, 19, (ui->flags & UI_FLAG_FOCUS ? A_REVERSE : A_BOLD), COLOR_PAIR(0), NULL);
+      mvwchgat(ui->win, line, 0, -1, (ui->flags & UI_FLAG_FOCUS ? A_REVERSE : A_BOLD), COLOR_PAIR(0), NULL);
     ++line;
   }
 }
 
-int sidebar_keypress(int ch)
+int sidebar_keypress(wint_t ch, bool code)
 {
+  (void)code;
+
   if (!g_session.search_len)
     return ch;
 

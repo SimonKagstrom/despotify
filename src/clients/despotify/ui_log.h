@@ -9,7 +9,7 @@
 #include "ui.h"
 
 void log_draw(ui_t *ui);
-int  log_keypress(int ch);
+int  log_keypress(wint_t ch, bool code);
 
 void log_append(const char *fmt, ...);
 

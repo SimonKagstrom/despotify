@@ -9,6 +9,6 @@
 #include "ui.h"
 
 void help_draw(ui_t *ui);
-int  help_keypress(int ch);
+int  help_keypress(wint_t ch, bool code);
 
 #endif

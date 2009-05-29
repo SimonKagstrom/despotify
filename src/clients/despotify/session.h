@@ -24,7 +24,9 @@ typedef struct session {
   struct despotify_session *dsfy;
   char *username;
   char *password;
-  // FIXME: Username/password may contain wide characters.
+
+  bool playing;
+  bool paused;
 
   sess_search_t *search;
   unsigned int   search_len;
@@ -40,5 +42,8 @@ void sess_username(const char *username);
 void sess_password(const char *password);
 
 void sess_search(const char *query);
+void sess_play(struct track *t);
+void sess_stop();
+void sess_pause();
 
 #endif

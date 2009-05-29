@@ -81,7 +81,7 @@ void ui_init()
   g_ui_elements[UI_SIDEBAR].win            = newwin(0, 0, 0, 0);
   g_ui_elements[UI_SIDEBAR].flags          = 0;
   g_ui_elements[UI_SIDEBAR].set            = UI_SET_BROWSER;
-  g_ui_elements[UI_SIDEBAR].fixed_width    = 20;
+  g_ui_elements[UI_SIDEBAR].fixed_width    = 25;
   g_ui_elements[UI_SIDEBAR].fixed_height   = 0;
   g_ui_elements[UI_SIDEBAR].draw_cb        = sidebar_draw;
   g_ui_elements[UI_SIDEBAR].keypress_cb    = sidebar_keypress;
@@ -185,13 +185,12 @@ void ui_balance()
       ui->width = setwidth[ui->set];
   }
   
-  // Stack elements. Begin at second entry, first element is always at (0, 0).
-  // Set all dynamic elements at same y-position, only one horizontal set will
-  // be visible at a time.
-  unsigned int scry = g_ui_elements[0].height,
+  // Stack elements. Set all dynamic elements at same y-position, only one
+  // horizontal set will be visible at a time.
+  unsigned int scry = 0,
                staty = 0,
                setx[UI_SET_END] = { };
-  UI_FOREACH_START(g_ui_elements, ui, 1) {
+  UI_FOREACH(g_ui_elements, ui) {
     // Resize and mark dirty.
     wresize(ui->win, ui->height, ui->width);
     ui->flags |= UI_FLAG_DIRTY;
@@ -305,7 +304,7 @@ ui_elem_t ui_focused()
 }
 
 // Handle keyboard bindings and redirect keypresses to focused UI element.
-void ui_keypress(int ch)
+void ui_keypress(wint_t ch, bool code)
 {
   // Very special keys.
   switch (ch) {
@@ -325,7 +324,7 @@ void ui_keypress(int ch)
   }
 
   // Forward regular keys to focused element.
-  ch = g_ui_elements[g_ui_focus].keypress_cb(ch);
+  ch = g_ui_elements[g_ui_focus].keypress_cb(ch, code);
 
   if (!ch)
     return;
@@ -339,6 +338,14 @@ void ui_keypress(int ch)
     case '/':
       footer_input(INPUT_SEARCH);
       return;
+
+    case KEY_BACKSPACE:
+      cmd_cb_stop();
+      return;
+
+    case ' ':
+      cmd_cb_pause();
+      break;
 
     case '|':
       ui_show(UI_SET_LOG);

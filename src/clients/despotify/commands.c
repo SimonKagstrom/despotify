@@ -28,6 +28,16 @@ void cmd_cb_search()
   footer_input(INPUT_SEARCH);
 }
 
+void cmd_cb_stop()
+{
+  sess_stop();
+}
+
+void cmd_cb_pause()
+{
+  sess_pause();
+}
+
 void cmd_cb_log()
 {
   ui_show(UI_SET_LOG);
@@ -67,6 +77,10 @@ static cmd_t g_commands[] = {
   { "d",          0, cmd_cb_disconnect },
   { "search",     0, cmd_cb_search     },
   { "s",          0, cmd_cb_search     },
+  { "stop",       0, cmd_cb_stop       },
+  { "t",          0, cmd_cb_stop       },
+  { "pause",      0, cmd_cb_pause      },
+  { "p",          0, cmd_cb_pause      },
   { "log",        0, cmd_cb_log        },
   { "l",          0, cmd_cb_log        },
   { "help",       0, cmd_cb_help       },

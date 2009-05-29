@@ -70,7 +70,7 @@ void sess_connect()
 void sess_disconnect()
 {
   if (g_session.state == SESS_ONLINE) {
-    despotify_stop(g_session.dsfy);
+    sess_stop();
     despotify_exit(g_session.dsfy);
     log_append("Disconnected");
   }
@@ -105,7 +105,7 @@ void sess_search(const char *query)
   }
 
   log_append("Searching for: \"%s\"", query);
-  struct search_result *sr = despotify_search(g_session.dsfy, (char*)query, 20);
+  struct search_result *sr = despotify_search(g_session.dsfy, (char*)query, 100);
   log_append("Got %d/%d tracks", sr->playlist->num_tracks, sr->total_tracks);
 
   sess_search_t *prev = g_session.search;
@@ -116,6 +116,47 @@ void sess_search(const char *query)
   ++g_session.search_len;
 
   sidebar_reset();
+}
+
+// Start playback.
+void sess_play(struct track *t)
+{
+  if (g_session.state != SESS_ONLINE) {
+    log_append("Not connected");
+    return;
+  }
+
+  if (despotify_play(g_session.dsfy, t, true)) {
+    g_session.playing = true;
+    g_session.paused = false;
+    log_append("Playing %s", t->title);
+  }
+  else
+    log_append("Playback failed");
+}
+
+// Stop playback.
+void sess_stop()
+{
+  if (g_session.state != SESS_ONLINE)
+    return;
+
+  g_session.playing = false;
+  despotify_stop(g_session.dsfy);
+}
+
+// Toggle playback pause.
+void sess_pause()
+{
+  if (!g_session.playing)
+    return;
+
+  if (g_session.paused)
+    g_session.paused = !despotify_resume(g_session.dsfy);
+  else {
+    g_session.playing = despotify_pause(g_session.dsfy);
+    g_session.paused = true;
+  }
 }
 
 static void sess_callback(int signal, void *data)

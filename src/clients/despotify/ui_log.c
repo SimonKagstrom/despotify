@@ -31,15 +31,22 @@ void log_draw(ui_t *ui)
   }
 }
 
-int log_keypress(int ch)
+int log_keypress(wint_t ch, bool code)
 {
-  // TODO: Scolling...
-  if (ch == ' ') {
-    ui_show(UI_SET_BROWSER);
-    return 0;
-  }
+  (void)code;
 
-  return ch;
+  // TODO: Scrolling...
+  switch (ch) {
+    case KEY_LEFT:
+    case KEY_RIGHT:
+    case KEY_ESC:
+    case 'D' - '@':
+      ui_show(UI_SET_BROWSER);
+      return 0;
+
+    default:
+      return ch;
+  }
 }
 
 void log_append(const char *fmt, ...)

@@ -9,6 +9,8 @@
 void cmd_cb_connect();
 void cmd_cb_disconnect();
 void cmd_cb_search();
+void cmd_cb_stop();
+void cmd_cb_pause();
 void cmd_cb_log();
 void cmd_cb_help();
 void cmd_cb_main();
