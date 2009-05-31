@@ -15,6 +15,7 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include <wchar.h>
 
 #ifdef MAEMO4
 #include <hildon/hildon-window.h>
@@ -81,6 +82,9 @@ enum
   N_COLUMNS
 };
 
+/* these are global to allow the callback to access them */
+static struct playlist* lastlist = NULL;
+static int listoffset = 0;
 
 /* Forward declarations */
 static void init_list(GtkWidget *list);
@@ -98,6 +102,7 @@ static void create_menu(HildonWindow * main_window);
 bool despotify_deinit(AppData* appdata);
 bool on_insert_text(GtkEntry* entry, GdkEventKey *event, AppData* appdata);
 void do_search(gchar* searchstring, AppData* appdata);
+void callback(int signal, void* data);
 
 int main(int argc, char *argv[])
 {
@@ -163,7 +168,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    appdata->ds = despotify_init_client();
+    appdata->ds = despotify_init_client(callback);
     if (!appdata->ds) {
         printf("despotify_init_client() failed\n");
         return 1;
@@ -501,3 +506,23 @@ static void create_menu(HildonWindow * main_window)
     gtk_widget_show_all(GTK_WIDGET(main_menu));
 }
 #endif
+
+
+void callback(int signal, void* data)
+{
+    (void)data;
+
+    switch (signal) {
+        case DESPOTIFY_TRACK_CHANGE:
+            listoffset++;
+            struct track* t = lastlist->tracks;
+            for (int i=1; i<listoffset && t; i++)
+                t = t->next;
+            if (t)
+                wprintf(L"New track: %d: %s / %s (%d:%02d)\n",
+                        listoffset, t->title, t->artist->name,
+                        t->length / 60000, t->length % 60000 / 1000);
+            break;
+    }
+}
+

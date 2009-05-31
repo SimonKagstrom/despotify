@@ -45,9 +45,9 @@ ifeq ($(firstword $(subst ., ,$(shell $(CC) -dumpversion))), 4)
     CFLAGS += -Wno-pointer-sign
 endif
 
-CLIENTS = clients/simple clients/gateway clients/despotify
+CLIENTS = clients/simple clients/gateway
 ifneq ($(NOGUI), 1)
-    CLIENTS += clients/maemify
+    CLIENTS += clients/despotify clients/maemify
 endif
 SUBDIRS = lib $(CLIENTS)
 
