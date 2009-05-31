@@ -940,12 +940,3 @@ SPOTIFYSESSION *spotify_find_http_client (void)
 
 	return NULL;
 }
-
-void app_packet_callback (SESSION * s, int cmd, unsigned char *payload,
-			  int len)
-{
-	(void) s;
-	(void) cmd;
-	(void) payload;
-	(void) len;
-}
