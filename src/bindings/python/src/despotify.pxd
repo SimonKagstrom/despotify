@@ -1,5 +1,6 @@
 cdef extern from "despotify.h":
     int MAX_SEARCH_RESULTS
+    int DESPOTIFY_TRACK_CHANGE
 
     cdef enum link_type:
         LINK_TYPE_INVALID = 0
@@ -121,11 +122,15 @@ cdef extern from "despotify.h":
         bint list_of_lists
         bint play_as_list
 
+        void (*client_callback)(int, void*)
+
+
     bint despotify_init()
     char * despotify_get_error(despotify_session *)
     bint despotify_cleanup()
 
-    despotify_session * despotify_init_client()
+    despotify_session *despotify_init_client(void(*)(int, void*))
+
     bint despotify_authenticate(despotify_session *, char *, char *)
     void despotify_exit(despotify_session *)
     void despotify_free(despotify_session *, bint)

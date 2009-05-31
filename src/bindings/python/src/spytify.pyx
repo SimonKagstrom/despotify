@@ -29,7 +29,7 @@ cdef class Spytify:
         """
         self._stored_playlists = None
 
-        self.ds = despotify_init_client()
+        self.ds = despotify_init_client(NULL)
         if not self.ds:
             raise SpytifyError(despotify_get_error(self.ds))
 
