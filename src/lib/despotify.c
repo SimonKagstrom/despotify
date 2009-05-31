@@ -59,7 +59,7 @@ static void* despotify_thread(void* arg)
     return NULL;
 }
 
-struct despotify_session* despotify_init_client(void(*callback)(int, void*))
+struct despotify_session* despotify_init_client(void(*callback)(struct despotify_session*, int, void*, void*), void* callback_data)
 {
     struct despotify_session* ds = calloc(1,sizeof(struct despotify_session));
     if (!ds)
@@ -74,6 +74,7 @@ struct despotify_session* despotify_init_client(void(*callback)(int, void*))
 
     ds->user_info = &ds->session->user_info;
     ds->client_callback = callback;
+    ds->client_callback_data = callback_data;
 
     return ds;
 }
@@ -366,7 +367,7 @@ static int despotify_snd_end_callback(void* arg)
 
         /* notify client */
         if (ds->client_callback)
-            ds->client_callback(DESPOTIFY_TRACK_CHANGE, NULL);
+            ds->client_callback(ds, DESPOTIFY_TRACK_CHANGE, NULL, ds->client_callback_data);
     }
 
     return error;

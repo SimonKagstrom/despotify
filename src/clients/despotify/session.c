@@ -15,7 +15,7 @@
 
 session_t g_session;
 
-static void sess_callback(int signal, void *data);
+static void sess_callback(struct despotify_session *ds, int signal, void *data, void *callback_data);
 
 void sess_init()
 {
@@ -45,7 +45,7 @@ void sess_connect()
 
   sess_disconnect();
 
-  if (!(g_session.dsfy = despotify_init_client(sess_callback)))
+  if (!(g_session.dsfy = despotify_init_client(sess_callback, NULL)))
     panic("despotify_init_client(...) failed");
 
   // Login with credentials set by sess_username/sess_password.
@@ -165,9 +165,9 @@ void sess_pause()
   }
 }
 
-static void sess_callback(int signal, void *data)
+static void sess_callback(struct despotify_session* ds, int signal, void *data, void* callback_data)
 {
-  (void)data;
+  (void)data; (void)ds; (void)callback_data;
 
   switch (signal) {
     case DESPOTIFY_TRACK_CHANGE:

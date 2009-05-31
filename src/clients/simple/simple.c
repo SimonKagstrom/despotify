@@ -530,9 +530,9 @@ void command_loop(struct despotify_session* ds)
         despotify_free_album_browse(playalbum);
 }
 
-void callback(int signal, void* data)
+void callback(struct despotify_session* ds, int signal, void* data, void* callback_data)
 {
-    (void)data;
+    (void)data; (void)ds; (void)callback_data;
 
     switch (signal) {
         case DESPOTIFY_TRACK_CHANGE:
@@ -563,7 +563,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    struct despotify_session* ds = despotify_init_client(callback);
+    struct despotify_session* ds = despotify_init_client(callback, NULL);
     if (!ds) {
         wprintf(L"despotify_init_client() failed\n");
         return 1;

@@ -102,7 +102,7 @@ static void create_menu(HildonWindow * main_window);
 bool despotify_deinit(AppData* appdata);
 bool on_insert_text(GtkEntry* entry, GdkEventKey *event, AppData* appdata);
 void do_search(gchar* searchstring, AppData* appdata);
-void callback(int signal, void* data);
+void callback(struct despotify_session* ds, int signal, void* data, void* callback_data);
 
 int main(int argc, char *argv[])
 {
@@ -508,9 +508,9 @@ static void create_menu(HildonWindow * main_window)
 #endif
 
 
-void callback(int signal, void* data)
+void callback(struct despotify_session* ds, int signal, void* data, void* callback_data)
 {
-    (void)data;
+    (void)data; (void)ds; (void)callback_data;
 
     switch (signal) {
       case DESPOTIFY_TRACK_CHANGE:

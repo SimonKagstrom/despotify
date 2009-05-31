@@ -157,7 +157,8 @@ struct despotify_session
     bool play_as_list;
 
     /* client callback */
-    void(*client_callback)(int,void*);
+    void(*client_callback)(struct despotify_session*, int, void*, void*);
+    void *client_callback_data;
 };
 
 /* callback signals */
@@ -168,7 +169,7 @@ bool despotify_init(void);
 bool despotify_cleanup(void);
 
 /* Session stuff. */
-struct despotify_session *despotify_init_client(void(*callback)(int, void*));
+struct despotify_session *despotify_init_client(void(*callback)(struct despotify_session*, int, void*, void*), void*);
 
 void despotify_exit(struct despotify_session *ds);
 
