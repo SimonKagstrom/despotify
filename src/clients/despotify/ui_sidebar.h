@@ -8,6 +8,7 @@
 
 #include "ui.h"
 
+void sidebar_init(ui_t *ui);
 void sidebar_draw(ui_t *ui);
 int  sidebar_keypress(wint_t ch, bool code);
 

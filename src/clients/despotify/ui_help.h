@@ -8,6 +8,7 @@
 
 #include "ui.h"
 
+void help_init(ui_t *ui);
 void help_draw(ui_t *ui);
 int  help_keypress(wint_t ch, bool code);
 

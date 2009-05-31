@@ -13,6 +13,7 @@
 #include "ui_help.h"
 #include "ui_log.h"
 #include "ui_sidebar.h"
+#include "ui_splash.h"
 #include "ui_tracklist.h"
 
 #define UI_FOREACH_START_END(uis, var, start, end) for (ui_t *var = &uis[start], *_i = (ui_t*)start; \
@@ -25,11 +26,7 @@ static ui_t      g_ui_elements[UI_END];
 static int       g_stdscr_initialized = 0;
 static ui_elem_t g_ui_focus;
 
-// Draw header UI element.
-static void header_draw(ui_t *ui)
-{
-  mvwprintw(ui->win, 0, DSFY_MAX(0, ((signed)ui->width - 5) / 2), "despotify");
-}
+extern session_t g_session;
 
 // Draw playback status placeholder.
 static void player_draw(ui_t *ui)
@@ -44,6 +41,21 @@ void stdscr_init()
     return;
 
   initscr();
+
+  if (has_colors()
+      && start_color() == OK
+      && use_default_colors() == OK) {
+    // Define some more comfortable colors if supported.
+    if (can_change_color()) {
+      init_color(COLOR_BLACK, 256, 256, 256); // Dark gray
+      init_color(COLOR_RED,   384,   0,   0); // Dark red
+    }
+
+    init_pair(UI_STYLE_NORMAL, -1, -1);
+    init_pair(UI_STYLE_DIM, COLOR_BLACK, -1);
+    init_pair(UI_STYLE_NA, COLOR_RED, -1);
+  }
+
   raw();
   noecho();
   nodelay(stdscr, TRUE);
@@ -70,45 +82,13 @@ void ui_init()
 {
   stdscr_init();
 
-  g_ui_elements[UI_HEADER].win             = newwin(0, 0, 0, 0);
-  g_ui_elements[UI_HEADER].flags           = 0;
-  g_ui_elements[UI_HEADER].set             = UI_SET_NONE;
-  g_ui_elements[UI_HEADER].fixed_width     = 0;
-  g_ui_elements[UI_HEADER].fixed_height    = 1;
-  g_ui_elements[UI_HEADER].draw_cb         = header_draw;
-  g_ui_elements[UI_HEADER].keypress_cb     = 0;
-
-  g_ui_elements[UI_SIDEBAR].win            = newwin(0, 0, 0, 0);
-  g_ui_elements[UI_SIDEBAR].flags          = 0;
-  g_ui_elements[UI_SIDEBAR].set            = UI_SET_BROWSER;
-  g_ui_elements[UI_SIDEBAR].fixed_width    = 25;
-  g_ui_elements[UI_SIDEBAR].fixed_height   = 0;
-  g_ui_elements[UI_SIDEBAR].draw_cb        = sidebar_draw;
-  g_ui_elements[UI_SIDEBAR].keypress_cb    = sidebar_keypress;
-
-  g_ui_elements[UI_TRACKLIST].win          = newwin(0, 0, 0, 0);
-  g_ui_elements[UI_TRACKLIST].flags        = 0;
-  g_ui_elements[UI_TRACKLIST].set          = UI_SET_BROWSER;
-  g_ui_elements[UI_TRACKLIST].fixed_width  = 0;
-  g_ui_elements[UI_TRACKLIST].fixed_height = 0;
-  g_ui_elements[UI_TRACKLIST].draw_cb      = tracklist_draw;
-  g_ui_elements[UI_TRACKLIST].keypress_cb  = tracklist_keypress;
-
-  g_ui_elements[UI_LOG].win                = newwin(0, 0, 0, 0);
-  g_ui_elements[UI_LOG].flags              = 0;
-  g_ui_elements[UI_LOG].set                = UI_SET_LOG;
-  g_ui_elements[UI_LOG].fixed_width        = 0;
-  g_ui_elements[UI_LOG].fixed_height       = 0;
-  g_ui_elements[UI_LOG].draw_cb            = log_draw;
-  g_ui_elements[UI_LOG].keypress_cb        = log_keypress;
-
-  g_ui_elements[UI_HELP].win               = newwin(0, 0, 0, 0);
-  g_ui_elements[UI_HELP].flags             = 0;
-  g_ui_elements[UI_HELP].set               = UI_SET_HELP;
-  g_ui_elements[UI_HELP].fixed_width       = 0;
-  g_ui_elements[UI_HELP].fixed_height      = 0;
-  g_ui_elements[UI_HELP].draw_cb           = help_draw;
-  g_ui_elements[UI_HELP].keypress_cb       = help_keypress;
+  splash_init(&g_ui_elements[UI_SPLASH]);
+  sidebar_init(&g_ui_elements[UI_SIDEBAR]);
+  tracklist_init(&g_ui_elements[UI_TRACKLIST]);
+  log_init(&g_ui_elements[UI_LOG]);
+  help_init(&g_ui_elements[UI_HELP]);
+  //player_init(&g_ui_elements[UI_PLAYER]);
+  footer_init(&g_ui_elements[UI_FOOTER]);
 
   g_ui_elements[UI_PLAYER].win             = newwin(0, 0, 0, 0);
   g_ui_elements[UI_PLAYER].flags           = 0;
@@ -117,14 +97,6 @@ void ui_init()
   g_ui_elements[UI_PLAYER].fixed_height    = 3;
   g_ui_elements[UI_PLAYER].draw_cb         = player_draw;
   g_ui_elements[UI_PLAYER].keypress_cb     = 0;
-
-  g_ui_elements[UI_FOOTER].win             = newwin(0, 0, 0, 0);
-  g_ui_elements[UI_FOOTER].flags           = 0;
-  g_ui_elements[UI_FOOTER].set             = UI_SET_NONE;
-  g_ui_elements[UI_FOOTER].fixed_width     = 0;
-  g_ui_elements[UI_FOOTER].fixed_height    = 1;
-  g_ui_elements[UI_FOOTER].draw_cb         = footer_draw;
-  g_ui_elements[UI_FOOTER].keypress_cb     = footer_keypress;
 
   ui_show(UI_SET_BROWSER);
   ui_balance();
@@ -150,7 +122,6 @@ void ui_balance()
   ioctl(0, TIOCGWINSZ, &ws);
   resizeterm(ws.ws_row, ws.ws_col);
   unsigned int scrwidth = ws.ws_col, scrheight = ws.ws_row;
-
 
   // Set size for fixed-height elements.
   UI_FOREACH(g_ui_elements, ui) {
@@ -184,11 +155,12 @@ void ui_balance()
     if (ui->set > UI_SET_NONE && !ui->fixed_width)
       ui->width = setwidth[ui->set];
   }
-  
+
   // Stack elements. Set all dynamic elements at same y-position, only one
   // horizontal set will be visible at a time.
+  bool dyny_set = false;
   unsigned int scry = 0,
-               staty = 0,
+               dyny = 0,
                setx[UI_SET_END] = { };
   UI_FOREACH(g_ui_elements, ui) {
     // Resize and mark dirty.
@@ -201,11 +173,12 @@ void ui_balance()
       scry += ui->height;
     }
     else {
-      if (!staty) {
-        staty = scry;
+      if (!dyny_set) {
+        dyny = scry;
         scry += ui->height;
+        dyny_set = true;
       }
-      mvwin(ui->win, staty, setx[ui->set]);
+      mvwin(ui->win, dyny, setx[ui->set]);
       setx[ui->set] += ui->width;
     }
   }
@@ -245,6 +218,10 @@ void ui_update(bool redraw)
 // Show and focus a UI element set. Elements in current visible set will be disabled.
 void ui_show(ui_set_t show)
 {
+  // Default to splash screen when disconnected.
+  if (show == UI_SET_BROWSER && g_session.state != SESS_ONLINE)
+    show = UI_SET_SPLASH;
+
   bool focused = false;
 
   for (ui_elem_t i = 0; i < UI_END; ++i) {
@@ -317,10 +294,6 @@ void ui_keypress(wint_t ch, bool code)
     case 'L' - '@':
       event_msg_post(MSG_CLASS_APP, MSG_APP_REDRAW, NULL);
       return;
-
-    case KEY_F(1):
-      ui_show(UI_SET_HELP);
-      return;
   }
 
   // Forward regular keys to focused element.
@@ -331,6 +304,12 @@ void ui_keypress(wint_t ch, bool code)
 
   // Check remaining keys. Text input will override most of these.
   switch (ch) {
+    case '?':
+    case 'h':
+    case KEY_F(1):
+      ui_show(UI_SET_HELP);
+      return;
+
     case ':':
       footer_input(INPUT_COMMAND);
       return;
@@ -351,11 +330,11 @@ void ui_keypress(wint_t ch, bool code)
       ui_show(UI_SET_LOG);
       return;
 
-    case 'c':
+    case 'E' - '@':
       cmd_cb_connect();
       return;
 
-    case 'd':
+    case 'W' - '@':
       cmd_cb_disconnect();
       return;
   }

@@ -28,6 +28,17 @@ static char *g_titles[INPUT_END] = { 0, "command", "search", "username", "passwo
 
 extern session_t g_session;
 
+void footer_init(ui_t *ui)
+{
+  ui->win          = newwin(0, 0, 0, 0);
+  ui->flags        = 0;
+  ui->set          = UI_SET_NONE;
+  ui->fixed_width  = 0;
+  ui->fixed_height = 1;
+  ui->draw_cb      = footer_draw;
+  ui->keypress_cb  = footer_keypress;
+}
+
 void footer_draw(ui_t *ui)
 {
   // Print status info by default.
@@ -188,6 +199,7 @@ void footer_input(input_type_t type)
       ui_focus(g_input.prev_focus);
       ui_dirty(UI_FOOTER);
 
+      // FIXME: Convert to UTF-8, don't rely on env locale.
       wcstombs(g_input.cbuf, g_input.wbuf, sizeof(g_input.cbuf));
 
       switch (cur_type) {

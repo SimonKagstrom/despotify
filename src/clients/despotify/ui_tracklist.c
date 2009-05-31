@@ -19,12 +19,20 @@ static int g_availy = 10;
 // Current search result.
 static struct search_result *g_res = 0;
 
+void tracklist_init(ui_t *ui)
+{
+  ui->win          = newwin(0, 0, 0, 0);
+  ui->flags        = 0;
+  ui->set          = UI_SET_BROWSER;
+  ui->fixed_width  = 0;
+  ui->fixed_height = 0;
+  ui->draw_cb      = tracklist_draw;
+  ui->keypress_cb  = tracklist_keypress;
+}
+
 // Print tracks in search result.
 void tracklist_draw(ui_t *ui)
 {
-  if (!g_res)
-    return;
-
   int i = 0, line = 0;
   g_availy = ui->height - 2;
 
@@ -33,7 +41,10 @@ void tracklist_draw(ui_t *ui)
 
   mvwprintw(ui->win, 0, 0, "%3s %-*.*s %-*.*sLength", "#",
       slen, slen, "Title", slen, slen, "Artist");
-  mvwchgat(ui->win, 0, 0, -1, A_UNDERLINE, COLOR_PAIR(0), NULL);
+  mvwchgat(ui->win, 0, 0, -1, A_BOLD, UI_STYLE_DIM, NULL);
+
+  if (!g_res)
+    return;
 
   if (g_res->playlist->num_tracks) {
     struct track *t = g_res->playlist->tracks;
@@ -61,25 +72,18 @@ void tracklist_draw(ui_t *ui)
       if (i + line == g_pos)
         mvwchgat(ui->win, line + 1, 0, -1,
             (ui->flags & UI_FLAG_FOCUS ? A_REVERSE : A_BOLD),
-            COLOR_PAIR(0), NULL);
+            (t->playable ? UI_STYLE_NORMAL : UI_STYLE_NA), NULL);
 
       ++line;
     }
   }
 
-  // Combine bottom line with possible attributes from last track in list.
-  mvwchgat(ui->win, g_availy, 0, -1,
-      A_UNDERLINE | (line == g_availy && (i + line - 1 == g_pos) ?
-        (ui->flags & UI_FLAG_FOCUS ? A_REVERSE : A_BOLD) : 0),
-      COLOR_PAIR(0), NULL);
-
   // Additional info at bottom.
-  wattron(ui->win, A_DIM);
   mvwprintw(ui->win, ui->height - 1, 0, "Query: <%s> Hits: %d/%d",
       g_res->query,
       g_res->playlist->num_tracks,
       g_res->total_tracks);
-  wattroff(ui->win, A_DIM);
+  mvwchgat(ui->win, ui->height - 1, 0, -1, A_BOLD, UI_STYLE_DIM, NULL);
 }
 
 int tracklist_keypress(wint_t ch, bool code)

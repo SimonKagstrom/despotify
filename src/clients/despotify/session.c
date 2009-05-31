@@ -53,6 +53,8 @@ void sess_connect()
     g_session.state = SESS_ERROR;
     log_append(despotify_get_error(g_session.dsfy));
     despotify_exit(g_session.dsfy);
+    // Switch to log view.
+    ui_show(UI_SET_LOG);
   }
   else {
     g_session.state = SESS_ONLINE;
@@ -61,6 +63,8 @@ void sess_connect()
         g_session.dsfy->user_info->server_host,
         g_session.dsfy->user_info->server_port,
         g_session.dsfy->user_info->country);
+    // Switch to browser view.
+    ui_show(UI_SET_BROWSER);
   }
 
   // Redraw status info.
@@ -73,6 +77,8 @@ void sess_disconnect()
     sess_stop();
     despotify_exit(g_session.dsfy);
     log_append("Disconnected");
+    // Return to splash screen.
+    ui_show(UI_SET_SPLASH);
   }
 
   g_session.state = SESS_OFFLINE;
@@ -104,7 +110,7 @@ void sess_search(const char *query)
     return;
   }
 
-  log_append("Searching for: \"%s\"", query);
+  log_append("Searching for: <%s>", query);
   struct search_result *sr = despotify_search(g_session.dsfy, (char*)query, 100);
   log_append("Got %d/%d tracks", sr->playlist->num_tracks, sr->total_tracks);
 

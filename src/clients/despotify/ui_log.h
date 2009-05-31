@@ -8,6 +8,7 @@
 
 #include "ui.h"
 
+void log_init(ui_t *ui);
 void log_draw(ui_t *ui);
 int  log_keypress(wint_t ch, bool code);
 

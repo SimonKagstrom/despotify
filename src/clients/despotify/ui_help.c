@@ -5,31 +5,46 @@
 
 #include "ui_help.h"
 
+#define HELP_HEIGHT 18
+#define HELP_WIDTH  48
+
+void help_init(ui_t *ui)
+{
+  ui->win          = newwin(0, 0, 0, 0);
+  ui->flags        = 0;
+  ui->set          = UI_SET_HELP;
+  ui->fixed_width  = 0;
+  ui->fixed_height = 0;
+  ui->draw_cb      = help_draw;
+  ui->keypress_cb  = help_keypress;
+}
+
 void help_draw(ui_t *ui)
 {
   // TODO: Print arguments.
-  unsigned int line = 0;
-  wattron(ui->win, A_BOLD);
-  mvwprintw(ui->win,   line, 2, "Key     Command         Description");
-  wattroff(ui->win, A_BOLD);
+  int line = DSFY_MAX((ui->height - HELP_HEIGHT) / 2, 0);
+  int x = DSFY_MAX((ui->width - HELP_WIDTH) / 2, 0);
 
-  mvwprintw(ui->win, ++line, 2, ":                        Open command input");
-  mvwprintw(ui->win, ++line, 2, "^D                       Cancel input");
+  mvwprintw(ui->win,   line, x, "Key        Command       Description");
+  mvwchgat(ui->win,    line, x, -1, A_BOLD, UI_STYLE_DIM, NULL);
+
+  mvwprintw(ui->win, ++line, x, ":                        Open command input");
+  mvwprintw(ui->win, ++line, x, "^D                       Cancel input");
   ++line;
-  mvwprintw(ui->win, ++line, 2, "c          c/connect     (Re)connect to Spotify");
-  mvwprintw(ui->win, ++line, 2, "d          d/disconnect  Disconnect from Spotify");
-  mvwprintw(ui->win, ++line, 2, "/          s/search      Search");
+  mvwprintw(ui->win, ++line, x, "^E         c/connect     (Re)connect to Spotify");
+  mvwprintw(ui->win, ++line, x, "^W         d/disconnect  Disconnect from Spotify");
+  mvwprintw(ui->win, ++line, x, "/          s/search      Search");
   ++line;
-  mvwprintw(ui->win, ++line, 2, "Enter                    Play highlighted track");
-  mvwprintw(ui->win, ++line, 2, "Backspace  t/stop        Stop playback");
-  mvwprintw(ui->win, ++line, 2, "Space      p/pause       Toggle playback pause");
+  mvwprintw(ui->win, ++line, x, "Enter                    Play highlighted track");
+  mvwprintw(ui->win, ++line, x, "Backspace  t/stop        Stop playback");
+  mvwprintw(ui->win, ++line, x, "Space      p/pause       Toggle playback pause");
   ++line;
-  mvwprintw(ui->win, ++line, 2, "|          l/log         Display log");
-  mvwprintw(ui->win, ++line, 2, "F1         ?/h/help      Display this text");
-  mvwprintw(ui->win, ++line, 2, "Esc        m/main        Return to main screen");
+  mvwprintw(ui->win, ++line, x, "|          l/log         Display log");
+  mvwprintw(ui->win, ++line, x, "F1         ?/h/help      Display this text");
+  mvwprintw(ui->win, ++line, x, "Esc        m/main        Return to main screen");
   ++line;
-  mvwprintw(ui->win, ++line, 2, "^L         r/redraw      Force screen redraw");
-  mvwprintw(ui->win, ++line, 2, "^Q         q/quit        Quit");
+  mvwprintw(ui->win, ++line, x, "^L         r/redraw      Force screen redraw");
+  mvwprintw(ui->win, ++line, x, "^Q         q/quit        Quit");
 }
 
 int help_keypress(wint_t ch, bool code)

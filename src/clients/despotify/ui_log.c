@@ -20,6 +20,17 @@ typedef struct entry {
 
 static entry_t *g_last_entry = 0;
 
+void log_init(ui_t *ui)
+{
+  ui->win          = newwin(0, 0, 0, 0);
+  ui->flags        = 0;
+  ui->set          = UI_SET_LOG;
+  ui->fixed_width  = 0;
+  ui->fixed_height = 0;
+  ui->draw_cb      = log_draw;
+  ui->keypress_cb  = log_keypress;
+}
+
 void log_draw(ui_t *ui)
 {
   // Draw as many entries as we can fit inside the window.

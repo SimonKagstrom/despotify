@@ -12,7 +12,7 @@ NCURSES_INCLUDE ?= /usr/include/ncursesw
 CFLAGS += -I$(LIBDIR) -I$(NCURSES_INCLUDE)
 LDFLAGS += -lncursesw
 
-DESPOTIFY_OBJS = commands.o event.o main.o session.o ui.o ui_footer.o ui_help.o ui_log.o ui_sidebar.o ui_tracklist.o
+DESPOTIFY_OBJS = commands.o event.o main.o session.o ui.o ui_footer.o ui_help.o ui_log.o ui_sidebar.o ui_splash.o ui_tracklist.o
 
 .PHONY: all clean install uninstall
 all: despotify 

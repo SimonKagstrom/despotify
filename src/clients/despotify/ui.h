@@ -16,6 +16,12 @@
 
 #define KEY_ESC 0x1b
 
+enum {
+  UI_STYLE_NORMAL = 0,
+  UI_STYLE_DIM,
+  UI_STYLE_NA
+};
+
 typedef enum ui_flags {
   UI_FLAG_OFFSCREEN = 1 << 0,
   UI_FLAG_FOCUS     = 1 << 1,
@@ -23,7 +29,7 @@ typedef enum ui_flags {
 } ui_flags_t;
 
 typedef enum ui_elem {
-  UI_HEADER = 0,
+  UI_SPLASH = 0,
   UI_SIDEBAR,
   UI_TRACKLIST,
   UI_LOG,
@@ -35,6 +41,7 @@ typedef enum ui_elem {
 
 typedef enum ui_set {
   UI_SET_NONE,
+  UI_SET_SPLASH,
   UI_SET_BROWSER,
   UI_SET_LOG,
   UI_SET_HELP,

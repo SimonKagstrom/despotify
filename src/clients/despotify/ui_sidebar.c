@@ -13,16 +13,30 @@ extern session_t g_session;
 // Cursor position.
 static unsigned int g_pos = ~0;
 
+void sidebar_init(ui_t *ui)
+{
+  ui->win          = newwin(0, 0, 0, 0);
+  ui->flags        = 0;
+  ui->set          = UI_SET_BROWSER;
+  ui->fixed_width  = 25;
+  ui->fixed_height = 0;
+  ui->draw_cb      = sidebar_draw;
+  ui->keypress_cb  = sidebar_keypress;
+}
+
 // Print list of search results.
 void sidebar_draw(ui_t *ui)
 {
-  unsigned int line = 0;
+  mvwprintw(ui->win, 0, 0, "Searches");
+  mvwchgat(ui->win, 0, 0, -1, A_BOLD, UI_STYLE_DIM, NULL);
+
+  unsigned int line = 1;
 
   // TODO: Scrolling.
   for (sess_search_t *s = g_session.search; s && line < ui->height; s = s->next) {
     mvwprintw(ui->win, line, 0, "%.24s", s->res->query);
 
-    if (line == g_pos)
+    if (line - 1 == g_pos)
       mvwchgat(ui->win, line, 0, -1, (ui->flags & UI_FLAG_FOCUS ? A_REVERSE : A_BOLD), COLOR_PAIR(0), NULL);
     ++line;
   }
