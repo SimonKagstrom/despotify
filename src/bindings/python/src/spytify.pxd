@@ -28,7 +28,8 @@ cdef class SessionStruct:
     cdef list tracks_to_list(self, track* tracks)
 
 cdef class Spytify(SessionStruct):
-    cdef RootList _stored_playlists
+    cdef RootList stored_playlists
+    cdef object callback
 
 cdef class AlbumData:
     cdef album* data

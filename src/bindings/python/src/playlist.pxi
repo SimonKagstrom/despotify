@@ -52,7 +52,7 @@ cdef class RootList:
         raise TypeError("This class cannot be instantiated from Python")
 
     cdef fetch(self):
-        if self.list is None:
+        if self.playlists is None:
             self.data = despotify_get_stored_playlists(self.ds)
             self.playlists = self.playlists_to_list(self.data)
 

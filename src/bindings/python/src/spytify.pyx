@@ -14,34 +14,42 @@ include "track.pxi"
 include "playlist.pxi"
 include "searchresult.pxi"
 
+cdef void callback_handler(despotify_session* ds, int signal, void* data, void *python_obj):
+    (<object>python_obj).handle(signal)
+
 cdef class Spytify:
     """Class representing a connection to the Spotify service.
     
     This should be any scripts "entrypoint" into this module; any other
     class will most likely be instantiated by this class and returned.
     """
-    def __init__(self, str user, str pw):
+    def __init__(self, str user, str pw, object callback=None):
         """Create a new Spytify instance, and connect to Spotify.
 
         Args:
             user: Username to authenticate with
             pw: Password to authenticate with
         """
-        self._stored_playlists = None
+        self.stored_playlists = None
+        self.callback = callback
 
-        self.ds = despotify_init_client(NULL)
+        self.ds = despotify_init_client(callback_handler, <void*>self)
         if not self.ds:
             raise SpytifyError(despotify_get_error(self.ds))
 
         if not despotify_authenticate(self.ds, user, pw):
             raise SpytifyError(despotify_get_error(self.ds))
 
+    def handle(self, int signal):
+        if self.callback:
+            self.callback(self, signal)
+
     property stored_playlists:
         def __get__(self):
-            if self._stored_playlists is None:
-                self._stored_playlists = self.create_rootlist()
+            if self.stored_playlists is None:
+                self.stored_playlists = self.create_rootlist()
 
-            return self._stored_playlists
+            return self.stored_playlists
 
     property current_track:
         def __get__(self):
@@ -49,7 +57,7 @@ cdef class Spytify:
 
     def flush_stored_playlists(self):
         """Clear cached playlists."""
-        self._stored_playlists = self.create_rootlist()
+        self.stored_playlists = self.create_rootlist()
 
     def lookup(self, str uri):
         """Looks up URIs like spotify:track:32a2n4NPXhH3OI06VPLwTA.

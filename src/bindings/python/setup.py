@@ -17,7 +17,7 @@ def pkgconfig(*packages, **kw):
 
     return kw
 
-files = map(lambda f: 'src/' + f, ['callback.c', 'spytify.c'])
+files = map(lambda f: 'src/' + f, ['spytify.c'])
 
 setup(name         = 'spytify',
       version      = 'v0.1',
