@@ -67,7 +67,7 @@ void splash_draw(ui_t *ui)
   mvwprintw(ui->win, line, x + 34, "despotify.se");
   mvwchgat(ui->win, line, x + 34, 12, A_REVERSE, UI_STYLE_DIM, NULL);
 
-  line +=2;
+  line += 2;
 
   mvwprintw(ui->win, ++line, x, "Type ':connect' to login, then press '/' to search for hits.");
   mvwprintw(ui->win, ++line, x + 3, "Press F1 for a list of all commands and key bindings.");

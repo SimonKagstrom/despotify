@@ -37,7 +37,7 @@ void sidebar_draw(ui_t *ui)
     mvwprintw(ui->win, line, 0, "%.24s", s->res->query);
 
     if (line - 1 == g_pos)
-      mvwchgat(ui->win, line, 0, -1, (ui->flags & UI_FLAG_FOCUS ? A_REVERSE : A_BOLD), COLOR_PAIR(0), NULL);
+      mvwchgat(ui->win, line, 0, -1, (ui->flags & UI_FLAG_FOCUS ? A_REVERSE : A_BOLD), UI_STYLE_NORMAL, NULL);
     ++line;
   }
 }

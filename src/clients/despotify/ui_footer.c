@@ -81,7 +81,7 @@ void footer_draw(ui_t *ui)
     mvwaddwstr(ui->win, 0, 0, str);
 
     // Draw fake cursor.
-    mvwchgat(ui->win, 0, curx, 1, A_REVERSE, COLOR_PAIR(0), NULL);
+    mvwchgat(ui->win, 0, curx, 1, A_REVERSE, UI_STYLE_NORMAL, NULL);
   }
 }
 

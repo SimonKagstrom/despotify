@@ -4,8 +4,10 @@
 ## Enable debug output to /tmp/gui.log
 # DEBUG = 1
 
-## Disable GUI stuff
-# NOGUI = 1
+## Enable additional clients.
+# CLIENT_DESPOTIFY = 1
+# CLIENT_MAEMIFY   = 1
+CLIENT_GATEWAY   = 1
 
 ## Enable Nokia Maemo4 specific code in maemify client. 
 ## At least LINUX_BACKEND = gstreamer seems to work with this.

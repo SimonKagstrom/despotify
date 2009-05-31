@@ -45,10 +45,17 @@ ifeq ($(firstword $(subst ., ,$(shell $(CC) -dumpversion))), 4)
     CFLAGS += -Wno-pointer-sign
 endif
 
-CLIENTS = clients/simple clients/gateway
-ifneq ($(NOGUI), 1)
-    CLIENTS += clients/despotify clients/maemify
+CLIENTS = clients/simple
+ifeq ($(CLIENT_DESPOTIFY), 1)
+    CLIENTS += clients/despotify
 endif
+ifeq ($(CLIENT_GATEWAY), 1)
+	CLIENTS += clients/gateway
+endif
+ifeq ($(CLIENT_MAEMIFY), 1)
+	CLIENTS += clients/maemify
+endif
+
 SUBDIRS = lib $(CLIENTS)
 
 .PHONY: all clean $(SUBDIRS) install uninstall

@@ -37,6 +37,11 @@ void sess_cleanup()
 
   if (!despotify_cleanup())
     panic("despotify_cleanup() failed");
+
+  free(g_session.username);
+  g_session.username = 0;
+  free(g_session.password);
+  g_session.password = 0;
 }
 
 void sess_connect()
@@ -112,6 +117,12 @@ void sess_search(const char *query)
 
   log_append("Searching for: <%s>", query);
   struct search_result *sr = despotify_search(g_session.dsfy, (char*)query, 100);
+
+  if (!sr) {
+    log_append(despotify_get_error(g_session.dsfy));
+    return;
+  }
+
   log_append("Got %d/%d tracks", sr->playlist->num_tracks, sr->total_tracks);
 
   sess_search_t *prev = g_session.search;
@@ -167,7 +178,9 @@ void sess_pause()
 
 static void sess_callback(struct despotify_session* ds, int signal, void *data, void* callback_data)
 {
-  (void)data; (void)ds; (void)callback_data;
+  (void)data;
+  (void)ds;
+  (void)callback_data;
 
   switch (signal) {
     case DESPOTIFY_TRACK_CHANGE:
