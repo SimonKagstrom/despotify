@@ -83,8 +83,8 @@ enum
 };
 
 /* these are global to allow the callback to access them */
-static struct playlist* lastlist = NULL;
-static int listoffset = 0;
+//static struct playlist* lastlist = NULL;
+//static int listoffset = 0;
 
 /* Forward declarations */
 static void init_list(GtkWidget *list);
@@ -513,16 +513,8 @@ void callback(int signal, void* data)
     (void)data;
 
     switch (signal) {
-        case DESPOTIFY_TRACK_CHANGE:
-            listoffset++;
-            struct track* t = lastlist->tracks;
-            for (int i=1; i<listoffset && t; i++)
-                t = t->next;
-            if (t)
-                wprintf(L"New track: %d: %s / %s (%d:%02d)\n",
-                        listoffset, t->title, t->artist->name,
-                        t->length / 60000, t->length % 60000 / 1000);
-            break;
+      case DESPOTIFY_TRACK_CHANGE:
+        break;
     }
 }
 
