@@ -255,12 +255,14 @@ void ui_dirty(ui_elem_t dirty)
 // focus may affect how highlighted content is drawn.
 void ui_focus(ui_elem_t focus)
 {
+  ui_elem_t i;
+
   // Don't focus offscreen UI elements or elements that can't handle keypresses.
   if ((g_ui_elements[focus].flags & UI_FLAG_OFFSCREEN)
       || !g_ui_elements[focus].keypress_cb)
     return;
 
-  for (ui_elem_t i = 0; i < UI_END; ++i) {
+  for (i = 0; i < UI_END; ++i) {
     if (i == focus) {
       g_ui_elements[i].flags |= (UI_FLAG_FOCUS | UI_FLAG_DIRTY);
       g_ui_focus = focus;

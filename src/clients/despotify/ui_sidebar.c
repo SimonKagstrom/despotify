@@ -27,13 +27,15 @@ void sidebar_init(ui_t *ui)
 // Print list of search results.
 void sidebar_draw(ui_t *ui)
 {
+  sess_search_t *s;
+
   mvwprintw(ui->win, 0, 0, "Searches");
   mvwchgat(ui->win, 0, 0, -1, A_BOLD, UI_STYLE_DIM, NULL);
 
   unsigned int line = 1;
 
   // TODO: Scrolling.
-  for (sess_search_t *s = g_session.search; s && line < ui->height; s = s->next) {
+  for (s = g_session.search; s && line < ui->height; s = s->next) {
     mvwprintw(ui->win, line, 0, "%.24s", s->res->query);
 
     if (line - 1 == g_pos)

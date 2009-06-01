@@ -23,6 +23,8 @@ static wchar_t g_wlogo[LOGO_HEIGHT][LOGO_WIDTH];
 
 void splash_init(ui_t *ui)
 {
+  int i, j;
+
   ui->win          = newwin(0, 0, 0, 0);
   ui->flags        = 0;
   ui->set          = UI_SET_SPLASH;
@@ -32,8 +34,8 @@ void splash_init(ui_t *ui)
   ui->keypress_cb  = splash_keypress;
 
   // Generate unicode logo from ASCII source.
-  for (int i = 0; i < LOGO_HEIGHT; ++i) {
-    for (int j = 0; j < LOGO_WIDTH; ++j) {
+  for (i = 0; i < LOGO_HEIGHT; ++i) {
+    for (j = 0; j < LOGO_WIDTH; ++j) {
       switch (g_clogo[i][j]) {
         case '8':  g_wlogo[i][j] = L'\u2588'; break; // '█'
         case ',':  g_wlogo[i][j] = L'\u2597'; break; // '▗'
@@ -54,12 +56,13 @@ void splash_init(ui_t *ui)
 
 void splash_draw(ui_t *ui)
 {
+  int i;
   int line = DSFY_MAX((ui->height - LOGO_HEIGHT * 2) / 2, 0);
 
   int x = DSFY_MAX((ui->width - LOGO_WIDTH) / 2, 0);
 
   wattron(ui->win, COLOR_PAIR(UI_STYLE_DIM));
-  for (int i = 0; i < LOGO_HEIGHT; ++i) {
+  for (i = 0; i < LOGO_HEIGHT; ++i) {
     mvwaddnwstr(ui->win, ++line, x, g_wlogo[i], ui->width - x);
   }
   wattroff(ui->win, COLOR_PAIR(UI_STYLE_DIM));

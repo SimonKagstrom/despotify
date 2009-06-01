@@ -25,10 +25,11 @@ void sess_init()
 
 void sess_cleanup()
 {
+  sess_search_t *s;
   sess_disconnect();
 
   // Free search results.
-  for (sess_search_t *s = g_session.search; s;) {
+  for (s = g_session.search; s;) {
     despotify_free_search(s->res);
     sess_search_t *p = s;
     s = s->next;
