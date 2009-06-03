@@ -98,10 +98,8 @@ static cmd_t g_commands[] = {
 void command_process(char *str)
 {
   char cmd[16];
-  int i;
-
   if (sscanf(str, "%15s", cmd) == 1) {
-    for (i = 0; g_commands[i].name; ++i) {
+    for (int i = 0; g_commands[i].name; ++i) {
       if (!strcmp(cmd, g_commands[i].name)) {
         g_commands[i].cmd_cb();
         return;

@@ -33,7 +33,6 @@ void tracklist_init(ui_t *ui)
 // Print tracks in search result.
 void tracklist_draw(ui_t *ui)
 {
-  struct artist *a;
   int i = 0, line = 0;
   g_availy = ui->height - 2;
 
@@ -61,7 +60,7 @@ void tracklist_draw(ui_t *ui)
       // Concat list of artists.
       wchar_t art[slen];
       int len = 0;
-      for (a = t->artist; a && len < slen; a = a->next)
+      for (struct artist* a = t->artist; a && len < slen; a = a->next)
         len += swprintf(art + len, slen - len, L"%s%s", a->name, a->next ? "/" : "");
 
       wchar_t str[ui->width];
@@ -89,8 +88,6 @@ void tracklist_draw(ui_t *ui)
 
 int tracklist_keypress(wint_t ch, bool code)
 {
-  int i;
-
   (void)code;
 
   // Change focus back to sidebar.
@@ -111,7 +108,7 @@ int tracklist_keypress(wint_t ch, bool code)
     case '\r':
       // Find track and play.
       t = g_res->playlist->tracks;
-      for (i = 0; t && i < g_pos; ++i, t = t->next);
+      for (int i = 0; t && i < g_pos; ++i, t = t->next);
       if (t)
         sess_play(t);
       else
@@ -157,11 +154,9 @@ int tracklist_keypress(wint_t ch, bool code)
 // Set search result for displaying.
 void tracklist_set(int pos, bool focus)
 {
-  int i;
-
   // Find search.
   sess_search_t *s = g_session.search;
-  for (i = 0; s && i != pos; ++i, s = s->next);
+  for (int i = 0; s && i != pos; ++i, s = s->next);
 
   if (g_res != s->res) {
     g_res = s->res;

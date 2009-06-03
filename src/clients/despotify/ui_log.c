@@ -33,11 +33,9 @@ void log_init(ui_t *ui)
 
 void log_draw(ui_t *ui)
 {
-  unsigned int i;
-
   // Draw as many entries as we can fit inside the window.
   entry_t *e = g_last_entry;
-  for (i = 1; i < ui->height && e; ++i, e = e->prev) {
+  for (unsigned int i = 1; i < ui->height && e; ++i, e = e->prev) {
     struct tm *t = localtime(&e->time);
     mvwprintw(ui->win, ui->height - i, 0, "(%02d:%02d:%02d) %s",
         t->tm_hour, t->tm_min, t->tm_sec, e->msg);
