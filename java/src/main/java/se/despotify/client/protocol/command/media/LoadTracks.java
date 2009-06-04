@@ -3,8 +3,8 @@ package se.despotify.client.protocol.command.media;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.BrowseType;
+import se.despotify.Connection;
 import se.despotify.client.protocol.PacketType;
-import se.despotify.client.protocol.Protocol;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.command.Command;
@@ -43,7 +43,7 @@ public class LoadTracks extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Protocol protocol) throws DespotifyException {
+  public Boolean send(Connection connection) throws DespotifyException {
 
 /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
@@ -78,7 +78,7 @@ public class LoadTracks extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
-    protocol.sendPacket(PacketType.browse, buffer, "load track");
+    connection.getProtocol().sendPacket(PacketType.browse, buffer, "load track");
 
 
     /* Get data and inflate it. */

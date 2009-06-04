@@ -94,11 +94,11 @@ public class Connection implements Player, CommandListener, Runnable {
 
     running = true;
 
-    while (this.running) {
+    while (running) {
       try {
         this.protocol.receivePacket();
       } catch (DespotifyException e) {
-        log.error("Exception in when receiving packet.", e);
+        log.error("Exception when receiving packet.", e);
         if (isFailFast()) {
           break;
         }
@@ -331,6 +331,7 @@ public class Connection implements Player, CommandListener, Runnable {
    * Stop playback of current track.
    */
   public void stop() {
+    running = false;
     if (this.player != null) {
       this.player.close();
 

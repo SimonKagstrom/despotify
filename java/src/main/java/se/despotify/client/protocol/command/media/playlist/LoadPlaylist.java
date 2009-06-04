@@ -3,7 +3,6 @@ package se.despotify.client.protocol.command.media.playlist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.client.protocol.PacketType;
-import se.despotify.client.protocol.Protocol;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.command.ChecksumException;
@@ -13,6 +12,7 @@ import se.despotify.domain.media.Playlist;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
+import se.despotify.Connection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -43,7 +43,7 @@ public class LoadPlaylist extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Protocol protocol) throws DespotifyException {
+  public Boolean send(Connection connection) throws DespotifyException {
     byte[] data;
 
 
@@ -70,7 +70,7 @@ public class LoadPlaylist extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
-    protocol.sendPacket(PacketType.getPlaylist, buffer, "get playlist");
+    connection.getProtocol().sendPacket(PacketType.getPlaylist, buffer, "get playlist");
 
     /* Get data and inflate it. */
     data = callback.getData("get playlist response");

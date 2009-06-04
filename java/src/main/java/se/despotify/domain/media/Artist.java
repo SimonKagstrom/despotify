@@ -197,8 +197,7 @@ public class Artist extends Media implements Visitable {
 
       artist.setSimilarArtists(similarArtists);
     }
-
-
+    
     return artist;
   }
 

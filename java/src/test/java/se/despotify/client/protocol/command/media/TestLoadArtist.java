@@ -15,12 +15,12 @@ public class TestLoadArtist extends DespotifyClientTest {
   public void test() throws Exception {
 
     for (Artist artist : defaultArtists) {
-      new LoadArtist(store, artist).send(connection.getProtocol());
+      new LoadArtist(store, artist).send(connection);
     }
 
 //    for (Artist artist : defaultArtists) {
 //      MediaTestCaseGenerator.createEqualsTest(artist, "artist = store.getArtist(\"" + artist.getHexUUID() + "\");\n" +
-//          "    new LoadArtist(store, artist).send(connection.getProtocol());\n" +
+//          "    new LoadArtist(store, artist).send(connection);\n" +
 //          "    artist");
 //    }
 //    System.out.flush();
@@ -33,7 +33,7 @@ public class TestLoadArtist extends DespotifyClientTest {
     // generated tests
 
     artist = store.getArtist("d00d9e7b82894fb8851a109c82568eb5");
-    new LoadArtist(store, artist).send(connection.getProtocol());
+    new LoadArtist(store, artist).send(connection);
     artist.accept(new VisitorAdapter() {
       @Override
       public void visit(Artist artist) {
@@ -47,7 +47,7 @@ public class TestLoadArtist extends DespotifyClientTest {
       }
     });
     artist = store.getArtist("4f9873e19e5a4b4096c216c98bcdb010");
-    new LoadArtist(store, artist).send(connection.getProtocol());
+    new LoadArtist(store, artist).send(connection);
     artist.accept(new VisitorAdapter() {
       @Override
       public void visit(Artist artist) {
@@ -61,7 +61,7 @@ public class TestLoadArtist extends DespotifyClientTest {
       }
     });
     artist = store.getArtist("db614c7060fc47baa7be732d88ae446d");
-    new LoadArtist(store, artist).send(connection.getProtocol());
+    new LoadArtist(store, artist).send(connection);
     artist.accept(new VisitorAdapter() {
       @Override
       public void visit(Artist artist) {
@@ -75,7 +75,7 @@ public class TestLoadArtist extends DespotifyClientTest {
       }
     });
     artist = store.getArtist("f4d5d82d09124feda0633a2671f8c81a");
-    new LoadArtist(store, artist).send(connection.getProtocol());
+    new LoadArtist(store, artist).send(connection);
     artist.accept(new VisitorAdapter() {
       @Override
       public void visit(Artist artist) {
@@ -89,7 +89,7 @@ public class TestLoadArtist extends DespotifyClientTest {
       }
     });
     artist = store.getArtist("f6150726a8e94c89a7cf336d3f72be9c");
-    new LoadArtist(store, artist).send(connection.getProtocol());
+    new LoadArtist(store, artist).send(connection);
     artist.accept(new VisitorAdapter() {
       @Override
       public void visit(Artist artist) {

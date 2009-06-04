@@ -23,20 +23,19 @@ public class TestCreatePlaylist extends DespotifyClientTest {
   public void testCreatePlaylist() throws Exception {
 
     String playlistName = randomPlaylistName();
-    
+
     log.info("\n\n\n\n\n\n\n           create playlist named "+playlistName+"\n\n\n\n\n\n\n\n\n");
 
-    Playlist originalPlaylist = new CreatePlaylist(new MemoryStore(), user, playlistName, false).send(connection.getProtocol());
-
+    Playlist originalPlaylist = new CreatePlaylist(new MemoryStore(), user, playlistName, false).send(connection);
 
     log.info("\n\n\n\n\n\n\n           load playlist with UUID "+Hex.toHex(originalPlaylist.getUUID())+"\n\n             spotify:user:"+ username + ":playlist:" + SpotifyURI.toURI(Hex.toHex(originalPlaylist.getUUID())) +"\n\n\n\n\n\n\n\n\n");
 
     // brand new store to make sure we dont pick something up from the cache.
     MemoryStore store = new MemoryStore();
     Playlist loadedPlaylist = store.getPlaylist(originalPlaylist.getUUID());
-    new LoadPlaylist(store, loadedPlaylist).send(connection.getProtocol());
+    new LoadPlaylist(store, loadedPlaylist).send(connection);
 
-    assertTrue("different stores means different instances", loadedPlaylist != originalPlaylist);   
+    assertTrue("different stores means different instances", loadedPlaylist != originalPlaylist);
     assertEquals(loadedPlaylist.getChecksum().longValue(), loadedPlaylist.calculateChecksum());
     assertEquals(originalPlaylist.getHexUUID(), loadedPlaylist.getHexUUID());
     // todo assert the rest

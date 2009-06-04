@@ -15,8 +15,8 @@ import java.util.ArrayList;
  */
 public class TestChecksum extends DespotifyClientTest {
   @Override
-  protected Connection connectionFactory() {
-    return null;
+  protected boolean doConnect() {
+    return false;
   }
 
   // todo artists, albums

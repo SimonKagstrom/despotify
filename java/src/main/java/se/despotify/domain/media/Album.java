@@ -193,10 +193,7 @@ public class Album extends Media implements Visitable {
       album.setTracks(tracks);
 
     }
-
-    /* TODO: album-type, copyright, discs, ... */
-
-
+    
     return album;
   }
 

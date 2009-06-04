@@ -1,7 +1,6 @@
 package se.despotify.client.protocol.command.media.playlist;
 
 import se.despotify.client.protocol.command.Command;
-import se.despotify.client.protocol.Protocol;
 import se.despotify.client.protocol.PacketType;
 import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.channel.Channel;
@@ -10,6 +9,7 @@ import se.despotify.domain.User;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XMLElement;
 import se.despotify.util.XML;
+import se.despotify.Connection;
 
 import java.util.Date;
 import java.nio.charset.Charset;
@@ -35,7 +35,7 @@ public class SetPlaylistCollaborative extends Command<Boolean> {
     this.value = value;
   }
 
-  public Boolean send(Protocol protocol) throws DespotifyException {
+  public Boolean send(Connection connection) throws DespotifyException {
 
     if (!playlist.getAuthor().equals(user.getName())) {
       throw new RuntimeException("user " + user.getName() + " != author " + playlist.getAuthor());
@@ -74,7 +74,7 @@ public class SetPlaylistCollaborative extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
-    protocol.sendPacket(PacketType.changePlaylist, buffer, value ? "set playlist collaborative flag true" : "set playlist collaborative flag false");
+    connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, value ? "set playlist collaborative flag true" : "set playlist collaborative flag false");
 
     /* Get response. */
     byte[] data = callback.getData(value ? "set playlist collaborative flag true response" : "set playlist collaborative flag false reponse");

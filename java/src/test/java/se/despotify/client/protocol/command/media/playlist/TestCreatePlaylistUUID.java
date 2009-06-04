@@ -17,7 +17,7 @@ public class TestCreatePlaylistUUID extends DespotifyClientTest {
     String playlistName = randomPlaylistName();
     
 
-    byte[] UUID = new ReserveRandomPlaylistUUID(store, user, playlistName, false).send(connection.getProtocol());
+    byte[] UUID = new ReserveRandomPlaylistUUID(store, user, playlistName, false).send(connection);
     assertNotNull(UUID);
     assertEquals(16, UUID.length);
     

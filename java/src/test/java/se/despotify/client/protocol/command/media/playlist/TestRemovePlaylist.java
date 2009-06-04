@@ -17,20 +17,20 @@ public class TestRemovePlaylist extends DespotifyClientTest {
 
     String playlistName = randomPlaylistName();
 
-    new LoadUserPlaylists(store, user).send(connection.getProtocol());
+    new LoadUserPlaylists(store, user).send(connection);
     int originalSize = user.getPlaylists().getItems().size();
 
-    Playlist playlist = new CreatePlaylist(store, user, playlistName, false).send(connection.getProtocol());
+    Playlist playlist = new CreatePlaylist(store, user, playlistName, false).send(connection);
     assertEquals(originalSize + 1, user.getPlaylists().getItems().size());
     assertTrue(user.getPlaylists().getItems().contains(playlist));
 
-    new RemovePlaylistFromUser(store, user, playlist).send(connection.getProtocol());
+    new RemovePlaylistFromUser(store, user, playlist).send(connection);
     assertEquals(originalSize, user.getPlaylists().getItems().size());
     assertFalse(user.getPlaylists().getItems().contains(playlist));
 
     reset();
 
-    new LoadUserPlaylists(store, user).send(connection.getProtocol());
+    new LoadUserPlaylists(store, user).send(connection);
     assertEquals(originalSize, user.getPlaylists().getItems().size());
     for (Playlist playlist2 : user.getPlaylists()) {
       assertNotSame(playlist.getUUID(), playlist2.getUUID());

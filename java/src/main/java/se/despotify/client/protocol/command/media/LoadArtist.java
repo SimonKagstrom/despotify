@@ -3,16 +3,14 @@ package se.despotify.client.protocol.command.media;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.BrowseType;
+import se.despotify.Connection;
 import se.despotify.client.protocol.PacketType;
-import se.despotify.client.protocol.Protocol;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.command.Command;
 import se.despotify.domain.Store;
 import se.despotify.domain.media.Artist;
-import se.despotify.domain.media.Result;
 import se.despotify.exceptions.DespotifyException;
-import se.despotify.exceptions.MissingChildElement;
 import se.despotify.util.GZIP;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
@@ -21,9 +19,6 @@ import se.despotify.util.XMLElement;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 
 /**
  * @since 2009-apr-25 16:28:42
@@ -42,7 +37,7 @@ public class LoadArtist extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Protocol protocol) throws DespotifyException {
+  public Boolean send(Connection connection) throws DespotifyException {
 
     /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
@@ -66,7 +61,7 @@ public class LoadArtist extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
-    protocol.sendPacket(PacketType.browse, buffer, "load artist");
+    connection.getProtocol().sendPacket(PacketType.browse, buffer, "load artist");
 
 
     /* Get data and inflate it. */

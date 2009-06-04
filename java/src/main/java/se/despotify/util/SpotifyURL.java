@@ -74,7 +74,7 @@ public class SpotifyURL {
       public Visitable track(URLtype type, String URI) {
         Track track = store.getTrack(SpotifyURI.toHex(URI));
         try {
-          new LoadTracks(store, track).send(connection.getProtocol());
+          new LoadTracks(store, track).send(connection);
         } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }
@@ -84,7 +84,7 @@ public class SpotifyURL {
       public Visitable album(URLtype type, String URI) {
         Album album = store.getAlbum(SpotifyURI.toHex(URI));
         try {
-          new LoadAlbum(store, album).send(connection.getProtocol());
+          new LoadAlbum(store, album).send(connection);
         } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }
@@ -94,7 +94,7 @@ public class SpotifyURL {
       public Visitable artist(URLtype type, String URI) {
         Artist artist = store.getArtist(SpotifyURI.toHex(URI));
         try {
-          new LoadArtist(store, artist).send(connection.getProtocol());
+          new LoadArtist(store, artist).send(connection);
         } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }
@@ -104,7 +104,7 @@ public class SpotifyURL {
       public Visitable playlist(URLtype type, String user, String URI) {
         Playlist playlist = store.getPlaylist(SpotifyURI.toHex(URI));
         try {
-          new LoadPlaylist(store, playlist).send(connection.getProtocol());
+          new LoadPlaylist(store, playlist).send(connection);
         } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }

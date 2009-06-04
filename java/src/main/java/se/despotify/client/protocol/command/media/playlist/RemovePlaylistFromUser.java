@@ -15,6 +15,7 @@ import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
+import se.despotify.Connection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -38,11 +39,11 @@ public class RemovePlaylistFromUser extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Protocol protocol) throws DespotifyException {
+  public Boolean send(Connection connection) throws DespotifyException {
 
     if (user.getPlaylists() == null) {
       log.warn("user playlists not loaded yet! should it be? loading..");
-      new LoadUserPlaylists(store, user).send(protocol);
+      new LoadUserPlaylists(store, user).send(connection);
     }
 
     int position = user.getPlaylists().getItems().indexOf(playlist);
@@ -55,10 +56,10 @@ public class RemovePlaylistFromUser extends Command<Boolean> {
 
     // todo probably don't destoy collaborative that is not owned by user? or?
 
-    if (!sendDelete(protocol, position)) {
+    if (!sendDelete(connection.getProtocol(), position)) {
       throw new DespotifyException();
     }
-    if (!sendDestroy(protocol, position)) {
+    if (!sendDestroy(connection.getProtocol(), position)) {
       throw new DespotifyException();
     }
     return true;
@@ -204,7 +205,7 @@ shn_decrypt(ctx=0x8f0dc0, buf=0x8c8a8c, len=2 [0x0002]) called from 0x000adf64
             "<version>%010d,%010d,%010d,%d</version>",
             // change
             position,
-            1, // unknown
+            1, // number of playlists to delete with start at attribute "position"
             new Date().getTime() / 1000,
             user.getName(),
             // version

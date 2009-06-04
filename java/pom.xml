@@ -6,7 +6,7 @@
 
   <groupId>se.despotify</groupId>
   <artifactId>despotify</artifactId>
-  <version>0.3.2</version>
+  <version>0.3.3</version>
 
   <name>Despotify</name>
   <description>Spotify client API</description>

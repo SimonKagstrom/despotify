@@ -24,8 +24,8 @@ public abstract class DespotifyClientTest extends TestCase {
 
   protected final Logger log = LoggerFactory.getLogger(getClass());
 
+  private DespotifyManager manager;
   protected Connection connection;
-  private Thread connectionThread;
 
   protected Store store;
   protected User user;
@@ -48,15 +48,14 @@ public abstract class DespotifyClientTest extends TestCase {
   }
 
   public void reset() throws Exception {
-    if (connection != null) {
-      connection.stop();
+    if (manager != null) {
+      manager.stop();
     }
-    connection = connectionFactory();
-    if (connection != null) {
-      connection.login(username, password);
-      connectionThread = new Thread(connection);
-      connectionThread.start();
+    manager = new DespotifyManager(username, password, 1);
+    if (doConnect()) {
+      connection = manager.getConnection();
     }
+
     user = new User();
     user.setName(username);
 
@@ -112,16 +111,17 @@ public abstract class DespotifyClientTest extends TestCase {
 
   }
 
-  protected Connection connectionFactory() {
-    return new Connection();
+  protected boolean doConnect() {
+    return true;
   }
 
   @After
   @Override
   protected void tearDown() throws Exception {
+    log.info("Tearing down test..");
     super.tearDown();
-    if (connection != null) {
-      connection.close();
+    if (manager != null) {
+      manager.stop(false);
     }
   }
 }

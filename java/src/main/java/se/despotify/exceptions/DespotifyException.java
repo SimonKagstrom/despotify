@@ -1,7 +1,7 @@
 package se.despotify.exceptions;
 
 @SuppressWarnings("serial")
-public class DespotifyException extends Exception {
+public class DespotifyException extends RuntimeException {
   public DespotifyException() {
   }
 

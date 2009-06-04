@@ -2,12 +2,12 @@ package se.despotify.client.protocol.command.media.playlist;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.despotify.client.protocol.Protocol;
 import se.despotify.client.protocol.command.Command;
 import se.despotify.domain.Store;
 import se.despotify.domain.User;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
+import se.despotify.Connection;
 
 import java.util.Random;
 
@@ -36,7 +36,7 @@ public class ReserveRandomPlaylistUUID extends Command<byte[]> {
   /**
    * @return uuid
    */
-  public byte[] send(Protocol protocol) throws DespotifyException {
+  public byte[] send(Connection connection) throws DespotifyException {
     int counter = 0; // avoid eternal looping
 
     while (true) {
@@ -51,7 +51,7 @@ public class ReserveRandomPlaylistUUID extends Command<byte[]> {
 
       log.info("requesting uuid " + hexId);
 
-      if (new ReservePlaylistUUID(store, user, UUID, playlistName, collaborative).send(protocol)) {
+      if (new ReservePlaylistUUID(store, user, UUID, playlistName, collaborative).send(connection)) {
         return UUID;
       }
 

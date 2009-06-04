@@ -14,10 +14,26 @@ public abstract class Media implements Visitable {
 
   protected static Logger log = LoggerFactory.getLogger(Media.class);
 
+  public enum State {
+    stub, loaded
+  }
+  private State state = State.stub;
+
+  public State getState() {
+    return state;
+  }
+
+  protected void setState(State state) {
+    this.state = state;
+  }
+
   protected abstract int getUUIDlength();
   protected abstract Pattern getHexUUIDpattern();
 
+  /** most media UUID */
   protected final static Pattern hexUUIDpattern32 = Pattern.compile("^[0-9a-fA-F]{32}$");
+
+  /** image UUID */
   protected final static Pattern hexUUIDpattern40 = Pattern.compile("^[0-9a-fA-F]{40}$");
 
 
@@ -75,8 +91,6 @@ public abstract class Media implements Visitable {
 	public final byte[] getUUID(){
 		return this.UUID;
 	}
-
-  // todo transient URI too!
 
   private transient String hexUUID;
 

@@ -13,11 +13,11 @@ public class TestLoadTracks extends DespotifyClientTest {
   @Test
   public void test() throws Exception {
 
-    new LoadTracks(store, defaultTracks).send(connection.getProtocol());
+    new LoadTracks(store, defaultTracks).send(connection);
 
 //    for (Track track : defaultTracks) {
 //      MediaTestCaseGenerator.createEqualsTest(track, "track = store.getTrack(\"" + track.getHexUUID() + "\");\n" +
-//          "    new LoadTracks(store, track).send(connection.getProtocol());\n" +
+//          "    new LoadTracks(store, track).send(connection);\n" +
 //          "    track");
 //    }
 //    System.out.flush();
@@ -27,7 +27,7 @@ public class TestLoadTracks extends DespotifyClientTest {
     // generated tests
 
     track = store.getTrack("93f98ea75b4748f797668485a3d01bd0");
-    new LoadTracks(store, track).send(connection.getProtocol());
+    new LoadTracks(store, track).send(connection);
     track.accept(new VisitorAdapter() {
       @Override
       public void visit(Track track) {
@@ -36,7 +36,7 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("spotify:track:4vdV2Eua6RkUoUM51jdH56", track.getSpotifyURL());
         assertEquals("http://open.spotify.com/track/4vdV2Eua6RkUoUM51jdH56", track.getHttpURL());
         assertEquals("One", track.getTitle());
-        assertEquals("d37dda0ea348147ce6b9b8cf0b4a5b98d3894ef9", track.getCover());
+        assertEquals("3d44ff9d9b75a44b835f7e719a193e9033cae6af", track.getCover());
         assertEquals(1, track.getFiles().size());
         assertEquals("36fa172ca1a707ba71e79757f3014cc1a26fbbf6", track.getFiles().get(0));
         assertEquals(231200l, track.getLength().longValue());
@@ -61,7 +61,7 @@ public class TestLoadTracks extends DespotifyClientTest {
       }
     });
     track = store.getTrack("cf2cd530980e450d855977ba0a80ec6e");
-    new LoadTracks(store, track).send(connection.getProtocol());
+    new LoadTracks(store, track).send(connection);
     track.accept(new VisitorAdapter() {
       @Override
       public void visit(Track track) {
@@ -70,7 +70,7 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("spotify:track:6iVTOPCmpABvG9jDZ2JozY", track.getSpotifyURL());
         assertEquals("http://open.spotify.com/track/6iVTOPCmpABvG9jDZ2JozY", track.getHttpURL());
         assertEquals("Two", track.getTitle());
-        assertEquals("0d66f558747f176c8ce787e375686ed83dd23da9", track.getCover());
+        assertEquals("95cdf93b035a5c568bc19981a9e618bd2f9a50bf", track.getCover());
         assertEquals(1, track.getFiles().size());
         assertEquals("ddc30e1090b43403cc0828db91300450a358a1a8", track.getFiles().get(0));
         assertEquals(158293l, track.getLength().longValue());
@@ -95,7 +95,7 @@ public class TestLoadTracks extends DespotifyClientTest {
       }
     });
     track = store.getTrack("fc1f1b5860f04a739971fcad9c1cd634");
-    new LoadTracks(store, track).send(connection.getProtocol());
+    new LoadTracks(store, track).send(connection);
     track.accept(new VisitorAdapter() {
       @Override
       public void visit(Track track) {
@@ -104,7 +104,7 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("spotify:track:7FKhuZtIPchBVNIhFnNL5W", track.getSpotifyURL());
         assertEquals("http://open.spotify.com/track/7FKhuZtIPchBVNIhFnNL5W", track.getHttpURL());
         assertEquals("Three", track.getTitle());
-        assertEquals("243bf851b18ab38a303d24b4c361f9ba997ad423", track.getCover());
+        assertEquals("1946f99c0408e958f88c1811f1d9d92df0a4b16f", track.getCover());
         assertEquals(1, track.getFiles().size());
         assertEquals("6186903f7ffa0e579954fa42c537cebc06ac7427", track.getFiles().get(0));
         assertEquals(229066l, track.getLength().longValue());
@@ -129,7 +129,7 @@ public class TestLoadTracks extends DespotifyClientTest {
       }
     });
     track = store.getTrack("7093f50c9ecf428eb780348c076f9f7f");
-    new LoadTracks(store, track).send(connection.getProtocol());
+    new LoadTracks(store, track).send(connection);
     track.accept(new VisitorAdapter() {
       @Override
       public void visit(Track track) {
@@ -138,7 +138,7 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("spotify:track:3qqKWUVfiLMrNPacFRzTzh", track.getSpotifyURL());
         assertEquals("http://open.spotify.com/track/3qqKWUVfiLMrNPacFRzTzh", track.getHttpURL());
         assertEquals("Four", track.getTitle());
-        assertEquals("0b85aa8202d8f5a49006e721e34a72200904220a", track.getCover());
+        assertEquals("2df174a97a577044edaa482b5eb198b5bc20dddb", track.getCover());
         assertEquals(1, track.getFiles().size());
         assertEquals("55473589cbccde7f9621fea833f38487f92f2892", track.getFiles().get(0));
         assertEquals(240226l, track.getLength().longValue());
@@ -163,7 +163,7 @@ public class TestLoadTracks extends DespotifyClientTest {
       }
     });
     track = store.getTrack("48daf12f96f84793a526b579aa4d1f66");
-    new LoadTracks(store, track).send(connection.getProtocol());
+    new LoadTracks(store, track).send(connection);
     track.accept(new VisitorAdapter() {
       @Override
       public void visit(Track track) {
@@ -172,9 +172,9 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("spotify:track:2dtvgPd3vsotKXtGk4dWlg", track.getSpotifyURL());
         assertEquals("http://open.spotify.com/track/2dtvgPd3vsotKXtGk4dWlg", track.getHttpURL());
         assertEquals("Five", track.getTitle());
-        assertEquals("24238c9ac14f1a10758a85ea66531b0d88b085f8", track.getCover());
+        assertEquals("e1712082598617226c51214314392d7d19f989d3", track.getCover());
         assertEquals(1, track.getFiles().size());
-        assertEquals("534ba228b88d1d5e468bc865b33b755aae61e181", track.getFiles().get(0));
+        assertEquals("4c5a99ef480c133dc365642f827f79e6e963c565", track.getFiles().get(0));
         assertEquals(385000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(9, track.getTrackNumber().intValue());

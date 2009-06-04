@@ -14,12 +14,12 @@ public class TestLoadAlbum extends DespotifyClientTest {
   public void test() throws Exception {
 
     for (Album album : defaultAlbums) {
-      new LoadAlbum(store, album).send(connection.getProtocol());
+      new LoadAlbum(store, album).send(connection);
     }
 
 //    for (Album album : defaultAlbums) {
 //      MediaTestCaseGenerator.createEqualsTest(album, "album = store.getAlbum(\""+album.getHexUUID()+"\");\n" +
-//          "    new LoadAlbum(store, album).send(connection.getProtocol());\n" +
+//          "    new LoadAlbum(store, album).send(connection);\n" +
 //          "    album");
 //    }
 
@@ -28,7 +28,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
     // generated tests follows
 
     album = store.getAlbum("02f8df4ad52d449caca8c6a25d2eca08");
-    new LoadAlbum(store, album).send(connection.getProtocol());
+    new LoadAlbum(store, album).send(connection);
     album.accept(new VisitorAdapter() {
       @Override
       public void visit(Album album) {
@@ -44,7 +44,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
       }
     });
     album = store.getAlbum("4dc7cec0b8e441daaef85f46a915c7d4");
-    new LoadAlbum(store, album).send(connection.getProtocol());
+    new LoadAlbum(store, album).send(connection);
     album.accept(new VisitorAdapter() {
       @Override
       public void visit(Album album) {
@@ -60,7 +60,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
       }
     });
     album = store.getAlbum("b8a09d31b4994b79a01f966b86cb9394");
-    new LoadAlbum(store, album).send(connection.getProtocol());
+    new LoadAlbum(store, album).send(connection);
     album.accept(new VisitorAdapter() {
       @Override
       public void visit(Album album) {
@@ -76,7 +76,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
       }
     });
     album = store.getAlbum("cce79af3bd864a799806a557877dda7a");
-    new LoadAlbum(store, album).send(connection.getProtocol());
+    new LoadAlbum(store, album).send(connection);
     album.accept(new VisitorAdapter() {
       @Override
       public void visit(Album album) {
@@ -92,7 +92,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
       }
     });
     album = store.getAlbum("792d90d6e5c14679afd00e7ea28982ce");
-    new LoadAlbum(store, album).send(connection.getProtocol());
+    new LoadAlbum(store, album).send(connection);
     album.accept(new VisitorAdapter() {
       @Override
       public void visit(Album album) {

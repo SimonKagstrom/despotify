@@ -3,7 +3,6 @@ package se.despotify.client.protocol.command.media.playlist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.client.protocol.PacketType;
-import se.despotify.client.protocol.Protocol;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.command.Command;
@@ -15,6 +14,7 @@ import se.despotify.domain.media.Track;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
+import se.despotify.Connection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -31,6 +31,10 @@ public class AddTrackToPlaylist extends Command<Boolean> {
   private Playlist playlist;
   private Track track;
   private Integer position;
+
+  public AddTrackToPlaylist(Store store, User user, Playlist playlist, Track track) {
+    this(store, user, playlist, track, null);
+  }
 
   /**
    * @param store
@@ -49,14 +53,14 @@ public class AddTrackToPlaylist extends Command<Boolean> {
 
 
   @Override
-  public Boolean send(Protocol protocol) throws DespotifyException {
+  public Boolean send(Connection connection) throws DespotifyException {
 
     if (!playlist.isCollaborative() && !playlist.getAuthor().equals(user.getName())) {
       throw new DespotifyException("Playlist must be collaborative or owned by the current user!");
     }
 
     if (user.getPlaylists() == null) {
-      new LoadUserPlaylists(store, user).send(protocol);    
+      new LoadUserPlaylists(store, user).send(connection);
     }
 
     if (playlist.getTracks() == null) {
@@ -114,7 +118,7 @@ public class AddTrackToPlaylist extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
-    protocol.sendPacket(PacketType.changePlaylist, buffer, "add track to playlist");
+    connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "add track to playlist");
 
     /* Get response. */
     byte[] data = callback.getData("add track to playlist, updated playlist response");
