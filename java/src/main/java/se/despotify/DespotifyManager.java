@@ -86,8 +86,8 @@ public class DespotifyManager {
   }
 
   public void stop(boolean wait) {
-    for (ConnectionThread thread : threads.values()) {
-      thread.connection.stop();
+    for (ConnectionThread thread : threads.values()) {      
+      thread.connection.close();
     }
     for (ConnectionThread thread : threads.values()) {
       if (wait) {

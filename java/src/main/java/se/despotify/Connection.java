@@ -22,7 +22,9 @@ import se.despotify.util.XMLElement;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-public class Connection implements Player, CommandListener, Runnable {
+public class Connection implements CommandListener, Runnable {
+
+  private static final Charset UTF8 = Charset.forName("UTF-8");
 
   public enum ProductType {
     free, daypass, premium
@@ -36,10 +38,7 @@ public class Connection implements Player, CommandListener, Runnable {
 
   private Session session;
   private Protocol protocol;
-  private boolean running = false;
-
-  private ChannelPlayer player;
-  private float volume;
+  private boolean running = false;  
 
   /**
    * Create a new instance using the default client revision
@@ -55,7 +54,6 @@ public class Connection implements Player, CommandListener, Runnable {
    */
   public Connection(int revision) {
     this.session = new Session(revision);
-    this.volume = 1.0f;
   }
 
   /**
@@ -178,7 +176,7 @@ public class Connection implements Player, CommandListener, Runnable {
 
 
     } else if (packetType == PacketType.countryCode) {
-      System.out.println("Country: " + new String(payload, Charset.forName("UTF-8")));
+      System.out.println("Country: " + new String(payload, UTF8));
 
 
     } else if (packetType == PacketType.p2pInitBlock) {
@@ -189,14 +187,14 @@ public class Connection implements Player, CommandListener, Runnable {
       /* HTML-notification, shown in a yellow bar in the official client. */
       /* Skip 11 byte header... */
       System.out.println("Notification: " + new String(
-          Arrays.copyOfRange(payload, 11, payload.length), Charset.forName("UTF-8")
+          Arrays.copyOfRange(payload, 11, payload.length), UTF8
       ));
 
 
     } else if (packetType == PacketType.productInformation) {
-      /* Payload is uncompressed XML. */
+      /* Payload is uncompressed UTF8 formatted XML. */
 
-      String xml = new String(payload, Charset.forName("UTF-8"));
+      String xml = new String(payload, UTF8);
       XMLElement root = XML.load(xml);
       productType = ProductType.valueOf(root.getChild("product").getChild("type").getText());
       if (!allowProductType(productType)) {
@@ -243,151 +241,19 @@ public class Connection implements Player, CommandListener, Runnable {
     return protocol;
   }
 
+  /**
+   * @return if false the connection will closed if an exception is thrown while receiving data.
+   */
   public boolean isFailFast() {
     return failFast;
   }
 
+  /**
+   *
+   * @param failFast false if the connection will be closed when an exception is thrown while receiving data.
+   */
   public void setFailFast(boolean failFast) {
     this.failFast = failFast;
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // todo
-  // todo
-  // todo
-  // todo move player stuff out of here?!
-  // todo
-  // todo
-  // todo
-
-
-  /**
-   * Play a track in a background thread.
-   *
-   * @param track    A {@link Track} object identifying the track to be played.
-   * @param listener event listener
-   */
-  public void play(Track track, PlaybackListener listener) {
-    /* Create channel callback */
-    ChannelCallback callback = new ChannelCallback();
-
-    /* Send play request (token notify + AES key). */
-    try {
-      this.protocol.sendPlayRequest(callback, track);
-    }
-    catch (DespotifyException e) {
-      return;
-    }
-
-    /* Get AES key. */
-    byte[] key = callback.getData("play response");
-
-    /* Create channel player. */
-    this.player = new ChannelPlayer(this.protocol, track, key, listener);
-    this.player.volume(this.volume);
-
-    /* Start playing. */
-    this.play();
-  }
-
-  /**
-   * Start playing or resume current track.
-   */
-  public void play() {
-    if (this.player != null) {
-      this.player.play();
-    }
-  }
-
-  /**
-   * Pause playback of current track.
-   */
-  public void pause() {
-    if (this.player != null) {
-      this.player.stop();
-    }
-  }
-
-  /**
-   * Stop playback of current track.
-   */
-  public void stop() {
-    running = false;
-    if (this.player != null) {
-      this.player.close();
-
-      this.player = null;
-    }
-  }
-
-  /**
-   * Get length of current track.
-   *
-   * @return Length in seconds or -1 if not available.
-   */
-  public int length() {
-    if (this.player != null) {
-      return this.player.length();
-    }
-
-    return -1;
-  }
-
-  /**
-   * Get playback position of current track.
-   *
-   * @return Playback position in seconds or -1 if not available.
-   */
-  public int position() {
-    if (this.player != null) {
-      return this.player.position();
-    }
-
-    return -1;
-  }
-
-  /**
-   * Get volume.
-   *
-   * @return A value from 0.0 to 1.0.
-   */
-  public float volume() {
-    if (this.player != null) {
-      return this.player.volume();
-    }
-
-    return -1;
-  }
-
-  /**
-   * Set volume.
-   *
-   * @param volume A value from 0.0 to 1.0.
-   */
-  public void volume(float volume) {
-    this.volume = volume;
-
-    if (this.player != null) {
-      this.player.volume(this.volume);
-    }
-  }
 }

@@ -47,6 +47,10 @@ public abstract class DespotifyClientTest extends TestCase {
     return "despotify_" + getClass().getSimpleName() + "_" + Hex.toHex(playlistNameBytes);
   }
 
+  /**
+   * reconnected to spotify with a new empty memory store.
+   * @throws Exception
+   */
   public void reset() throws Exception {
     if (manager != null) {
       manager.stop();

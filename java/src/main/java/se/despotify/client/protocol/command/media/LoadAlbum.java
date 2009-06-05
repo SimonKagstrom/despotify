@@ -31,7 +31,6 @@ public class LoadAlbum extends Command<Boolean> {
   private Album album;
   private Store store;
 
-
   public LoadAlbum(Store store, Album album) {
     this.store = store;
     this.album = album;
@@ -86,10 +85,13 @@ public class LoadAlbum extends Command<Boolean> {
     // load tracks
 
 
-    Result.fromXMLElement(root, store);
-
+    if (!"album".equals(root.getElement().getNodeName())) {
+      throw new DespotifyException("Expected document root to be of type <album>");
+    }
+    Album album = Album.fromXMLElement(root, store);
+    if (this.album != album) {
+      throw new DespotifyException("Album in response has different UUID than the requested album!");
+    }
     return true;
-
-
   }
 }

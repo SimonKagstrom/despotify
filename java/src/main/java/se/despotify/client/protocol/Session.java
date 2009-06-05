@@ -5,16 +5,19 @@ import se.despotify.crypto.DH.DHKeyPair;
 import se.despotify.crypto.RSA.RSAKeyPair;
 import se.despotify.domain.User;
 import se.despotify.exceptions.AuthenticationException;
-import se.despotify.exceptions.ConnectionException;
 import se.despotify.exceptions.DespotifyException;
 
 import javax.crypto.interfaces.DHPublicKey;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Random;
 
 public class Session {
+
+  private static final Charset UTF8 = Charset.forName("UTF8");
+
 	/* Spotify protocol to send and receive data. */
 	private Protocol protocol;
 	
@@ -81,8 +84,12 @@ public class Session {
   // FIXED:
   /**
    * Client revision sent to Spotify.
-   * 99999 is used by despotify,
-   * so I thought it could be fun for Spotify with 99987 for java despotify.
+   *
+   * by default
+   * 99999 is used by despotify c
+   * 99998 is used by jotify?
+   * 99997 us used by depotify java
+   * 99996 is used by spot   
    *
    * TODO:
    * Best would perhaps be to automatically detect the current revision
@@ -90,7 +97,7 @@ public class Session {
    * in a file. Perhaps the despotify also connects to the  spotify repository
    * and makes sure no update of the lib is required.
    */
-	public static final int CLIENT_REVISION = 99876;
+	public static final int CLIENT_REVISION = Integer.valueOf(System.getProperty("despotify.clientRevision", "99997"));
 	
 	public Session(){
 		this(-1);
@@ -174,8 +181,8 @@ public class Session {
 	
 	public Protocol authenticate(String username, String password) throws DespotifyException {
 		/* Set username and password. */
-		this.username = username.getBytes();
-		this.password = password.getBytes();
+		this.username = username.getBytes(UTF8);
+		this.password = password.getBytes(UTF8);
 		
 		/* Connect to a spotify server. */
 		this.protocol.connect();

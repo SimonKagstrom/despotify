@@ -47,18 +47,22 @@ public class Protocol {
 
   /* Connect to one of the spotify servers. */
 	public void connect() throws ConnectionException {
-		/* Lookup servers via DNS SRV query. */
+		log.info("Lookup servers via DNS SRV query.");
 		List<InetSocketAddress> servers = DNS.lookupSRV("_spotify-client._tcp.spotify.com");
+
+    if (servers.size() == 0) {
+      log.warn("Empty DNS SRV response!");
+    }
 
 		/* Add a fallback server if others don't work. */
 		servers.add(new InetSocketAddress("ap.spotify.com", 4070));
 
 		/* Try to connect to each server, stop trying when connected. */
-    // FIXED: previous for statment did not loop
     boolean connected = false;
 		for(InetSocketAddress server : servers){
 			try{
 				/* Connect to server. */
+        log.info("Attempting to connect to " + server);
 				channel = SocketChannel.open(server);
 				/* Save server for later use. */
 				this.server = server;
@@ -74,7 +78,7 @@ public class Protocol {
     }
 
 
-		System.out.format("Connected to '%s'\n", this.server);
+		log.info("Connected to " + server);
 	}
 
 	/* Disconnect from server */

@@ -168,6 +168,7 @@ public class Album extends Media implements Visitable {
           Track track = Track.fromXMLElement(trackElement, store);
           track.setDiscNumber(discNumber);
           tracks.add(track);
+          track.setAlbum(album);
         }
       }
 

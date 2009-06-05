@@ -30,7 +30,7 @@ public class Clean extends DespotifyClientTest {
 
     System.out.println("loaded content of user playlists");
 
-    for (int i = user.getPlaylists().getItems().size() - 1; i > 0; i--) {
+    for (int i = user.getPlaylists().getItems().size() - 1; i >= 0; i--) {
       Playlist playlist = user.getPlaylists().getItems().get(i);
       if (playlist.getName().startsWith("despotify_Test")) {
         new RemovePlaylistFromUser(store, user, playlist).send(connection);
