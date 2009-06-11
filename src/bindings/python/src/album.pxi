@@ -54,7 +54,7 @@ cdef class AlbumDataFull(AlbumData):
         next.browse = self.browse.next
         return next
 
-cdef class Album(SessionStruct):
+cdef class Album(SpotifyObject):
     def __init__(self):
         raise TypeError("This class cannot be instantiated from Python")
 

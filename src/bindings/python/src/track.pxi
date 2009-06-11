@@ -1,6 +1,6 @@
 # vim: set fileencoding=utf-8 filetype=pyrex :
 
-cdef class Track:
+cdef class Track(SpotifyObject):
     def __init__(self):
         raise TypeError("This class cannot be instantiated from Python")
 

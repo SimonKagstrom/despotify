@@ -1,6 +1,6 @@
 # vim: set fileencoding=utf-8 filetype=pyrex :
 
-cdef class Playlist:
+cdef class Playlist(SpotifyObject):
     def __init__(self):
         raise TypeError("This class cannot be instantiated from Python")
 
@@ -54,7 +54,7 @@ cdef class RootIterator:
         self.i = self.i + 1
         return retval
 
-cdef class RootList:
+cdef class RootList(SessionStruct):
     def __init__(self):
         raise TypeError("This class cannot be instantiated from Python")
 

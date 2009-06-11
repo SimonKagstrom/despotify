@@ -1,12 +1,13 @@
 from despotify cimport *
 
 cdef class SessionStruct
-cdef class Album(SessionStruct)
-cdef class Artist(SessionStruct)
-cdef class SearchResult(SessionStruct)
-cdef class Playlist(SessionStruct)
+cdef class SpotifyObject(SessionStruct)
+cdef class Album(SpotifyObject)
+cdef class Artist(SpotifyObject)
+cdef class SearchResult(SpotifyObject)
+cdef class Playlist(SpotifyObject)
 cdef class RootList(SessionStruct)
-cdef class Track(SessionStruct)
+cdef class Track(SpotifyObject)
 
 cdef class SessionStruct:
     cdef despotify_session* ds
@@ -26,6 +27,9 @@ cdef class SessionStruct:
     cdef list artists_to_list(self, artist* artists)
     cdef list playlists_to_list(self, playlist* playlists)
     cdef list tracks_to_list(self, track* tracks)
+
+cdef class SpotifyObject(SessionStruct):
+    pass
 
 cdef class Spytify(SessionStruct):
     cdef RootList stored_playlists
@@ -48,7 +52,7 @@ cdef class AlbumDataFull(AlbumData):
     cdef int year(self)
     cdef AlbumDataFull next_full(self)
 
-cdef class Album(SessionStruct):
+cdef class Album(SpotifyObject):
     cdef AlbumData data
     cdef AlbumDataFull full_data
     cdef bint take_owner
@@ -71,26 +75,19 @@ cdef class ArtistDataFull(ArtistData):
     cdef int num_albums(self)
     cdef album_browse* albums(self)
 
-cdef class Artist(SessionStruct):
+cdef class Artist(SpotifyObject):
     cdef ArtistData data
     cdef ArtistDataFull full_data
     cdef bint take_owner
 
     cdef get_full_data(self)
 
-cdef class SearchResult(SessionStruct):
+cdef class SearchResult(SpotifyObject):
     cdef search_result* data
     cdef Playlist playlist
     cdef bint take_owner
 
-cdef class SearchTracks(SessionStruct):
-    cdef SearchResult result
-
-cdef class SearchIterator(SessionStruct):
-    cdef SearchTracks parent
-    cdef int i
-
-cdef class Playlist(SessionStruct):
+cdef class Playlist(SpotifyObject):
     cdef playlist* data
     cdef bint take_owner
 
@@ -103,5 +100,5 @@ cdef class RootIterator:
     cdef RootList parent
     cdef int i
 
-cdef class Track(SessionStruct):
+cdef class Track(SpotifyObject):
     cdef track* data

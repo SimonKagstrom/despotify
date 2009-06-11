@@ -7,6 +7,7 @@ class SpytifyError(Exception):
     pass
 
 include "sessionstruct.pxi"
+include "spotifyobject.pxi"
 
 include "album.pxi"
 include "artist.pxi"
