@@ -37,15 +37,15 @@ public class SetPlaylistCollaborative extends Command<Boolean> {
 
   public Boolean send(Connection connection) throws DespotifyException {
 
-    if (!playlist.getAuthor().equals(user.getName())) {
-      throw new RuntimeException("user " + user.getName() + " != author " + playlist.getAuthor());
+    if (!playlist.getAuthor().equals(user.getId())) {
+      throw new RuntimeException("user " + user.getId() + " != author " + playlist.getAuthor());
     }
 
     String xml = String.format(
         "<change><ops><pub>%d</pub></ops>" +
             "<time>%d</time><user>%s</user></change>" +
             "<version>%010d,%010d,%010d,%d</version>",
-        value ? 1 : 0, new Date().getTime() / 1000, user.getName(),
+        value ? 1 : 0, new Date().getTime() / 1000, user.getId(),
         playlist.getRevision() + 1, playlist.getTracks().size(),
         playlist.getChecksum(), playlist.isCollaborative() ? 1 : 0
     );
@@ -60,7 +60,7 @@ public class SetPlaylistCollaborative extends Command<Boolean> {
 
     /* Append channel id, playlist id and some bytes... */
     buffer.putShort((short)channel.getId());
-    buffer.put(playlist.getUUID()); /* 16 bytes */
+    buffer.put(playlist.getByteUUID()); /* 16 bytes */
     buffer.put((byte)0x00); // 0x00 for adding tracks, 0x02 for the rest?
     buffer.putInt(playlist.getRevision().intValue());
     buffer.putInt(playlist.getTracks().size());

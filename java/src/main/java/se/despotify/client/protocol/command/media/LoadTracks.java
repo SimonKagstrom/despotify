@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * @since 2009-apr-25 16:28:42
@@ -45,6 +46,8 @@ public class LoadTracks extends Command<Boolean> {
   @Override
   public Boolean send(Connection connection) throws DespotifyException {
 
+    // todo send multiple requests if more than 200 tracks!
+
 /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
 
@@ -64,7 +67,7 @@ public class LoadTracks extends Command<Boolean> {
 
     /* Append (16 byte) ids. */
     for (Track track : tracks) {
-      buffer.put(Arrays.copyOfRange(track.getUUID(), 0, 16));
+      buffer.put(Arrays.copyOfRange(track.getByteUUID(), 0, 16));
     }
 
 //		/* Append zero. */
@@ -88,6 +91,9 @@ public class LoadTracks extends Command<Boolean> {
       log.info("load track response, " + data.length + " uncompressed bytes:\n" + Hex.log(data, log));
     }
 
+    if (data.length == 0) {
+      throw new DespotifyException("Received an empty response");
+    }
 
     /* Cut off that last 0xFF byte... */
     data = Arrays.copyOfRange(data, 0, data.length - 1);
@@ -102,7 +108,11 @@ public class LoadTracks extends Command<Boolean> {
     // load tracks
 
 
-    Result.fromXMLElement(root, store);
+    Result result = Result.fromXMLElement(root, store);
+
+    for (Track track : result.getTracks() ) {
+      track.setLoaded(new Date());
+    }
 
     return true;
 

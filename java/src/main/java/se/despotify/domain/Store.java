@@ -3,39 +3,46 @@ package se.despotify.domain;
 import se.despotify.domain.media.*;
 import se.despotify.util.Hex;
 
+import java.io.Serializable;
+
+import org.domdrides.entity.Entity;
+
 
 /**
  * @since 2009-apr-25 17:30:25
  */
-public abstract class Store {
+public abstract class Store implements Serializable {
 
-  public abstract Playlist getPlaylist(byte[] UUID);
-  public abstract Album getAlbum(byte[] UUID);
-  public abstract Artist getArtist(byte[] UUID);
-  public abstract Track getTrack(byte[] UUID);
-  public abstract Image getImage(byte[] UUID);
-
-
-  public Image getImage(String hexUUID) {
-    return getImage(Hex.toBytes(hexUUID));
+  public final Playlist getPlaylist(byte[] UUID) {
+    return getPlaylist(Hex.toHex(UUID));
   }
 
-  public Playlist getPlaylist(String hexUUID) {
-    return getPlaylist(Hex.toBytes(hexUUID));
+  public final Album getAlbum(byte[] UUID) {
+    return getAlbum(Hex.toHex(UUID));
   }
 
-  public Album getAlbum(String hexUUID) {
-    return getAlbum(Hex.toBytes(hexUUID));
+  public final Artist getArtist(byte[] UUID) {
+    return getArtist(Hex.toHex(UUID));
   }
 
-  public Artist getArtist(String hexUUID) {
-    return getArtist(Hex.toBytes(hexUUID));
+  public final Track getTrack(byte[] UUID) {
+    return getTrack(Hex.toHex(UUID));
   }
 
-  public Track getTrack(String hexUUID) {
-    return getTrack(Hex.toBytes(hexUUID));
+  public final Image getImage(byte[] UUID) {
+    return getImage(Hex.toHex(UUID));
   }
 
+  public abstract Media persist(Media media);
 
+  public abstract Playlist getPlaylist(String hexUUID);
+
+  public abstract Image getImage(String hexUUID);
+
+  public abstract Album getAlbum(String hexUUID);
+
+  public abstract Artist getArtist(String hexUUID);
+
+  public abstract Track getTrack(String hexUUID);
 
 }

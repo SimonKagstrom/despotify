@@ -50,7 +50,7 @@ public class DNS {
 		catch(NamingException e){
 			/* Ignore and just return possibly empty list. */
 		}
-		
+	    
 		/* Return list of addresses. */
 		return addresses;
 	}

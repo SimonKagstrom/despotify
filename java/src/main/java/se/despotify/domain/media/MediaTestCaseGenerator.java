@@ -6,14 +6,14 @@ package se.despotify.domain.media;
 public class MediaTestCaseGenerator {
 
   public static void createEqualsTest(final Media media) throws Exception {
-    createEqualsTest(media, "SpotifyURL.browse(\"" + media.getSpotifyURL() + "\", connection)");
+    createEqualsTest(media, "SpotifyURL.browse(\"" + media.getSpotifyURI() + "\", connection)");
   }
 
   public static void createEqualsTest(final Media media, final String objectName) throws Exception {
     media.accept(new VisitorAdapter() {
       @Override
       public void visit(Album album) {
-        System.out.println("    "+objectName+".accept(new VisitorAdapter() {");
+        System.out.println("    " + objectName + ".accept(new VisitorAdapter() {");
         System.out.println("      @Override");
         System.out.println("      public void visit(Album album) {");
 
@@ -51,7 +51,7 @@ public class MediaTestCaseGenerator {
 
       @Override
       public void visit(Artist artist) {
-        System.out.println("    "+objectName+".accept(new VisitorAdapter() {");
+        System.out.println("    " + objectName + ".accept(new VisitorAdapter() {");
         System.out.println("      @Override");
         System.out.println("      public void visit(Artist artist) {");
 
@@ -71,7 +71,7 @@ public class MediaTestCaseGenerator {
 
 
 */
-        System.out.println("    "+objectName+".accept(new VisitorAdapter() {");
+        System.out.println("    " + objectName + ".accept(new VisitorAdapter() {");
         System.out.println("      @Override");
         System.out.println("      public void visit(Playlist playlist) {");
         System.out.println("        assertEquals(\"" + playlist.getName() + "\", playlist.getName());");
@@ -80,7 +80,7 @@ public class MediaTestCaseGenerator {
         System.out.println("        assertEquals(" + playlist.calculateChecksum() + "l, playlist.calculateChecksum());");
         System.out.println("        assertEquals(\"" + playlist.getAuthor() + "\", playlist.getAuthor());");
         System.out.println("        assert" + (playlist.isCollaborative() ? "True" : "False") + "(playlist.isCollaborative());");
-        System.out.println("        assertEquals(\"" + playlist.getHexUUID() + "\", playlist.getHexUUID());");
+        System.out.println("        assertEquals(\"" + playlist.getId() + "\", playlist.getHexUUID());");
         System.out.println("        assertEquals(" + playlist.getTracks().size() + ", playlist.getTracks().size());");
         System.out.println("        ");
         for (int i = 0; i < playlist.getTracks().size(); i++) {
@@ -96,7 +96,7 @@ public class MediaTestCaseGenerator {
 
       @Override
       public void visit(Track track) {
-        System.out.println("    "+objectName+".accept(new VisitorAdapter() {");
+        System.out.println("    " + objectName + ".accept(new VisitorAdapter() {");
         System.out.println("      @Override");
         System.out.println("      public void visit(Track track) {");
         System.out.println("");
@@ -126,7 +126,7 @@ public class MediaTestCaseGenerator {
   }
 
   public static void printAlbum(Album album, String prefix) {
-    System.out.println("        assertEquals(\"" + album.getSpotifyURL() + "\", " + prefix + ".getSpotifyURL());");
+    System.out.println("        assertEquals(\"" + album.getSpotifyURI() + "\", " + prefix + ".getSpotifyURL());");
     System.out.println("        assertEquals(\"" + album.getHttpURL() + "\", " + prefix + ".getHttpURL());");
 
     if (album.getName() == null) {
@@ -140,18 +140,18 @@ public class MediaTestCaseGenerator {
     } else {
       System.out.println("        assertEquals(\"" + album.getCover() + "\", " + prefix + ".getCover());");
     }
-    System.out.println("        assertEquals(\"" + album.getHexUUID() + "\", " + prefix + ".getHexUUID());");
+    System.out.println("        assertEquals(\"" + album.getId() + "\", " + prefix + ".getHexUUID());");
 
     if (album.getPopularity() != null) {
       System.out.println("        assertEquals(" + album.getPopularity() + "f, track.getPopularity());");
     } else {
-      System.out.println("        assertNull("+prefix+".getPopularity());");
+      System.out.println("        assertNull(" + prefix + ".getPopularity());");
     }
   }
 
   public static void printArtist(Artist artist, String prefix) {
-    System.out.println("        assertEquals(\"" + artist.getHexUUID() + "\", " + prefix + ".getHexUUID());");
-    System.out.println("        assertEquals(\"" + artist.getSpotifyURL() + "\", " + prefix + ".getSpotifyURL());");
+    System.out.println("        assertEquals(\"" + artist.getId() + "\", " + prefix + ".getHexUUID());");
+    System.out.println("        assertEquals(\"" + artist.getSpotifyURI() + "\", " + prefix + ".getSpotifyURL());");
     System.out.println("        assertEquals(\"" + artist.getHttpURL() + "\", " + prefix + ".getHttpURL());");
 
     System.out.println("        assertEquals(\"" + artist.getName() + "\", " + prefix + ".getName());");
@@ -171,8 +171,8 @@ public class MediaTestCaseGenerator {
   }
 
   public static void printTrack(Track track, String prefix) {
-    System.out.println("        assertEquals(\"" + track.getHexUUID() + "\", " + prefix + ".getHexUUID());");
-    System.out.println("        assertEquals(\"" + track.getSpotifyURL() + "\", " + prefix + ".getSpotifyURL());");
+    System.out.println("        assertEquals(\"" + track.getId() + "\", " + prefix + ".getHexUUID());");
+    System.out.println("        assertEquals(\"" + track.getSpotifyURI() + "\", " + prefix + ".getSpotifyURL());");
     System.out.println("        assertEquals(\"" + track.getHttpURL() + "\", " + prefix + ".getHttpURL());");
 
     if (track.getTitle() != null) {
@@ -188,7 +188,7 @@ public class MediaTestCaseGenerator {
       System.out.println("        assertEquals(\"" + track.getCover() + "\", " + prefix + ".getCover());");
     }
     if (track.getFiles() == null) {
-      System.out.println("        assertNull("+prefix+".getFiles());");
+      System.out.println("        assertNull(" + prefix + ".getFiles());");
     } else {
       System.out.println("        assertEquals(" + track.getFiles().size() + ", " + prefix + ".getFiles().size());");
       for (int i = 0; i < track.getFiles().size(); i++) {
@@ -198,19 +198,19 @@ public class MediaTestCaseGenerator {
     if (track.getLength() != null) {
       System.out.println("        assertEquals(" + track.getLength() + "l, " + prefix + ".getLength().longValue());");
     } else {
-      System.out.println("        assertNull("+prefix+".getLength());");
+      System.out.println("        assertNull(" + prefix + ".getLength());");
     }
 
     if (track.getPopularity() != null) {
       System.out.println("        assertTrue(track.getPopularity() > 0f);");
     } else {
-      System.out.println("        assertNull("+prefix+".getPopularity());");
+      System.out.println("        assertNull(" + prefix + ".getPopularity());");
     }
 
     if (track.getTrackNumber() != null) {
       System.out.println("        assertEquals(" + track.getTrackNumber() + ", " + prefix + ".getTrackNumber().intValue());");
     } else {
-      System.out.println("        assertNull("+prefix+".getTrackNumber());");
+      System.out.println("        assertNull(" + prefix + ".getTrackNumber());");
     }
 
     if (track.getYear() == null) {

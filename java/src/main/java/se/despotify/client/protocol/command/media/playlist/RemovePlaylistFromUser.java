@@ -207,7 +207,7 @@ shn_decrypt(ctx=0x8f0dc0, buf=0x8c8a8c, len=2 [0x0002]) called from 0x000adf64
             position,
             1, // number of playlists to delete with start at attribute "position"
             new Date().getTime() / 1000,
-            user.getName(),
+            user.getId(),
             // version
             playlists.getRevision() + 1,
             playlists.getItems().size(),
@@ -255,7 +255,7 @@ shn_decrypt(ctx=0x8f0dc0, buf=0x8c8a8c, len=2 [0x0002]) called from 0x000adf64
         ("<change><ops><destroy/></ops><time>%s</time><user>%s</user></change>" +
             "<version>%010d,%010d,%010d,%d</version>",
             new Date().getTime() / 1000,
-            user.getName(),
+            user.getId(),
             // version
             playlist.getRevision() + 1,
             playlist.getTracks().size(),
@@ -271,7 +271,7 @@ shn_decrypt(ctx=0x8f0dc0, buf=0x8c8a8c, len=2 [0x0002]) called from 0x000adf64
 
 
     buffer.putShort((short) channel.getId());
-    buffer.put(playlist.getUUID());
+    buffer.put(playlist.getByteUUID());
     buffer.put((byte) 0x02); // playlist type UUID tag
     buffer.putInt((int) playlist.getRevision().longValue());
     buffer.putInt(playlist.getTracks().size());

@@ -4,107 +4,55 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.util.Hex;
 
-import java.util.Arrays;
-import java.util.regex.Pattern;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Id;
+import javax.persistence.Column;
+import java.util.Date;
 
 /**
  * @since 2009-apr-24 14:17:32
  */
-public abstract class Media implements Visitable {
+@MappedSuperclass
+public abstract class Media implements Visitable<String>, org.domdrides.entity.Entity<String> {
 
   protected static Logger log = LoggerFactory.getLogger(Media.class);
 
-  public enum State {
-    stub, loaded
-  }
-  private State state = State.stub;
+  @Id
+  @Column(length = 48)
+  protected String id;
 
-  public State getState() {
-    return state;
-  }
+  private Date loaded;
 
-  protected void setState(State state) {
-    this.state = state;
-  }
-
-  protected abstract int getUUIDlength();
-  protected abstract Pattern getHexUUIDpattern();
-
-  /** most media UUID */
-  protected final static Pattern hexUUIDpattern32 = Pattern.compile("^[0-9a-fA-F]{32}$");
-
-  /** image UUID */
-  protected final static Pattern hexUUIDpattern40 = Pattern.compile("^[0-9a-fA-F]{40}$");
-
-
-  protected  boolean isHexUUID(String value) {
-    return getHexUUIDpattern().matcher(value).matches();
+  public byte[] getByteUUID() {
+    return Hex.toBytes(getId());
   }
 
 
-  private byte[] UUID;
 
-  protected Media() {
-    UUID = null;
-    hexUUID = null;
-  }
-
-  protected Media(byte[] UUID) {
-    this(UUID, null);
-  }
-
-  protected Media(byte[] UUID, String hexUUID) {
-    this.UUID = UUID;
-    this.hexUUID = hexUUID;
-  }
-
-  protected Media(String hexUUID) {
-    if (hexUUID == null) {
-      throw new NullPointerException("Expected hex UUID");
-    }
-    if (!isHexUUID(hexUUID)) {
-      throw new IllegalArgumentException(hexUUID + " is not a hex UUID");
-    }
-    this.UUID = Hex.toBytes(hexUUID);
-    this.hexUUID = hexUUID;
-  }
-
-  public void setUUID(String hexUUID) {
-    if (isHexUUID(hexUUID)) {
-      this.UUID= Hex.toBytes(hexUUID);
-      this.hexUUID = hexUUID;
-    } else {
-      throw new IllegalArgumentException(hexUUID + " is not a valid UUID.");
-    }
-  }
-
-  public void setUUID(byte[] UUID) {
-    if (UUID == null) {
-      throw new IllegalArgumentException("UUID must not be null");
-    } else if (UUID.length != getUUIDlength()) {
-      throw new IllegalArgumentException("UUID should be "+getUUIDlength()+" bytes");
-    }
-    this.UUID = UUID;
-    hexUUID = null; // reset
-  }
-
-	public final byte[] getUUID(){
-		return this.UUID;
-	}
-
-  private transient String hexUUID;
-
-  public final String getHexUUID() {
-    if (hexUUID == null && UUID != null) {
-      hexUUID = Hex.toHex(UUID);
-    }
-    return hexUUID;
-  }
-
-
-	public abstract String getSpotifyURL();
+  public abstract String getSpotifyURI();
 
   public abstract String getHttpURL();
+
+  public Date getLoaded() {
+    return loaded;
+  }
+
+  public void setLoaded(Date loaded) {
+    this.loaded = loaded;
+  }
+
+  @Override
+  public String toString() {
+    return getSpotifyURI();
+  }
+
+  public final String getId() {
+    return id;
+  }
+
+  public final void setId(String id) {
+    this.id = id;
+  }
 
   @Override
   public boolean equals(Object o) {
@@ -113,19 +61,13 @@ public abstract class Media implements Visitable {
 
     Media media = (Media) o;
 
-    return Arrays.equals(UUID, media.UUID);
+    if (!id.equals(media.id)) return false;
 
+    return true;
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(UUID);
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "hexUUID=" + getHexUUID()+
-        '}';
+    return id.hashCode();
   }
 }

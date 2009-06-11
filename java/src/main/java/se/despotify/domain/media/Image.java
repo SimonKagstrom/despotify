@@ -1,51 +1,46 @@
 package se.despotify.domain.media;
 
 import se.despotify.domain.Store;
+import se.despotify.util.Hex;
 import se.despotify.util.XMLElement;
 
 import javax.imageio.ImageIO;
+import javax.persistence.Entity;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.regex.Pattern;
+
 
 /**
  * @since 2009-apr-27 18:08:58
  */
-public class Image extends Media {
+@Entity
+public class Image extends Media  {
+
+  private static final long serialVersionUID = 1L;
 
   public Image() {
   }
 
-  public Image(byte[] UUID) {
-    super(UUID);
-  }
-
-  public Image(byte[] UUID, String hexUUID) {
-    super(UUID, hexUUID);
-  }
-
   public Image(String hexUUID) {
-    super(hexUUID);
+    id = hexUUID;
   }
+
+  public Image(byte[] bytesUUID) {
+    this(Hex.toHex(bytesUUID));
+  }
+
 
   @Override
-  protected int getUUIDlength() {
-    return 20;
+  public byte[] getByteUUID() {
+    return Hex.toBytes(id);
   }
-
-  @Override
-  protected Pattern getHexUUIDpattern() {
-    return hexUUIDpattern40;
-  }
-
 
   public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 
 
-  public String getSpotifyURL() {
+  public String getSpotifyURI() {
     throw new UnsupportedOperationException();
   }
 
@@ -83,7 +78,6 @@ public class Image extends Media {
   }
 
 
-
   public java.awt.Image toAwtImage() {
     try {
       return ImageIO.read(new ByteArrayInputStream(getBytes()));
@@ -98,7 +92,7 @@ public class Image extends Media {
 
     if (imageNode.hasChild("id")) {
       image = store.getImage(imageNode.getChildText("id"));
-    } else if (Media.hexUUIDpattern40.matcher(imageNode.getText()).matches()) {
+    } else if (Hex.pattern.matcher(imageNode.getText()).matches()) {
       image = store.getImage(imageNode.getText());
     } else {
       throw new RuntimeException("Image hexUUID missing in XML node");
@@ -118,10 +112,12 @@ public class Image extends Media {
   @Override
   public String toString() {
     return "Image{" +
-        "hexUUID=" + getHexUUID() +
+        "id=" + id +
         ", width=" + width +
         ", height=" + height +
         ", bytes=" + (bytes == null ? null : bytes.length) +
         '}';
   }
+
+
 }

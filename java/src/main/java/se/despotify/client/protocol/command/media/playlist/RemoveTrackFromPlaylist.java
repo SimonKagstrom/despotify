@@ -182,7 +182,7 @@ shn_decrypt(ctx=0x8523c0, buf=0x81328a, len=2 [0x0002]) called from 0x000adf64
   @Override
   public Track send(Connection connection) throws DespotifyException {
 
-    if (!playlist.isCollaborative() && !playlist.getAuthor().equals(user.getName())) {
+    if (!playlist.isCollaborative() && !playlist.getAuthor().equals(user.getId())) {
       throw new DespotifyException("Playlist must be collaborative or owned by the current user!");
     }
 
@@ -207,7 +207,7 @@ shn_decrypt(ctx=0x8523c0, buf=0x81328a, len=2 [0x0002]) called from 0x000adf64
         playlist.getTracks().size(), // todo uncertain
         1, // unknown <k>
         new Date().getTime() / 1000,
-        user.getName(),
+        user.getId(),
         playlist.getRevision() + 1,
         playlist.getTracks().size(),
         playlist.getChecksum(),
@@ -222,7 +222,7 @@ shn_decrypt(ctx=0x8523c0, buf=0x81328a, len=2 [0x0002]) called from 0x000adf64
     ByteBuffer buffer = ByteBuffer.allocate(2 + 16 + 1 + 4 + 4 + 4 + 1 + 1 + xmlBytes.length);
 
     buffer.putShort((short) channel.getId());
-    buffer.put(playlist.getUUID());
+    buffer.put(playlist.getByteUUID());
     buffer.put((byte) 0x02); // track UUID type tag
 
     buffer.putInt(playlist.getRevision().intValue());

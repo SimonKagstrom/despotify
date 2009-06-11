@@ -6,7 +6,7 @@
 
   <groupId>se.despotify</groupId>
   <artifactId>despotify</artifactId>
-  <version>0.3.3</version>
+  <version>0.4.0</version>
 
   <name>Despotify</name>
   <description>Spotify client API</description>
@@ -15,7 +15,42 @@
 
   <packaging>jar</packaging>
 
+  <distributionManagement>
+    <repository>
+      <id>kodapan</id>
+      <name>depostify</name>
+      <url>scp://maven.kodapan.se/var/www/mvn</url>
+    </repository>
+
+  </distributionManagement>
+
   <dependencies>
+
+    <dependency>
+      <groupId>org.domdrides</groupId>
+      <artifactId>domdrides-core</artifactId>
+      <version>1.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.domdrides</groupId>
+      <artifactId>domdrides-jpa</artifactId>
+      <version>1.2</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>persistence-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-annotations</artifactId>
+      <version>3.3.1.GA</version>
+    </dependency>
+
 
     <dependency>
       <groupId>com.projectdarkstar.ext.jorbis</groupId>
@@ -69,7 +104,7 @@
       <id>repo1</id>
       <name>repo1</name>
       <url>http://repo1.maven.org/maven2/</url>
-    </repository>    
+    </repository>
     <repository>
       <id>java.net</id>
       <name>java.net</name>
@@ -80,6 +115,11 @@
       <name>lius4compass</name>
       <url>http://lius4compass.googlecode.com/svn-history/r65/maven2/</url>
     </repository>
+    <repository>
+      <id>kodapan</id>
+      <name>kodapan</name>
+      <url>http://maven.kodapan.se/mvn</url>
+    </repository>
   </repositories>
 
   <pluginRepositories>
@@ -88,7 +128,7 @@
       <url>http://repository.codehaus.org/</url>
     </pluginRepository>
   </pluginRepositories>
-    
+
   <build>
     <pluginManagement>
       <plugins>
@@ -97,8 +137,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
             <encoding>UTF8</encoding>
-            <source>1.5</source>
-            <target>1.5</target>
+            <source>1.6</source>
+            <target>1.6</target>
           </configuration>
         </plugin>
 
@@ -112,6 +152,25 @@
             <useFile>true</useFile>
           </configuration>
         </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-idea-plugin</artifactId>
+          <configuration>
+            <downloadSources>true</downloadSources>
+            <downloadJavadocs>true</downloadJavadocs>
+          </configuration>
+
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <configuration>
+            <downloadSources>true</downloadSources>
+          </configuration>
+        </plugin>
+
       </plugins>
 
     </pluginManagement>
@@ -137,6 +196,25 @@
       -->
   <reporting>
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-idea-plugin</artifactId>
+        <configuration>
+          <downloadSources>true</downloadSources>
+          <downloadJavadocs>true</downloadJavadocs>
+        </configuration>
+
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <downloadSources>true</downloadSources>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -250,8 +328,6 @@
       -->
     </plugins>
   </reporting>
-
-
 
 
 </project>

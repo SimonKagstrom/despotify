@@ -10,6 +10,7 @@ import se.despotify.domain.media.Track;
 import se.despotify.exceptions.ConnectionException;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.exceptions.AuthenticationException;
+import se.despotify.exceptions.RecievedInvalidHeaderException;
 import se.despotify.util.DNS;
 import se.despotify.util.Hex;
 import se.despotify.util.IntegerUtilities;
@@ -22,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// FIXED: cleaned up the code
+/**
+ * todo merge with Session?
+ */
 public class Protocol {
 
   private static final Logger log = LoggerFactory.getLogger(Protocol.class);
@@ -48,14 +51,19 @@ public class Protocol {
   /* Connect to one of the spotify servers. */
 	public void connect() throws ConnectionException {
 		log.info("Lookup servers via DNS SRV query.");
-		List<InetSocketAddress> servers = DNS.lookupSRV("_spotify-client._tcp.spotify.com");
+		List<InetSocketAddress> servers = new ArrayList<InetSocketAddress>();
 
-    if (servers.size() == 0) {
-      log.warn("Empty DNS SRV response!");
+    /* Add a fallback server if others don't work. */    
+    servers.add(new InetSocketAddress(System.getProperty("despotify.defaultServer.hostname", "ap.spotify.com"), Integer.valueOf(System.getProperty("despotify.defaultServer.port", "4070"))));
+    if (Boolean.valueOf(System.getProperty("despotify.useDNSSRV", "true"))) {
+      List<InetSocketAddress> response = DNS.lookupSRV("_spotify-client._tcp.spotify.com");
+      if (response.size() == 0) {
+        log.warn("DNS SRV lookup returned an empty result!");
+      } else {
+        servers.addAll(response);
+      }
     }
 
-		/* Add a fallback server if others don't work. */
-		servers.add(new InetSocketAddress("ap.spotify.com", 4070));
 
 		/* Try to connect to each server, stop trying when connected. */
     boolean connected = false;
@@ -427,8 +435,10 @@ public class Protocol {
     int payloadLength, headerLength = 3, macLength = 4;
 
 		/* Read header. */
-		if(this.receive(header, headerLength, log.isDebugEnabled() ? "packet header" : null) != headerLength){
-			throw new DespotifyException("Failed to read header.");
+    int received = this.receive(header, headerLength, log.isDebugEnabled() ? "packet header" : null);
+		if(received != headerLength){
+      // todo reconnect?
+			throw new RecievedInvalidHeaderException("Failed to read header. Expected " + headerLength + " bytes, received "+ received+". todo try to reconnect once?");
 		}
 
 		/* Set IV. */
@@ -542,40 +552,40 @@ public class Protocol {
 		this.sendPacket(PacketType.image, buffer);
 	}
 
-	/* Search music. The response comes as GZIP compressed XML. */
-	public void sendSearchQuery(ChannelListener listener, String query, int offset, int limit) throws DespotifyException {
-		/* Create channel and buffer. */
-		Channel    channel = new Channel("Search-Channel", Channel.Type.TYPE_SEARCH, listener);
-		ByteBuffer buffer  = ByteBuffer.allocate(2 + 4 + 4 + 2 + 1 + query.getBytes().length);
-
-		/* Check offset and limit. */
-		if(offset < 0){
-			throw new IllegalArgumentException("Offset needs to be >= 0");
-		}
-		else if((limit < 0 && limit != -1) || limit == 0){
-			throw new IllegalArgumentException("Limit needs to be either -1 for no limit or > 0");
-		}
-
-		/* Append channel id, some values, query length and query. */
-		buffer.putShort((short)channel.getId());
-		buffer.putInt(offset); /* Result offset. */
-		buffer.putInt(limit); /* Reply limit. */
-		buffer.putShort((short)0x0000);
-		buffer.put((byte)query.length());
-		buffer.put(query.getBytes());
-		buffer.flip();
-
-		/* Register channel. */
-		Channel.register(channel);
-
-		/* Send packet. */
-		this.sendPacket(PacketType.search, buffer);
-	}
-
-	/* Search music. The response comes as GZIP compressed XML. */
-	public void sendSearchQuery(ChannelListener listener, String query) throws DespotifyException {
-		this.sendSearchQuery(listener, query, 0, -1);
-	}
+//	/* Search music. The response comes as GZIP compressed XML. */
+//	public void sendSearchQuery(ChannelListener listener, String query, int offset, int limit) throws DespotifyException {
+//		/* Create channel and buffer. */
+//		Channel    channel = new Channel("Search-Channel", Channel.Type.TYPE_SEARCH, listener);
+//		ByteBuffer buffer  = ByteBuffer.allocate(2 + 4 + 4 + 2 + 1 + query.getBytes().length);
+//
+//		/* Check offset and limit. */
+//		if(offset < 0){
+//			throw new IllegalArgumentException("Offset needs to be >= 0");
+//		}
+//		else if((limit < 0 && limit != -1) || limit == 0){
+//			throw new IllegalArgumentException("Limit needs to be either -1 for no limit or > 0");
+//		}
+//
+//		/* Append channel id, some values, query length and query. */
+//		buffer.putShort((short)channel.getId());
+//		buffer.putInt(offset); /* Result offset. */
+//		buffer.putInt(limit); /* Reply limit. */
+//		buffer.putShort((short)0x0000);
+//		buffer.put((byte)query.length());
+//		buffer.put(query.getBytes());
+//		buffer.flip();
+//
+//		/* Register channel. */
+//		Channel.register(channel);
+//
+//		/* Send packet. */
+//		this.sendPacket(PacketType.search, buffer);
+//	}
+//
+//	/* Search music. The response comes as GZIP compressed XML. */
+//	public void sendSearchQuery(ChannelListener listener, String query) throws DespotifyException {
+//		this.sendSearchQuery(listener, query, 0, -1);
+//	}
 
 	/* Notify server we're going to play. */
 	public void sendTokenNotify() throws DespotifyException {
@@ -590,7 +600,7 @@ public class Protocol {
 
 		/* Request the AES key for this file by sending the file id and track id. */
 		buffer.put(Hex.toBytes(track.getFiles().get(0))); /* 20 bytes */
-		buffer.put(track.getUUID()); /* 16 bytes */
+		buffer.put(track.getByteUUID()); /* 16 bytes */
 		buffer.putShort((short)0x0000);
 		buffer.putShort((short)channel.getId());
 		buffer.flip();
@@ -677,7 +687,7 @@ public class Protocol {
 
 		/* Append channel id, playlist id and some bytes... */
 		buffer.putShort((short)channel.getId());
-		buffer.put(playlist.getUUID()); /* 16 bytes */
+		buffer.put(playlist.getByteUUID()); /* 16 bytes */
     buffer.put((byte)0x00); // 0x00 for adding tracks, 0x02 for the rest?
 		buffer.putInt(playlist.getRevision().intValue());
 		buffer.putInt(playlist.getTracks().size());

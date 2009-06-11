@@ -18,6 +18,9 @@ public class DespotifyManager {
 
   private static Logger log = LoggerFactory.getLogger(DespotifyManager.class);
 
+  public DespotifyManager() {
+  }
+
   public DespotifyManager(String username, String password) {
     this(username, password, 1);
   }
@@ -30,6 +33,10 @@ public class DespotifyManager {
 
   private String username;
   private String password;
+
+  public void connect() {
+    releaseConnection(getConnection());
+  }
 
   private static class ConnectionThread {
     private Thread thread;
@@ -68,7 +75,7 @@ public class DespotifyManager {
       } else {
         connectionsCreated.decrementAndGet();
         // todo wait for connection
-        throw new UnsupportedOperationException(""); // todo
+        throw new UnsupportedOperationException("Not implemented> waiting for connection"); // todo
       }
     }
     return connection;
@@ -102,4 +109,19 @@ public class DespotifyManager {
     }
   }
 
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
 }

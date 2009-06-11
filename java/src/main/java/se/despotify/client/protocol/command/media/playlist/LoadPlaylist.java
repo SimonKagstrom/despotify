@@ -16,6 +16,7 @@ import se.despotify.Connection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Date;
 
 /**
  * input (plaintext):
@@ -56,7 +57,7 @@ public class LoadPlaylist extends Command<Boolean> {
 
     /* Append channel id, playlist id and some bytes... */
     buffer.putShort((short) channel.getId());
-    buffer.put(playlist.getUUID()); /// playlist UUID
+    buffer.put(playlist.getByteUUID()); /// playlist UUID
     buffer.put((byte) 0x02); // playlist UUID type
 
     // todo if getTracks() == null..
@@ -94,6 +95,7 @@ public class LoadPlaylist extends Command<Boolean> {
       throw new ChecksumException(playlist.getChecksum(), playlist.calculateChecksum());
     }
 
+    playlist.setLoaded(new Date());
     return true;
 
 

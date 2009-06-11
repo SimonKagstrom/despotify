@@ -8,6 +8,7 @@ import se.despotify.exceptions.DespotifyException;
 import se.despotify.Connection;
 
 import java.nio.ByteBuffer;
+import java.util.Date;
 
 /**
  * @since 2009-apr-27 18:02:29
@@ -33,7 +34,7 @@ public class LoadImage extends Command<Boolean> {
 
     /* Append channel id and image hash. */
     buffer.putShort((short)channel.getId());
-    buffer.put(image.getUUID());
+    buffer.put(image.getByteUUID());
     buffer.flip();
 
     /* Register channel. */
@@ -44,6 +45,8 @@ public class LoadImage extends Command<Boolean> {
 
       /* Get data. */
     image.setBytes(callback.getData("load image response"));
+
+    image.setLoaded(new Date());
 
     return true;
 

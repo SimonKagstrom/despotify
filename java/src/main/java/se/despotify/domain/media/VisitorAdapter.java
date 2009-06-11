@@ -1,7 +1,6 @@
 package se.despotify.domain.media;
 
 /**
- *
  * @since 2009-apr-20 20:49:52
  */
 public class VisitorAdapter implements Visitor {

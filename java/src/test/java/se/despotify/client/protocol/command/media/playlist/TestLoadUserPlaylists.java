@@ -17,9 +17,9 @@ public class TestLoadUserPlaylists extends DespotifyClientTest {
     new LoadUserPlaylists(store, user).send(connection);
     PlaylistContainer playlists  = user.getPlaylists();
     assertNotNull(playlists);
-    assertEquals(username, playlists.getAuthor());
+    assertEquals(username, playlists.getId());
     for (Playlist playlist : playlists) {      
-      assertEquals(16, playlist.getUUID().length);
+      assertEquals(16, playlist.getByteUUID().length);
       testGetPlaylist(playlist);
     }
 
@@ -38,10 +38,10 @@ public class TestLoadUserPlaylists extends DespotifyClientTest {
 
     assertNotNull(playlist.getName());
 
-    System.err.println(playlist.getName() + "\t" + playlist.getSpotifyURL());
+    System.err.println(playlist.getName() + "\t" + playlist.getSpotifyURI());
 
     assertNotNull(playlist);
-    assertNotNull(playlist.getUUID());
+    assertNotNull(playlist.getByteUUID());
     assertNotNull(playlist.getName());
     assertNotNull(playlist.getAuthor());
     assertNotNull(playlist.isCollaborative());

@@ -55,7 +55,7 @@ public class AddTrackToPlaylist extends Command<Boolean> {
   @Override
   public Boolean send(Connection connection) throws DespotifyException {
 
-    if (!playlist.isCollaborative() && !playlist.getAuthor().equals(user.getName())) {
+    if (!playlist.isCollaborative() && !playlist.getAuthor().equals(user.getId())) {
       throw new DespotifyException("Playlist must be collaborative or owned by the current user!");
     }
 
@@ -85,9 +85,9 @@ public class AddTrackToPlaylist extends Command<Boolean> {
         "<change><ops><add><i>%s</i><items>%s</items></add></ops><time>%d</time><user>%s</user></change>" +
             "<version>%010d,%010d,%010d,%d</version>",
         position,
-        track.getHexUUID() + "01", // hex uuid tag
+        track.getId() + "01", // hex uuid tag
         new Date().getTime() / 1000,
-        user.getName(),
+        user.getId(),
         playlist.getRevision() + 1,
         playlist.getTracks().size(),
         playlist.getChecksum(),
@@ -103,7 +103,7 @@ public class AddTrackToPlaylist extends Command<Boolean> {
 
     /* Append channel id, playlist id and some bytes... */
     buffer.putShort((short) channel.getId());
-    buffer.put(playlist.getUUID());
+    buffer.put(playlist.getByteUUID());
     buffer.put((byte) 0x02); // track UUID type tag
 
     buffer.putInt(playlist.getRevision().intValue());

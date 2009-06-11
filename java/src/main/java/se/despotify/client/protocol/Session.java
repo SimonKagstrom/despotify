@@ -14,6 +14,9 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * todo merge with Protocol?
+ */
 public class Session {
 
   private static final Charset UTF8 = Charset.forName("UTF8");
@@ -192,7 +195,7 @@ public class Session {
     this.protocol.receiveInitialPacket();
 
 
-    user.setName(username);
+    user.setId(username);
 		
 		/* Generate auth hash. */
 		this.generateAuthHash();

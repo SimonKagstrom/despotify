@@ -61,7 +61,7 @@ public abstract class DespotifyClientTest extends TestCase {
     }
 
     user = new User();
-    user.setName(username);
+    user.setId(username);
 
     store = new MemoryStore();
 

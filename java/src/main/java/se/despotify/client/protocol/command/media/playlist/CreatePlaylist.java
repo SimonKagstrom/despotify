@@ -6,6 +6,7 @@ import se.despotify.domain.User;
 import se.despotify.domain.media.Playlist;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.Connection;
+import se.despotify.util.Hex;
 
 /**
  * @since 2009-apr-27 00:46:31
@@ -27,10 +28,11 @@ public class CreatePlaylist extends Command<Playlist> {
   @Override
   public Playlist send(Connection connection) throws DespotifyException {
     byte[] playlistUUID = new ReserveRandomPlaylistUUID(store, user, playlistName, collaborative).send(connection);
-    Playlist playlist = store.getPlaylist(playlistUUID);
-    playlist.setAuthor(user.getName());
+    String hexUUID = Hex.toHex(playlistUUID);
+    Playlist playlist = store.getPlaylist(hexUUID);
+    playlist.setAuthor(user.getId());
     playlist.setName(playlistName);
-    playlist.setUUID(playlistUUID);
+    playlist.setId(hexUUID);
     if (new CreatePlaylistWithReservedUUID(store, user, playlist).send(connection)) {
       return playlist;
     } else {

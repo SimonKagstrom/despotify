@@ -2,19 +2,16 @@ package se.despotify;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.despotify.client.player.ChannelPlayer;
-import se.despotify.client.player.PlaybackListener;
 import se.despotify.client.protocol.CommandListener;
 import se.despotify.client.protocol.PacketType;
 import se.despotify.client.protocol.Protocol;
 import se.despotify.client.protocol.Session;
 import se.despotify.client.protocol.channel.Channel;
-import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.crypto.RSA;
-import se.despotify.domain.media.Track;
 import se.despotify.exceptions.AuthenticationException;
 import se.despotify.exceptions.ConnectionException;
 import se.despotify.exceptions.DespotifyException;
+import se.despotify.exceptions.RecievedInvalidHeaderException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
@@ -95,7 +92,15 @@ public class Connection implements CommandListener, Runnable {
     while (running) {
       try {
         this.protocol.receivePacket();
+      } catch (RecievedInvalidHeaderException e) {
+        try {
+          this.protocol.disconnect();
+        } catch (Exception e2) {
+          log.warn(e2.getMessage(), e2);
+        }
+        throw e;
       } catch (DespotifyException e) {
+
         log.error("Exception when receiving packet.", e);
         if (isFailFast()) {
           break;

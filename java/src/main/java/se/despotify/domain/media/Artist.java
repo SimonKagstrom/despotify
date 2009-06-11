@@ -1,50 +1,64 @@
 package se.despotify.domain.media;
 
+import org.hibernate.annotations.CollectionOfElements;
 import se.despotify.domain.Store;
+import se.despotify.util.Hex;
 import se.despotify.util.SpotifyURI;
 import se.despotify.util.XMLElement;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Arrays;
-import java.util.regex.Pattern;
+import javax.persistence.OneToMany;
+import javax.persistence.Entity;
+import javax.persistence.CascadeType;
+import javax.persistence.ManyToOne;
+import java.util.*;
 
-public class Artist extends Media implements Visitable {
+@Entity
+public class Artist extends Media {
+
+  private static final long serialVersionUID = 1L;
+
   private String name;
+
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Image portrait;
   private Float popularity;
+
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Artist> similarArtists;
+
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Biography> biographies;
-  private List<String> genres;
+
+  @CollectionOfElements
+  private Set<String> genres;
+
+  @CollectionOfElements
   private List<String> yearsActive;
+
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Album> albums;
 
   public Artist() {
     super();
   }
 
-  public Artist(byte[] UUID) {
-    super(UUID);
-  }
-
-  public Artist(byte[] UUID, String hexUUID) {
-    super(UUID, hexUUID);
-  }
-
   public Artist(String hexUUID) {
-    super(hexUUID);
+    this(hexUUID, null);
+  }
+
+  public Artist(byte[] bytesUUID) {
+    this(Hex.toHex(bytesUUID), null);
+  }
+
+  public Artist(String hexUUID, String name) {
+    this.id = hexUUID;
+    this.name = name;
   }
 
   @Override
-  protected int getUUIDlength() {
-    return 16;
+  public byte[] getByteUUID() {
+    return Hex.toBytes(id);
   }
-
-  @Override
-  protected Pattern getHexUUIDpattern() {
-    return hexUUIDpattern32;
-  }
-  
 
   @Override
   public void accept(Visitor visitor) {
@@ -52,13 +66,13 @@ public class Artist extends Media implements Visitable {
   }
 
   @Override
-  public String getSpotifyURL() {
-    return "spotify:artist:" + SpotifyURI.toURI(getUUID());
+  public String getSpotifyURI() {
+    return "spotify:artist:" + SpotifyURI.toURI(getByteUUID());
   }
 
   @Override
   public String getHttpURL() {
-    return "http://open.spotify.com/artist/" + SpotifyURI.toURI(getUUID());
+    return "http://open.spotify.com/artist/" + SpotifyURI.toURI(getByteUUID());
   }
 
   public String getName() {
@@ -101,11 +115,11 @@ public class Artist extends Media implements Visitable {
     this.biographies = biographies;
   }
 
-  public List<String> getGenres() {
+  public Set<String> getGenres() {
     return genres;
   }
 
-  public void setGenres(List<String> genres) {
+  public void setGenres(Set<String> genres) {
     this.genres = genres;
   }
 
@@ -135,7 +149,7 @@ public class Artist extends Media implements Visitable {
 
     /* Set portrait. */
     if (artistNode.hasChild("portrait")) {
-      XMLElement portraitNode  = artistNode.getChild("portrait");
+      XMLElement portraitNode = artistNode.getChild("portrait");
       if (!"".equals(portraitNode.getText().trim())) {
         artist.portrait = Image.fromXMLElement(portraitNode, store);
       }
@@ -174,13 +188,20 @@ public class Artist extends Media implements Visitable {
     }
 
     if (artistNode.hasChild("genres")) {
-      artist.genres = new ArrayList<String>(Arrays.asList(artistNode.getChildText("genres").split(",")));
+      String[] genreIds = artistNode.getChildText("genres").split(",");
+      Set<String> genres = new LinkedHashSet<String>(genreIds.length);
+      for(String genre : genreIds) {
+        if (!"".equals(genre)) {
+          genres.add(genre);
+        }
+      }      
+      artist.genres = genres;
     }
 
     XMLElement albumsNode = artistNode.getChild("albums");
     if (albumsNode != null) {
       List<Album> albums = new ArrayList<Album>();
-      for (XMLElement albumNode : albumsNode.getChildren())  {
+      for (XMLElement albumNode : albumsNode.getChildren()) {
         albums.add(Album.fromXMLElement(albumNode, store));
       }
       artist.albums = albums;
@@ -197,23 +218,15 @@ public class Artist extends Media implements Visitable {
 
       artist.setSimilarArtists(similarArtists);
     }
-    
-    return artist;
-  }
-
-
-  public static Artist fromURI(String uri) {
-    Artist artist = new Artist();
-
-    artist.setUUID(SpotifyURI.toHex(uri));
 
     return artist;
   }
+
 
   @Override
   public String toString() {
     return "Artist{" +
-        "id='" + getHexUUID() + '\'' +
+        "id='" + id + '\'' +
         ", name='" + name + '\'' +
         ", portrait='" + portrait + '\'' +
         ", popularity=" + popularity +

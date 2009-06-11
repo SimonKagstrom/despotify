@@ -124,9 +124,9 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
             "<version>%010d,%010d,%010d,%d</version>",
             // change
             position,
-            Hex.toHex(playlist.getUUID()) + "02",
+            Hex.toHex(playlist.getByteUUID()) + "02",
             new Date().getTime() / 1000,
-            user.getName(),
+            user.getId(),
             // version
             playlists.getRevision() + 1,         // new revision of user playlists
             playlists.getItems().size(),         // new size of user playlists

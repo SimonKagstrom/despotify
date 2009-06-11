@@ -2,22 +2,32 @@ package se.despotify.domain;
 
 import se.despotify.domain.media.PlaylistContainer;
 
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Entity;
+import java.io.Serializable;
+
 /**
- *
  * @since 2009-apr-24 07:03:09
  */
-public class User {
+@Entity
+public class User implements Serializable, org.domdrides.entity.Entity<String> {
 
-  private String name;
+  private static final long serialVersionUID = 1L;
+
+  @Id
+  private String id;
+
+  @OneToOne
   private PlaylistContainer playlists = null;
 
 
-  public String getName() {
-    return name;
+  public String getId() {
+    return id;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setId(String id) {
+    this.id = id;
   }
 
   public PlaylistContainer getPlaylists() {

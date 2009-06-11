@@ -4,7 +4,6 @@ import org.junit.Test;
 import se.despotify.DespotifyClientTest;
 import se.despotify.domain.media.Playlist;
 import se.despotify.util.SpotifyURI;
-import se.despotify.util.SpotifyURL;
 
 /**
  * @since 2009-apr-25 14:59:00
@@ -37,11 +36,11 @@ public class TestLoadPlaylist extends DespotifyClientTest {
     assertEquals(3794544626l, playlist.calculateChecksum());
     assertEquals("kent.finell", playlist.getAuthor());
     assertFalse(playlist.isCollaborative());
-    assertEquals("d65f21be4a744a88ea67d8a83c7a2eb5", playlist.getHexUUID());
+    assertEquals("d65f21be4a744a88ea67d8a83c7a2eb5", playlist.getId());
     assertEquals(5, playlist.getTracks().size());
 
-    assertEquals("93f98ea75b4748f797668485a3d01bd0", playlist.getTracks().get(0).getHexUUID());
-    assertEquals("spotify:track:4vdV2Eua6RkUoUM51jdH56", playlist.getTracks().get(0).getSpotifyURL());
+    assertEquals("93f98ea75b4748f797668485a3d01bd0", playlist.getTracks().get(0).getId());
+    assertEquals("spotify:track:4vdV2Eua6RkUoUM51jdH56", playlist.getTracks().get(0).getSpotifyURI());
     assertEquals("http://open.spotify.com/track/4vdV2Eua6RkUoUM51jdH56", playlist.getTracks().get(0).getHttpURL());
     assertNull(playlist.getTracks().get(0).getTitle());
     assertNull(playlist.getTracks().get(0).getCover());
@@ -51,8 +50,8 @@ public class TestLoadPlaylist extends DespotifyClientTest {
     assertNull(playlist.getTracks().get(0).getTrackNumber());
     assertNull(playlist.getTracks().get(0).getYear());
 
-    assertEquals("cf2cd530980e450d855977ba0a80ec6e", playlist.getTracks().get(1).getHexUUID());
-    assertEquals("spotify:track:6iVTOPCmpABvG9jDZ2JozY", playlist.getTracks().get(1).getSpotifyURL());
+    assertEquals("cf2cd530980e450d855977ba0a80ec6e", playlist.getTracks().get(1).getId());
+    assertEquals("spotify:track:6iVTOPCmpABvG9jDZ2JozY", playlist.getTracks().get(1).getSpotifyURI());
     assertEquals("http://open.spotify.com/track/6iVTOPCmpABvG9jDZ2JozY", playlist.getTracks().get(1).getHttpURL());
     assertNull(playlist.getTracks().get(1).getTitle());
     assertNull(playlist.getTracks().get(1).getCover());
@@ -62,8 +61,8 @@ public class TestLoadPlaylist extends DespotifyClientTest {
     assertNull(playlist.getTracks().get(1).getTrackNumber());
     assertNull(playlist.getTracks().get(1).getYear());
 
-    assertEquals("fc1f1b5860f04a739971fcad9c1cd634", playlist.getTracks().get(2).getHexUUID());
-    assertEquals("spotify:track:7FKhuZtIPchBVNIhFnNL5W", playlist.getTracks().get(2).getSpotifyURL());
+    assertEquals("fc1f1b5860f04a739971fcad9c1cd634", playlist.getTracks().get(2).getId());
+    assertEquals("spotify:track:7FKhuZtIPchBVNIhFnNL5W", playlist.getTracks().get(2).getSpotifyURI());
     assertEquals("http://open.spotify.com/track/7FKhuZtIPchBVNIhFnNL5W", playlist.getTracks().get(2).getHttpURL());
     assertNull(playlist.getTracks().get(2).getTitle());
     assertNull(playlist.getTracks().get(2).getCover());
@@ -73,8 +72,8 @@ public class TestLoadPlaylist extends DespotifyClientTest {
     assertNull(playlist.getTracks().get(2).getTrackNumber());
     assertNull(playlist.getTracks().get(2).getYear());
 
-    assertEquals("7093f50c9ecf428eb780348c076f9f7f", playlist.getTracks().get(3).getHexUUID());
-    assertEquals("spotify:track:3qqKWUVfiLMrNPacFRzTzh", playlist.getTracks().get(3).getSpotifyURL());
+    assertEquals("7093f50c9ecf428eb780348c076f9f7f", playlist.getTracks().get(3).getId());
+    assertEquals("spotify:track:3qqKWUVfiLMrNPacFRzTzh", playlist.getTracks().get(3).getSpotifyURI());
     assertEquals("http://open.spotify.com/track/3qqKWUVfiLMrNPacFRzTzh", playlist.getTracks().get(3).getHttpURL());
     assertNull(playlist.getTracks().get(3).getTitle());
     assertNull(playlist.getTracks().get(3).getCover());
@@ -84,8 +83,8 @@ public class TestLoadPlaylist extends DespotifyClientTest {
     assertNull(playlist.getTracks().get(3).getTrackNumber());
     assertNull(playlist.getTracks().get(3).getYear());
 
-    assertEquals("48daf12f96f84793a526b579aa4d1f66", playlist.getTracks().get(4).getHexUUID());
-    assertEquals("spotify:track:2dtvgPd3vsotKXtGk4dWlg", playlist.getTracks().get(4).getSpotifyURL());
+    assertEquals("48daf12f96f84793a526b579aa4d1f66", playlist.getTracks().get(4).getId());
+    assertEquals("spotify:track:2dtvgPd3vsotKXtGk4dWlg", playlist.getTracks().get(4).getSpotifyURI());
     assertEquals("http://open.spotify.com/track/2dtvgPd3vsotKXtGk4dWlg", playlist.getTracks().get(4).getHttpURL());
     assertNull(playlist.getTracks().get(4).getTitle());
     assertNull(playlist.getTracks().get(4).getCover());

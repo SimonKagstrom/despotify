@@ -3,8 +3,12 @@ package se.despotify.util;
 import org.slf4j.Logger;
 
 import java.nio.charset.Charset;
+import java.util.regex.Pattern;
 
 public class Hex {
+
+  public static Pattern pattern = Pattern.compile("([0-9a-fA-F][0-9a-fA-F])+");
+
   /* Safe with leading zeroes (unlike BigInteger) and with negative byte values (unlike Byte.parseByte). */
   public static byte[] toBytes(String hex) {
     if (hex.length() % 2 != 0) {

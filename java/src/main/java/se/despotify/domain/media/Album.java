@@ -1,64 +1,69 @@
 package se.despotify.domain.media;
 
 import se.despotify.domain.Store;
+import se.despotify.util.Hex;
 import se.despotify.util.SpotifyURI;
 import se.despotify.util.XMLElement;
 
-import java.util.zip.Adler32;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Entity;
+import javax.persistence.CascadeType;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.zip.Adler32;
 
-public class Album extends Media implements Visitable {
+
+@Entity
+public class Album extends RestrictedMedia {
+
+  private static final long serialVersionUID = 1L;
+
   private String name;
+
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Artist artist;
+
   private String cover;
   private Float popularity;
+
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Track> tracks;
-  private Restrictions restrictions;
-  private Copyright copyright;
+
+  private String c;
+  private String p;
 
   public Album() {
     super();
   }
 
   public Album(String hexUUID) {
-    super(hexUUID);
+    this(hexUUID, null, null);
   }
 
-  public Album(byte[] UUID) {
-    super(UUID);
+  public Album(byte[] bytesUUID) {
+    this(Hex.toHex(bytesUUID), null, null);
   }
 
-  public Album(byte[] UUID, String hexUUID) {
-    super(UUID, hexUUID);
-  }
-
-  public Album(byte[] UUID, String hexUUID, String name, Artist artist) {
-    super(UUID, hexUUID);
+  public Album(String hexUUID, String name, Artist artist) {
+    this.id = hexUUID;
     this.name = name;
     this.artist = artist;
   }
 
-
   @Override
-  protected int getUUIDlength() {
-    return 16;
+  public byte[] getByteUUID() {
+    return Hex.toBytes(id);
   }
 
   @Override
-  protected Pattern getHexUUIDpattern() {
-    return hexUUIDpattern32;
-  }
-
-  @Override
-  public String getSpotifyURL() {
-    return "spotify:album:" + SpotifyURI.toURI(getUUID());
+  public String getSpotifyURI() {
+    return "spotify:album:" + SpotifyURI.toURI(getByteUUID());
   }
 
   @Override
   public String getHttpURL() {
-    return "http://open.spotify.com/album/" + SpotifyURI.toURI(getUUID());
+    return "http://open.spotify.com/album/" + SpotifyURI.toURI(getByteUUID());
   }
 
   @Override
@@ -107,20 +112,20 @@ public class Album extends Media implements Visitable {
     this.tracks = tracks;
   }
 
-  public Restrictions getRestrictions() {
-    return restrictions;
+  public String getC() {
+    return c;
   }
 
-  public void setRestrictions(Restrictions restrictions) {
-    this.restrictions = restrictions;
+  public void setC(String c) {
+    this.c = c;
   }
 
-  public Copyright getCopyright() {
-    return copyright;
+  public String getP() {
+    return p;
   }
 
-  public void setCopyright(Copyright copyright) {
-    this.copyright = copyright;
+  public void setP(String p) {
+    this.p = p;
   }
 
   public static Album fromXMLElement(XMLElement albumElement, Store store) {
@@ -174,35 +179,26 @@ public class Album extends Media implements Visitable {
 
       XMLElement restrictionsNode = albumElement.getChild("restrictions");
       if (restrictionsNode != null) {
-        album.restrictions = Restrictions.fromXMLElement(restrictionsNode);
+        RestrictedMedia.fromXMLElement(restrictionsNode, album);
       }
 
       if (albumElement.hasChild("copyright")) {
-        Copyright copyright = new Copyright();
+
         for (XMLElement copyrightNode : albumElement.getChild("copyright").getChildren()) {
           if ("c".equals(copyrightNode.getElement().getNodeName())) {
-            copyright.setC(copyrightNode.getText());
+            album.setC(copyrightNode.getText());
           } else if ("p".equals(copyrightNode.getElement().getNodeName())) {
-            copyright.setP(copyrightNode.getText());
+            album.setP(copyrightNode.getText());
           } else {
             log.warn("Unknown copyright type " + copyrightNode.getElement().getNodeName());
           }
         }
-        album.copyright = copyright;
+
       }
 
       album.setTracks(tracks);
 
     }
-    
-    return album;
-  }
-
-
-  public static Album fromURI(String uri) {
-    Album album = new Album();
-
-    album.setUUID(SpotifyURI.toHex(uri));
 
     return album;
   }
@@ -211,23 +207,24 @@ public class Album extends Media implements Visitable {
   public long calculateChecksum() {
     Adler32 adler = new Adler32();
     for (Track track : tracks) {
-      adler.update(track.getUUID());
+      adler.update(track.getByteUUID());
       adler.update(0x01);
     }
     return adler.getValue();
   }
 
+
   @Override
   public String toString() {
     return "Album{" +
-        "hexUUID='" + getHexUUID() + '\'' +
+        "id='" + id + '\'' +
         ", name='" + name + '\'' +
-        ", artist=" + (artist == null ? null : artist.getHexUUID()) +
+        ", artist=" + (artist == null ? null : artist.getId()) +
         ", cover='" + cover + '\'' +
         ", popularity=" + popularity +
         ", tracks=" + (tracks == null ? null : tracks.size()) +
-        ", restrictions=" + restrictions +
-        ", copyright=" + copyright +
+        ", c=" + c +
+        ", p=" + p +
         '}';
   }
 }

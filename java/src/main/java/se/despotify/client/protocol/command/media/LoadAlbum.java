@@ -10,7 +10,6 @@ import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.command.Command;
 import se.despotify.domain.Store;
 import se.despotify.domain.media.Album;
-import se.despotify.domain.media.Result;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.GZIP;
 import se.despotify.util.Hex;
@@ -20,6 +19,7 @@ import se.despotify.util.XMLElement;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * @since 2009-apr-25 16:28:42
@@ -51,7 +51,7 @@ public class LoadAlbum extends Command<Boolean> {
 
     buffer.putShort((short) channel.getId());
     buffer.put((byte) BrowseType.album.getValue());
-    buffer.put(album.getUUID());
+    buffer.put(album.getByteUUID());
     buffer.putInt(0); // unknown
 
 
@@ -62,6 +62,12 @@ public class LoadAlbum extends Command<Boolean> {
 
     /* Send packet. */
     connection.getProtocol().sendPacket(PacketType.browse, buffer, "load album");
+
+//    INFO  Protocol - sending load album, 26 bytes:
+//        1   3    5  7   |9   11  13  15  |17  19  21  23  |25  27  29  31  |           1111111112222222222333
+//          2   4   6   8 |  10  12  14  16|  18  20  22  24|  26  28  31  32| 12345678901234567890123456789012
+//        ----------------|----------------|----------------|----------------|----------------------------------
+//        30001700000202f8 df4ad52d449caca8 c6a25d2eca080000 0000             [0????????J?-D?????].??????]
 
 
     /* Get data and inflate it. */
@@ -92,6 +98,9 @@ public class LoadAlbum extends Command<Boolean> {
     if (this.album != album) {
       throw new DespotifyException("Album in response has different UUID than the requested album!");
     }
+
+    album.setLoaded(new Date());
+
     return true;
   }
 }

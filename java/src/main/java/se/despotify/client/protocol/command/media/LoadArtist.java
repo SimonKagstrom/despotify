@@ -19,6 +19,7 @@ import se.despotify.util.XMLElement;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * @since 2009-apr-25 16:28:42
@@ -51,7 +52,7 @@ public class LoadArtist extends Command<Boolean> {
 
     buffer.putShort((short) channel.getId());
     buffer.put((byte) BrowseType.artist.getValue());
-    buffer.put(artist.getUUID());
+    buffer.put(artist.getByteUUID());
     buffer.putInt(0); // unknown
 
 
@@ -84,13 +85,13 @@ public class LoadArtist extends Command<Boolean> {
 
     if (root.getElement().getNodeName().equals("artist")) {
       Artist.fromXMLElement(root, store);
-      return true;
     } else {
       throw new DespotifyException("Root element is not named <artist>: " + root.getElement().getNodeName());
     }
 
 
+    artist.setLoaded(new Date());
 
-
+    return true;
   }
 }

@@ -2,10 +2,7 @@ package se.despotify.client.protocol.command.media.playlist;
 
 import se.despotify.DespotifyClientTest;
 import se.despotify.domain.media.Playlist;
-import se.despotify.util.Hex;
 import org.junit.Test;
-
-import java.util.Random;
 
 /**
  * @since 2009-apr-28 01:59:33
@@ -33,7 +30,7 @@ public class TestRemovePlaylist extends DespotifyClientTest {
     new LoadUserPlaylists(store, user).send(connection);
     assertEquals(originalSize, user.getPlaylists().getItems().size());
     for (Playlist playlist2 : user.getPlaylists()) {
-      assertNotSame(playlist.getUUID(), playlist2.getUUID());
+      assertNotSame(playlist.getByteUUID(), playlist2.getByteUUID());
     }
     
 

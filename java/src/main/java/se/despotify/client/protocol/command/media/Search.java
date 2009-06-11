@@ -57,9 +57,10 @@ public class Search extends Command<Result> {
     /* Check offset and limit. */
     if (offset < 0) {
       throw new IllegalArgumentException("Offset needs to be >= 0");
-    } else if ((maxResults < 0 && maxResults != -1) || maxResults == 0) {
-      throw new IllegalArgumentException("Limit needs to be either -1 for no limit or > 0");
     }
+//    else if ((maxResults < 0 && maxResults != -1) || maxResults == 0) {
+//      throw new IllegalArgumentException("Limit needs to be either -1 for no limit or > 0");
+//    }
 
     /* Append channel id, some values, query length and query. */
     buffer.putShort((short) channel.getId());

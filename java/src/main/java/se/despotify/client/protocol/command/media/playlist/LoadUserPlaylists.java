@@ -17,6 +17,7 @@ import se.despotify.Connection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Date;
 
 /**
  * shn_encrypt(ctx=0x852490, buf=0xbfffde50, len=35 [0x0023]) called from 0x000abc35
@@ -78,10 +79,12 @@ public class LoadUserPlaylists extends Command<Boolean> {
     PlaylistContainer.fromXMLElement(playlistElement, store, user.getPlaylists());
 
     if (playlistElement.hasChild("next-change")) {
+      user.getPlaylists().setLoaded(new Date());
       return true;
     } else {
       throw new RuntimeException("Unknown server response:\n" + xml);
     }
+
 
 
   }

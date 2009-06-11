@@ -83,7 +83,7 @@ public class TestChecksum extends DespotifyClientTest {
     3030303030362c30 3030303030303030 312c313032363232 393836362c303c2f [000006,0000000001,1026229866,0</]
     76657273696f6e3e                                                    [version>]
      */
-    user.getPlaylists().getItems().add(new Playlist(Hex.toBytes("5667962d4c1764d12cd68b86a4394916"), "jotify1", "kent.finell", false));
+    user.getPlaylists().getItems().add(new Playlist("kent.finell", "5667962d4c1764d12cd68b86a4394916", "jotify1", false));
     assertEquals(1026229866l, user.getPlaylists().calculateChecksum());
 
     /*
@@ -104,7 +104,7 @@ public class TestChecksum extends DespotifyClientTest {
     3030303030372c30 3030303030303030 322c333730313437 363237332c303c2f [000007,0000000002,3701476273,0</]
     76657273696f6e3e                                                    [version>]
      */
-    user.getPlaylists().getItems().add(new Playlist(Hex.toBytes("fd51193b394298130028850a1a72bb7f"), "jotify2", "kent.finell", false));
+    user.getPlaylists().getItems().add(new Playlist("kent.finell", "fd51193b394298130028850a1a72bb7f", "jotify2", false));
     assertEquals(3701476273l, user.getPlaylists().calculateChecksum());
 
 
@@ -126,7 +126,7 @@ public class TestChecksum extends DespotifyClientTest {
     3030303030382c30 3030303030303030 332c343035313337 353135382c303c2f [000008,0000000003,4051375158,0</]
     76657273696f6e3e                                                    [version>]
      */
-    user.getPlaylists().getItems().add(new Playlist(Hex.toBytes("5710e66cde8a35bfa824d56f85fdab31"), "jotify3", "kent.finell", false));
+    user.getPlaylists().getItems().add(new Playlist("kent.finell", "5710e66cde8a35bfa824d56f85fdab31", "jotify3", false));
     assertEquals(4051375158l, user.getPlaylists().calculateChecksum());
 
 

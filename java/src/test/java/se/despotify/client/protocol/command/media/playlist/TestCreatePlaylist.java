@@ -9,8 +9,6 @@ import se.despotify.domain.media.Playlist;
 import se.despotify.util.Hex;
 import se.despotify.util.SpotifyURI;
 
-import java.util.Random;
-
 /**
  *
  * @since 2009-apr-22 03:00:06
@@ -28,16 +26,16 @@ public class TestCreatePlaylist extends DespotifyClientTest {
 
     Playlist originalPlaylist = new CreatePlaylist(new MemoryStore(), user, playlistName, false).send(connection);
 
-    log.info("\n\n\n\n\n\n\n           load playlist with UUID "+Hex.toHex(originalPlaylist.getUUID())+"\n\n             spotify:user:"+ username + ":playlist:" + SpotifyURI.toURI(Hex.toHex(originalPlaylist.getUUID())) +"\n\n\n\n\n\n\n\n\n");
+    log.info("\n\n\n\n\n\n\n           load playlist with UUID "+Hex.toHex(originalPlaylist.getByteUUID())+"\n\n             spotify:user:"+ username + ":playlist:" + SpotifyURI.toURI(Hex.toHex(originalPlaylist.getByteUUID())) +"\n\n\n\n\n\n\n\n\n");
 
     // brand new store to make sure we dont pick something up from the cache.
     MemoryStore store = new MemoryStore();
-    Playlist loadedPlaylist = store.getPlaylist(originalPlaylist.getUUID());
+    Playlist loadedPlaylist = store.getPlaylist(originalPlaylist.getByteUUID());
     new LoadPlaylist(store, loadedPlaylist).send(connection);
 
     assertTrue("different stores means different instances", loadedPlaylist != originalPlaylist);
     assertEquals(loadedPlaylist.getChecksum().longValue(), loadedPlaylist.calculateChecksum());
-    assertEquals(originalPlaylist.getHexUUID(), loadedPlaylist.getHexUUID());
+    assertEquals(originalPlaylist.getId(), loadedPlaylist.getId());
     // todo assert the rest
 
   }

@@ -1,72 +1,62 @@
 package se.despotify.domain.media;
 
+import org.hibernate.annotations.CollectionOfElements;
 import se.despotify.domain.Store;
+import se.despotify.util.Hex;
 import se.despotify.util.SpotifyURI;
 import se.despotify.util.XMLElement;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import javax.persistence.Entity;
+import javax.persistence.CascadeType;
+import javax.persistence.ManyToOne;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Track extends Media implements Visitable {
-	private String       title;
-	private Artist       artist;
-	private Album        album;
-	private Integer      year;
-  private Integer      discNumber;
-	private Integer      trackNumber;
-	private Integer      length;
-	private List<String> files;
-	private String       cover;
-	private Float        popularity;
+@Entity
+public class Track extends RestrictedMedia {
 
-  private Restrictions restrictions;
+  private static final long serialVersionUID = 1L;
+
+  private String title;
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private Artist artist;
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private Album album;
+  private Integer year;
+  private Integer discNumber;
+  private Integer trackNumber;
+  private Integer length;
+
+  @CollectionOfElements
+  private List<String> files;
+
+  private String cover;
+  private Float popularity;
 
   public Track() {
   }
 
   public Track(byte[] UUID) {
-    super(UUID);
-  }
-
-  public Track(byte[] UUID, String hexUUID) {
-    super(UUID, hexUUID);
+    this(Hex.toHex(UUID));
   }
 
   public Track(String hexUUID) {
-    super(hexUUID);
+    this.id = hexUUID;
   }
 
   public Track(String hexUUID, String title, Artist artist, Album album) {
-    super(hexUUID);
+    this(hexUUID);
     this.title = title;
     this.artist = artist;
     this.album = album;
   }
 
   public Track(byte[] UUID, String title, Artist artist, Album album) {
-    super(UUID);
+    this(UUID);
     this.title = title;
     this.artist = artist;
     this.album = album;
   }
-
-  public Track(byte[] UUID, String hexUUID, String title, Artist artist, Album album){
-		super(UUID, hexUUID);
-		this.title       = title;
-		this.artist      = artist;
-		this.album       = album;
-	}
-
-  @Override
-  protected int getUUIDlength() {
-    return 16;
-  }
-
-  @Override
-  protected Pattern getHexUUIDpattern() {
-    return hexUUIDpattern32;
-  }
-  
 
   @Override
   public void accept(Visitor visitor) {
@@ -74,13 +64,13 @@ public class Track extends Media implements Visitable {
   }
 
   @Override
-  public String getSpotifyURL() {
-    return "spotify:track:" + SpotifyURI.toURI(getUUID());
+  public String getSpotifyURI() {
+    return "spotify:track:" + SpotifyURI.toURI(getByteUUID());
   }
 
   @Override
   public String getHttpURL() {
-    return "http://open.spotify.com/track/" + SpotifyURI.toURI(getUUID());
+    return "http://open.spotify.com/track/" + SpotifyURI.toURI(getByteUUID());
   }
 
   public Integer getDiscNumber() {
@@ -163,103 +153,95 @@ public class Track extends Media implements Visitable {
     this.popularity = popularity;
   }
 
-	public static Track fromXMLElement(XMLElement trackElement, Store store){
+  public static Track fromXMLElement(XMLElement trackElement, Store store) {
 
-		Track track = store.getTrack(trackElement.getChildText("id"));
+    Track track = store.getTrack(trackElement.getChildText("id"));
 
-		/* Set title. */
-		if(trackElement.hasChild("title")){
-			track.title = trackElement.getChildText("title");
-		}
-		
-		/* Set artist. */
-		if(trackElement.hasChild("artist-id") && trackElement.hasChild("artist")){
-			track.artist = store.getArtist(trackElement.getChildText("artist-id"));
-      track.artist.setUUID(trackElement.getChildText("artist-id"));
-		  track.artist.setName(trackElement.getChildText("artist"));
-		}
-		
-		/* Set album. */
-		if(trackElement.hasChild("album-id")){
-			track.album = store.getAlbum(trackElement.getChildText("album-id"));
+    /* Set title. */
+    if (trackElement.hasChild("title")) {
+      track.title = trackElement.getChildText("title");
+    }
+
+    /* Set artist. */
+    if (trackElement.hasChild("artist-id") && trackElement.hasChild("artist")) {
+      track.artist = store.getArtist(trackElement.getChildText("artist-id"));
+      track.artist.setId(trackElement.getChildText("artist-id"));
+      track.artist.setName(trackElement.getChildText("artist"));
+    }
+
+    /* Set album. */
+    if (trackElement.hasChild("album-id")) {
+      track.album = store.getAlbum(trackElement.getChildText("album-id"));
     }
 
     if (trackElement.hasChild("album")) {
-			track.album.setName(trackElement.getChildText("album"));
-		}
-		
-		/* Set year. */
-		if(trackElement.hasChild("year")){
-			try{
-				track.year = Integer.parseInt(trackElement.getChildText("year"));
-			}
-			catch(NumberFormatException e){
-        log.error("Could not read year from track",e);
-				track.year = null;
-			}
-		}
-		
-		/* Set track number. */
-		if(trackElement.hasChild("track-number")){
-			track.trackNumber = Integer.parseInt(trackElement.getChildText("track-number"));
-		}
-		
-		/* Set length. */
-		if(trackElement.hasChild("length")){
-			track.length = Integer.parseInt(trackElement.getChildText("length"));
-		}
-		
-		/* Set files. */
-		if(trackElement.hasChild("files")){
+      track.album.setName(trackElement.getChildText("album"));
+    }
+
+    /* Set year. */
+    if (trackElement.hasChild("year")) {
+      try {
+        track.year = Integer.parseInt(trackElement.getChildText("year"));
+      }
+      catch (NumberFormatException e) {
+        log.error("Could not read year from track", e);
+        track.year = null;
+      }
+    }
+
+    /* Set track number. */
+    if (trackElement.hasChild("track-number")) {
+      track.trackNumber = Integer.parseInt(trackElement.getChildText("track-number"));
+    }
+
+    /* Set length. */
+    if (trackElement.hasChild("length")) {
+      track.length = Integer.parseInt(trackElement.getChildText("length"));
+    }
+
+    /* Set files. */
+    if (trackElement.hasChild("files")) {
 
       List<String> fileUUIDs = new ArrayList<String>();
 
-			for(XMLElement fileElement : trackElement.getChild("files").getChildren()){
+      for (XMLElement fileElement : trackElement.getChild("files").getChildren()) {
         fileUUIDs.add(fileElement.getAttribute("id"));
-			}
+      }
 
       track.setFiles(fileUUIDs);
-		}
-		
-		/* Set cover. */
+    }
+
+    /* Set cover. */
     // FIXED: now null if ""
-		if(trackElement.hasChild("cover")){
-			String value = trackElement.getChildText("cover");
+    if (trackElement.hasChild("cover")) {
+      String value = trackElement.getChildText("cover");
       if (!"".equals(value)) {
         track.cover = value;
       }
-		}
-		
-		/* Set popularity. */
-		if(trackElement.hasChild("popularity")){
-			track.popularity = Float.parseFloat(trackElement.getChildText("popularity"));
-		}
+    }
 
-    
+    /* Set popularity. */
+    if (trackElement.hasChild("popularity")) {
+      track.popularity = Float.parseFloat(trackElement.getChildText("popularity"));
+    }
+
+
     XMLElement restrictionsNode = trackElement.getChild("restrictions");
     if (restrictionsNode != null) {
-        track.restrictions = Restrictions.fromXMLElement(restrictionsNode);
+      RestrictedMedia.fromXMLElement(restrictionsNode, track);
     }
 
     return track;
-		
-	}
 
-  @Deprecated
-	public static Track fromURI(String uri) {
-		Track track = new Track();
-		track.setUUID(SpotifyURI.toHex(uri));
-		return track;
-	}
-
+  }
 
   @Override
   public String toString() {
     return "Track{" +
-        "hexUUID='" + getHexUUID() + '\'' +
+        "id='" + id + '\'' +
         ", title='" + title + '\'' +
-        ", artist=" + (artist == null ? null : artist.getHexUUID()) +
-        ", album=" + (album == null ? null : album.getHexUUID()) +
+        ", artist=" + (artist == null ? null : artist.getId()) +
+        ", album=" + (album == null ? null : album.getId()) +
         ", year=" + year +
         ", discNumber=" + discNumber +
         ", trackNumber=" + trackNumber +
@@ -267,7 +249,7 @@ public class Track extends Media implements Visitable {
         ", files=" + files +
         ", cover='" + cover + '\'' +
         ", popularity=" + popularity +
-        ", restrictions=" + restrictions +
         '}';
   }
+
 }
