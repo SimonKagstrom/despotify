@@ -4,6 +4,9 @@ cdef class SearchResult:
     def __init__(self):
         raise TypeError("This class cannot be instantiated from Python")
 
+    def get_uri(self):
+        return 'spotify:search:%s' % self.query
+
     property query:
         def __get__(self):
             return <char*>self.data.query

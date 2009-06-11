@@ -64,6 +64,11 @@ cdef class Album(SessionStruct):
             self.full_data.browse = despotify_get_album(self.ds, self.data.id())
             self.data = self.full_data
 
+    def get_uri(self):
+        cdef char uri_id[23]
+        despotify_id2uri(self.id, uri_id)
+        return 'spotify:album:%s' % uri_id
+
     property name:
         def __get__(self):
             return self.data.name()

@@ -4,6 +4,13 @@ cdef class Playlist:
     def __init__(self):
         raise TypeError("This class cannot be instantiated from Python")
 
+    def get_uri(self):
+        cdef char uri_id[23]
+        cdef str id = self.id[:-2] # Remove last two characters from id, as per despotify_playlist_to_uri
+
+        despotify_id2uri(id, uri_id)
+        return 'spotify:user:%s:playlist:%s' % (self.author, uri_id)
+
     property name:
         def __get__(self):
             return self.data.name

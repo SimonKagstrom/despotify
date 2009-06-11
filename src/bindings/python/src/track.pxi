@@ -4,6 +4,11 @@ cdef class Track:
     def __init__(self):
         raise TypeError("This class cannot be instantiated from Python")
 
+    def get_uri(self):
+        cdef char uri_id[23]
+        despotify_id2uri(self.track_id, uri_id)
+        return 'spotify:track:%s' % uri_id
+
     property track_id:
         def __get__(self):
             return <char*>self.data.track_id

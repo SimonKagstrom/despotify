@@ -55,6 +55,11 @@ cdef class Artist:
     def __init__(self):
         raise TypeError("This class cannot be instantiated from Python")
 
+    def get_uri(self):
+        cdef char uri_id[23]
+        despotify_id2uri(self.id, uri_id)
+        return 'spotify:artist:%s' % uri_id
+
     cdef get_full_data(self):
         if self.full_data == None:
             self.full_data = AlbumDataFull()
