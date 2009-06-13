@@ -1,10 +1,7 @@
 package se.despotify.domain.media;
 
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -20,6 +17,7 @@ public class Biography implements Serializable, org.domdrides.entity.Entity<Long
   @GeneratedValue
   private Long id;
 
+  @Lob    
   private String text;
 
   @OneToMany

@@ -10,6 +10,15 @@ import se.despotify.domain.media.VisitorAdapter;
  */
 public class TestLoadTracks extends DespotifyClientTest {
 
+//  @Test
+//  public void testRedirect() throws Exception {
+//    Track track = store.getTrack("47d4ae9b03e64bc39b5728925550ee5f");
+//    // 1c6794cce5664a51a2bc47f99496a90c good
+//    // 47d4ae9b03e64bc39b5728925550ee5f redirected from
+//    new LoadTracks(store, track).send(connection);
+//    System.currentTimeMillis();
+//  }
+
   @Test
   public void test() throws Exception {
 

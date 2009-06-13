@@ -41,7 +41,7 @@ public class SpotifyURL {
   public static <T> T match(String URL, Visitor<T> matcher) {
     Matcher patternMatcher = pattern.matcher(URL);
     if (!patternMatcher.matches()) {
-      throw new IllegalArgumentException("Not a valid URL: " + URL);
+      throw new DespotifyException("Not a valid URL: " + URL);
     }
 
     URLtype urlType = patternMatcher.group(2) != null ? URLtype.httpURL : URLtype.spotifyURL;

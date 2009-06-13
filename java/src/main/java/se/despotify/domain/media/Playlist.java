@@ -25,7 +25,7 @@ public class Playlist extends Media implements Iterable<Track> {
 
   @Index(name = "index_author")
   private String author;
-
+  
   private String name;
 
   @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})

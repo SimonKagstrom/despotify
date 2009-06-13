@@ -6,10 +6,7 @@ import se.despotify.util.Hex;
 import se.despotify.util.SpotifyURI;
 import se.despotify.util.XMLElement;
 
-import javax.persistence.OneToMany;
-import javax.persistence.Entity;
-import javax.persistence.CascadeType;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.*;
 
 @Entity
@@ -30,9 +27,11 @@ public class Artist extends Media {
   private List<Biography> biographies;
 
   @CollectionOfElements
+  @Column(length = 128)
   private Set<String> genres;
 
   @CollectionOfElements
+  @Column(length = 50)    
   private List<String> yearsActive;
 
   @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})

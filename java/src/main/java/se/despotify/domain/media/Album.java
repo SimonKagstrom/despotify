@@ -5,10 +5,7 @@ import se.despotify.util.Hex;
 import se.despotify.util.SpotifyURI;
 import se.despotify.util.XMLElement;
 
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Entity;
-import javax.persistence.CascadeType;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Adler32;
@@ -19,6 +16,7 @@ public class Album extends RestrictedMedia {
 
   private static final long serialVersionUID = 1L;
 
+  @Column(length = 512)
   private String name;
 
   @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -30,7 +28,10 @@ public class Album extends RestrictedMedia {
   @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Track> tracks;
 
+  @Column(length = 512)
   private String c;
+  
+  @Column(length = 512)
   private String p;
 
   public Album() {

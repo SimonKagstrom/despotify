@@ -6,6 +6,7 @@ import se.despotify.util.XMLElement;
 
 import javax.imageio.ImageIO;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -18,6 +19,14 @@ public class Image extends Media  {
 
   private static final long serialVersionUID = 1L;
 
+
+  private int width;
+  private int height;
+
+  @Lob
+  private byte[] bytes;
+
+  
   public Image() {
   }
 
@@ -47,11 +56,6 @@ public class Image extends Media  {
   public String getHttpURL() {
     throw new UnsupportedOperationException();
   }
-
-  private int width;
-  private int height;
-
-  private byte[] bytes;
 
   public byte[] getBytes() {
     return bytes;

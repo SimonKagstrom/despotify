@@ -6,7 +6,7 @@
 
   <groupId>se.despotify</groupId>
   <artifactId>despotify</artifactId>
-  <version>0.4.0</version>
+  <version>0.4.1-SNAPSHOT</version>
 
   <name>Despotify</name>
   <description>Spotify client API</description>
@@ -73,13 +73,13 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.5.6</version>
+      <version>1.4.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.5.6</version>
+      <version>1.4.2</version>
     </dependency>
 
     <dependency>

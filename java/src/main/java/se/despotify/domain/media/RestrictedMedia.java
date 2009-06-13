@@ -4,6 +4,7 @@ import org.hibernate.annotations.CollectionOfElements;
 import se.despotify.util.XMLElement;
 
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Column;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -20,18 +21,21 @@ public abstract class RestrictedMedia extends Media {
    * AT,BE,CH,CN,CZ,DK,ES,FI,GB,HK,HU,IE,IL,IN,IT,MY,NL,NO,NZ,PL,PT,RU,SE,SG,SK,TR,TW,ZA
    */
   @CollectionOfElements
+  @Column(length = 3)
   private Set<String> allowed;
 
   /**
    * AT,BE,CH,CN,CZ,DK,ES,FI,GB,HK,HU,IE,IL,IN,IT,MY,NL,NO,NZ,PL,PT,RU,SE,SG,SK,TR,TW,ZA
    */
   @CollectionOfElements
+  @Column(length = 3)
   private Set<String> forbidden;
 
   /**
    * free,daypass,premium
    */
   @CollectionOfElements
+  @Column(length = 50)
   private Set<String> catalogues;
 
 
