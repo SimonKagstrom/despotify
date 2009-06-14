@@ -48,6 +48,10 @@ public class LoadTracks extends Command<Boolean> {
 
     // todo send multiple requests if more than 200 tracks!
 
+    if (tracks.length > 240) {
+      throw new DespotifyException("Can only load up to 240 track at the time.");
+    }
+
 /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
 

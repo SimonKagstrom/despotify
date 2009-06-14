@@ -18,12 +18,12 @@ public class Clean extends DespotifyClientTest {
   @Test
   public void test() throws Exception {
 
-    new LoadUserPlaylists(store, user).send(connection);
+    manager.send(new LoadUserPlaylists(store, user));
 
     System.out.println("loaded user playlists");
 
     for (Playlist playlist : user.getPlaylists()) {
-      new LoadPlaylist(store, playlist).send(connection);
+      manager.send(new LoadPlaylist(store, playlist));
 
       System.out.println("loaded content of user playlist " + playlist.getName());
     }
@@ -33,7 +33,7 @@ public class Clean extends DespotifyClientTest {
     for (int i = user.getPlaylists().getItems().size() - 1; i >= 0; i--) {
       Playlist playlist = user.getPlaylists().getItems().get(i);
       if (playlist.getName().startsWith("despotify_Test")) {
-        new RemovePlaylistFromUser(store, user, playlist).send(connection);
+        manager.send(new RemovePlaylistFromUser(store, user, playlist));
       }
     }
   }

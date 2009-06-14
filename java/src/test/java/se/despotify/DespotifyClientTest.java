@@ -24,8 +24,8 @@ public abstract class DespotifyClientTest extends TestCase {
 
   protected final Logger log = LoggerFactory.getLogger(getClass());
 
-  private DespotifyManager manager;
-  protected Connection connection;
+  protected DespotifyManager manager;
+//  protected Connection connection;
 
   protected Store store;
   protected User user;
@@ -57,7 +57,7 @@ public abstract class DespotifyClientTest extends TestCase {
     }
     manager = new DespotifyManager(username, password, 1);
     if (doConnect()) {
-      connection = manager.getConnection();
+      manager.connect();
     }
 
     user = new User();

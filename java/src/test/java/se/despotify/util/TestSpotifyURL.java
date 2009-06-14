@@ -2,6 +2,8 @@ package se.despotify.util;
 
 import org.junit.Test;
 import se.despotify.DespotifyClientTest;
+import se.despotify.Connection;
+import se.despotify.exceptions.DespotifyException;
 import se.despotify.domain.MemoryStore;
 import se.despotify.domain.media.*;
 
@@ -29,7 +31,7 @@ public class TestSpotifyURL extends DespotifyClientTest {
     try {
       SpotifyURL.match("spotify:moo:bar", transformer);
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (DespotifyException e) {
 
     }
 
@@ -37,38 +39,46 @@ public class TestSpotifyURL extends DespotifyClientTest {
 
   @Test
   public void testBrowseTrack() {
+    Connection connection = manager.getManagedConnection();
     SpotifyURL.browse("spotify:track:7lF0U328NdKSIPXEOWEpea",  new MemoryStore(), connection).accept(new VisitorAdapter() {
       @Override
       public void visit(Track track) {
       }
     });
+    connection.close();
   }
 
   @Test
   public void testBrowseArtist() {
+    Connection connection = manager.getManagedConnection();
     SpotifyURL.browse("spotify:artist:0WjkBDqno4HbjwNDqyMgVa", new MemoryStore(), connection).accept(new VisitorAdapter() {
       @Override
       public void visit(Artist artist) {
       }
     });
+    connection.close();
   }
 
   @Test
   public void testBrowseAlbum() {
+    Connection connection = manager.getManagedConnection();
     SpotifyURL.browse("spotify:album:6XOpVcNWQD7kXDjtrWM968", new MemoryStore(), connection).accept(new VisitorAdapter() {
       @Override
       public void visit(Album album) {
       }
     });
+    connection.close();
   }
 
   @Test
   public void testBrowsePlaylist() {
+    Connection connection = manager.getManagedConnection();
     SpotifyURL.browse("spotify:user:kent.finell:playlist:6wvPFkLGKOVl1v3qRJD6HX", new MemoryStore(), connection).accept(new VisitorAdapter() {
       @Override
       public void visit(Playlist playlist) {
       }
     });
+    connection.close();
   }
 
 }

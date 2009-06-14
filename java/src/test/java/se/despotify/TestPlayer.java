@@ -24,9 +24,11 @@ public class TestPlayer extends DespotifyClientTest {
 
     despotify.setUp();
 
-    Player player = new Player(despotify.connection);
+    Connection connection = despotify.manager.getManagedConnection();
 
-    new LoadTracks(despotify.store, despotify.defaultTracks).send(despotify.connection);
+    Player player = new Player(connection);
+
+    new LoadTracks(despotify.store, despotify.defaultTracks).send(connection);
     
     player.play(despotify.defaultTracks[0], new PlaybackListener(){
       @Override

@@ -14,7 +14,7 @@ public class TestLoadUserPlaylists extends DespotifyClientTest {
   @Test
   public void testGetPlaylists() throws Exception {
 
-    new LoadUserPlaylists(store, user).send(connection);
+    manager.send(new LoadUserPlaylists(store, user));
     PlaylistContainer playlists  = user.getPlaylists();
     assertNotNull(playlists);
     assertEquals(username, playlists.getId());
@@ -34,7 +34,7 @@ public class TestLoadUserPlaylists extends DespotifyClientTest {
 
     System.out.println("asserting playlist " + playlist.toString());
 
-    new LoadPlaylist(store, playlist).send(connection);
+    manager.send(new LoadPlaylist(store, playlist));
 
     assertNotNull(playlist.getName());
 

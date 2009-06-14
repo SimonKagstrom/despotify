@@ -12,9 +12,9 @@ public class TestSearch extends DespotifyClientTest {
 
   @Test
   public void test() throws Exception {
-    Result result = new Search(store, "Johnny Cash").send(connection);
+    Result result = (Result)manager.send(new Search(store, "Johnny Cash"));
     assertTrue(result.getTotalTracks() > 2000);
-    assertEquals(100, result.getTracks());
+    assertEquals(100, result.getTracks().size());
     // todo assert a bit. at least we know there was no exception.
     System.currentTimeMillis();
   }

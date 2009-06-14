@@ -28,7 +28,7 @@ public class TestLoadPlaylist extends DespotifyClientTest {
 //    MediaTestCaseGenerator.createEqualsTest((Playlist)SpotifyURL.browse("spotify:user:kent.finell:playlist:6wvPFkLGKOVl1v3qRJD6HX", connection));
 
     playlist = store.getPlaylist(SpotifyURI.toHex("6wvPFkLGKOVl1v3qRJD6HX"));
-    new LoadPlaylist(store, playlist).send(connection);
+    manager.send(new LoadPlaylist(store, playlist));
 
     assertEquals("despotify apriori", playlist.getName());   
     assertEquals(7l, playlist.getRevision().longValue());

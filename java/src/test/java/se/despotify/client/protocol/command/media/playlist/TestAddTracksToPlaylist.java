@@ -17,10 +17,10 @@ public class TestAddTracksToPlaylist extends DespotifyClientTest {
     String playlistName = randomPlaylistName();
 
 
-    new LoadUserPlaylists(store, user).send(connection);
+    manager.send(new LoadUserPlaylists(store, user));
     int playlistsFromStart = user.getPlaylists().getItems().size();
 
-    Playlist playlist = new CreatePlaylist(store, user, playlistName, false).send(connection);
+    Playlist playlist = (Playlist)manager.send(new CreatePlaylist(store, user, playlistName, false));
 
     assertEquals(playlistsFromStart + 1, user.getPlaylists().getItems().size());
 
@@ -34,7 +34,7 @@ public class TestAddTracksToPlaylist extends DespotifyClientTest {
 
     for (int i = 0; i < checksums.length; i++) {
       log.info("\n\n\n\n\n\n\n           ADD TRACK " + i + "\n\n\n\n\n\n\n\n\n");
-      new AddTrackToPlaylist(store, user, playlist, defaultTracks[i], null).send(connection);
+      manager.send(new AddTrackToPlaylist(store, user, playlist, defaultTracks[i], null));
       assertEquals(checksums[i], playlist.calculateChecksum());
       assertEquals(checksums[i], playlist.getChecksum().longValue());
       assertEquals(i + 1, playlist.getTracks().size());
@@ -46,7 +46,7 @@ public class TestAddTracksToPlaylist extends DespotifyClientTest {
 
     for (int i = checksums.length; i > 1; i--) {
       log.info("\n\n\n\n\n\n\n           REMOVE TRACK " + i + "\n\n\n\n\n\n\n\n\n");
-      new RemoveTrackFromPlaylist(store, user, playlist, i).send(connection);
+      manager.send(new RemoveTrackFromPlaylist(store, user, playlist, i));
       assertEquals(checksums[i - 2], playlist.calculateChecksum());
       assertEquals(checksums[i - 2], playlist.getChecksum().longValue());
       assertEquals(i - 1, playlist.getTracks().size());
@@ -55,7 +55,7 @@ public class TestAddTracksToPlaylist extends DespotifyClientTest {
 
     }
 
-    assertTrue(new RemovePlaylistFromUser(store, user, playlist).send(connection));
+    assertTrue((Boolean)manager.send(new RemovePlaylistFromUser(store, user, playlist)));
 
     assertEquals(playlistsFromStart, user.getPlaylists().getItems().size());
 
