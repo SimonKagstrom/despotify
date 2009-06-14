@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+        http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" version="1.0">
+
+
+  <persistence-unit name="despotify">
+    <class>se.despotify.domain.User</class>
+    <class>se.despotify.domain.media.Album</class>
+    <class>se.despotify.domain.media.Artist</class>
+    <class>se.despotify.domain.media.Biography</class>
+    <class>se.despotify.domain.media.Image</class>
+    <class>se.despotify.domain.media.Media</class>
+    <class>se.despotify.domain.media.Playlist</class>
+    <class>se.despotify.domain.media.PlaylistContainer</class>
+    <class>se.despotify.domain.media.Track</class>
+  </persistence-unit>
+
+
+</persistence>
