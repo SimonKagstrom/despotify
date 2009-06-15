@@ -6,14 +6,13 @@
 #define __RB_ALBUM_H
 
 typedef struct {
-	despotify_album *real;
-	bool ischild;
-} rb_despotify_album;
+	ds_album_t *real;
+} rb_ds_album;
 
-VALUE Init_despotify_album(VALUE mDespotify);
-VALUE rb_despotify_album_new_from_album(despotify_album *a, bool ischild);
+VALUE Init_Album (VALUE mDespotify);
+VALUE ALBUM2VALUE (ds_album_t *a);
 
 #define VALUE2ALBUM(obj, var) \
-		Data_Get_Struct ((obj), rb_despotify_album, (var))
+		Data_Get_Struct ((obj), rb_ds_album, (var))
 
 #endif

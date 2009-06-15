@@ -6,15 +6,15 @@
 #define __RB_SESSION_H
 
 typedef struct {
-	despotify_session *real;
-	despotify_playlist *rootpl;
+	ds_session_t *real;
+	ds_playlist_t *rootpl;
 	bool connected;
-} rb_despotify_session;
+} rb_ds_session;
 
-VALUE Init_despotify_session(VALUE mDespotify);
-
+VALUE Init_Session (VALUE mDespotify);
+void rb_despotify_session_error (VALUE session);
 
 #define VALUE2SESSION(obj, var) \
-	Data_Get_Struct ((obj), rb_despotify_session, (var))
+	Data_Get_Struct ((obj), rb_ds_session, (var))
 
 #endif

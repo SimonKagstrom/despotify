@@ -65,14 +65,14 @@ module Despotify
 				length = '%02d:%02d' % [(track['length'] / 60000), (track['length'] % 60000 / 1000)]
 				index = tracks.index(track) + 1
 
-				col << [index, track['title'], track['artist'].join(', '), length, track['album']]
+				col << [index, track['title'], track.artists.map { |a| a.name }.join(', '), length, track['album']]
 			end
 
 			col.display
 		end
 	end
 
-	class Artist
+	class ArtistBrowse
 		def display
 			puts 'Name: %s' % metadata['name']
 			puts 'Genres: %s' % metadata['genres']
@@ -152,7 +152,7 @@ module Rubify
 			searchterm = args.join(' ')
 			puts 'Searching for: %s' % searchterm
 
-			results = @ds.search(searchterm)
+			results = @ds.search(searchterm, 100)
 
 			if results
 				searchtimes = (results.search_info['total_tracks'].to_f / Despotify::MAX_SEARCH_RESULTS).ceil
@@ -174,21 +174,10 @@ module Rubify
 		def call(*args)
 			name = args.join(' ')
 
-			results = @ds.search(name)
+			results = @ds.search(name, 1)
 
 			if results then
-				artist = nil
-
-				results.tracks.each do |track|
-					track['artist'].each_index do |i|
-						if name.downcase == track['artist'][i].downcase
-							artist = @ds.artist(track['artist_id'][i])
-						end
-					end
-					break if artist
-				end
-
-				artist.display if artist
+				@ds.artist(results.artists.first.id).display
 			end
 		end
 	end
@@ -203,14 +192,14 @@ module Rubify
 				if @rubify.paused
 					return @ds.resume
 				else
-					id = 1
+					return @ds.play_playlist(@rubify.playlist || @ds.stored_playlists.first)
 				end
 			end
 
 			playlist = @rubify.playlist
 			if playlist and id <= playlist.tracks.size
 				track = playlist.tracks[id - 1]
-				@ds.play(playlist, track)
+				@ds.play(track)
 				@rubify.paused = false
 			end
 		end
@@ -272,6 +261,11 @@ module Rubify
 		def initialize(ds)
 			@ds = ds
 
+			@ds.signal(Despotify::TRACK_CHANGE) do
+				puts 'track changed'
+				pp @ds.current_track
+			end
+
 			@playlists = []
 			@playlist = nil
 			@haslists = false
@@ -326,12 +320,11 @@ module Rubify
 			else
 				puts 'Unknown command: %s. Type "help" for a list of commands.' % name
 			end
-
 		end
 
 		def cache_lists
 			if not @haslists
-				@playlists += @ds.playlists
+				@playlists += @ds.stored_playlists
 				@haslists = true
 			end
 		end
@@ -356,7 +349,7 @@ Despotify::Session.new do |ds|
 	end
 
 	if ds.user_info['type'] != 'premium'
-		puts 'You need a premium account to user Rubify!'
+		puts 'You need a premium account to use Rubify!'
 		exit
 	end
 

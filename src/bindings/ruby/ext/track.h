@@ -6,13 +6,14 @@
 #define __RB_TRACK_H
 
 typedef struct {
-		despotify_track *real;
-} rb_despotify_track;
+	ds_track_t *real;
+	bool ischild;
+} rb_ds_track;
 
-VALUE Init_despotify_track(VALUE mDespotify);
-VALUE rb_despotify_track_new_from_track(despotify_track *t);
+VALUE Init_Track (VALUE mDespotify);
+VALUE TRACK2VALUE(ds_track_t *t, bool ischild);
 
 #define VALUE2TRACK(obj, var) \
-		Data_Get_Struct ((obj), rb_despotify_track, (var))
+		Data_Get_Struct ((obj), rb_ds_track, (var))
 
 #endif
