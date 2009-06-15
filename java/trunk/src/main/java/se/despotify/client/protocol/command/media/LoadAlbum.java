@@ -88,13 +88,13 @@ public class LoadAlbum extends Command<Album> {
       log.debug(xml);
     }
 
-    try {
-      Writer out = new OutputStreamWriter(new FileOutputStream(new File("tmp/load_album_"+album.getId()+".xml")), "UTF8");
-      out.write(xml);
-      out.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+//    try {
+//      Writer out = new OutputStreamWriter(new FileOutputStream(new File("tmp/load_album_"+album.getId()+".xml")), "UTF8");
+//      out.write(xml);
+//      out.close();
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
 
 
     XMLElement root = XML.load(xml);

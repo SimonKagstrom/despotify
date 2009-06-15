@@ -92,13 +92,13 @@ public class LoadArtist extends Command<Artist> {
       }
       XMLElement root = XML.load(xml);
 
-      try {
-        Writer out = new OutputStreamWriter(new FileOutputStream(new File("tmp/load_artist_"+artist.getId()+".xml")), "UTF8");
-        out.write(xml);
-        out.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+//      try {
+//        Writer out = new OutputStreamWriter(new FileOutputStream(new File("tmp/load_artist_"+artist.getId()+".xml")), "UTF8");
+//        out.write(xml);
+//        out.close();
+//      } catch (IOException e) {
+//        e.printStackTrace();
+//      }
 
       if (root.getElement().getNodeName().equals("artist")) {
         Artist.fromXMLElement(root, store, new Date());

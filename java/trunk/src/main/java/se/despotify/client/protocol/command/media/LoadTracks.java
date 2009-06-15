@@ -109,13 +109,13 @@ public class LoadTracks extends Command<Object> {
       log.debug(xml);
     }
 
-    try {
-      Writer out = new OutputStreamWriter(new FileOutputStream(new File("tmp/load_tracks_"+System.currentTimeMillis()+".xml")), "UTF8");
-      out.write(xml);
-      out.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+//    try {
+//      Writer out = new OutputStreamWriter(new FileOutputStream(new File("tmp/load_tracks_"+System.currentTimeMillis()+".xml")), "UTF8");
+//      out.write(xml);
+//      out.close();
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
     
 
     XMLElement root = XML.load(xml);
