@@ -267,6 +267,7 @@ shn_decrypt(ctx=0x8523c0, buf=0x81328a, len=2 [0x0002]) called from 0x000adf64
         throw new RuntimeException();
       }
 
+      store.persist(playlist);
       return track;
     } else {
       playlist.getTracks().add(position, track);

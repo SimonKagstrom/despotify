@@ -138,7 +138,7 @@ public class Artist extends Media {
     this.albums = albums;
   }
 
-  public static Artist fromXMLElement(XMLElement artistNode, Store store) {
+  public static Artist fromXMLElement(XMLElement artistNode, Store store, Date fullyLoadedDate) {
     Artist artist = store.getArtist(artistNode.getChildText("id"));
 
     /* Set name. */
@@ -201,7 +201,7 @@ public class Artist extends Media {
     if (albumsNode != null) {
       List<Album> albums = new ArrayList<Album>();
       for (XMLElement albumNode : albumsNode.getChildren()) {
-        albums.add(Album.fromXMLElement(albumNode, store));
+        albums.add(Album.fromXMLElement(albumNode, store, fullyLoadedDate));
       }
       artist.albums = albums;
     }
@@ -212,7 +212,7 @@ public class Artist extends Media {
       List<Artist> similarArtists = new ArrayList<Artist>();
 
       for (XMLElement similarArtistElement : artistNode.getChild("similar-artists").getChildren()) {
-        similarArtists.add(Artist.fromXMLElement(similarArtistElement, store));
+        similarArtists.add(Artist.fromXMLElement(similarArtistElement, store, null));
       }
 
       artist.setSimilarArtists(similarArtists);

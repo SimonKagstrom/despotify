@@ -6,6 +6,7 @@ import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.domain.media.Playlist;
 import se.despotify.domain.User;
+import se.despotify.domain.Store;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XMLElement;
 import se.despotify.util.XML;
@@ -25,11 +26,12 @@ public class SetPlaylistCollaborative extends Command<Boolean> {
 
   private static Logger log = LoggerFactory.getLogger(SetPlaylistCollaborative.class);
 
+  private Store store;
   private User user;
   private Playlist playlist;
   private boolean value;
 
-  public SetPlaylistCollaborative(User user, Playlist playlist, boolean value) {
+  public SetPlaylistCollaborative(Store store, User user, Playlist playlist, boolean value) {
     this.user = user;
     this.playlist = playlist;
     this.value = value;
@@ -98,6 +100,7 @@ public class SetPlaylistCollaborative extends Command<Boolean> {
       playlist.setChecksum(Long.parseLong(parts[2]));
       playlist.setCollaborative(Integer.parseInt(parts[3]) == 1);
 
+      store.persist(playlist);
       return true;
     }
 

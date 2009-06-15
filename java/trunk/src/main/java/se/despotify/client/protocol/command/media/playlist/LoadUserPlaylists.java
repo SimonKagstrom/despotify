@@ -80,6 +80,7 @@ public class LoadUserPlaylists extends Command<Boolean> {
 
     if (playlistElement.hasChild("next-change")) {
       user.getPlaylists().setLoaded(new Date());
+
       return true;
     } else {
       throw new RuntimeException("Unknown server response:\n" + xml);

@@ -20,7 +20,7 @@ public class Biography implements Serializable, org.domdrides.entity.Entity<Long
   @Lob    
   private String text;
 
-  @OneToMany
+  @ManyToMany
   private List<Image> portraits;
 
   public String getText() {

@@ -34,7 +34,7 @@ public class CreatePlaylist extends Command<Playlist> {
     playlist.setName(playlistName);
     playlist.setId(hexUUID);
     if (new CreatePlaylistWithReservedUUID(store, user, playlist).send(connection)) {
-      return playlist;
+      return (Playlist)store.persist(playlist);
     } else {
       throw new DespotifyException();
     }

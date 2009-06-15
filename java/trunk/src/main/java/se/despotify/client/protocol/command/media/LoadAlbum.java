@@ -20,11 +20,12 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
+import java.io.*;
 
 /**
  * @since 2009-apr-25 16:28:42
  */
-public class LoadAlbum extends Command<Boolean> {
+public class LoadAlbum extends Command<Album> {
 
   protected static Logger log = LoggerFactory.getLogger(LoadAlbum.class);
 
@@ -37,7 +38,7 @@ public class LoadAlbum extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Connection connection) throws DespotifyException {
+  public Album send(Connection connection) throws DespotifyException {
 
 /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
@@ -86,6 +87,16 @@ public class LoadAlbum extends Command<Boolean> {
     if (log.isDebugEnabled()) {
       log.debug(xml);
     }
+
+    try {
+      Writer out = new OutputStreamWriter(new FileOutputStream(new File("tmp/load_album_"+album.getId()+".xml")), "UTF8");
+      out.write(xml);
+      out.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+
     XMLElement root = XML.load(xml);
 
     // load tracks
@@ -94,13 +105,12 @@ public class LoadAlbum extends Command<Boolean> {
     if (!"album".equals(root.getElement().getNodeName())) {
       throw new DespotifyException("Expected document root to be of type <album>");
     }
-    Album album = Album.fromXMLElement(root, store);
+    Album album = Album.fromXMLElement(root, store, new Date());
     if (this.album != album) {
       throw new DespotifyException("Album in response has different UUID than the requested album!");
     }
 
     album.setLoaded(new Date());
-
-    return true;
+    return (Album)store.persist(album);
   }
 }

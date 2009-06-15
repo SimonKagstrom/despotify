@@ -6,6 +6,7 @@ import se.despotify.util.XMLElement;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class Result implements Serializable {
 
@@ -102,6 +103,12 @@ public class Result implements Serializable {
     this.tracks = tracks;
   }
 
+  /**
+   *
+   * @param resultElement
+   * @param store
+   * @return
+   */
   public static Result fromXMLElement(XMLElement resultElement, Store store) {
 
     if (resultElement == null) {
@@ -134,17 +141,17 @@ public class Result implements Serializable {
 
     if (resultElement.hasChild("artists")) {
       for (XMLElement artistElement : resultElement.getChild("artists").getChildren()) {
-        result.getArtists().add(Artist.fromXMLElement(artistElement, store));
+        result.getArtists().add(Artist.fromXMLElement(artistElement, store, null));
       }
     }
     if (resultElement.hasChild("albums")) {
       for (XMLElement albumElement : resultElement.getChild("albums").getChildren()) {
-        result.getAlbums().add(Album.fromXMLElement(albumElement, store));
+        result.getAlbums().add(Album.fromXMLElement(albumElement, store, null));
       }
     }
     if (resultElement.hasChild("tracks")) {
       for (XMLElement trackElement : resultElement.getChild("tracks").getChildren()) {
-        result.getTracks().add(Track.fromXMLElement(trackElement, store));
+        result.getTracks().add(Track.fromXMLElement(trackElement, store, null));
       }
     }
 

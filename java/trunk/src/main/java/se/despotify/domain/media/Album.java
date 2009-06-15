@@ -8,6 +8,7 @@ import se.despotify.util.XMLElement;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 import java.util.zip.Adler32;
 
 
@@ -129,7 +130,14 @@ public class Album extends RestrictedMedia {
     this.p = p;
   }
 
-  public static Album fromXMLElement(XMLElement albumElement, Store store) {
+  /**
+   *
+   * @param albumElement
+   * @param store
+   * @param fullyLoadedDate set this not null only if the xml contains data for the complete album
+   * @return
+   */
+  public static Album fromXMLElement(XMLElement albumElement, Store store, Date fullyLoadedDate) {
 
 
     Album album = store.getAlbum(albumElement.getChildText("id"));
@@ -171,7 +179,7 @@ public class Album extends RestrictedMedia {
 
         int discNumber = Integer.valueOf(discElement.getChildText("disc-number"));
         for (XMLElement trackElement : discElement.getChildren("track")) {
-          Track track = Track.fromXMLElement(trackElement, store);
+          Track track = Track.fromXMLElement(trackElement, store, fullyLoadedDate);
           track.setDiscNumber(discNumber);
           tracks.add(track);
           track.setAlbum(album);
@@ -199,6 +207,10 @@ public class Album extends RestrictedMedia {
 
       album.setTracks(tracks);
 
+    }
+
+    if (fullyLoadedDate != null) {
+      album.setLoaded(fullyLoadedDate);
     }
 
     return album;

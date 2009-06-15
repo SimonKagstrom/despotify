@@ -96,6 +96,7 @@ public class LoadPlaylist extends Command<Boolean> {
     }
 
     playlist.setLoaded(new Date());
+    store.persist(playlist);
     return true;
 
 

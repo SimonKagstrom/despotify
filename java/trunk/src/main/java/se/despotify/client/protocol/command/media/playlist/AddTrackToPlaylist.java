@@ -55,6 +55,10 @@ public class AddTrackToPlaylist extends Command<Boolean> {
   @Override
   public Boolean send(Connection connection) throws DespotifyException {
 
+    if (playlist.getLoaded() == null) {
+      new LoadPlaylist(store, playlist).send(connection);
+    }
+
     if (!playlist.isCollaborative() && !playlist.getAuthor().equals(user.getId())) {
       throw new DespotifyException("Playlist must be collaborative or owned by the current user!");
     }
@@ -145,6 +149,8 @@ public class AddTrackToPlaylist extends Command<Boolean> {
       if(playlist.isCollaborative() != (Integer.parseInt(versionTagValues[3]) == 1)) {
         throw new RuntimeException(); 
       }
+
+      store.persist(playlist);
 
       return true;
     } else {

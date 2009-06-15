@@ -11,6 +11,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.ManyToOne;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 @Entity
 public class Track extends RestrictedMedia {
@@ -153,7 +154,14 @@ public class Track extends RestrictedMedia {
     this.popularity = popularity;
   }
 
-  public static Track fromXMLElement(XMLElement trackElement, Store store) {
+  /**
+   *
+   * @param trackElement
+   * @param store
+   * @param fullyLoadedDate set this not null only if the xml contains data for the complete album
+   * @return
+   */
+  public static Track fromXMLElement(XMLElement trackElement, Store store, Date fullyLoadedDate) {
 
     Track track = store.getTrack(trackElement.getChildText("id"));
 
@@ -162,7 +170,7 @@ public class Track extends RestrictedMedia {
       track.title = trackElement.getChildText("title");
     }
 
-    /*
+    /* todo redirect
     3c3f786d6c207665 7273696f6e3d2231 2e302220656e636f 64696e673d227574 [<?xml version="1.0" encoding="ut]
     662d38223f3e0a0a 0a0a0a0a3c726573 756c743e0a20203c 76657273696f6e3e [f-8"?>??????<result>?  <version>]
     313c2f7665727369 6f6e3e0a20203c74 6f74616c2d747261 636b733e323c2f74 [1</version>?  <total-tracks>2</t]
@@ -222,7 +230,7 @@ public class Track extends RestrictedMedia {
         track.year = Integer.parseInt(trackElement.getChildText("year"));
       }
       catch (NumberFormatException e) {
-        log.error("Could not read year from track", e);
+        log.error("Could not read year from track");
         track.year = null;
       }
     }
@@ -269,6 +277,10 @@ public class Track extends RestrictedMedia {
       RestrictedMedia.fromXMLElement(restrictionsNode, track);
     }
 
+    if (fullyLoadedDate != null) {
+      track.setLoaded(fullyLoadedDate);
+    }
+    
     return track;
 
   }

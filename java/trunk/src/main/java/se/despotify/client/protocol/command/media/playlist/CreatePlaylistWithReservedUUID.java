@@ -88,6 +88,7 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
   private Store store;
   private Playlist playlist;
   private User user;
+  private Integer position;
 
   public CreatePlaylistWithReservedUUID(Store store, User user, Playlist playlist) {
     this.store = store;
@@ -95,6 +96,12 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
     this.user = user;
   }
 
+  public CreatePlaylistWithReservedUUID(Store store, User user, Playlist playlist, int position) {
+    this.store = store;
+    this.playlist = playlist;
+    this.user = user;
+    this.position = position;
+  }
 
   @Override
   public Boolean send(Connection connection) throws DespotifyException {
@@ -117,7 +124,9 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
 
     playlists.getItems().add(playlist);
 
-    int position = playlists.getItems().size() - 1;
+    if (position == null) {
+      position = playlists.getItems().size() - 1;
+    }
 
     String xml = String.format
         ("<change><ops><add><i>%s</i><items>%s</items></add></ops><time>%s</time><user>%s</user></change>" +

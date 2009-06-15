@@ -5,6 +5,7 @@ import se.despotify.client.protocol.PacketType;
 import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.domain.User;
+import se.despotify.domain.Store;
 import se.despotify.domain.media.Playlist;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XMLElement;
@@ -25,14 +26,16 @@ public class RenamePlaylist extends Command<Boolean> {
 
   private static Logger log = LoggerFactory.getLogger(RenamePlaylist.class);
 
+  private Store store;
   private User user;
   private Playlist playlist;
   private String newName;
 
-  public RenamePlaylist(User user, Playlist playlist, String newName) {
+  public RenamePlaylist(Store store, User user, Playlist playlist, String newName) {
     this.user = user;
     this.playlist = playlist;
     this.newName = newName;
+    this.store = store;
   }
 
   public Boolean send(Connection connection) throws DespotifyException {
@@ -98,6 +101,7 @@ public class RenamePlaylist extends Command<Boolean> {
       playlist.setChecksum(Long.parseLong(parts[2]));
       playlist.setCollaborative(Integer.parseInt(parts[3]) == 1);
 
+      store.persist(playlist);
       return true;
     }
 

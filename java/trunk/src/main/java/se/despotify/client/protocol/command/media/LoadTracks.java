@@ -22,11 +22,12 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.io.*;
 
 /**
  * @since 2009-apr-25 16:28:42
  */
-public class LoadTracks extends Command<Boolean> {
+public class LoadTracks extends Command<Object> {
 
   protected static Logger log = LoggerFactory.getLogger(LoadTracks.class);
 
@@ -67,7 +68,7 @@ public class LoadTracks extends Command<Boolean> {
 
     /* Append channel id and type. */
     buffer.putShort((short) channel.getId());
-		buffer.put((byte)BrowseType.track.getValue());
+    buffer.put((byte) BrowseType.track.getValue());
 
     /* Append (16 byte) ids. */
     for (Track track : tracks) {
@@ -107,6 +108,16 @@ public class LoadTracks extends Command<Boolean> {
     if (log.isDebugEnabled()) {
       log.debug(xml);
     }
+
+    try {
+      Writer out = new OutputStreamWriter(new FileOutputStream(new File("tmp/load_tracks_"+System.currentTimeMillis()+".xml")), "UTF8");
+      out.write(xml);
+      out.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    
+
     XMLElement root = XML.load(xml);
 
     // load tracks
@@ -114,8 +125,12 @@ public class LoadTracks extends Command<Boolean> {
 
     Result result = Result.fromXMLElement(root, store);
 
-    for (Track track : result.getTracks() ) {
-      track.setLoaded(new Date());
+    Date now = new Date();
+    for(int i = 0; i<result.getTracks().size(); i++) {
+      Track track = result.getTracks().get(i);
+      track.setLoaded(now);
+      result.getTracks().set(i, (Track)store.persist(track));
+
     }
 
     return true;

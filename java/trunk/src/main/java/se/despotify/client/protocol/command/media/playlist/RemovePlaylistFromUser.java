@@ -302,7 +302,7 @@ shn_decrypt(ctx=0x8f0dc0, buf=0x8c8a8c, len=2 [0x0002]) called from 0x000adf64
 
     Playlist.fromXMLElement(response, store, playlist);
 
-    if (response.hasChild("next-change")) {
+    if (response.hasChild("next-change")) {      
       return true;
     } else {
       playlists.getItems().add(position - 1, playlist);
