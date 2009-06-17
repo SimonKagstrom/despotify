@@ -14,10 +14,6 @@
 #include <wchar.h>
 #include "despotify.h"
 
-/* these are global to allow the callback to access them */
-static struct playlist* lastlist = NULL;
-static int listoffset = 0;
-
 struct playlist* get_playlist(struct playlist* rootlist, int num)
 {
     struct playlist* p = rootlist;
@@ -185,6 +181,7 @@ void command_loop(struct despotify_session* ds)
     char buf[80];
     struct playlist* rootlist = NULL;
     struct playlist* searchlist = NULL;
+    struct playlist* lastlist = NULL;
     struct search_result *search = NULL;
     struct album_browse* playalbum = NULL;
 
@@ -480,21 +477,29 @@ void command_loop(struct despotify_session* ds)
             }
 
             /* skip to track <num>, else play next */
-            if (buf[4])
-                listoffset = atoi(buf + 5);
-            else
-                listoffset++;
-            struct track* t = lastlist->tracks;
-            for (int i=1; i<listoffset && t; i++)
-                t = t->next;
+            struct track* t;
+            if (buf[4]) {
+                int listoffset = atoi(buf + 5);
+                t = lastlist->tracks;
+                for (int i=1; i<listoffset && t; i++)
+                    t = t->next;
+
+                if (!t) {
+                    wprintf(L"Invalid track number %d\n", listoffset);
+                }
+            }
+            else {
+                t = despotify_get_current_track(ds);
+                if (t)
+                    t = t->next;
+            }
+
             if (t) {
                 despotify_play(ds, t, true);
-                wprintf(L"New track: %d: %s / %s (%d:%02d)\n",
-                        listoffset, t->title, t->artist->name,
+                wprintf(L"New track: %s / %s (%d:%02d)\n",
+                        t->title, t->artist->name,
                         t->length / 60000, t->length % 60000 / 1000);
             }
-            else
-                wprintf(L"Invalid track number %d\n", listoffset);
         }
 
         /* stop */
@@ -543,16 +548,13 @@ void callback(struct despotify_session* ds, int signal, void* data, void* callba
     (void)data; (void)ds; (void)callback_data;
 
     switch (signal) {
-        case DESPOTIFY_TRACK_CHANGE:
-            listoffset++;
-            struct track* t = lastlist->tracks;
-            for (int i=1; i<listoffset && t; i++)
-                t = t->next;
-            if (t)
-                wprintf(L"New track: %d: %s / %s (%d:%02d)\n",
-                        listoffset, t->title, t->artist->name,
-                        t->length / 60000, t->length % 60000 / 1000);
+        case DESPOTIFY_TRACK_CHANGE: {
+            struct track* t = data;
+            wprintf(L"New track: %s / %s (%d:%02d)\n",
+                    t->title, t->artist->name,
+                    t->length / 60000, t->length % 60000 / 1000);
             break;
+        }
     }
 }
 
