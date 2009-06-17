@@ -13,7 +13,7 @@
       <xs:element name="portrait" type="imageType"/>
       <xs:element name="genres" type="xs:string"/>
       <xs:element name="years-active" type="xs:string"/>
-      <xs:element type="xs:byte" name="version"/>
+      <xs:element type="xs:long" name="version"/>
       <xs:element type="biosType" name="bios"/>
       <xs:element type="similar-artistsType" name="similar-artists"/>
       <xs:element type="albumsType" name="albums"/>

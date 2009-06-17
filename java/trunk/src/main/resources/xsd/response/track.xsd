@@ -4,6 +4,8 @@
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <xs:include schemaLocation="restriction.xsd"/>
+  <xs:include schemaLocation="file.xsd"/>
+  <xs:include schemaLocation="link.xsd"/>
 
   <xs:complexType name="discsType">
     <xs:sequence>
@@ -27,6 +29,7 @@
     
   <xs:complexType name="trackType">
     <xs:sequence>
+
       <xs:element type="xs:string" name="id"/>
       <xs:element type="xs:string" name="title"/>
       <xs:element type="xs:string" name="artist-id"/>
@@ -36,7 +39,8 @@
       <xs:element type="xs:short" name="year"/>
       <xs:element type="xs:byte" name="track-number"/>
       <xs:element type="xs:int" name="length"/>
-      <xs:element type="xs:string" name="files"/>
+      <xs:element type="linksType" name="links"/>
+      <xs:element type="filesType" name="files"/>
       <xs:element type="xs:string" name="cover"/>
       <xs:element type="xs:float" name="popularity"/>
       <xs:element type="restrictionsType" name="restrictions"/>
