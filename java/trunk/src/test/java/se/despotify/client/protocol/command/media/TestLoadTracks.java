@@ -22,6 +22,8 @@ public class TestLoadTracks extends DespotifyClientTest {
   @Test
   public void test() throws Exception {
 
+    final String hex40 = "^[a-f0-9]{40}$";
+    
     manager.send(new LoadTracks(store, defaultTracks));
 
 //    for (Track track : defaultTracks) {
@@ -47,7 +49,7 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("One", track.getTitle());
         assertEquals("3d44ff9d9b75a44b835f7e719a193e9033cae6af", track.getCover());
         assertEquals(1, track.getFiles().size());
-        assertEquals("36fa172ca1a707ba71e79757f3014cc1a26fbbf6", track.getFiles().get(0));
+        assertTrue(track.getFiles().get(0).matches(hex40));
         assertEquals(231200l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(20, track.getTrackNumber().intValue());
@@ -81,7 +83,7 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("Two", track.getTitle());
         assertEquals("95cdf93b035a5c568bc19981a9e618bd2f9a50bf", track.getCover());
         assertEquals(1, track.getFiles().size());
-        assertEquals("ddc30e1090b43403cc0828db91300450a358a1a8", track.getFiles().get(0));
+        assertTrue(track.getFiles().get(0).matches(hex40));
         assertEquals(158293l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(2, track.getTrackNumber().intValue());
@@ -115,7 +117,7 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("Three", track.getTitle());
         assertEquals("1946f99c0408e958f88c1811f1d9d92df0a4b16f", track.getCover());
         assertEquals(1, track.getFiles().size());
-        assertEquals("6186903f7ffa0e579954fa42c537cebc06ac7427", track.getFiles().get(0));
+        assertTrue(track.getFiles().get(0).matches(hex40));
         assertEquals(229066l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(3, track.getTrackNumber().intValue());
@@ -149,7 +151,7 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("Four", track.getTitle());
         assertEquals("2df174a97a577044edaa482b5eb198b5bc20dddb", track.getCover());
         assertEquals(1, track.getFiles().size());
-        assertEquals("55473589cbccde7f9621fea833f38487f92f2892", track.getFiles().get(0));
+        assertTrue(track.getFiles().get(0).matches(hex40));
         assertEquals(240226l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(3, track.getTrackNumber().intValue());
@@ -183,7 +185,7 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("Five", track.getTitle());
         assertEquals("e1712082598617226c51214314392d7d19f989d3", track.getCover());
         assertEquals(1, track.getFiles().size());
-        assertEquals("4c5a99ef480c133dc365642f827f79e6e963c565", track.getFiles().get(0));
+        assertTrue(track.getFiles().get(0).matches(hex40));
         assertEquals(385000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(9, track.getTrackNumber().intValue());

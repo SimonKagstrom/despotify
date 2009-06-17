@@ -2,6 +2,7 @@ package se.despotify.client.protocol.command.media;
 
 import org.junit.Test;
 import se.despotify.DespotifyClientTest;
+import se.despotify.util.SpotifyURI;
 import se.despotify.domain.MemoryStore;
 import se.despotify.domain.media.Artist;
 import se.despotify.domain.media.VisitorAdapter;
@@ -13,6 +14,15 @@ public class TestLoadArtist extends DespotifyClientTest {
 
   @Test
   public void test() throws Exception {
+
+    // todo
+//    Artist variousArtists = store.getArtist("19334eaffa3f4f2282e251e36611e26f");
+//    manager.send(new LoadArtist(store, variousArtists));
+
+
+    Artist dolly = store.getArtist(SpotifyURI.toHex("32vWCbZh0xZ4o9gkz4PsEU"));
+    manager.send(new LoadArtist(store, dolly));
+
 
     for (Artist artist : defaultArtists) {
       manager.send(new LoadArtist(store, artist));
@@ -31,6 +41,7 @@ public class TestLoadArtist extends DespotifyClientTest {
     Artist artist;
 
     // generated tests
+
 
     artist = store.getArtist("d00d9e7b82894fb8851a109c82568eb5");
     manager.send(new LoadArtist(store, artist));

@@ -115,7 +115,7 @@ public class TestStore extends DespotifyClientTest {
         assertEquals("One", track.getTitle());
         assertEquals("3d44ff9d9b75a44b835f7e719a193e9033cae6af", track.getCover());
         assertEquals(1, track.getFiles().size());
-        assertEquals("36fa172ca1a707ba71e79757f3014cc1a26fbbf6", track.getFiles().get(0));
+        assertEquals("e935faa17b7755c1a6a970f4ab087a9de347c0e6", track.getFiles().get(0));
         assertEquals(231200l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(20, track.getTrackNumber().intValue());
