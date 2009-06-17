@@ -110,7 +110,6 @@ public class LoadAlbum extends Command<Album> {
       throw new DespotifyException("Album in response has different UUID than the requested album!");
     }
 
-    album.setLoaded(new Date());
     return (Album)store.persist(album);
   }
 }

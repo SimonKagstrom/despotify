@@ -17,11 +17,14 @@ import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
-import java.io.*;
+import java.io.StringReader;
 
 /**
  * @since 2009-apr-25 16:28:42
@@ -39,8 +42,11 @@ public class LoadArtist extends Command<Artist> {
     this.artist = artist;
   }
 
+
   @Override
   public Artist send(Connection connection) throws DespotifyException {
+
+    Date now = new Date();
 
     /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
@@ -76,9 +82,10 @@ public class LoadArtist extends Command<Artist> {
 
     if (data.length == 0) {
       if ("Various Artists".equals(artist.getName())) {
+        artist.setLoaded(now);
         // good stuff // todo figure this out, various artists does not seem to get loaded> 19334eaffa3f4f2282e251e36611e26f
       } else {
-        throw new ReceivedEmptyResponseException();
+        throw new ReceivedEmptyResponseException("This might be a real problem while communicting with Spotify, it can also be that you tried to load an artist representing 'Various Artists' Spotify will return an empty result. The official client does not seem to ever load such an artist.");
       }
     } else {
 
@@ -90,6 +97,8 @@ public class LoadArtist extends Command<Artist> {
       if (log.isDebugEnabled()) {
         log.debug(xml);
       }
+
+
       XMLElement root = XML.load(xml);
 
 //      try {
@@ -101,14 +110,13 @@ public class LoadArtist extends Command<Artist> {
 //      }
 
       if (root.getElement().getNodeName().equals("artist")) {
-        Artist.fromXMLElement(root, store, new Date());
+        Artist.fromXMLElement(root, store, now);
       } else {
         throw new DespotifyException("Root element is not named <artist>: " + root.getElement().getNodeName());
       }
 
     }
 
-    artist.setLoaded(new Date());
     return (Artist) store.persist(artist);
   }
 }

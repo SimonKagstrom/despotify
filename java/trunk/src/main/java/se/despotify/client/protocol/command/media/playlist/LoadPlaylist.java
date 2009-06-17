@@ -10,6 +10,7 @@ import se.despotify.client.protocol.command.Command;
 import se.despotify.domain.Store;
 import se.despotify.domain.media.Playlist;
 import se.despotify.exceptions.DespotifyException;
+import se.despotify.exceptions.ReceivedEmptyResponseException;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
 import se.despotify.Connection;
@@ -77,7 +78,7 @@ public class LoadPlaylist extends Command<Boolean> {
     data = callback.getData("get playlist response");
 
     if (data.length == 0) {
-      throw new DespotifyException("Received an empty response");
+      throw new ReceivedEmptyResponseException();
     }
 
     /* Load XML. */

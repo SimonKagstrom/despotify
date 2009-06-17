@@ -221,6 +221,7 @@ public class Track extends RestrictedMedia {
     }
 
     if (trackElement.hasChild("album")) {
+      // todo not sure when this happends or what might happend then...
       track.album.setName(trackElement.getChildText("album"));
     }
 

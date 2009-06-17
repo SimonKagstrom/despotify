@@ -130,7 +130,6 @@ public class LoadTracks extends Command<Object> {
       Track track = result.getTracks().get(i);
       track.setLoaded(now);
       result.getTracks().set(i, (Track)store.persist(track));
-
     }
 
     return true;

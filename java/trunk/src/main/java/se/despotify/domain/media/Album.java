@@ -21,12 +21,12 @@ public class Album extends RestrictedMedia {
   private String name;
 
   @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-  private Artist artist;
+  private Artist mainArtist;
 
   private String cover;
   private Float popularity;
 
-  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "album")
   private List<Track> tracks;
 
   @Column(length = 512)
@@ -40,17 +40,16 @@ public class Album extends RestrictedMedia {
   }
 
   public Album(String hexUUID) {
-    this(hexUUID, null, null);
+    this(hexUUID, null);
   }
 
   public Album(byte[] bytesUUID) {
-    this(Hex.toHex(bytesUUID), null, null);
+    this(Hex.toHex(bytesUUID), null);
   }
 
-  public Album(String hexUUID, String name, Artist artist) {
+  public Album(String hexUUID, String name) {
     this.id = hexUUID;
     this.name = name;
-    this.artist = artist;
   }
 
   @Override
@@ -82,12 +81,12 @@ public class Album extends RestrictedMedia {
     this.name = name;
   }
 
-  public Artist getArtist() {
-    return artist;
+  public Artist getMainArtist() {
+    return mainArtist;
   }
 
-  public void setArtist(Artist artist) {
-    this.artist = artist;
+  public void setMainArtist(Artist mainArtist) {
+    this.mainArtist = mainArtist;
   }
 
   public String getCover() {
@@ -147,11 +146,11 @@ public class Album extends RestrictedMedia {
     }
 
     if (albumElement.hasChild("artist-id")) {
-      album.artist = store.getArtist(albumElement.getChildText("artist-id"));
+      album.mainArtist = store.getArtist(albumElement.getChildText("artist-id"));
     }
 
     if (albumElement.hasChild("artist") || albumElement.hasChild("artist-name")) {
-      album.artist.setName(albumElement.hasChild("artist") ? albumElement.getChildText("artist") : albumElement.getChildText("artist-name"));
+      album.mainArtist.setName(albumElement.hasChild("artist") ? albumElement.getChildText("artist") : albumElement.getChildText("artist-name"));
     }
 
 
@@ -170,12 +169,15 @@ public class Album extends RestrictedMedia {
     }
 
 
+
     /* Set tracks. */
+
     if (albumElement.hasChild("discs")) {
 
       List<Track> tracks = new ArrayList<Track>();
 
       for (XMLElement discElement : albumElement.getChild("discs").getChildren("disc")) {
+
 
         int discNumber = Integer.valueOf(discElement.getChildText("disc-number"));
         for (XMLElement trackElement : discElement.getChildren("track")) {
@@ -183,6 +185,7 @@ public class Album extends RestrictedMedia {
           track.setDiscNumber(discNumber);
           tracks.add(track);
           track.setAlbum(album);
+
         }
       }
 
@@ -210,7 +213,7 @@ public class Album extends RestrictedMedia {
     }
 
     if (fullyLoadedDate != null) {
-      album.setLoaded(fullyLoadedDate);
+      album.setLoaded(fullyLoadedDate);      
     }
 
     return album;
@@ -232,7 +235,7 @@ public class Album extends RestrictedMedia {
     return "Album{" +
         "id='" + id + '\'' +
         ", name='" + name + '\'' +
-        ", artist=" + (artist == null ? null : artist.getId()) +
+        ", mainArtist=" + (mainArtist == null ? null : mainArtist.getId()) +
         ", cover='" + cover + '\'' +
         ", popularity=" + popularity +
         ", tracks=" + (tracks == null ? null : tracks.size()) +

@@ -38,10 +38,10 @@ public class MediaTestCaseGenerator {
 
         }
 
-        if (album.getArtist() == null) {
+        if (album.getMainArtist() == null) {
           System.out.println("        assertNull(album.getArtist());");
         } else {
-          printArtist(album.getArtist(), "album.getArtist()");
+          printArtist(album.getMainArtist(), "album.getArtist()");
         }
 
         System.out.println("      }");

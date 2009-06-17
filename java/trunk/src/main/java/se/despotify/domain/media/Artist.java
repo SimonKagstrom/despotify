@@ -20,7 +20,7 @@ public class Artist extends Media {
   private Image portrait;
   private Float popularity;
 
-  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "id")
   private List<Artist> similarArtists;
 
   @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -31,11 +31,17 @@ public class Artist extends Media {
   private Set<String> genres;
 
   @CollectionOfElements
-  @Column(length = 50)    
+  @Column(length = 50)
   private List<String> yearsActive;
 
-  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-  private List<Album> albums;
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "mainArtist")
+  private List<Album> mainArtistAlbums;
+
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "artist")
+  private List<Track> tracks;
+
+  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private List<Album> allAlbumsWithTrackPresent;
 
   public Artist() {
     super();
@@ -130,13 +136,33 @@ public class Artist extends Media {
     this.yearsActive = yearsActive;
   }
 
-  public List<Album> getAlbums() {
-    return albums;
+  public List<Album> getAllAlbumsWithTrackPresent() {
+    return allAlbumsWithTrackPresent;
   }
 
-  public void setAlbums(List<Album> albums) {
-    this.albums = albums;
+  public void setAllAlbumsWithTrackPresent(List<Album> allAlbumsWithTrackPresent) {
+    this.allAlbumsWithTrackPresent = allAlbumsWithTrackPresent;
   }
+
+  public List<Album> getMainArtistAlbums() {
+    return mainArtistAlbums;
+  }
+
+  public void setMainArtistAlbums(List<Album> mainArtistAlbums) {
+    this.mainArtistAlbums = mainArtistAlbums;
+  }
+
+  public List<Track> getTracks() {
+    return tracks;
+  }
+
+  public void setTracks(List<Track> tracks) {
+    this.tracks = tracks;
+  }
+
+
+
+
 
   public static Artist fromXMLElement(XMLElement artistNode, Store store, Date fullyLoadedDate) {
     Artist artist = store.getArtist(artistNode.getChildText("id"));
@@ -189,21 +215,35 @@ public class Artist extends Media {
     if (artistNode.hasChild("genres")) {
       String[] genreIds = artistNode.getChildText("genres").split(",");
       Set<String> genres = new LinkedHashSet<String>(genreIds.length);
-      for(String genre : genreIds) {
+      for (String genre : genreIds) {
         if (!"".equals(genre)) {
           genres.add(genre);
         }
-      }      
+      }
       artist.genres = genres;
     }
 
     XMLElement albumsNode = artistNode.getChild("albums");
     if (albumsNode != null) {
-      List<Album> albums = new ArrayList<Album>();
+      List<Album> allAlbumsWithTrackPresent = new ArrayList<Album>();
       for (XMLElement albumNode : albumsNode.getChildren()) {
-        albums.add(Album.fromXMLElement(albumNode, store, fullyLoadedDate));
+        Album album = Album.fromXMLElement(albumNode, store, fullyLoadedDate);
+
+        // add to all albums
+        allAlbumsWithTrackPresent.add(album);
+
+        // add to main artist albums
+        if (artist.equals(album.getMainArtist())) {
+          if (artist.getMainArtistAlbums() == null) {
+            artist.setMainArtistAlbums(new ArrayList<Album>());
+          }
+          if (!artist.getMainArtistAlbums().contains(album)) {
+            artist.getMainArtistAlbums().add(album);
+          }
+        }
+
       }
-      artist.albums = albums;
+      artist.allAlbumsWithTrackPresent = allAlbumsWithTrackPresent;
     }
 
     /* Set similar artists. */
@@ -216,6 +256,10 @@ public class Artist extends Media {
       }
 
       artist.setSimilarArtists(similarArtists);
+    }
+
+    if (fullyLoadedDate != null) {
+      artist.setLoaded(fullyLoadedDate);
     }
 
     return artist;
