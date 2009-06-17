@@ -6,20 +6,6 @@
   <xs:include schemaLocation="restriction.xsd"/>
   <xs:include schemaLocation="file.xsd"/>
   <xs:include schemaLocation="link.xsd"/>
-
-  <xs:complexType name="discsType">
-    <xs:sequence>
-      <xs:element type="discType" name="disc"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="discType">
-    <xs:sequence>
-      <xs:element type="xs:string" name="disc-number"/>
-      <xs:element type="xs:string" name="name"/>
-      <xs:element type="trackType" name="track" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
   
   <xs:complexType name="tracksType">
     <xs:sequence>

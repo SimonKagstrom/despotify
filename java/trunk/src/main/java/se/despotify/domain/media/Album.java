@@ -10,12 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 import java.util.zip.Adler32;
+import java.io.Serializable;
+
+import org.hibernate.annotations.CollectionOfElements;
 
 
 @Entity
 public class Album extends RestrictedMedia {
 
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Enumeration: compilation, single, album
+   */
+  @Column(length = 20)
+  private String type;
 
   @Column(length = 512)
   private String name;
@@ -29,11 +38,17 @@ public class Album extends RestrictedMedia {
   @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "album")
   private List<Track> tracks;
 
+  @CollectionOfElements
   @Column(length = 512)
-  private String c;
-  
+  private List<String> c;
+
+  @CollectionOfElements
   @Column(length = 512)
-  private String p;
+  private List<String> p;
+
+  @CollectionOfElements
+  @Column(length = 512)
+  private List<String> discNames;
 
   public Album() {
     super();
@@ -113,20 +128,36 @@ public class Album extends RestrictedMedia {
     this.tracks = tracks;
   }
 
-  public String getC() {
+  public List<String> getC() {
     return c;
   }
 
-  public void setC(String c) {
+  public void setC(List<String> c) {
     this.c = c;
   }
 
-  public String getP() {
+  public List<String> getP() {
     return p;
   }
 
-  public void setP(String p) {
+  public void setP(List<String> p) {
     this.p = p;
+  }
+
+  public List<String> getDiscNames() {
+    return discNames;
+  }
+
+  public void setDiscNames(List<String> discNames) {
+    this.discNames = discNames;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   /**
@@ -172,11 +203,19 @@ public class Album extends RestrictedMedia {
 
     /* Set tracks. */
 
+    List<String> discNames = new ArrayList<String>();
     if (albumElement.hasChild("discs")) {
 
       List<Track> tracks = new ArrayList<Track>();
 
       for (XMLElement discElement : albumElement.getChild("discs").getChildren("disc")) {
+
+
+        if (discElement.hasChild("name")) {
+          discNames.add(discElement.getChild("name").getText());
+        } else {
+          discNames.add(null);
+        }
 
 
         int discNumber = Integer.valueOf(discElement.getChildText("disc-number"));
@@ -196,14 +235,22 @@ public class Album extends RestrictedMedia {
 
       if (albumElement.hasChild("copyright")) {
 
+        List<String> c = new ArrayList<String>();
+        List<String> p = new ArrayList<String>();
         for (XMLElement copyrightNode : albumElement.getChild("copyright").getChildren()) {
           if ("c".equals(copyrightNode.getElement().getNodeName())) {
-            album.setC(copyrightNode.getText());
+            c.add(copyrightNode.getText());
           } else if ("p".equals(copyrightNode.getElement().getNodeName())) {
-            album.setP(copyrightNode.getText());
+            p.add(copyrightNode.getText());
           } else {
             log.warn("Unknown copyright type " + copyrightNode.getElement().getNodeName());
           }
+        }
+        if (c.size() > 0) {
+          album.setC(c);
+        }
+        if (p.size() > 0) {
+          album.setP(p);
         }
 
       }
@@ -235,12 +282,15 @@ public class Album extends RestrictedMedia {
     return "Album{" +
         "id='" + id + '\'' +
         ", name='" + name + '\'' +
+        ", type='" + type + '\'' +
+        ", popularity=" + popularity +
+        ", discNames=" + discNames +
         ", mainArtist=" + (mainArtist == null ? null : mainArtist.getId()) +
         ", cover='" + cover + '\'' +
-        ", popularity=" + popularity +
         ", tracks=" + (tracks == null ? null : tracks.size()) +
         ", c=" + c +
         ", p=" + p +
         '}';
   }
+
 }

@@ -6,7 +6,7 @@
   <xs:include schemaLocation="restriction.xsd"/>
   <xs:include schemaLocation="file.xsd"/>
   <xs:include schemaLocation="link.xsd"/>
-  <xs:include schemaLocation="track.xsd"/>
+  <xs:include schemaLocation="disc.xsd"/>
 
   <xs:complexType name="albumsType">
     <xs:sequence>
