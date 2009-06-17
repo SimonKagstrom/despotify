@@ -367,7 +367,7 @@ static int despotify_snd_end_callback(void* arg)
 
         /* notify client */
         if (ds->client_callback)
-            ds->client_callback(ds, DESPOTIFY_TRACK_CHANGE, NULL, ds->client_callback_data);
+            ds->client_callback(ds, DESPOTIFY_TRACK_CHANGE, ds->track, ds->client_callback_data);
     }
 
     return error;
