@@ -171,6 +171,7 @@ void print_help(void)
            "\n"
            "play [num]              Play track [num] in the last viewed list\n"
            "playalbum [num]         Play album for track [num]\n"
+           "next                    Play next track in the current list\n"
            "stop, pause, resume     Control playback\n"
            "\n"
            "info                    Details about your account and current connection\n"
@@ -472,19 +473,26 @@ void command_loop(struct despotify_session* ds)
         }
 
         /* play */
-        else if (!strncmp(buf, "play", 4)) {
+        else if (!strncmp(buf, "play", 4) || !strncmp(buf, "next", 4)) {
             if (!lastlist) {
                 wprintf(L"No list to play from. Use 'list' or 'search' to select a list.\n");
                 continue;
             }
 
-            /* skip to track <num> */
-            listoffset = atoi(buf + 5);
+            /* skip to track <num>, else play next */
+            if (buf[4])
+                listoffset = atoi(buf + 5);
+            else
+                listoffset++;
             struct track* t = lastlist->tracks;
             for (int i=1; i<listoffset && t; i++)
                 t = t->next;
-            if (t)
+            if (t) {
                 despotify_play(ds, t, true);
+                wprintf(L"New track: %d: %s / %s (%d:%02d)\n",
+                        listoffset, t->title, t->artist->name,
+                        t->length / 60000, t->length % 60000 / 1000);
+            }
             else
                 wprintf(L"Invalid track number %d\n", listoffset);
         }
