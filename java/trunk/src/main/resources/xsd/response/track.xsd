@@ -16,7 +16,7 @@
   <xs:complexType name="trackType">
     <xs:sequence>
 
-      <xs:element type="xs:string" name="id"/>
+      <xs:element type="hex_32" name="id"/>
       <xs:element type="xs:string" name="title"/>
       <xs:element type="xs:string" name="artist-id"/>
       <xs:element type="xs:string" name="artist"/>

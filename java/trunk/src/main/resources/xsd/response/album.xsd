@@ -3,6 +3,7 @@
            attributeFormDefault="unqualified"
            elementFormDefault="qualified">
 
+  <xs:include schemaLocation="common.xsd"/>
   <xs:include schemaLocation="restriction.xsd"/>
   <xs:include schemaLocation="file.xsd"/>
   <xs:include schemaLocation="link.xsd"/>
@@ -18,7 +19,7 @@
   <xs:complexType name="albumType">
     <xs:sequence>
       <xs:element type="xs:string" name="name"/>
-      <xs:element type="xs:string" name="id"/>
+      <xs:element type="hex_32" name="id"/>
       <xs:element type="xs:string" name="artist"/>
       <xs:element type="xs:string" name="artist-id"/>
       <xs:element name="album-type">

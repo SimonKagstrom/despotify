@@ -2,9 +2,13 @@
 <xs:schema attributeFormDefault="unqualified"
            elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:include schemaLocation="common.xsd"/>
+
+  
   <xs:complexType name="imageType">
     <xs:sequence>
-      <xs:element type="xs:string" name="id" minOccurs="0"/>
+      <xs:element type="hex_40" name="id" minOccurs="0"/>
       <xs:element name="width" minOccurs="0" type="xs:short"/>
       <xs:element type="xs:short" name="height" minOccurs="0"/>
     </xs:sequence>
