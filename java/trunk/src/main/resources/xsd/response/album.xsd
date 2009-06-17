@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
+
+  <xs:include schemaLocation="restriction.xsd"/>
+  <xs:include schemaLocation="track.xsd"/>
+
+  <xs:complexType name="albumsType">
+    <xs:sequence>
+      <xs:element type="albumType" name="album" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="albumType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="version"/>
+      <xs:element type="xs:string" name="name"/>
+      <xs:element type="xs:string" name="id"/>
+      <xs:element type="xs:string" name="artist"/>
+      <xs:element type="xs:string" name="artist-id"/>
+      <xs:element type="xs:string" name="album-type"/>
+      <xs:element type="xs:string" name="year"/>
+      <xs:element type="xs:string" name="cover"/>
+      <xs:element type="xs:string" name="review"/>
+      <xs:element type="xs:string" name="copyright"/>
+      <xs:element type="restrictionsType" name="restrictions"/>
+      <xs:element type="xs:string" name="allowed"/>
+      <xs:element type="linksType" name="links"/>
+      <xs:element type="xs:string" name="similar-albums"/>
+      <xs:element type="discsType" name="discs"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="linksType">
+    <xs:sequence>
+      <xs:element type="linkType" name="link"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="linkType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="type" use="optional"/>
+        <xs:attribute type="xs:string" name="countries" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+
+</xs:schema>

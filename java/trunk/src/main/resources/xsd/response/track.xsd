@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:include schemaLocation="restriction.xsd"/>
+
+  <xs:complexType name="discsType">
+    <xs:sequence>
+      <xs:element type="discType" name="disc"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="discType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="disc-number"/>
+      <xs:element type="xs:string" name="name"/>
+      <xs:element type="trackType" name="track" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="tracksType">
+    <xs:sequence>
+      <xs:element type="trackType" name="track" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+    
+  <xs:complexType name="trackType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="id"/>
+      <xs:element type="xs:string" name="title"/>
+      <xs:element type="xs:string" name="artist-id"/>
+      <xs:element type="xs:string" name="artist"/>
+      <xs:element type="xs:string" name="album"/>
+      <xs:element type="xs:string" name="album-id"/>
+      <xs:element type="xs:short" name="year"/>
+      <xs:element type="xs:byte" name="track-number"/>
+      <xs:element type="xs:int" name="length"/>
+      <xs:element type="xs:string" name="files"/>
+      <xs:element type="xs:string" name="cover"/>
+      <xs:element type="xs:float" name="popularity"/>
+      <xs:element type="restrictionsType" name="restrictions"/>
+      <xs:element type="xs:string" name="allowed"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
