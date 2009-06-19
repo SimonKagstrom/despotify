@@ -13,13 +13,13 @@ import java.io.Serializable;
  */
 public abstract class MediaSimilarity<M extends Media> implements Serializable {
 
-  protected final Store despotifyStore;
-  protected final DespotifyManager despotifyManager;
+  protected final Store store;
+  protected final DespotifyManager manager;
   protected final Class<M> _class;
 
-  protected MediaSimilarity(Store despotifyStore, Class<M> _class, DespotifyManager despotifyManager) {
-    this.despotifyStore = despotifyStore;
-    this.despotifyManager = despotifyManager;
+  protected MediaSimilarity(Store store, Class<M> _class, DespotifyManager despotifyManager) {
+    this.store = store;
+    this.manager = despotifyManager;
     this._class = _class;
   }
 

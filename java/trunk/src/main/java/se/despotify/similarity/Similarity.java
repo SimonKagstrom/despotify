@@ -15,10 +15,15 @@ public class Similarity {
   private ArtistSimilarity artistSimilarity;
   private TrackSimilarity trackSimilarity;
 
-  public Similarity(Store despotifyStore, DespotifyManager despotifyManager) {
-    artistSimilarity = new ArtistSimilarity(despotifyStore, despotifyManager);
-    albumSimilarity = new AlbumSimilarity(despotifyStore,despotifyManager, artistSimilarity);
-    trackSimilarity = new TrackSimilarity(despotifyStore,despotifyManager, artistSimilarity, albumSimilarity);
+  private Store store;
+  private DespotifyManager manager;
+
+  public Similarity(Store store, DespotifyManager manager) {
+    artistSimilarity = new ArtistSimilarity(store, manager);
+    albumSimilarity = new AlbumSimilarity(store,manager, artistSimilarity);
+    trackSimilarity = new TrackSimilarity(store,manager, artistSimilarity, albumSimilarity);
+    this.store = store;
+    this.manager = manager;
   }
 
 
@@ -33,4 +38,15 @@ public class Similarity {
   public TrackSimilarity getTrackSimilarity() {
     return trackSimilarity;
   }
+
+  public Store getStore() {
+    return store;
+  }
+
+  public DespotifyManager getManager() {
+    return manager;
+  }
+
+  
+
 }

@@ -29,10 +29,10 @@ public class ArtistSimilarity extends MediaSimilarity<Artist> {
     }
 
     if (artist.getLoaded() == null) {
-      artist = (Artist) despotifyManager.send(new LoadArtist(despotifyStore, artist));
+      artist = (Artist) manager.send(new LoadArtist(store, artist));
     }
     if (artist1.getLoaded() == null) {
-      artist1 = (Artist) despotifyManager.send(new LoadArtist(despotifyStore, artist1));
+      artist1 = (Artist) manager.send(new LoadArtist(store, artist1));
     }
 
     double similarity = 0d;

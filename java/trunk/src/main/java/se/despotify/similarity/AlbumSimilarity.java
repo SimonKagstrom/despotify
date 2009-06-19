@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @see se.despotify.similarity.Similarity
  * @author kalle
+ * @see se.despotify.similarity.Similarity
  * @since 2009-jun-13 17:39:19
  */
 public class AlbumSimilarity extends MediaSimilarity<Album> {
@@ -36,17 +36,20 @@ public class AlbumSimilarity extends MediaSimilarity<Album> {
     double similarity = 0d;
 
     if (album.getLoaded() == null) {
-      album = (Album) despotifyManager.send(new LoadAlbum(despotifyStore, album));
+      album = (Album) manager.send(new LoadAlbum(store, album));
     }
 
     if (album1.getLoaded() == null) {
-      album1 = (Album) despotifyManager.send(new LoadAlbum(despotifyStore, album1));
+      album1 = (Album) manager.send(new LoadAlbum(store, album1));
     }
 
-    similarity += artistSimilarity.itemSimilarity(album.getMainArtist(), album1.getMainArtist()) / 2d;
+
+    similarity += artistSimilarity.itemSimilarity(album.getMainArtist(), album1.getMainArtist()) / 3d;
 
 
-    // add se.despotify.similarity of all artists of all tracks in the album
+    // add mean similarity of all artists of all tracks of the albums
+
+    // load..
     Set<Track> tracksToLoad = new HashSet<Track>();
     for (Track track : album.getTracks()) {
       if (track.getLoaded() == null) {
@@ -59,12 +62,12 @@ public class AlbumSimilarity extends MediaSimilarity<Album> {
       }
     }
     if (tracksToLoad.size() > 0) {
-      despotifyManager.send(new LoadTracks(despotifyStore, tracksToLoad));
+      manager.send(new LoadTracks(store, tracksToLoad));
     }
 
-    // add se.despotify.similarity of all artists of all tracks in the album
+    // sum up
     List<Double> distances = new ArrayList<Double>();
-    for (Track track : new ArrayList<Track>(album.getTracks())){
+    for (Track track : new ArrayList<Track>(album.getTracks())) {
       for (Track track1 : new ArrayList<Track>(album1.getTracks())) {
         distances.add(artistSimilarity.itemSimilarity(track.getArtist(), track1.getArtist()));
       }
@@ -76,7 +79,7 @@ public class AlbumSimilarity extends MediaSimilarity<Album> {
     }
     tracksArtistsSimilariry /= length;
 
-    similarity += tracksArtistsSimilariry / 2d;
+    similarity += tracksArtistsSimilariry / 3d;
 
 
     return similarity;

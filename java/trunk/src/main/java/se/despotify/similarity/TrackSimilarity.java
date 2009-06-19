@@ -29,16 +29,20 @@ public class TrackSimilarity extends MediaSimilarity<Track> {
 
   public double itemSimilarity(Track track, Track track1) throws DespotifyException {
 
+    if (track == null || track1 == null) {
+      throw new NullPointerException();
+    }
+    
     if (track.equals(track1)) {
       return 1d;
     }
 
     // todo load both at once
     if (track.getLoaded() == null) {
-      despotifyManager.send(new LoadTracks(despotifyStore, track));
+      manager.send(new LoadTracks(store, track));
     }
     if (track1.getLoaded() == null) {
-      despotifyManager.send(new LoadTracks(despotifyStore, track1));
+      manager.send(new LoadTracks(store, track1));
     }
 
     // todo if artist and title equals return 0.99d. i.e. same track in multiple albums.     
@@ -47,7 +51,7 @@ public class TrackSimilarity extends MediaSimilarity<Track> {
 
     if (track.getSimilarTracks() != null && track.getSimilarTracks().contains(track1)) {
       similarity += 0.3d;
-    } else if (track1.getSimilarTracks() != null && track.getSimilarTracks().contains(track1)) {
+    } else if (track1.getSimilarTracks() != null && track1.getSimilarTracks().contains(track)) {
       similarity += 0.3d;
     } else if (track.getSimilarTracks() != null && track1.getSimilarTracks() != null) {
       Set<Track> similarTracksInCommon = new HashSet<Track>(track.getSimilarTracks());
