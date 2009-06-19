@@ -28,34 +28,41 @@ public class ArtistSimilarity extends MediaSimilarity<Artist> {
     }
 
     if (artist.getLoaded() == null) {
-      artist = (Artist)despotifyManager.send(new LoadArtist(despotifyStore, artist));
+      artist = (Artist) despotifyManager.send(new LoadArtist(despotifyStore, artist));
     }
     if (artist1.getLoaded() == null) {
-      artist1 = (Artist)despotifyManager.send(new LoadArtist(despotifyStore, artist1));
+      artist1 = (Artist) despotifyManager.send(new LoadArtist(despotifyStore, artist1));
     }
 
     double similarity = 0d;
 
-    if (artist.getSimilarArtists().contains(artist1)) {
+
+    if (artist.getSimilarArtists() != null && artist.getSimilarArtists().contains(artist1)) {
       similarity += 0.5d;
     } else if (artist1.getSimilarArtists() != null && artist1.getSimilarArtists().contains(artist)) {
       similarity += 0.5d;
     }
 
-    Set<String> genres = new HashSet<String>(artist.getGenres());
-    genres.retainAll(artist1.getGenres());
-    if (genres.size() > 2) {
-      similarity += 0.2d;
-    }else if (genres.size() > 0) {
-      similarity += 0.1d;
+    if (artist.getGenres() != null && artist1.getGenres() != null) {
+      Set<String> genres = new HashSet<String>(artist.getGenres());
+      genres.retainAll(artist1.getGenres());
+      if (genres.size() > 2) {
+        similarity += 0.2d;
+      } else if (genres.size() > 0) {
+        similarity += 0.1d;
+      }
     }
 
-    Set<Album> albums = new HashSet<Album>(artist.getAllAlbumsWithTrackPresent());
-    albums.retainAll(artist1.getAllAlbumsWithTrackPresent());
-    if (albums.size() > 2) {
-      similarity += 0.2d;
-    } else if (albums.size() > 0) {
-      similarity += 0.1d;
+    if (artist.getAllAlbumsWithTrackPresent() != null && artist1.getAllAlbumsWithTrackPresent() != null) {
+      Set<Album> albums = new HashSet<Album>(artist.getAllAlbumsWithTrackPresent());
+      albums.retainAll(artist1.getAllAlbumsWithTrackPresent());
+      if (albums.size() > 2) {
+        similarity += 0.2d;
+      } else if (albums.size() > 0) {
+        similarity += 0.1d;
+      }
+    } else {
+      System.currentTimeMillis();  // should be various artists only
     }
 
 //    if (se.despotify.similarity == 0d) {

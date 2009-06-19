@@ -30,10 +30,10 @@ public class TrackSimilarity extends MediaSimilarity<Track> {
 
 
     if (track.getLoaded() == null) {
-      track = (Track)despotifyManager.send(new LoadTracks(despotifyStore, track));
+      despotifyManager.send(new LoadTracks(despotifyStore, track));
     }
     if (track1.getLoaded() == null) {
-      track1 = (Track)despotifyManager.send(new LoadTracks(despotifyStore, track1));
+      despotifyManager.send(new LoadTracks(despotifyStore, track1));
     }
 
     double similarity = 0d;
