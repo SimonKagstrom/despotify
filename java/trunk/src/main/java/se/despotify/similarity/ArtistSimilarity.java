@@ -11,13 +11,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * @see se.despotify.similarity.Similarity
  * @author kalle
  * @since 2009-jun-13 17:38:47
  */
 public class ArtistSimilarity extends MediaSimilarity<Artist> {
 
 
-  public ArtistSimilarity(Store despotifyStore, DespotifyManager despotifyManager) {
+  ArtistSimilarity(Store despotifyStore, DespotifyManager despotifyManager) {
     super(despotifyStore, Artist.class, despotifyManager);
   }
 

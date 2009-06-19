@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ *
+ * @see se.despotify.similarity.Similarity 
  * @author kalle
  * @since 2009-jun-13 17:39:00
  */
@@ -19,7 +21,7 @@ public class TrackSimilarity extends MediaSimilarity<Track> {
   private ArtistSimilarity artistSimilarity;
   private AlbumSimilarity albumSimilarity;
 
-  public TrackSimilarity(Store despotifyStore, DespotifyManager despotifyManager, ArtistSimilarity artistSimilarity, AlbumSimilarity albumSimilarity) {
+  TrackSimilarity(Store despotifyStore, DespotifyManager despotifyManager, ArtistSimilarity artistSimilarity, AlbumSimilarity albumSimilarity) {
     super(despotifyStore, Track.class, despotifyManager);
     this.artistSimilarity = artistSimilarity;
     this.albumSimilarity = albumSimilarity;

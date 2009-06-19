@@ -4,6 +4,8 @@ import se.despotify.DespotifyManager;
 import se.despotify.domain.Store;
 
 /**
+ * Consumer facade against artist, album and track similarity classes.
+ * 
  * @author kalle
  * @since 2009-jun-14 20:16:40
  */

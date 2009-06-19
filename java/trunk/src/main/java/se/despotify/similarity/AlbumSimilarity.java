@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * @see se.despotify.similarity.Similarity
  * @author kalle
  * @since 2009-jun-13 17:39:19
  */
@@ -21,7 +22,7 @@ public class AlbumSimilarity extends MediaSimilarity<Album> {
 
   private ArtistSimilarity artistSimilarity;
 
-  public AlbumSimilarity(Store despotifyStore, DespotifyManager despotifyManager, ArtistSimilarity artistSimilarity) {
+  AlbumSimilarity(Store despotifyStore, DespotifyManager despotifyManager, ArtistSimilarity artistSimilarity) {
     super(despotifyStore, Album.class, despotifyManager);
     this.artistSimilarity = artistSimilarity;
   }
