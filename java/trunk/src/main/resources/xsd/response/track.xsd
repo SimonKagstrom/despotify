@@ -12,10 +12,9 @@
       <xs:element type="trackType" name="track" maxOccurs="unbounded" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
-    
+
   <xs:complexType name="trackType">
     <xs:sequence>
-
       <xs:element type="hex_32" name="id"/>
       <xs:element type="xs:string" name="title"/>
       <xs:element type="xs:string" name="artist-id"/>
@@ -25,12 +24,22 @@
       <xs:element type="xs:short" name="year"/>
       <xs:element type="xs:byte" name="track-number"/>
       <xs:element type="xs:int" name="length"/>
-      <xs:element type="linksType" name="links"/>
       <xs:element type="filesType" name="files"/>
+      <xs:element type="linksType" name="links"/>
       <xs:element type="xs:string" name="cover"/>
       <xs:element type="xs:float" name="popularity"/>
       <xs:element type="restrictionsType" name="restrictions"/>
+      <xs:element type="xs:string" name="forbidden"/>
       <xs:element type="xs:string" name="allowed"/>
+      <xs:element type="similar-tracksType" name="similar-tracks" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
+
+  <xs:complexType name="similar-tracksType">
+    <xs:sequence>
+      <xs:element type="hex_32" name="id" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+
 </xs:schema>

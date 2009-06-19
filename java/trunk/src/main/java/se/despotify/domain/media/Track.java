@@ -6,9 +6,7 @@ import se.despotify.util.Hex;
 import se.despotify.util.SpotifyURI;
 import se.despotify.util.XMLElement;
 
-import javax.persistence.Entity;
-import javax.persistence.CascadeType;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
@@ -33,6 +31,10 @@ public class Track extends RestrictedMedia {
 
   private String cover;
   private Float popularity;
+
+  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private List<Track> similarTracks;
+
 
   public Track() {
   }
@@ -154,6 +156,14 @@ public class Track extends RestrictedMedia {
     this.popularity = popularity;
   }
 
+  public List<Track> getSimilarTracks() {
+    return similarTracks;
+  }
+
+  public void setSimilarTracks(List<Track> similarTracks) {
+    this.similarTracks = similarTracks;
+  }
+
   /**
    *
    * @param trackElement
@@ -244,6 +254,14 @@ public class Track extends RestrictedMedia {
     /* Set length. */
     if (trackElement.hasChild("length")) {
       track.length = Integer.parseInt(trackElement.getChildText("length"));
+    }
+
+    if (trackElement.hasChild("similar-tracks")) {
+      List<Track> similarTracks = new ArrayList<Track>();
+      for (XMLElement similarTrackElement : trackElement.getChild("similar-tracks").getChildren()) {
+        similarTracks.add(store.getTrack(similarTrackElement.getText()));
+      }
+      track.setSimilarTracks(similarTracks);
     }
 
     /* Set files. */
