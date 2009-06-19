@@ -21,6 +21,10 @@ public class Track extends RestrictedMedia {
   private Artist artist;
   @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Album album;
+
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private Album composition;
+
   private Integer year;
   private Integer discNumber;
   private Integer trackNumber;
@@ -162,6 +166,14 @@ public class Track extends RestrictedMedia {
 
   public void setSimilarTracks(List<Track> similarTracks) {
     this.similarTracks = similarTracks;
+  }
+
+  public Album getComposition() {
+    return composition;
+  }
+
+  public void setComposition(Album composition) {
+    this.composition = composition;
   }
 
   /**
