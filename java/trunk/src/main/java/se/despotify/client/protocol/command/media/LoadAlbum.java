@@ -64,7 +64,6 @@ public class LoadAlbum extends Command<Album> {
     /* Send packet. */
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.browse, buffer, "load album");
-    connection.close();
 
 //    INFO  Protocol - sending load album, 26 bytes:
 //        1   3    5  7   |9   11  13  15  |17  19  21  23  |25  27  29  31  |           1111111112222222222333
@@ -75,6 +74,7 @@ public class LoadAlbum extends Command<Album> {
 
     /* Get data and inflate it. */
     byte[] data = GZIP.inflate(callback.getData("gzipped load album response"));
+    connection.close();
 
     if (log.isInfoEnabled()) {
       log.info("load album response, " + data.length + " uncompressed bytes:\n" + Hex.log(data, log));

@@ -180,10 +180,10 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
 
     /* Send packet. */
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "create playlist");
-    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData("create playlist response");
+    connection.close();
 
     xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlists>\n" +
         new String(data, Charset.forName("UTF-8")) +

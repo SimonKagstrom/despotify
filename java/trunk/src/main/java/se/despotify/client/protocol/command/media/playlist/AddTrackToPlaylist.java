@@ -33,6 +33,14 @@ public class AddTrackToPlaylist extends Command<Boolean> {
   private Track track;
   private Integer position;
 
+  public AddTrackToPlaylist(Store store, Playlist playlist, Track track) {
+    this(store, null, playlist, track, null);
+  }
+
+  public AddTrackToPlaylist(Store store, Playlist playlist, Track track, Integer position) {
+    this(store, null, playlist, track, position);
+  }
+
   public AddTrackToPlaylist(Store store, User user, Playlist playlist, Track track) {
     this(store, user, playlist, track, null);
   }
@@ -56,11 +64,18 @@ public class AddTrackToPlaylist extends Command<Boolean> {
   @Override
   public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
+    ManagedConnection connection = connectionManager.getManagedConnection();
+
+    if (user == null) {
+      user = connection.getSession().getUser();
+    }
+
     if (playlist.getLoaded() == null) {
       new LoadPlaylist(store, playlist).send(connectionManager);
     }
 
     if (!playlist.isCollaborative() && !playlist.getAuthor().equals(user.getId())) {
+      connection.close();
       throw new DespotifyException("Playlist must be collaborative or owned by the current user!");
     }
 
@@ -76,6 +91,7 @@ public class AddTrackToPlaylist extends Command<Boolean> {
     long previousChecksum = playlist.calculateChecksum();
 
     if (position != null && position != playlist.getTracks().size()) {
+      connection.close();
       throw new IllegalArgumentException("position not implemented!");
     }
     
@@ -123,12 +139,12 @@ public class AddTrackToPlaylist extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
-    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "add track to playlist");
-    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData("add track to playlist, updated playlist response");
+    connection.close();
+    
 
     xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n" +
         new String(data, Charset.forName("UTF-8")) +
@@ -158,7 +174,7 @@ public class AddTrackToPlaylist extends Command<Boolean> {
       return true;
     } else {
       playlist.getTracks().remove(position.intValue());
-      throw new RuntimeException("Unknown server response:\n" + xml);
+      throw new DespotifyException("Unknown server response:\n" + xml);
     }
 
   }

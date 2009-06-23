@@ -58,11 +58,11 @@ public class LoadUserPlaylists extends Command<Boolean> {
     Channel.register(channel);
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.getPlaylist, buffer, "request list of user playlists");
-    connection.close();
 
 
     byte[] data = callback.getData("user playlists response");
-
+    connection.close();
+           
     if (data.length == 0) {
       throw new DespotifyException("received an empty response!");
     }

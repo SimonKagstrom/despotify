@@ -111,10 +111,10 @@ public class ReservePlaylistUUID extends Command<Boolean> {
     /* Send packet. */
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "create playlist UUID");
-    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData("create playlist uuid reponse");
+    connection.close();
 
     xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n" +
         new String(data, Charset.forName("UTF-8")) +

@@ -79,10 +79,10 @@ public class SetPlaylistCollaborative extends Command<Boolean> {
     /* Send packet. */
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, value ? "set playlist collaborative flag true" : "set playlist collaborative flag false");
-    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData(value ? "set playlist collaborative flag true response" : "set playlist collaborative flag false reponse");
+    connection.close();
 
 
     xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><playlist>" +

@@ -30,9 +30,6 @@ public class DespotifyManager {
   private GenericObjectPool connectionPool;
 
 
-  public DespotifyManager() {
-  }
-
   public DespotifyManager(String username, String password) {
     this(username, password, 1);
   }
@@ -83,6 +80,7 @@ public class DespotifyManager {
         super.passivateObject(o);    //To change body of overridden methods use File | Settings | File Templates.
       }
     }, poolSize);
+    
   }
 
 

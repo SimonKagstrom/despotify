@@ -80,10 +80,10 @@ public class RenamePlaylist extends Command<Boolean> {
     /* Send packet. */
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "rename playlist");
-    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData("rename playlist response");
+    connection.close();
 
     xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><playlist>" +
         new String(data, Charset.forName("UTF-8")) +

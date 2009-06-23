@@ -240,10 +240,10 @@ shn_decrypt(ctx=0x8523c0, buf=0x81328a, len=2 [0x0002]) called from 0x000adf64
     /* Send packet. */
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "remove track from playlist");
-    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData("remove track from playlist ack");
+    connection.close();
 
     xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n" +
         new String(data, Charset.forName("UTF-8")) +

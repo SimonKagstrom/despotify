@@ -69,11 +69,11 @@ public class LoadArtist extends Command<Artist> {
     /* Send packet. */
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.browse, buffer, "load artist");
-    connection.close();
-
 
     /* Get data and inflate it. */
     byte[] data = GZIP.inflate(callback.getData("gzipped load artist response"));
+    connection.close();
+
 
     if (log.isInfoEnabled()) {
       log.info("load artist response, " + data.length + " uncompressed bytes:\n" + Hex.log(data, log));

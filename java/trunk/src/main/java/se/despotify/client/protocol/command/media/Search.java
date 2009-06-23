@@ -78,10 +78,10 @@ public class Search extends Command<Result> {
     /* Send packet. */
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.search, buffer, "search");
-    connection.close();
 
     /* Get data and inflate it. */
     byte[] data = GZIP.inflate(callback.getData("gzipped search response"));
+    connection.close();
 
     if (log.isInfoEnabled()) {
       log.info("received search response packet, " + data.length + " uncompressed bytes:\n" + Hex.log(data, log));

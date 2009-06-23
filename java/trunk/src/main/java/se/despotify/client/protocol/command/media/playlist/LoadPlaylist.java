@@ -75,11 +75,11 @@ public class LoadPlaylist extends Command<Boolean> {
     /* Send packet. */
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.getPlaylist, buffer, "get playlist");
-    connection.close();
 
     /* Get data and inflate it. */
     data = callback.getData("get playlist response");
-
+    connection.close();
+    
     if (data.length == 0) {
       throw new ReceivedEmptyResponseException();
     }

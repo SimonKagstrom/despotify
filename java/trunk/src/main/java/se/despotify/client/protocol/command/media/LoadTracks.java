@@ -88,10 +88,10 @@ public class LoadTracks extends Command<Object> {
     /* Send packet. */
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.browse, buffer, "load track");
-    connection.close();
 
     /* Get data and inflate it. */
     byte[] data = GZIP.inflate(callback.getData("gzipped load track response"));
+    connection.close();
 
     if (log.isInfoEnabled()) {
       log.info("load track response, " + data.length + " uncompressed bytes:\n" + Hex.log(data, log));
