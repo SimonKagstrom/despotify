@@ -16,6 +16,6 @@ public abstract class Command<T> {
   // this is here to make it easy to find the template code from a subclass..
   private static Logger log = LoggerFactory.getLogger(Command.class);
 
-  public abstract T send(Connection connection) throws DespotifyException;
+  public abstract T send(DespotifyManager connectionManager) throws DespotifyException;
 
 }

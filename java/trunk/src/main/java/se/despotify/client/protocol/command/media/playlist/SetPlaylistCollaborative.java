@@ -10,7 +10,8 @@ import se.despotify.domain.Store;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XMLElement;
 import se.despotify.util.XML;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 
 import java.util.Date;
 import java.nio.charset.Charset;
@@ -37,7 +38,7 @@ public class SetPlaylistCollaborative extends Command<Boolean> {
     this.value = value;
   }
 
-  public Boolean send(Connection connection) throws DespotifyException {
+  public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
     if (!playlist.getAuthor().equals(user.getId())) {
       throw new RuntimeException("user " + user.getId() + " != author " + playlist.getAuthor());
@@ -76,7 +77,9 @@ public class SetPlaylistCollaborative extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, value ? "set playlist collaborative flag true" : "set playlist collaborative flag false");
+    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData(value ? "set playlist collaborative flag true response" : "set playlist collaborative flag false reponse");

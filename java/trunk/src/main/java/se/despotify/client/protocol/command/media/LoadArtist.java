@@ -3,7 +3,8 @@ package se.despotify.client.protocol.command.media;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.BrowseType;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 import se.despotify.client.protocol.PacketType;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
@@ -17,14 +18,10 @@ import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
-import java.io.StringReader;
 
 /**
  * @since 2009-apr-25 16:28:42
@@ -44,7 +41,7 @@ public class LoadArtist extends Command<Artist> {
 
 
   @Override
-  public Artist send(Connection connection) throws DespotifyException {
+  public Artist send(DespotifyManager connectionManager) throws DespotifyException {
 
     Date now = new Date();
 
@@ -70,7 +67,9 @@ public class LoadArtist extends Command<Artist> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.browse, buffer, "load artist");
+    connection.close();
 
 
     /* Get data and inflate it. */

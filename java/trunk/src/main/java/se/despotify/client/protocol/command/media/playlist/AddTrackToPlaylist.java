@@ -14,7 +14,8 @@ import se.despotify.domain.media.Track;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -53,10 +54,10 @@ public class AddTrackToPlaylist extends Command<Boolean> {
 
 
   @Override
-  public Boolean send(Connection connection) throws DespotifyException {
+  public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
     if (playlist.getLoaded() == null) {
-      new LoadPlaylist(store, playlist).send(connection);
+      new LoadPlaylist(store, playlist).send(connectionManager);
     }
 
     if (!playlist.isCollaborative() && !playlist.getAuthor().equals(user.getId())) {
@@ -64,7 +65,7 @@ public class AddTrackToPlaylist extends Command<Boolean> {
     }
 
     if (user.getPlaylists() == null) {
-      new LoadUserPlaylists(store, user).send(connection);
+      new LoadUserPlaylists(store, user).send(connectionManager);
     }
 
     if (playlist.getTracks() == null) {
@@ -122,7 +123,9 @@ public class AddTrackToPlaylist extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "add track to playlist");
+    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData("add track to playlist, updated playlist response");

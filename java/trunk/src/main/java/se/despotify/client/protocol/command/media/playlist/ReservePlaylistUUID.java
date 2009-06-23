@@ -13,7 +13,8 @@ import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -65,20 +66,21 @@ public class ReservePlaylistUUID extends Command<Boolean> {
   /**
    * @return uuid
    */
-  public Boolean send(Connection connection) throws DespotifyException {
+  public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
     if (user.getPlaylists() == null) {
       log.warn("user playlists not loaded yet! should it be? loading..");
-      new LoadUserPlaylists(store, user).send(connection);
+      new LoadUserPlaylists(store, user).send(connectionManager);
     }
     
+
 
     String xml = String.format(
         "<id-is-unique/><change><ops><create/><name>%s</name></ops><time>%d</time><user>%s</user></change>" +
             "<version>0000000001,0000000000,0000000001,%s</version>",
         playlistName,
         new Date().getTime() / 1000,
-        connection.getSession().getUsername(),
+        connectionManager.getUsername(),
         collaborative ? 1 : 0
     );
 
@@ -107,7 +109,9 @@ public class ReservePlaylistUUID extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "create playlist UUID");
+    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData("create playlist uuid reponse");

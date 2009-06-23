@@ -16,7 +16,8 @@ import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -104,7 +105,7 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Connection connection) throws DespotifyException {
+  public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
 
     if (playlist.isCollaborative() == null) {
@@ -118,7 +119,7 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
 
     if (user.getPlaylists() == null) {
       log.warn("user playlists not loaded yet! should it be? loading..");
-      new LoadUserPlaylists(store, user).send(connection);
+      new LoadUserPlaylists(store, user).send(connectionManager);
     }
     PlaylistContainer playlists = user.getPlaylists();
 
@@ -162,7 +163,9 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "create playlist");
+    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData("create playlist response");

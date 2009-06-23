@@ -3,7 +3,8 @@ package se.despotify.client.protocol.command.media;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.BrowseType;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 import se.despotify.client.protocol.PacketType;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
@@ -22,7 +23,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.io.*;
 
 /**
  * @since 2009-apr-25 16:28:42
@@ -45,7 +45,7 @@ public class LoadTracks extends Command<Object> {
   }
 
   @Override
-  public Boolean send(Connection connection) throws DespotifyException {
+  public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
     // todo send multiple requests if more than 200 tracks!
 
@@ -86,8 +86,9 @@ public class LoadTracks extends Command<Object> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.browse, buffer, "load track");
-
+    connection.close();
 
     /* Get data and inflate it. */
     byte[] data = GZIP.inflate(callback.getData("gzipped load track response"));

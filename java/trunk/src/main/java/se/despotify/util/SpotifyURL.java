@@ -1,6 +1,7 @@
 package se.despotify.util;
 
 import se.despotify.Connection;
+import se.despotify.DespotifyManager;
 import se.despotify.client.protocol.command.media.LoadAlbum;
 import se.despotify.client.protocol.command.media.LoadArtist;
 import se.despotify.client.protocol.command.media.LoadTracks;
@@ -66,15 +67,15 @@ public class SpotifyURL {
    * Use a {@link se.despotify.domain.media.Visitor visitor} on the {@link Visitable visitable} response rather than instanceof.
    *  
    * @param URL A spotify URL, "http://open.spotify.com/..." or "spotify:...".
-   * @param connection service instance used to query for data.
+   * @param connectionManager service instance used to query for data.
    * @return  A visitable domain object representing parameter URL.
    */
-  public static Visitable browse(String URL, final Store store, final Connection connection) {
+  public static Visitable browse(String URL, final Store store, final DespotifyManager connectionManager) {
     return match(URL, new Visitor<Visitable>(){
       public Visitable track(URLtype type, String URI) {
         Track track = store.getTrack(SpotifyURI.toHex(URI));
         try {
-          new LoadTracks(store, track).send(connection);
+          new LoadTracks(store, track).send(connectionManager);
         } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }
@@ -84,7 +85,7 @@ public class SpotifyURL {
       public Visitable album(URLtype type, String URI) {
         Album album = store.getAlbum(SpotifyURI.toHex(URI));
         try {
-          new LoadAlbum(store, album).send(connection);
+          new LoadAlbum(store, album).send(connectionManager);
         } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }
@@ -94,7 +95,7 @@ public class SpotifyURL {
       public Visitable artist(URLtype type, String URI) {
         Artist artist = store.getArtist(SpotifyURI.toHex(URI));
         try {
-          new LoadArtist(store, artist).send(connection);
+          new LoadArtist(store, artist).send(connectionManager);
         } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }
@@ -104,7 +105,7 @@ public class SpotifyURL {
       public Visitable playlist(URLtype type, String user, String URI) {
         Playlist playlist = store.getPlaylist(SpotifyURI.toHex(URI));
         try {
-          new LoadPlaylist(store, playlist).send(connection);
+          new LoadPlaylist(store, playlist).send(connectionManager);
         } catch (DespotifyException e) {
           throw new RuntimeException(e);
         }

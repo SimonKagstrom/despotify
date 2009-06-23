@@ -14,7 +14,8 @@ import se.despotify.domain.media.Track;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -175,19 +176,19 @@ shn_decrypt(ctx=0x8523c0, buf=0x81328a, len=2 [0x0002]) called from 0x000adf64
    */
 
   /**
-   * @param connection
+   * @param connectionManager
    * @return removed track removed from playlist
    * @throws se.despotify.exceptions.DespotifyException
    */
   @Override
-  public Track send(Connection connection) throws DespotifyException {
+  public Track send(DespotifyManager connectionManager) throws DespotifyException {
 
     if (!playlist.isCollaborative() && !playlist.getAuthor().equals(user.getId())) {
       throw new DespotifyException("Playlist must be collaborative or owned by the current user!");
     }
 
     if (user.getPlaylists() == null) {
-      new LoadUserPlaylists(store, user).send(connection);
+      new LoadUserPlaylists(store, user).send(connectionManager);
     }
 
     if (playlist.getTracks() == null) {
@@ -237,7 +238,9 @@ shn_decrypt(ctx=0x8523c0, buf=0x81328a, len=2 [0x0002]) called from 0x000adf64
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "remove track from playlist");
+    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData("remove track from playlist ack");

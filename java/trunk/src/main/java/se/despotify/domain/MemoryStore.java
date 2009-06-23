@@ -56,7 +56,6 @@ public class MemoryStore extends Store implements Serializable {
       tracks.put(hexUUID, track = new Track(hexUUID));
     }
     return track;
-
   }
 
   @Override

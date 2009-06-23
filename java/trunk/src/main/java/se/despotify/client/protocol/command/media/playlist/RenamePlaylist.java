@@ -10,7 +10,8 @@ import se.despotify.domain.media.Playlist;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.XMLElement;
 import se.despotify.util.XML;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 
 import java.util.Date;
 import java.nio.charset.Charset;
@@ -38,7 +39,7 @@ public class RenamePlaylist extends Command<Boolean> {
     this.store = store;
   }
 
-  public Boolean send(Connection connection) throws DespotifyException {
+  public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
     if (!playlist.getAuthor().equals(user.getId())) {
       throw new RuntimeException("user " + user.getId() + " != author " + playlist.getAuthor());
@@ -77,7 +78,9 @@ public class RenamePlaylist extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "rename playlist");
+    connection.close();
 
     /* Get response. */
     byte[] data = callback.getData("rename playlist response");

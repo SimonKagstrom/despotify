@@ -3,7 +3,8 @@ package se.despotify.client.protocol.command.media;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.BrowseType;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 import se.despotify.client.protocol.PacketType;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
@@ -20,7 +21,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
-import java.io.*;
 
 /**
  * @since 2009-apr-25 16:28:42
@@ -38,7 +38,7 @@ public class LoadAlbum extends Command<Album> {
   }
 
   @Override
-  public Album send(Connection connection) throws DespotifyException {
+  public Album send(DespotifyManager connectionManager) throws DespotifyException {
 
 /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
@@ -62,7 +62,9 @@ public class LoadAlbum extends Command<Album> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.browse, buffer, "load album");
+    connection.close();
 
 //    INFO  Protocol - sending load album, 26 bytes:
 //        1   3    5  7   |9   11  13  15  |17  19  21  23  |25  27  29  31  |           1111111112222222222333

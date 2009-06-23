@@ -36,7 +36,7 @@ public class AlbumSimilarity extends MediaSimilarity<Album> {
     double similarity = 0d;
 
     if (album.getLoaded() == null) {
-      album = (Album) manager.send(new LoadAlbum(store, album));
+      album = (Album) new LoadAlbum(store, album).send(manager);
     }
 
     if (album1.getLoaded() == null) {

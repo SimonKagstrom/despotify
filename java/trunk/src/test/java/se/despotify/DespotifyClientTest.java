@@ -125,7 +125,7 @@ public abstract class DespotifyClientTest extends TestCase {
     log.info("Tearing down test..");
     super.tearDown();
     if (manager != null) {
-      manager.stop(false);
+      manager.stop();
     }
   }
 }

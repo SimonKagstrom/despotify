@@ -13,7 +13,8 @@ import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -38,7 +39,7 @@ public class LoadUserPlaylists extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Connection connection) throws DespotifyException {
+  public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
     ChannelCallback callback = new ChannelCallback();
 
@@ -55,7 +56,11 @@ public class LoadUserPlaylists extends Command<Boolean> {
     buffer.flip();
 
     Channel.register(channel);
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.getPlaylist, buffer, "request list of user playlists");
+    connection.close();
+
+
     byte[] data = callback.getData("user playlists response");
 
     if (data.length == 0) {

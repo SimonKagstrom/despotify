@@ -13,7 +13,8 @@ import se.despotify.exceptions.DespotifyException;
 import se.despotify.exceptions.ReceivedEmptyResponseException;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -45,7 +46,7 @@ public class LoadPlaylist extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Connection connection) throws DespotifyException {
+  public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
     byte[] data;
 
 
@@ -72,7 +73,9 @@ public class LoadPlaylist extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.getPlaylist, buffer, "get playlist");
+    connection.close();
 
     /* Get data and inflate it. */
     data = callback.getData("get playlist response");

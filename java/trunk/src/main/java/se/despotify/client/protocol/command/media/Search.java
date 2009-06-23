@@ -13,7 +13,8 @@ import se.despotify.util.GZIP;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -44,7 +45,7 @@ public class Search extends Command<Result> {
     this.maxResults = maxResults;
   }
 
-  public Result send(Connection connection) throws DespotifyException {
+  public Result send(DespotifyManager connectionManager) throws DespotifyException {
     /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
 
@@ -75,7 +76,9 @@ public class Search extends Command<Result> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.search, buffer, "search");
+    connection.close();
 
     /* Get data and inflate it. */
     byte[] data = GZIP.inflate(callback.getData("gzipped search response"));

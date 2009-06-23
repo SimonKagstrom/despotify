@@ -6,7 +6,7 @@
 
   <groupId>se.despotify</groupId>
   <artifactId>despotify</artifactId>
-  <version>0.4.4-SNAPSHOT</version>
+  <version>0.4.5-SNAPSHOT</version>
 
   <name>Despotify</name>
   <description>Spotify client API</description>
@@ -25,6 +25,12 @@
   </distributionManagement>
 
   <dependencies>
+
+    <dependency>
+      <groupId>commons-pool</groupId>
+      <artifactId>commons-pool</artifactId>
+      <version>1.5.1</version>      
+    </dependency>
 
     <dependency>
       <groupId>org.domdrides</groupId>

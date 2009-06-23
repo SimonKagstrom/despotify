@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.ArrayList;
 
 /**
  * @author kalle
@@ -43,13 +44,13 @@ public abstract class RestrictedMedia extends Media {
 
     String tmp;
     if ((tmp = restrictionsNode.getAttribute("allowed")) != null) {
-      restrictedMedia.setAllowed(new LinkedHashSet<String>(Arrays.asList(tmp.split(","))));
+      restrictedMedia.setAllowed(new LinkedHashSet<String>(new ArrayList<String>(Arrays.asList(tmp.split(",")))));
     }
     if ((tmp = restrictionsNode.getAttribute("forbidden")) != null) {
-      restrictedMedia.setForbidden(new LinkedHashSet<String>(Arrays.asList(tmp.split(","))));
+      restrictedMedia.setForbidden(new LinkedHashSet<String>(new ArrayList<String>(Arrays.asList(tmp.split(",")))));
     }
     if ((tmp = restrictionsNode.getAttribute("catalouges")) != null) {
-      restrictedMedia.setCatalogues(new LinkedHashSet<String>(Arrays.asList(tmp.split(","))));
+      restrictedMedia.setCatalogues(new LinkedHashSet<String>(new ArrayList<String>(Arrays.asList(tmp.split(",")))));
     }
 
     // todo enumarate all attributes and warn if there are any unknown

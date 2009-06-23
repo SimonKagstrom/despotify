@@ -15,7 +15,8 @@ import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
-import se.despotify.Connection;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -39,11 +40,11 @@ public class RemovePlaylistFromUser extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(Connection connection) throws DespotifyException {
+  public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
     if (user.getPlaylists() == null) {
       log.warn("user playlists not loaded yet! should it be? loading..");
-      new LoadUserPlaylists(store, user).send(connection);
+      new LoadUserPlaylists(store, user).send(connectionManager);
     }
 
     int position = user.getPlaylists().getItems().indexOf(playlist);
@@ -56,12 +57,16 @@ public class RemovePlaylistFromUser extends Command<Boolean> {
 
     // todo probably don't destoy collaborative that is not owned by user? or?
 
+    ManagedConnection connection = connectionManager.getManagedConnection();
     if (!sendDelete(connection.getProtocol(), position)) {
+      connection.close();
       throw new DespotifyException();
     }
     if (!sendDestroy(connection.getProtocol(), position)) {
+      connection.close();
       throw new DespotifyException();
     }
+    connection.close();
     return true;
   }
 

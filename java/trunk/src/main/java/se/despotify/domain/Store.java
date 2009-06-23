@@ -13,6 +13,22 @@ import org.domdrides.entity.Entity;
  */
 public abstract class Store implements Serializable {
 
+  /**
+   * @param media
+   * @return merged instance of the media. 
+   */
+  public abstract Media persist(Media media);
+
+  public abstract Playlist getPlaylist(String hexUUID);
+
+  public abstract Image getImage(String hexUUID);
+
+  public abstract Album getAlbum(String hexUUID);
+
+  public abstract Artist getArtist(String hexUUID);
+
+  public abstract Track getTrack(String hexUUID);
+
   public final Playlist getPlaylist(byte[] UUID) {
     return getPlaylist(Hex.toHex(UUID));
   }
@@ -32,17 +48,5 @@ public abstract class Store implements Serializable {
   public final Image getImage(byte[] UUID) {
     return getImage(Hex.toHex(UUID));
   }
-
-  public abstract Media persist(Media media);
-
-  public abstract Playlist getPlaylist(String hexUUID);
-
-  public abstract Image getImage(String hexUUID);
-
-  public abstract Album getAlbum(String hexUUID);
-
-  public abstract Artist getArtist(String hexUUID);
-
-  public abstract Track getTrack(String hexUUID);
 
 }
