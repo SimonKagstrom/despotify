@@ -54,7 +54,7 @@ public abstract class DespotifyClientTest extends TestCase {
     if (manager != null) {
       manager.stop();
     }
-    manager = new DespotifyManager(username, password, 1);
+    manager = new DespotifyManager(username, password);
     if (doConnect()) {
       manager.connect();
     }

@@ -53,6 +53,13 @@ public class ReservePlaylistUUID extends Command<Boolean> {
   private String playlistName;
   private boolean collaborative;
 
+  public ReservePlaylistUUID(Store store, byte[] requestedPlaylistUUID, String playlistName, boolean collaborative) {
+    this.store = store;
+    this.requestedPlaylistUUID = requestedPlaylistUUID;
+    this.playlistName = playlistName;
+    this.collaborative = collaborative;
+  }
+
   public ReservePlaylistUUID(Store store, User user, byte[] requestedPlaylistUUID, String playlistName, boolean collaborative) {
     this.store = store;
     this.user = user;
@@ -68,6 +75,12 @@ public class ReservePlaylistUUID extends Command<Boolean> {
    */
   public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
+    ManagedConnection connection = connectionManager.getManagedConnection();
+
+    if (user == null){
+      user = connection.getSession().getUser();
+    }
+
     if (user.getPlaylists() == null) {
       log.warn("user playlists not loaded yet! should it be? loading..");
       new LoadUserPlaylists(store, user).send(connectionManager);
@@ -80,7 +93,7 @@ public class ReservePlaylistUUID extends Command<Boolean> {
             "<version>0000000001,0000000000,0000000001,%s</version>",
         playlistName,
         new Date().getTime() / 1000,
-        connectionManager.getUsername(),
+        user.getId(),
         collaborative ? 1 : 0
     );
 
@@ -109,7 +122,6 @@ public class ReservePlaylistUUID extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
-    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "create playlist UUID");
 
     /* Get response. */
