@@ -18,6 +18,12 @@ public class CreatePlaylist extends Command<Playlist> {
   private String playlistName;
   private boolean collaborative;
 
+  public CreatePlaylist(Store store, String playlistName, boolean collaborative) {
+    this.store = store;
+    this.playlistName = playlistName;
+    this.collaborative = collaborative;
+  }
+
   public CreatePlaylist(Store store, User user, String playlistName, boolean collaborative) {
     this.store = store;
     this.user = user;

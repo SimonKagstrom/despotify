@@ -91,13 +91,24 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
   private User user;
   private Integer position;
 
-  public CreatePlaylistWithReservedUUID(Store store, User user, Playlist playlist) {
+  public CreatePlaylistWithReservedUUID(Store store, Playlist playlist) {
     this.store = store;
     this.playlist = playlist;
-    this.user = user;
   }
 
-  public CreatePlaylistWithReservedUUID(Store store, User user, Playlist playlist, int position) {
+  public CreatePlaylistWithReservedUUID(Store store, Playlist playlist, Integer position) {
+    this.store = store;
+    this.playlist = playlist;
+    this.position = position;
+  }
+
+  public CreatePlaylistWithReservedUUID(Store store, User user, Playlist playlist) {
+    this.store = store;
+    this.user = user;
+    this.playlist = playlist;
+  }
+
+  public CreatePlaylistWithReservedUUID(Store store, Playlist playlist, User user, Integer position) {
     this.store = store;
     this.playlist = playlist;
     this.user = user;
@@ -107,6 +118,11 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
   @Override
   public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
+    ManagedConnection connection = connectionManager.getManagedConnection();
+
+    if (user == null) {
+      user = connection.getSession().getUser();
+    }
 
     if (playlist.isCollaborative() == null) {
       playlist.setCollaborative(false);
@@ -163,7 +179,6 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
-    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "create playlist");
     connection.close();
 
