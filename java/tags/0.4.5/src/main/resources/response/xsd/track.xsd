@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:include schemaLocation="restriction.xsd"/>
+  <xs:include schemaLocation="file.xsd"/>
+  <xs:include schemaLocation="link.xsd"/>
+
+  <xs:complexType name="tracksType">
+    <xs:sequence>
+      <xs:element type="trackType" name="track" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="trackType">
+    <xs:sequence>
+      <xs:element type="hex_32" name="id" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="hex_32" name="redirect" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element type="xs:string" name="title" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:string" name="artist-id" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:string" name="artist" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:string" name="album" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:string" name="album-id" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:short" name="year" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:byte" name="track-number" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:int" name="length" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="filesType" name="files" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="linksType" name="links" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="linksType" name="album-links" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:string" name="cover" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:float" name="popularity" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="restrictionsType" name="restrictions" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:string" name="forbidden" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:string" name="allowed" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="similar-tracksType" name="similar-tracks" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="external-idsType" name="external-ids" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="similar-tracksType">
+    <xs:sequence>
+      <xs:element type="hex_32" name="id" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+
+
+</xs:schema>

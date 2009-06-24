@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+
+
+<album>
+  <version>1</version>
+  <name>The Legend Of Johnny Cash</name>
+  <id>02f8df4ad52d449caca8c6a25d2eca08</id>
+  <artist>Johnny Cash</artist>
+  <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+  <album-type>album</album-type>
+  <year>2005</year>
+  <cover>3d44ff9d9b75a44b835f7e719a193e9033cae6af</cover>
+  <review><![CDATA[]]></review>
+  <copyright>
+    <c>(C) 2005 Universal Music Enterprises, a Division of UMG Recordings, Inc.</c>
+    <p>(P) 2005 Universal Music Enterprises, a Division of UMG Recordings, Inc.</p>
+  </copyright>
+  <restrictions>
+    <restriction allowed="AT,BE,CH,CN,CZ,DE,DK,ES,FR,HK,IL,MY,NL,NO,PT,SE,SG,SK,TH,TR,TW" catalogues="free,daypass,premium" />
+  </restrictions>
+  <allowed>AT BE CH CN CZ DE DK ES FR HK IL MY NL NO PT SE SG SK TH TR TW</allowed>
+  <links>
+    <link type="7digital" countries="DE" /></links>
+  <similar-albums></similar-albums>
+  <discs>
+    <disc>
+      <disc-number>1</disc-number>
+      <name></name>
+      <track>
+        <id>78fa2ba4d4124b51a708dd074c62d24c</id>
+        <title>Ring Of Fire</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>1</track-number>
+        <length>155866</length>
+        <files>
+          <file id="7157abd4072b689be62f4716c03173f8bfde9c99" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.83993</popularity>
+      </track>
+      <track>
+        <id>728f02c7fc5d4a1c83ae91a88b455d6c</id>
+        <title>I Walk The Line</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>2</track-number>
+        <length>164440</length>
+        <files>
+          <file id="2d44bd87e6a390e48c76f5b56d24efc512ef65e8" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.73003</popularity>
+      </track>
+      <track>
+        <id>8bd3f688cf9f4c96ad3926eda6ebf87a</id>
+        <title>Jackson</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <artist-id>47cc3df2dcab4e13b01ca4e60cf11192</artist-id>
+        <artist>June Carter</artist>
+        <track-number>3</track-number>
+        <length>165973</length>
+        <files>
+          <file id="637bc87ac99f5882ae4f4dfd75e0fe720ea3de41" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.68271</popularity>
+      </track>
+      <track>
+        <id>3515cd3fba3249ca83f746da0a2e1faa</id>
+        <title>Folsom Prison Blues</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>4</track-number>
+        <length>169506</length>
+        <files>
+          <file id="9ef03777131043ef6e0f0b5bd998f3ed2e605b4d" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.66151</popularity>
+      </track>
+      <track>
+        <id>8441c41dbfda4bb1b66f2b68ac330447</id>
+        <title>A Boy Named Sue</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>5</track-number>
+        <length>225466</length>
+        <files>
+          <file id="1ac882b05d83cd396b6ab530fdbd7171c826ae34" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.72548</popularity>
+      </track>
+      <track>
+        <id>f07783cebc8f4bafa2fce8c6d0cc1deb</id>
+        <title>Big River</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>6</track-number>
+        <length>151293</length>
+        <files>
+          <file id="058a746ecf10fd293ef9a86572459d9f3bc2c33e" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.58243</popularity>
+      </track>
+      <track>
+        <id>ddd9350f4c2246e19de7b203d5bb1aff</id>
+        <title>Get Rhythm</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>7</track-number>
+        <length>133240</length>
+        <files>
+          <file id="f17fad7a95438676a687b0cde2ae722f74a501b2" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.69725</popularity>
+      </track>
+      <track>
+        <id>2e5144d2fbb14cf9889410dde3f62f63</id>
+        <title>Cry! Cry! Cry!</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>8</track-number>
+        <length>144226</length>
+        <files>
+          <file id="9f283fe38540bba43c447b2aa89dff795edfe40c" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.63913</popularity>
+      </track>
+      <track>
+        <id>da1b14a8928d4f19b0758e49076d1451</id>
+        <title>Hey Porter</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>9</track-number>
+        <length>132906</length>
+        <files>
+          <file id="a797d643884fbc36c4b737d47dfa5e1c0c253333" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.61721</popularity>
+      </track>
+      <track>
+        <id>e376c1392b8f42539a0668445657492b</id>
+        <title>A Thing Called Love - Original Version</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>10</track-number>
+        <length>151360</length>
+        <files>
+          <file id="47f168b14b16e911fe1d9ccb7c48868d35832fa1" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.62175</popularity>
+      </track>
+      <track>
+        <id>d7ac88008f5a4924969941721d6ebec7</id>
+        <title>Guess Things Happen That Way - 1958 Single Version</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>11</track-number>
+        <length>110000</length>
+        <files>
+          <file id="3e5c975f7d4734b951751cad294549b96c9e481d" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.59246</popularity>
+      </track>
+      <track>
+        <id>730da679d40443e28b64b4ab44e7b554</id>
+        <title>San Quentin - Live Version</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>12</track-number>
+        <length>185880</length>
+        <files>
+          <file id="a06a7d689f48b827cf57c18cefee603bcfe94d08" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.68739</popularity>
+      </track>
+      <track>
+        <id>75ca03b768d040a3b6b9197faeaa5bfa</id>
+        <title>Man In Black - Single Version</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>13</track-number>
+        <length>172226</length>
+        <files>
+          <file id="a7b4df37faa270231b1f667091442759bbfdd9c4" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.61515</popularity>
+      </track>
+      <track>
+        <id>e6d3c0171555466496dc31180ebcd98d</id>
+        <title>Highwayman</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <artist-id>f748ac6d66c545b1aeda1f6c97d7ebb0</artist-id>
+        <artist>Waylon Jennings</artist>
+        <artist-id>c310d061109b4f4b989e06bd1c862395</artist-id>
+        <artist>Willie Nelson</artist>
+        <artist-id>10f2d589ccb04ed6ad55eac41a11d469</artist-id>
+        <artist>Kris Kristofferson</artist>
+        <track-number>14</track-number>
+        <length>183426</length>
+        <files>
+          <file id="5127a86b6f14242ce90cf615a2aa35f046093ded" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.69409</popularity>
+      </track>
+      <track>
+        <id>84630de2b70044938abadc2b5b004717</id>
+        <title>The Wanderer</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <artist-id>a52228a0661047759a28edc79579f332</artist-id>
+        <artist>U2</artist>
+        <track-number>15</track-number>
+        <length>284173</length>
+        <files>
+          <file id="f7ba938b009ade62756c12b8acc175ce18cb1321" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.6023</popularity>
+      </track>
+      <track>
+        <id>d73b8e4253f2474793691045569a2002</id>
+        <title>I&apos;ve Been Everywhere</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>16</track-number>
+        <length>196386</length>
+        <files>
+          <file id="bd7d21811399da1a00cb1085c09d43ad68b98a22" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.64722</popularity>
+      </track>
+      <track>
+        <id>87e27d275915442ba1d3d09053ad6696</id>
+        <title>Rusty Cage</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>17</track-number>
+        <length>169493</length>
+        <files>
+          <file id="7533e60485a581f90ebdb58b8fa2a846d793f868" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.63287</popularity>
+      </track>
+      <track>
+        <id>565e4c91f4ae42a39aa5646d325590e3</id>
+        <title>Personal Jesus</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>18</track-number>
+        <length>198960</length>
+        <files>
+          <file id="22a670fcade07bbc2915a623b22b91384532bb7b" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.71098</popularity>
+      </track>
+      <track>
+        <id>3deaacde160b4df9aa2a5ddac44dd2a0</id>
+        <title>Give My Love To Rose</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>19</track-number>
+        <length>207253</length>
+        <files>
+          <file id="2990057b24a2fc23ac56407a6a5422c0692d1c3a" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.59921</popularity>
+      </track>
+      <track>
+        <id>93f98ea75b4748f797668485a3d01bd0</id>
+        <title>One</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>20</track-number>
+        <length>231200</length>
+        <files>
+          <file id="e935faa17b7755c1a6a970f4ab087a9de347c0e6" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.75444</popularity>
+      </track>
+      <track>
+        <id>c2d8c567f4db4adc83120d132657955c</id>
+        <title>Hurt</title>
+        <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+        <artist>Johnny Cash</artist>
+        <track-number>21</track-number>
+        <length>218586</length>
+        <files>
+          <file id="eb955a2ea8334229d8151808ec224dcc619de20d" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.85429</popularity>
+      </track>
+    </disc>
+  </discs>
+</album>

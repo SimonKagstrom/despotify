@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+
+
+<result>
+  <version>1</version>
+  <total-tracks>5</total-tracks>
+  <tracks>
+    <track>
+      <id>93f98ea75b4748f797668485a3d01bd0</id>
+      <title>One</title>
+      <artist-id>d00d9e7b82894fb8851a109c82568eb5</artist-id>
+      <artist>Johnny Cash</artist>
+      <album>The Legend Of Johnny Cash</album>
+      <album-id>02f8df4ad52d449caca8c6a25d2eca08</album-id>
+      <year>2005</year>
+      <track-number>20</track-number>
+      <length>231200</length>
+      <files>
+        <file id="e935faa17b7755c1a6a970f4ab087a9de347c0e6" format="Ogg Vorbis,160000,1,32,4" /></files>
+      <cover>3d44ff9d9b75a44b835f7e719a193e9033cae6af</cover>
+      <popularity>0.75444</popularity>
+      <restrictions>
+        <restriction allowed="AT,BE,CH,CN,CZ,DE,DK,ES,FR,HK,IL,MY,NL,NO,PT,SE,SG,SK,TH,TR,TW" catalogues="free,daypass,premium" />
+      </restrictions>
+      <allowed>AT BE CH CN CZ DE DK ES FR HK IL MY NL NO PT SE SG SK TH TR TW</allowed>
+      <album-links>
+        <link type="7digital" countries="DE" />
+      </album-links>
+    </track>
+    <track>
+      <id>7093f50c9ecf428eb780348c076f9f7f</id>
+      <title>Four</title>
+      <artist-id>f4d5d82d09124feda0633a2671f8c81a</artist-id>
+      <artist>Miles Davis</artist>
+      <album>Miles Davis And The Jazz Giants</album>
+      <album-id>cce79af3bd864a799806a557877dda7a</album-id>
+      <year>1986</year>
+      <track-number>3</track-number>
+      <length>240226</length>
+      <files>
+        <file id="55473589cbccde7f9621fea833f38487f92f2892" format="Ogg Vorbis,160000,1,32,4" /></files>
+      <cover>2df174a97a577044edaa482b5eb198b5bc20dddb</cover>
+      <popularity>0.46391</popularity>
+      <restrictions>
+        <restriction allowed="AT,BE,CH,CN,CZ,DK,ES,FI,GB,HK,HU,IE,IL,IN,IT,MY,NL,NO,NZ,PL,PT,RU,SE,SG,SK,TR,TW,ZA" catalogues="free,daypass,premium" />
+      </restrictions>
+      <allowed>AT BE CH CN CZ DK ES FI GB HK HU IE IL IN IT MY NL NO NZ PL PT RU SE SG SK TR TW ZA</allowed>
+      <links>
+        <link type="7digital" countries="ES,GB" />
+      </links>
+      <album-links>
+        <link type="7digital" countries="ES,GB" />
+      </album-links>
+    </track>
+    <track>
+      <id>cf2cd530980e450d855977ba0a80ec6e</id>
+      <title>Two</title>
+      <artist-id>4f9873e19e5a4b4096c216c98bcdb010</artist-id>
+      <artist>Ryan Adams</artist>
+      <album>Easy Tiger</album>
+      <album-id>4dc7cec0b8e441daaef85f46a915c7d4</album-id>
+      <year>2007</year>
+      <track-number>2</track-number>
+      <length>158293</length>
+      <files>
+        <file id="ddc30e1090b43403cc0828db91300450a358a1a8" format="Ogg Vorbis,160000,1,32,4" /></files>
+      <cover>95cdf93b035a5c568bc19981a9e618bd2f9a50bf</cover>
+      <popularity>0.62899</popularity>
+      <restrictions>
+        <restriction allowed="AT,AU,BE,CH,DE,DK,ES,FI,HR,HU,MY,NL,NO,NZ,RU,SE" catalogues="free,daypass,premium" />
+      </restrictions>
+      <allowed>AT AU BE CH DE DK ES FI HR HU MY NL NO NZ RU SE</allowed>
+      <links>
+        <link type="7digital" countries="DE,ES" />
+      </links>
+      <album-links>
+        <link type="7digital" countries="DE,ES" />
+      </album-links>
+      <similar-tracks>
+        <id>09d8f69ef94e471db8882c6517535d96</id>
+        <id>9d8ee64600f948adb762ba38f43475d5</id>
+        <id>3e11be6a16af4e9ca2de4596240de2de</id>
+        <id>0db03b09f0bd4e7199338895d3bc008e</id>
+        <id>efb01d11430948fba4dfbdc66dad07e9</id>
+        <id>0217c98ef8c64886b2b63c049f3b2efe</id>
+        <id>ad972dfcfc9048de9fa2f8b98e01b8fd</id>
+        <id>1e9b02f57cf5453eaca6de42d5739687</id>
+        <id>7ff76975c46f475480ea17495d7c66b9</id>
+        <id>fcce092ed46f44ed80f84c08dcff35d5</id>
+        <id>e0401a16ff39498d9226530c4738bc14</id>
+        <id>306d5e7a393b484bb0369c1044c1abf8</id>
+        <id>29568a8fe51241eeab35e6e61f9c8ec8</id>
+        <id>1c1d2f60b2594ed29e93294332922127</id>
+        <id>2662c65af5e2444b9afce16455355c3b</id>
+      </similar-tracks>
+    </track>
+    <track>
+      <id>fc1f1b5860f04a739971fcad9c1cd634</id>
+      <title>Three</title>
+      <artist-id>db614c7060fc47baa7be732d88ae446d</artist-id>
+      <artist>Massive Attack</artist>
+      <album>Protection</album>
+      <album-id>b8a09d31b4994b79a01f966b86cb9394</album-id>
+      <year>1994</year>
+      <track-number>3</track-number>
+      <length>229066</length>
+      <files>
+        <file id="6186903f7ffa0e579954fa42c537cebc06ac7427" format="Ogg Vorbis,160000,1,32,4" /></files>
+      <cover>1946f99c0408e958f88c1811f1d9d92df0a4b16f</cover>
+      <popularity>0.57006</popularity>
+      <restrictions>
+        <restriction allowed="AT,BE,CH,CY,CZ,DE,DK,EE,ES,FI,FR,GB,GR,HR,HU,IE,IT,LT,LU,NL,NO,PL,PT,RO,SE,SI,SK" catalogues="free,daypass,premium" />
+      </restrictions>
+      <allowed>AT BE CH CY CZ DE DK EE ES FI FR GB GR HR HU IE IT LT LU NL NO PL PT RO SE SI SK</allowed>
+      <links>
+        <link type="7digital" countries="DE,GB,ES,FR" />
+      </links>
+      <album-links>
+        <link type="7digital" countries="GB,FR,ES,DE" />
+      </album-links>
+      <similar-tracks>
+        <id>e32028b469eb41909ab7317710852dd1</id>
+        <id>1cb53860e4564ac18ecae1301a894fc0</id>
+        <id>8b082f0b7a364d7b8d612a91bbfc8d34</id>
+        <id>828d297fc76c4a08b12d08219e2e5045</id>
+        <id>b35c4420d46d4a38965c3a3cb954ad9b</id>
+        <id>5d845a3eef644088ad65ed062b056030</id>
+        <id>ad0d478c5bcc405691560804b91aeb3a</id>
+        <id>33874cf4aeb24f19b8eb0486cf6bd6b1</id>
+        <id>1014941884704c9994105f3648e94500</id>
+        <id>afe9147c31694ef88073c2daa8145f5b</id>
+        <id>8af6f1f017214ba0976517f1f6221b97</id>
+        <id>d2254a652d7e4a7493868bf1e90bf53d</id>
+        <id>42c27d5ca6824fc283cf026e0dcb909a</id>
+        <id>e366ee545d5640f1bcd98d87b6e0a53b</id>
+        <id>1e75521630574eabbca23b8509b9385e</id>
+      </similar-tracks>
+    </track>
+    <track>
+      <id>48daf12f96f84793a526b579aa4d1f66</id>
+      <redirect>aaa96bdff36c4fbca5a836cb0a49ecc1</redirect>
+      <redirect>ca58250b16024e9db3f5efe1e1180331</redirect>
+      <title>Five</title>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <artist>Electrelane</artist>
+      <album>No Shouts, No Calls</album>
+      <album-id>792d90d6e5c14679afd00e7ea28982ce</album-id>
+      <year>2007</year>
+      <track-number>9</track-number>
+      <length>385000</length>
+      <files>
+        <file id="4c5a99ef480c133dc365642f827f79e6e963c565" format="Ogg Vorbis,160000,1,32,4" /></files>
+      <cover>e1712082598617226c51214314392d7d19f989d3</cover>
+      <popularity>0.45412</popularity>
+      <restrictions>
+        <restriction forbidden="AI,AQ,AX,BL,BM,BN,BV,CI,CK,CV,EH,FM,FO,GS,GU,IO,JP,ME,MF,MH,MM,MP,MR,MS,MT,MU,PF,PN,PS,PW,RS,SJ,TF,TL,TO,TT,UM,YE,YT,ZZ" catalogues="free,daypass,premium" />
+      </restrictions>
+      <forbidden>AI AQ AX BL BM BN BV CI CK CV EH FM FO GS GU IO JP ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YE YT ZZ</forbidden>
+      <links>
+        <link type="7digital" countries="FR,GB,DE,ES" />
+      </links>
+      <album-links>
+        <link type="7digital" countries="DE,ES,FR,GB" />
+      </album-links>
+    </track>
+  </tracks>
+</result>

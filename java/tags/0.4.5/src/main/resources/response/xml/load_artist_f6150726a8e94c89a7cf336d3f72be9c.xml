@@ -1,0 +1,1835 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+
+
+
+
+<artist>
+  <version>1</version>
+  <name>Electrelane</name>
+  <id>f6150726a8e94c89a7cf336d3f72be9c</id>
+  <portrait></portrait>
+  <bios>
+    <bio>
+      <text><![CDATA[Brighton, England's Electrelane formed in 1998, eventually comprising guitarist Mia Clarke, bassist Rachel Dalley, drummer Emma Gaze, and keyboardist/guitarist Verity Susman. Sharing an equal amount of fondness for Krautrock, vintage equipment like the Farfisa organ, and modern production techniques, the band made their recorded debut in January 2000 with the Film Music single on In Denial. Following another single for Fierce Panda, the group set up the Sony-supported Let's Rock! label, issuing a pair of singles (Gabriel and Blue Straggler) prior to the April 2001 release of <a href="spotify:album:1fSgr7eAObb3lp1NDColQz">Rock It to the Moon</a>, the band's first full-length. Active and vocal proponents of female involvement in music, the band became part of the Ladyfest concerts that took place in Glasgow a few months later. For the band's second album, 2004's <a href="spotify:album:40COqcfENWKnXSWGNdfBrO">The Power Out</a>, Electrelane moved to Too Pure and added vocals and more pop structure to their sound. Dalley left the band late in 2004 and was replaced by Ros Murray. <a href="spotify:album:43j6jtsRY5MkSNb8Qub7xJ">Axes</a>, Electrelane's denser, more experimental third full-length, arrived the following spring. After extensive touring in support of <a href="spotify:album:43j6jtsRY5MkSNb8Qub7xJ">Axes</a>, the band convened in Berlin in summer 2006 to write their fourth album, <a href="spotify:album:0v7A1rUV8FgC0wI0BPrY8B">No Shouts No Calls</a>, which they recorded that fall; the album, which fell closer to <a href="spotify:album:40COqcfENWKnXSWGNdfBrO">The Power Out</a>'s pop sound, was released in spring 2007. ~ Andy Kellman, All Music Guide]]></text>
+      <portraits></portraits>
+    </bio>
+  </bios>
+  <similar-artists>
+    <artist>
+      <id>fdbe3264cc084c879297c2e2f722c032</id>
+      <name>Young People</name>
+      <portrait>1324787e0076da29b4aa7e5fdef5cd555f91b46e</portrait>
+      <genres>Country-Rock,Alternative Country-Rock,Rock,Alternative Country,Alternative Pop/Rock</genres>
+      <years-active>2000</years-active>
+      <restrictions>
+      
+        <restriction forbidden="BL MF ZZ" catalogues="free,daypass,premium" />
+      
+      </restrictions>
+    </artist>
+    <artist>
+      <id>efa5234924a74716a7e5345895a4ec0b</id>
+      <name>Clinic</name>
+      <portrait>4e3fe61dbc5c153baa9f4d8c817f0f1f1ae86545</portrait>
+      <genres>Alternative Pop/Rock,Rock,New Wave/Post-Punk Revival,Indie Rock</genres>
+      <years-active>1997-</years-active>
+      <restrictions>
+      
+        <restriction forbidden="" catalogues="free,daypass,premium" />
+      
+      </restrictions>
+    </artist>
+    <artist>
+      <id>e9d40e512bd84c3cac120680e2a41400</id>
+      <name>Love of Diagrams</name>
+      <portrait>cfe5cf4d06e2b19935ae7085260e13927a98a96e</portrait>
+      <genres>Rock,Alternative Pop/Rock,Punk-Pop,Indie Rock</genres>
+      <years-active>2001-</years-active>
+      <restrictions>
+      
+        <restriction forbidden="AI AQ AX BL BM BN BV CD CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YT ZZ" catalogues="free,daypass,premium" />
+      
+      </restrictions>
+    </artist>
+    <artist>
+      <id>d5cfe4bbd3e04ba88609cffffc6015a8</id>
+      <name>Ikara Colt</name>
+      <portrait>82ba0818b05438488c86788e80245848478c0505</portrait>
+      <genres>Rock,Alternative Pop/Rock,Punk Revival,Indie Rock</genres>
+      <years-active>1999-</years-active>
+      <restrictions>
+      
+        <restriction forbidden="" catalogues="free,daypass,premium" />
+      
+      </restrictions>
+    </artist>
+    <artist>
+      <id>bf42254864dd4f8aa893191d8e42233a</id>
+      <name>Komeda</name>
+      <portrait></portrait>
+      <genres>Indie Pop,Rock,Indie Electronic,Indie Rock,Alternative Pop/Rock</genres>
+      <years-active>1991-</years-active>
+      <restrictions>
+      
+        <restriction forbidden="BL IM JE MF ZZ" catalogues="free,daypass,premium" />
+      
+      </restrictions>
+    </artist>
+    <artist>
+      <id>8a02b13c83e64ce7a0e69856ac63654c</id>
+      <name>Quickspace</name>
+      <portrait></portrait>
+      <genres>Space Rock,Rock,Alternative Pop/Rock,Ambient Pop,Indie Rock</genres>
+      <years-active>1990,2000</years-active>
+      <restrictions>
+      
+        <restriction allowed="AD AL AM AT AZ BA BE BG BY CH CY CZ DE DK EE ES FI FO FR GB GE GG GI GR HR HU IE IM IS IT JE LI LT LU LV MC MD ME MK MT NL NO PL PT RO RS RU SE SI SJ SK SM TR UA VA" catalogues="free,daypass,premium" />
+      
+      </restrictions>
+    </artist>
+    <artist>
+      <id>7ed202605b804837a32730731d55fdcb</id>
+      <name>Stereolab</name>
+      <portrait>91f82a076127b91bf711396be8647877e9583e45</portrait>
+      <genres>Rock,Indie Pop,Indie Rock,Indie Electronic,Alternative Pop/Rock</genres>
+      <years-active>1991-</years-active>
+      <restrictions>
+      
+        <restriction forbidden="" catalogues="free,daypass,premium" />
+      
+      </restrictions>
+    </artist>
+    <artist>
+      <id>475ddfffd68a4f7db99c833d2680e2ea</id>
+      <name>Pram</name>
+      <portrait>d3c6ab94860c1f1c984b9b0e8fb023c835b1c2f2</portrait>
+      <genres>Rock,Alternative Pop/Rock,Dream Pop,Experimental Rock,Indie Rock</genres>
+      <years-active>1990-</years-active>
+      <restrictions>
+      
+        <restriction forbidden="" catalogues="free,daypass,premium" />
+      
+      </restrictions>
+    </artist>
+    <artist>
+      <id>41deb53002b74d3fbabccf425678b8b1</id>
+      <name>Kaito</name>
+      <portrait>4f2e68dcee7aa899b4c2759500f60afffa9e970f</portrait>
+      <genres>Lo-Fi,Alternative Pop/Rock,Rock,Indie Rock</genres>
+      <years-active>1996-</years-active>
+      <restrictions>
+      
+        <restriction allowed="AT BE CH CY CZ DE DK EE ES FI FR GB GR HR HU IE IT LT LU NL NO PL PT RO SE SI SK" catalogues="free,daypass,premium" />
+      
+      </restrictions>
+    </artist>
+    <artist>
+      <id>1efe1c142a2d4be285455947917b3080</id>
+      <name>Broadcast</name>
+      <portrait></portrait>
+      <genres>Indie Pop,Rock,Indie Electronic,Indie Rock,Ambient Pop</genres>
+      <years-active>1995-</years-active>
+      <restrictions>
+      
+        <restriction allowed="" catalogues="free,daypass,premium" />
+      
+      </restrictions>
+    </artist></similar-artists>
+  <external-ids>
+  </external-ids>
+  <genres>Indie Rock,Ambient Pop,Indie Pop,Rock,Electronica,Post-Rock/Experimental,Alternative Pop/Rock</genres>
+  <years-active>1998-</years-active>
+  <albums>
+    <album>
+      <name>Rock It to the Moon</name>
+      <id>29451a1e1e82445e989cd4856cea078f</id>
+      <artist>Electrelane</artist>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <album-type>album</album-type>
+      <year>2001</year>
+      <cover>aeaf9d1f8a965222889f50e06d66a960bd5a9efd</cover>
+      <copyright>
+        <c>2005 Too Pure Records Ltd</c>
+        <p>2005 Too Pure Records Ltd</p>
+      </copyright>
+      <links>
+        <link type="7digital" countries="DE,GB" /></links>
+      <restrictions>
+        <restriction forbidden="AI AQ AX BL BM BN BV CD CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YE YT ZZ" catalogues="free,daypass,premium" />
+      </restrictions>
+      <forbidden>AI AQ AX BL BM BN BV CD CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YE YT ZZ</forbidden>
+      <external-ids>
+          <external-id type="upc" id="644918016922" />
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>3fb6d674591e4dcc81575475ec408a08</id>
+            <title>The Invisible Dog</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB" /></links>
+            <track-number>1</track-number>
+            <length>260000</length>
+            <files>
+              <file id="1c48dc20e6750b8bd7078f8887717c10ec56a31e" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.41448</popularity>
+          </track>
+          <track>
+            <id>4e5620b31342475c8991e6ddc636b6a0</id>
+            <title>Long Dark</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB" /></links>
+            <track-number>2</track-number>
+            <length>586000</length>
+            <files>
+              <file id="0ddb5673cd0367fee92c8f5c9ff80ad8f3296575" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.38961</popularity>
+          </track>
+          <track>
+            <id>f0ee12756db4406db0a7cd35b52e2ca4</id>
+            <title>Gabriel</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB" /></links>
+            <track-number>3</track-number>
+            <length>265000</length>
+            <files>
+              <file id="e7d7c7278b09c70288ef5b316c1b8033ffc3502b" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.3841</popularity>
+          </track>
+          <track>
+            <id>9d090719fff84e6e9d5fa7ed42a133a2</id>
+            <title>Film Music</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE" /></links>
+            <track-number>4</track-number>
+            <length>237000</length>
+            <files>
+              <file id="c69c65fa286a0998b90786836fcc7390e625091f" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.44963</popularity>
+          </track>
+          <track>
+            <id>f2027d8bf46e47a28f8d5b680a806372</id>
+            <title>Blue Straggler</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE" /></links>
+            <track-number>5</track-number>
+            <length>409000</length>
+            <files>
+              <file id="ea6f25ecf0128629d09842e0c44552015885a602" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.39636</popularity>
+          </track>
+          <track>
+            <id>c7db5c99f84447d1945a9d1ea0ccf6bc</id>
+            <title>Many Peaks</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE" /></links>
+            <track-number>6</track-number>
+            <length>241000</length>
+            <files>
+              <file id="018c0069480c53bb4edd92373ad3daf627a28f0c" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.37471</popularity>
+          </track>
+          <track>
+            <id>871ac85ea2d0467a85638c93ae585521</id>
+            <title>Le Song</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB" /></links>
+            <track-number>7</track-number>
+            <length>205000</length>
+            <files>
+              <file id="8a368feaed6a93198d6d789a15603c13c9cc50a4" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.36726</popularity>
+          </track>
+          <track>
+            <id>a35b051fb01c403a81ea04470fa27a00</id>
+            <title>Spartakiade</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB" /></links>
+            <track-number>8</track-number>
+            <length>101000</length>
+            <files>
+              <file id="59c7289769cec07ce5bc1ca74004c16062101adb" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.36119</popularity>
+          </track>
+          <track>
+            <id>56707162734348dda7adf605e14e675f</id>
+            <title>U.O.R.</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE" /></links>
+            <track-number>9</track-number>
+            <length>522000</length>
+            <files>
+              <file id="aeb16a3592dcedc765c6cb1d0301a0691738a133" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.34703</popularity>
+          </track>
+          <track>
+            <id>22f2c26ca3eb4beda002d77e7e86fb7c</id>
+            <title>The Boat</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE" /></links>
+            <track-number>10</track-number>
+            <length>265000</length>
+            <files>
+              <file id="be5fcb82539b6791a49fae365f686b168ce21cd6" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.36482</popularity>
+          </track>
+          <track>
+            <id>b71ba88c4be6412590565ab36b952354</id>
+            <title>Mother</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB" /></links>
+            <track-number>11</track-number>
+            <length>1344000</length>
+            <files>
+              <file id="48effb5bbb0b477a792e159d9a98528499b7c301" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.32906</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>Bells</name>
+      <id>a7a4b4f37b9440b6a8c7166bd479dc83</id>
+      <artist>Electrelane</artist>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <album-type>single</album-type>
+      <year>2005</year>
+      <cover>75fa906b378a6062fdb08422471faa6f40686a2d</cover>
+      <copyright>
+        <c>2005 Too Pure Records Ltd</c>
+        <p>2005 Too Pure Records Ltd</p>
+      </copyright>
+      <links>
+        <link type="7digital" countries="GB,ES,DE,FR" /></links>
+      <restrictions>
+        <restriction forbidden="AI AQ AX BL BM BN BV CD CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YT ZZ" catalogues="free,daypass,premium" />
+      </restrictions>
+      <forbidden>AI AQ AX BL BM BN BV CD CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YT ZZ</forbidden>
+      <external-ids>
+          <external-id type="upc" id="644918016755" />
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>0f749fb494064e1089c244838dea5196</id>
+            <title>Bells</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="ES,FR,GB,DE" /></links>
+            <track-number>1</track-number>
+            <length>281000</length>
+            <files>
+              <file id="4b4de975748189191157f8574a1b30bbe5a3a5c3" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.26924</popularity>
+          </track>
+          <track>
+            <id>c70eb6faabcb46029eb739f633d6adab</id>
+            <title>I Keep Losing Heart</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="ES,DE,GB,FR" /></links>
+            <track-number>2</track-number>
+            <length>223000</length>
+            <files>
+              <file id="4b58a500ffe6886eedfdde108ac38e2cd75c1b6c" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.29813</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>Sound Spectacular: The Beggars Group Spring Sampler</name>
+      <id>60f364c2d3584aab94bd46898e8e3655</id>
+      <artist>Various Artists</artist>
+      <artist-id>026d2046b2ed4129b8a4167f5706aa99</artist-id>
+      <album-type>album</album-type>
+      <year></year>
+      <cover></cover>
+      <restrictions>
+      </restrictions>
+      <allowed></allowed>
+      <external-ids>
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>3dda87d855c741578df5b6f3175f09e3</id>
+            <title>All Ones &amp; Zeros</title>
+            <artist-id>dd2b6fe1c7bd4f1a941afbb1e56bf49a</artist-id>
+            <artist>The Early Years</artist>
+            <track-number>1</track-number>
+            <length>251000</length>
+            <files>
+              
+            </files>
+            <popularity>0.01033</popularity>
+          </track>
+          <track>
+            <id>9a7f11f1cc8a4207b69cdee69fb65e15</id>
+            <title>Silently</title>
+            <artist-id>ae10fe4ec6b74a97b8caef69023689b7</artist-id>
+            <artist>Blonde Redhead</artist>
+            <track-number>2</track-number>
+            <length>238000</length>
+            <files>
+              
+            </files>
+            <popularity>0.01351</popularity>
+          </track>
+          <track>
+            <id>9e6e27a7c87e404dbd45b45776a0db22</id>
+            <title>Sanctify</title>
+            <artist-id>8f32629c67eb4a168cbfab49074f9042</artist-id>
+            <artist>Calla</artist>
+            <track-number>3</track-number>
+            <length>280000</length>
+            <files>
+              
+            </files>
+            <popularity>0.01264</popularity>
+          </track>
+          <track>
+            <id>ae6684232ecb4135812dad34ab62b86f</id>
+            <title>To The East</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>4</track-number>
+            <length>295000</length>
+            <files>
+              
+            </files>
+            <popularity>0.04761</popularity>
+          </track>
+          <track>
+            <id>6084507c8adb4cf3b168636e340f8e3a</id>
+            <title>While You Were Sleeping</title>
+            <artist-id>e61f88a05fa44c6f8f85ada59af6675d</artist-id>
+            <artist>Elvis Perkins</artist>
+            <track-number>5</track-number>
+            <length>380000</length>
+            <files>
+              
+            </files>
+            <popularity>0.05781</popularity>
+          </track>
+          <track>
+            <id>8013944d419d4f4680c96c036bcc65d5</id>
+            <title>Adrenaline</title>
+            <artist-id>1447e699b3e64d0aac42c203fbeff90c</artist-id>
+            <artist>Emma Pollock</artist>
+            <track-number>6</track-number>
+            <length>257000</length>
+            <files>
+              
+            </files>
+            <popularity>0.00948</popularity>
+          </track>
+          <track>
+            <id>93af0854479f49b1a05eebfc84aa55f4</id>
+            <title>March Of Clouds</title>
+            <artist-id>73e08536748a4f2db61f6f4f334709a1</artist-id>
+            <artist>Wolf &amp; Cub</artist>
+            <track-number>7</track-number>
+            <length>255000</length>
+            <files>
+              
+            </files>
+            <popularity>0.0115</popularity>
+          </track>
+          <track>
+            <id>cb3fa7fe41a54cd8afcca5270ed29bd3</id>
+            <title>Fingers Become Thumbs</title>
+            <artist-id>947a8d15d3054654a4ec97c5ed56754a</artist-id>
+            <artist>Future Of The Left</artist>
+            <track-number>8</track-number>
+            <length>113000</length>
+            <files>
+              
+            </files>
+            <popularity>0.01118</popularity>
+          </track>
+          <track>
+            <id>f8a2f27f4a1c4f5f9aadb157b35cc9ce</id>
+            <title>Your Biggest Fan</title>
+            <artist-id>ebe14612004f40adb425057946d36352</artist-id>
+            <artist>Voxtrot</artist>
+            <track-number>9</track-number>
+            <length>240000</length>
+            <files>
+              
+            </files>
+            <popularity>0.0294</popularity>
+          </track>
+          <track>
+            <id>07aed54190674fd78f7cc5955bd42bb8</id>
+            <title>You Never Had It So Good</title>
+            <artist-id>4dfb269e3ac84b619622870979fcb7ba</artist-id>
+            <artist>RJD2</artist>
+            <track-number>10</track-number>
+            <length>245000</length>
+            <files>
+              
+            </files>
+            <popularity>0.00776</popularity>
+          </track>
+          <track>
+            <id>41018f07dd5b4d918a9a5b22fe9b8305</id>
+            <title>Shining Bright Star</title>
+            <artist-id>074a4dbadd9a442585a386fab0fb3858</artist-id>
+            <artist>Black Strobe</artist>
+            <track-number>11</track-number>
+            <length>376000</length>
+            <files>
+              
+            </files>
+            <popularity>0.00561</popularity>
+          </track>
+          <track>
+            <id>a61e49e1885949468d376bfd8e3ada03</id>
+            <title>Part 5: The Sun&apos;s Gone Dim And The Sky&apos;s Turned Black</title>
+            <artist-id>c53551fe091e4344829a1ca02042d3b2</artist-id>
+            <artist>Johan Johansson</artist>
+            <track-number>12</track-number>
+            <length>430000</length>
+            <files>
+              
+            </files>
+            <popularity>0.00933</popularity>
+          </track>
+          <track>
+            <id>ea82c67ff5c34559a9f0713e0c3b2645</id>
+            <title>The Host Of Seraphim</title>
+            <artist-id>d433f5fdf937401a9ea94877e2535500</artist-id>
+            <artist>Dead Can Dance</artist>
+            <track-number>13</track-number>
+            <length>381000</length>
+            <files>
+              
+            </files>
+            <popularity>0.08732</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>On Parade</name>
+      <id>a758f9b6123f4d83a48f7a07b01039d6</id>
+      <artist>Electrelane</artist>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <album-type>single</album-type>
+      <year>2003</year>
+      <cover>5014d3036d823a4a416ce6c04d8f06d065748b53</cover>
+      <copyright>
+        <c>2003 Too Pure</c>
+        <p>2003 Too Pure</p>
+      </copyright>
+      <links>
+        <link type="7digital" countries="DE,GB" /></links>
+      <restrictions>
+        <restriction forbidden="AI AQ AX BL BM BN BV CI CK CV EH FM FO GS GU IO MF MH MM MP MR MS MT MU PF PN PS PW SJ TF TL TO TT UM YT ZZ" catalogues="free,daypass,premium" />
+      </restrictions>
+      <forbidden>AI AQ AX BL BM BN BV CI CK CV EH FM FO GS GU IO MF MH MM MP MR MS MT MU PF PN PS PW SJ TF TL TO TT UM YT ZZ</forbidden>
+      <external-ids>
+          <external-id type="upc" id="644918114628" />
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>f66bc3d0c2484d8bb59727d8e20ee40e</id>
+            <title>On Parade</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB" /></links>
+            <track-number>1</track-number>
+            <length>156000</length>
+            <files>
+              <file id="1dc20bc580253b8a79b9f1c81e1c4c493dd54371" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.33966</popularity>
+          </track>
+          <track>
+            <id>b7e8791e3e344391b4f82bbcfef84425</id>
+            <title>I&apos;m On Fire</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB" /></links>
+            <track-number>2</track-number>
+            <length>136000</length>
+            <files>
+              <file id="f25ed3240cd9c194bf738f483812ef276fdba948" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.44596</popularity>
+          </track>
+          <track>
+            <id>943410d0b90647e589a97950c0abb252</id>
+            <title>Teach The Sailor To Pray</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB" /></links>
+            <track-number>3</track-number>
+            <length>202000</length>
+            <files>
+              <file id="6b1d864947e16421768e5127ad8e1eedbd4333d9" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.31041</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>I Want to Be the President EP</name>
+      <id>bb44994be3954b45892e2911d7a8335c</id>
+      <artist>Electrelane</artist>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <album-type>single</album-type>
+      <year>2005</year>
+      <cover>11ffea6de64a93f1a792f19a72a143dab871200f</cover>
+      <copyright>
+        <c>2005 Too Pure Records Ltd</c>
+        <p>2005 Too Pure Records Ltd</p>
+      </copyright>
+      <links>
+        <link type="7digital" countries="GB,DE" /></links>
+      <restrictions>
+        <restriction forbidden="AI AQ AX BL BM BN BV CD CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YE YT ZZ" catalogues="free,daypass,premium" />
+      </restrictions>
+      <forbidden>AI AQ AX BL BM BN BV CD CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YE YT ZZ</forbidden>
+      <external-ids>
+          <external-id type="upc" id="644918018452" />
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>1cb21c97d52f4a3b930961a69b0bf063</id>
+            <title>I Want to Be the President</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB" /></links>
+            <track-number>1</track-number>
+            <length>287000</length>
+            <files>
+              <file id="6f3caaa442dd21d82492b4c9a990fcd6dc9b2f98" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.33786</popularity>
+          </track>
+          <track>
+            <id>1e3e1362b65145f4a5bf2cd21aa07fe2</id>
+            <title>I Only Always Thinking</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE" /></links>
+            <track-number>2</track-number>
+            <length>310000</length>
+            <files>
+              <file id="d74bb368f2b4b5d76038ddb4b5a955772c076792" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.33422</popularity>
+          </track>
+          <track>
+            <id>fc504c3734e44927a9821c082937d660</id>
+            <title>I&apos;ve Been Your Fan Since Yesterday</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE" /></links>
+            <track-number>3</track-number>
+            <length>308000</length>
+            <files>
+              <file id="0ba431efd7faa4daf36eb5805bdce77564641195" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.30952</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>This Deed</name>
+      <id>a9b739b953b945fb98b56b6a54365823</id>
+      <artist>Electrelane</artist>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <album-type>single</album-type>
+      <year>2004</year>
+      <cover>a53afad5cd43d54011b03dd3a980322fd1ea50b3</cover>
+      <copyright>
+        <c>2004 Too Pure Records</c>
+        <p>2004 Too Pure Records</p>
+      </copyright>
+      <links>
+        <link type="7digital" countries="FR,ES,DE,GB" /></links>
+      <restrictions>
+        <restriction forbidden="AI AQ AX BL BM BN BV CI CK CV EH FM FO GS GU IO MF MH MM MP MR MS MT MU PF PN PS PW SJ TF TL TO TT UM YT ZZ" catalogues="free,daypass,premium" />
+      </restrictions>
+      <forbidden>AI AQ AX BL BM BN BV CI CK CV EH FM FO GS GU IO MF MH MM MP MR MS MT MU PF PN PS PW SJ TF TL TO TT UM YT ZZ</forbidden>
+      <external-ids>
+          <external-id type="upc" id="644918115670" />
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>4655c21381d54ff9a75b025ee6ce36ee</id>
+            <title>This Deed</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,ES,DE,FR" /></links>
+            <track-number>1</track-number>
+            <length>206000</length>
+            <files>
+              <file id="8f7313d7ae56934f6aa9dff4f5477e8bd130a86c" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.28329</popularity>
+          </track>
+          <track>
+            <id>ddf3f57b01534efcba4c953df5b483c3</id>
+            <title>More Than This</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE,FR,ES" /></links>
+            <track-number>2</track-number>
+            <length>267000</length>
+            <files>
+              <file id="7cb63e887dce927c903b842af4b7332ab049acc2" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.36752</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>To The East</name>
+      <id>b1539156a3fd4f529e6b64271a7736cd</id>
+      <artist>Electrelane</artist>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <album-type>single</album-type>
+      <year>2007</year>
+      <cover>a3ad1eafa7d52d2b30e3342a38e17d67702c21cc</cover>
+      <copyright>
+        <c>2007 Too Pure Ltd.</c>
+        <p>2007 Too Pure Ltd.</p>
+      </copyright>
+      <links>
+        <link type="7digital" countries="GB,DE,FR,ES" /></links>
+      <restrictions>
+        <restriction forbidden="AI AQ AX BL BM BN BV CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM US YE YT ZZ" catalogues="free,daypass,premium" />
+      </restrictions>
+      <forbidden>AI AQ AX BL BM BN BV CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM US YE YT ZZ</forbidden>
+      <external-ids>
+          <external-id type="upc" id="644918020967" />
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>27db42d94d12484eb8c5f09d8226c020</id>
+            <title>To The East</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,ES,FR,DE" /></links>
+            <track-number>1</track-number>
+            <length>294000</length>
+            <files>
+              <file id="5c94d35c7ebe5c262ad82f4958962af860fa017a" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.27632</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>Singles, B-sides &amp; Live</name>
+      <id>9bad085a4c29434eacda655770c54802</id>
+      <artist>Electrelane</artist>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <album-type>album</album-type>
+      <year>2006</year>
+      <cover>f5c1238dd9dfe97d2f4172ee339081f1f9a866a4</cover>
+      <copyright>
+        <c>2006 Too Pure Records Ltd</c>
+        <p>2006 Too Pure Records Ltd</p>
+      </copyright>
+      <links>
+        <link type="7digital" countries="DE,FR,ES,GB" /></links>
+      <restrictions>
+        <restriction forbidden="AI AQ AX BL BM BN BV CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YE YT ZZ" catalogues="free,daypass,premium" />
+      </restrictions>
+      <forbidden>AI AQ AX BL BM BN BV CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YE YT ZZ</forbidden>
+      <external-ids>
+          <external-id type="upc" id="644918016663" />
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>10f4e44fd7f24873932a4c98e8af10ed</id>
+            <title>Film Music (Original Version)</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="ES,GB,DE,FR" /></links>
+            <track-number>1</track-number>
+            <length>251000</length>
+            <files>
+              <file id="0cfdedd0d6ea51c82404f7394b2c108c34ad51aa" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.42595</popularity>
+          </track>
+          <track>
+            <id>859c2babd4ec49c186381f93a56199a9</id>
+            <title>Come On</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="ES,DE,FR,GB" /></links>
+            <track-number>2</track-number>
+            <length>290000</length>
+            <files>
+              <file id="91f4e0879026c9409f02af738c2afa567c595f93" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.37983</popularity>
+          </track>
+          <track>
+            <id>15a92d3f8922474fbb84867fecfbf3fa</id>
+            <title>Le Song (Original Version)</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="ES,FR,GB,DE" /></links>
+            <track-number>3</track-number>
+            <length>190000</length>
+            <files>
+              <file id="6f7b8b183cd6a58e10749a691af2b6fae98d19c0" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.37058</popularity>
+          </track>
+          <track>
+            <id>a537f1823acf4338aed5b9dd128ac76c</id>
+            <title>U.O.R (Original Version)</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB,ES,FR" /></links>
+            <track-number>4</track-number>
+            <length>323000</length>
+            <files>
+              <file id="0c83e7418b4ce145c32beb00d442d29146927c83" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.36468</popularity>
+          </track>
+          <track>
+            <id>be54306a04a046fa93631b3f4dc11920</id>
+            <title>John Wayne</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,ES,GB,DE" /></links>
+            <track-number>5</track-number>
+            <length>158000</length>
+            <files>
+              <file id="5be65a6d409599a842342f1ab08cd0f6d8709486" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.36319</popularity>
+          </track>
+          <track>
+            <id>76cfaa1e1573455492bd8a5d6f9a60fa</id>
+            <title>I Love You My Farfisa</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE,FR,ES" /></links>
+            <track-number>6</track-number>
+            <length>250000</length>
+            <files>
+              <file id="cee4a44a26b4ae8afff036070d9172475624f66f" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.37146</popularity>
+          </track>
+          <track>
+            <id>35c75374d27f477282e451d0284b5d74</id>
+            <title>I Want To Be The President</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE,ES,FR" /></links>
+            <track-number>7</track-number>
+            <length>286000</length>
+            <files>
+              <file id="08ed489a16cb2c7ca873ab5d10ae01810f75f5af" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.38759</popularity>
+          </track>
+          <track>
+            <id>f9833e6533854ef69b0ab67f4fbe1583</id>
+            <title>I Only Always Think</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,FR,DE,ES" /></links>
+            <track-number>8</track-number>
+            <length>308000</length>
+            <files>
+              <file id="8a55c2737e278cc9b1b76d6dffa68d28e7d9e9fc" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.40641</popularity>
+          </track>
+          <track>
+            <id>72d5839e48874bf2a96be9b5dbb5384a</id>
+            <title>I&#8217;ve Been Your Fan Since Yesterday</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,ES,DE,GB" /></links>
+            <track-number>9</track-number>
+            <length>307000</length>
+            <files>
+              <file id="7e081c1b0ebf208e5595c4fdf3a622a4334ca6b5" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.354</popularity>
+          </track>
+          <track>
+            <id>f63d791f1fec453e8f4feacae184d5f4</id>
+            <title>I&#8217;m On Fire</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB,FR,ES" /></links>
+            <track-number>10</track-number>
+            <length>138000</length>
+            <files>
+              <file id="d9d734a9f64613b09b0714973d42998136b4f27b" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.41981</popularity>
+          </track>
+          <track>
+            <id>049c2c12d7dd4c7e9387c48324ec4e9c</id>
+            <title>Long Dark (Albini Version)</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="ES,FR,GB,DE" /></links>
+            <track-number>11</track-number>
+            <length>254000</length>
+            <files>
+              <file id="04f7e2a4e0514039e8a906b977d9642ee4509b27" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.33295</popularity>
+          </track>
+          <track>
+            <id>d276a3d5166f438fac44dd4c512da220</id>
+            <title>More Than This (Live)</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,ES,DE,FR" /></links>
+            <track-number>12</track-number>
+            <length>274000</length>
+            <files>
+              <file id="e99eba411cd108ea6c3e22c119dfc430955a6911" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.33513</popularity>
+          </track>
+          <track>
+            <id>621b1b60722d4e4e9d229b61a4e590bd</id>
+            <title>Birds (Live)</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,GB,ES,DE" /></links>
+            <track-number>13</track-number>
+            <length>243000</length>
+            <files>
+              <file id="f17247364358b4eeca28fb8e39456fce11a32624" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.3418</popularity>
+          </track>
+          <track>
+            <id>11d606021fdd4e39b7292d2752cab68e</id>
+            <title>Those Pockets Are People/The Partisan (Live)</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB,ES,FR" /></links>
+            <track-number>14</track-number>
+            <length>482000</length>
+            <files>
+              <file id="dddb81b7e5947881d95bb9a9cda0392a5910ab9e" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.31869</popularity>
+          </track>
+          <track>
+            <id>790df026f4154134976dbd44a405dfb8</id>
+            <title>Today</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,ES,FR,DE" /></links>
+            <track-number>15</track-number>
+            <length>510000</length>
+            <files>
+              <file id="68b2f65abc6939b8242b9bec58f538d0b0554380" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.30836</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>The Power Out</name>
+      <id>e2413d8fff9540a788287dcb6a9ad11b</id>
+      <artist>Electrelane</artist>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <album-type>album</album-type>
+      <year>2004</year>
+      <cover>cef9bca002c0a9a5e6004f0f7142b80536a3b2b5</cover>
+      <copyright>
+        <c>2004 Too Pure Records Ltd</c>
+        <p>2004 Too Pure Records Ltd</p>
+      </copyright>
+      <links>
+        <link type="7digital" countries="GB,DE,ES,FR" /></links>
+      <restrictions>
+        <restriction forbidden="AI AQ AX BL BM BN BV CD CI CK CV EH FM FO GG GS GU IM IO JE MF MH MM MP MR MS MT MU PF PN PS PW SJ TF TL TO TT UM YT ZW ZZ" catalogues="free,daypass,premium" />
+      </restrictions>
+      <forbidden>AI AQ AX BL BM BN BV CD CI CK CV EH FM FO GG GS GU IM IO JE MF MH MM MP MR MS MT MU PF PN PS PW SJ TF TL TO TT UM YT ZW ZZ</forbidden>
+      <external-ids>
+          <external-id type="amgid" id="R   677015" />
+          <external-id type="mbid" id="e994e100-450a-4cfe-a25f-1e3301c4f1f7" />
+          <external-id type="upc" id="644918014225" />
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>d77b697d77b74237815f5eeece840c92</id>
+            <title>Gone Under Sea</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,DE,GB,ES" /></links>
+            <track-number>1</track-number>
+            <length>192000</length>
+            <files>
+              <file id="caeea26992b5f703c9ea6f9d2e9960adeb6ceec5" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.53032</popularity>
+          </track>
+          <track>
+            <id>1f7e3e28eda64522a30da968790bba15</id>
+            <title>On Parade</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE,ES,FR" /></links>
+            <track-number>2</track-number>
+            <length>155000</length>
+            <files>
+              <file id="5fb791f8fc067d86d4da432e6fa5f4ea37449b65" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.46917</popularity>
+          </track>
+          <track>
+            <id>bfa837a396514fc3b6ab62c51dd53e14</id>
+            <title>The Valleys</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="ES,GB,FR,DE" /></links>
+            <track-number>3</track-number>
+            <length>320000</length>
+            <files>
+              <file id="8dc5d129603e420a6d8b7f2cb30092ba1a2319b4" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.47722</popularity>
+          </track>
+          <track>
+            <id>fa7dec60054f438c875eef9ab5dfc3d7</id>
+            <title>Birds</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="ES,GB,DE,FR" /></links>
+            <track-number>4</track-number>
+            <length>233000</length>
+            <files>
+              <file id="5fdaeaf9278cfc62da519c626a4a763c881ce429" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.48567</popularity>
+          </track>
+          <track>
+            <id>bac5e5d262a549749cb1a1fb4d1a559e</id>
+            <title>Take the Bit Between Your Teeth</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="ES,GB,FR,DE" /></links>
+            <track-number>5</track-number>
+            <length>298000</length>
+            <files>
+              <file id="ddf8b8aedd4ddcbfbd43a00bc6b0482b314ab1f6" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.41344</popularity>
+          </track>
+          <track>
+            <id>da25444ca96744aa974f955ef69e7dac</id>
+            <title>Oh Sombra!</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="ES,FR,GB,DE" /></links>
+            <track-number>6</track-number>
+            <length>178000</length>
+            <files>
+              <file id="d78734fbaf0df7852512d0b22a3eeb877b8515eb" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.43475</popularity>
+          </track>
+          <track>
+            <id>2f27ac88ab414622a8e68578ec104f6f</id>
+            <title>Enter Laughing</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,ES,GB,DE" /></links>
+            <track-number>7</track-number>
+            <length>222000</length>
+            <files>
+              <file id="2210784f1a8d77bc877235e4d797532eba477eef" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.42811</popularity>
+          </track>
+          <track>
+            <id>c32c5e9b50c24d0c823713b07e223acd</id>
+            <title>This Deed</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,GB,ES,DE" /></links>
+            <track-number>8</track-number>
+            <length>204000</length>
+            <files>
+              <file id="a7cc454a6797d664c305fd913530db3d93ecdcb1" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.40806</popularity>
+          </track>
+          <track>
+            <id>504a003a555a41a7863797ca2f3ae721</id>
+            <title>Love Builds Up</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,DE,GB,ES" /></links>
+            <track-number>9</track-number>
+            <length>324000</length>
+            <files>
+              <file id="42100bc267e8762ca90f8173ffe6b6426b191617" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.40141</popularity>
+          </track>
+          <track>
+            <id>96c9134ead474a5a94ad8b177415479c</id>
+            <title>Only One Thing Is Needed</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,DE,GB,ES" /></links>
+            <track-number>10</track-number>
+            <length>273000</length>
+            <files>
+              <file id="bdea7b996a562aded92f550b81919804bddeb8ed" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.39813</popularity>
+          </track>
+          <track>
+            <id>8e092fc89f6549499893e7ab8d85b920</id>
+            <title>You Make Me Weak at the Knees</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="DE,GB,FR,ES" /></links>
+            <track-number>11</track-number>
+            <length>203000</length>
+            <files>
+              <file id="9981b5dbd9419f287e79e9855397c6807c98ebcf" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.39143</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>Axes</name>
+      <id>46912c12da76443bbfb1d801abe1dff3</id>
+      <artist>Electrelane</artist>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <album-type>album</album-type>
+      <year>2005</year>
+      <cover>70439fc8c24872d781010eaf4fb644b742ced644</cover>
+      <copyright>
+        <c>2005 Too Pure Records Ltd</c>
+        <p>2005 Too Pure Records Ltd</p>
+      </copyright>
+      <restrictions>
+        <restriction forbidden="AI AQ AX BL BM BN BV CD CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YT ZZ" catalogues="free,daypass,premium" />
+      </restrictions>
+      <forbidden>AI AQ AX BL BM BN BV CD CI CK CV EH FM FO GS GU IO ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YT ZZ</forbidden>
+      <external-ids>
+          <external-id type="amgid" id="R   738588" />
+          <external-id type="mbid" id="17130ad1-1ac9-40dc-87ba-c1f7c7b7d0e9" />
+          <external-id type="upc" id="644918016229" />
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>c9502f9358364c6bbbd19b8f04ae8422</id>
+            <title>One, Two, Three, Lots</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>1</track-number>
+            <length>104000</length>
+            <files>
+              <file id="b91587bf8b40264b2fc0668938e027942d5ab609" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.39692</popularity>
+          </track>
+          <track>
+            <id>c06eba35dd8b41978693e9cf966bd534</id>
+            <title>Bells</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>2</track-number>
+            <length>278000</length>
+            <files>
+              <file id="bae4bed4d025b595a16ada4059b72dce8aa5197e" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.42307</popularity>
+          </track>
+          <track>
+            <id>4a81bec6c29644e38706528e2b9dad9b</id>
+            <title>Two for Joy</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>3</track-number>
+            <length>358000</length>
+            <files>
+              <file id="01a827f2401e6f1ca9ddda1ce14dd5773221f061" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.39453</popularity>
+          </track>
+          <track>
+            <id>8be725b6d17949de8f2f6885f2b29e63</id>
+            <title>If Not Now, When?</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>4</track-number>
+            <length>347000</length>
+            <files>
+              <file id="d29f0f85bdcb7d05ff6893a662b28a04c801b662" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.39254</popularity>
+          </track>
+          <track>
+            <id>1d6b750aee124b43894ddc515a8ef9fb</id>
+            <title>Eight Steps</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>5</track-number>
+            <length>301000</length>
+            <files>
+              <file id="140f2d6bca5a21744ba14d62f1307bd573804872" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.39268</popularity>
+          </track>
+          <track>
+            <id>32e374bd283c40c59a845c8189707602</id>
+            <title>Gone Darker</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>6</track-number>
+            <length>425000</length>
+            <files>
+              <file id="144138a088ed49359588c2d1b77d57d1bc8f723f" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.37387</popularity>
+          </track>
+          <track>
+            <id>258127a1e2464efaa0a90a35fc2aa992</id>
+            <title>Atom&apos;s Tomb</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>7</track-number>
+            <length>128000</length>
+            <files>
+              <file id="d1193820a8bb525231d68ba2fd9b3289b55476de" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.38101</popularity>
+          </track>
+          <track>
+            <id>247fc7e4a75f48818193e1ddaa7b56d5</id>
+            <title>Business or Otherwise</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>8</track-number>
+            <length>347000</length>
+            <files>
+              <file id="64f72c93e187c98a0f97ee92c0a7592cabb2c91a" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.3488</popularity>
+          </track>
+          <track>
+            <id>cf4d68c02ed941b5bc447834c207647e</id>
+            <title>Those Pockets Are People</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>9</track-number>
+            <length>302000</length>
+            <files>
+              <file id="1610603b46dd6a52143033ca070deb73fa3f536a" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.35263</popularity>
+          </track>
+          <track>
+            <id>f2f863ddf2fa405795d1969f12eda387</id>
+            <title>The Partisan</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>10</track-number>
+            <length>152000</length>
+            <files>
+              <file id="ae59ef45167ef2379bd30e5233206cc119ad1cfe" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.40437</popularity>
+          </track>
+          <track>
+            <id>0f08e6715cbb44d1999b3b87390ca00d</id>
+            <title>I Keep Losing Heart</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>11</track-number>
+            <length>221000</length>
+            <files>
+              <file id="8dac31934d828e994dfb0c7cc2dec05df5a5b274" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.3785</popularity>
+          </track>
+          <track>
+            <id>e486c7ca1a664aa2bdd3553b9293ef77</id>
+            <title>Come Back</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>12</track-number>
+            <length>7000</length>
+            <files>
+              <file id="f8b8fa3c62179a2a2a2a67445eb34f6c10cef644" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.31924</popularity>
+          </track>
+          <track>
+            <id>bd24c36e31d849cfab304a83eaf7dccf</id>
+            <title>Suitcase</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>13</track-number>
+            <length>586000</length>
+            <files>
+              <file id="a196960b3bb4d541e57c4799cc4f44c40eddceaa" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.35541</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>Independent Innovative Creative 13</name>
+      <id>76a238f9cb9a47c2a3a46406ebec6147</id>
+      <artist>Various Artists</artist>
+      <artist-id>026d2046b2ed4129b8a4167f5706aa99</artist-id>
+      <album-type>album</album-type>
+      <year></year>
+      <cover></cover>
+      <restrictions>
+      </restrictions>
+      <allowed></allowed>
+      <external-ids>
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>eff9e67d9acd48acb28a3b2eb9adda59</id>
+            <title>Our Velocity</title>
+            <artist-id>0231a451e1fd4a7c9084b091adf2014c</artist-id>
+            <artist>Max&#239;mo Park</artist>
+            <track-number>1</track-number>
+            <length>201000</length>
+            <files>
+              
+            </files>
+            <popularity>1.0E-5</popularity>
+          </track>
+          <track>
+            <id>4236ef03cffe4645af537d7f3e8546d9</id>
+            <title>Pace Or The Patience</title>
+            <artist-id>e9d40e512bd84c3cac120680e2a41400</artist-id>
+            <artist>Love of Diagrams</artist>
+            <track-number>2</track-number>
+            <length>192000</length>
+            <files>
+              
+            </files>
+            <popularity>2.0E-5</popularity>
+          </track>
+          <track>
+            <id>7117dd6d28c74a5795841defb31a5d02</id>
+            <title>To The East</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>3</track-number>
+            <length>294000</length>
+            <files>
+              
+            </files>
+            <popularity>1.0E-5</popularity>
+          </track>
+          <track>
+            <id>655f89abce224476952bd256f34d5ec5</id>
+            <title>23</title>
+            <artist-id>ae10fe4ec6b74a97b8caef69023689b7</artist-id>
+            <artist>Blonde Redhead</artist>
+            <track-number>4</track-number>
+            <length>318000</length>
+            <files>
+              
+            </files>
+            <popularity>2.0E-5</popularity>
+          </track>
+          <track>
+            <id>e8ef18a8ccb347d990190d6a4200ce6e</id>
+            <title>The Last Bandit</title>
+            <artist-id>535caf5b4cf242af8c5153b3b9a447ba</artist-id>
+            <artist>Songs:Ohia</artist>
+            <track-number>5</track-number>
+            <length>94000</length>
+            <files>
+              
+            </files>
+            <popularity>2.0E-5</popularity>
+          </track>
+          <track>
+            <id>58bd0e4279c84857a87f2f06ed52a628</id>
+            <title>You&apos;re Lovely To Me</title>
+            <artist-id>a211c1f085a745988d9845515fa03244</artist-id>
+            <artist>Lucky Jim</artist>
+            <track-number>6</track-number>
+            <length>192000</length>
+            <files>
+              
+            </files>
+            <popularity>1.0E-5</popularity>
+          </track>
+          <track>
+            <id>32c844e53e3d467c91dfcf030527a76c</id>
+            <title>Secrets</title>
+            <artist-id>6a2467b3519145b4a04554a6e822ccb4</artist-id>
+            <artist>Amandine</artist>
+            <track-number>7</track-number>
+            <length>162000</length>
+            <files>
+              
+            </files>
+            <popularity>6.0E-5</popularity>
+          </track>
+          <track>
+            <id>4d09d21127fe4808bfec613f387e81e6</id>
+            <title>That Summer At Home I Had Become The Invisible Boy</title>
+            <artist-id>cc9e17648e6a4251bdc595403b9bf7c5</artist-id>
+            <artist>The Twilight Sad</artist>
+            <track-number>8</track-number>
+            <length>290000</length>
+            <files>
+              
+            </files>
+            <popularity>1.0E-5</popularity>
+          </track>
+          <track>
+            <id>79914a0f2f5347c1a82dcd9e1e0915ba</id>
+            <title>Heretics</title>
+            <artist-id>93ca2383121f4ba6be8b9c9620eec555</artist-id>
+            <artist>Andrew Bird</artist>
+            <track-number>9</track-number>
+            <length>213000</length>
+            <files>
+              
+            </files>
+            <popularity>1.6E-4</popularity>
+          </track>
+          <track>
+            <id>a19fe5a80b1a4dffab9b0efefbbb55ea</id>
+            <title>Delicat</title>
+            <artist-id>20b4bede805c40d9af8a2e49bd2f5778</artist-id>
+            <artist>Sister Vanilla</artist>
+            <track-number>10</track-number>
+            <length>201000</length>
+            <files>
+              
+            </files>
+            <popularity>1.0E-5</popularity>
+          </track>
+          <track>
+            <id>4cb76d09ba454ff4851326e9d54a479e</id>
+            <title>When We Fell Through The Ice</title>
+            <artist-id>eddd359bc41a4557af481109ad6e442b</artist-id>
+            <artist>Fireworks Night</artist>
+            <track-number>11</track-number>
+            <length>224000</length>
+            <files>
+              
+            </files>
+            <popularity>1.0E-5</popularity>
+          </track>
+          <track>
+            <id>6ed32e47e3a345808a7e2f42e9b1491a</id>
+            <title>Kingdom</title>
+            <artist-id>73e08536748a4f2db61f6f4f334709a1</artist-id>
+            <artist>Wolf &amp; Cub</artist>
+            <track-number>12</track-number>
+            <length>446000</length>
+            <files>
+              
+            </files>
+            <popularity>1.0E-5</popularity>
+          </track>
+          <track>
+            <id>2aaff1e6ad474cec9fcf45f243de4d1f</id>
+            <title>Rainbowarriors</title>
+            <artist-id>c5999df78f3a4e8abf3d23f511b93222</artist-id>
+            <artist>CocoRosie</artist>
+            <track-number>13</track-number>
+            <length>235000</length>
+            <files>
+              
+            </files>
+            <popularity>0.0</popularity>
+          </track>
+          <track>
+            <id>830caeb94f06488d8e4eb3880790fda0</id>
+            <title>You&apos;ll Never Find (Feat Rodney P)</title>
+            <artist-id>9cdb251852f24d3db1823017432ce46a</artist-id>
+            <artist>Dub Pistols</artist>
+            <track-number>14</track-number>
+            <length>261000</length>
+            <files>
+              
+            </files>
+            <popularity>2.0E-5</popularity>
+          </track>
+          <track>
+            <id>e607b881bac34f228132ac34b0d3021a</id>
+            <title>Free</title>
+            <artist-id>7543801571194cdc93dfa0fdcea111a5</artist-id>
+            <artist>DJ Kentaro</artist>
+            <track-number>15</track-number>
+            <length>193000</length>
+            <files>
+              
+            </files>
+            <popularity>1.0E-5</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>No Shouts, No Calls</name>
+      <id>185e24fecdc54260abd667b80e6188a3</id>
+      <artist>Electrelane</artist>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <album-type>album</album-type>
+      <year></year>
+      <cover>2cd8f2d13993ec66f99907ad45048fa81e0fa4ca</cover>
+      <restrictions>
+      </restrictions>
+      <allowed></allowed>
+      <external-ids>
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>f7a49318d0bb40b5ba8d42550021f106</id>
+            <title>The Greater Times</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>1</track-number>
+            <length>222000</length>
+            <files>
+              
+            </files>
+            <popularity>0.00107</popularity>
+          </track>
+          <track>
+            <id>090ed70ce6ea471096e219565bb52e1a</id>
+            <title>To The East</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <track-number>2</track-number>
+            <length>294000</length>
+            <files>
+              
+            </files>
+            <popularity>8.9E-4</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+    <album>
+      <name>No Shouts, No Calls</name>
+      <id>792d90d6e5c14679afd00e7ea28982ce</id>
+      <artist>Electrelane</artist>
+      <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+      <album-type>album</album-type>
+      <year>2007</year>
+      <cover>e1712082598617226c51214314392d7d19f989d3</cover>
+      <copyright>
+        <c>2006 Too Pure Records Ltd</c>
+        <c>2006 Too Pure Records Ltd</c>
+        <p>2006 Too Pure Records Ltd</p>
+        <p>2006 Too Pure Records Ltd</p>
+      </copyright>
+      <links>
+        <link type="7digital" countries="FR,ES,DE,GB" /></links>
+      <restrictions>
+        <restriction forbidden="AI AQ AX BL BM BN BV CI CK CV EH FM FO GS GU IO JP ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YE YT ZZ" catalogues="free,daypass,premium" />
+      </restrictions>
+      <forbidden>AI AQ AX BL BM BN BV CI CK CV EH FM FO GS GU IO JP ME MF MH MM MP MR MS MT MU PF PN PS PW RS SJ TF TL TO TT UM YE YT ZZ</forbidden>
+      <external-ids>
+          <external-id type="amgid" id="R  1030967" />
+          <external-id type="mbid" id="ee226907-d810-4483-b410-58a2574708c2" />
+          <external-id type="upc" id="644918120162" />
+      </external-ids>
+      <discs>
+        <disc>
+          <disc-number>1</disc-number>
+          <name></name>
+          <track>
+            <id>95e5d43024a3426788fc2b1cddc56f17</id>
+            <title>The Greater Times</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,DE,ES,FR" /></links>
+            <track-number>1</track-number>
+            <length>222000</length>
+            <files>
+              <file id="5d5fa6f55783a2d868dce019e72a9208980a5105" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.51947</popularity>
+          </track>
+          <track>
+            <id>df237a0344a044c3b2241b02b91dc8c5</id>
+            <title>To the East</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,DE,GB,ES" /></links>
+            <track-number>2</track-number>
+            <length>294000</length>
+            <files>
+              <file id="3497561ff94003bd5ec365785eeeb3421a46d0e5" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.55186</popularity>
+          </track>
+          <track>
+            <id>8c1e7f5cbbc14462bce956e0a09bcc75</id>
+            <title>After the Call</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,ES,FR,DE" /></links>
+            <track-number>3</track-number>
+            <length>184000</length>
+            <files>
+              <file id="7463a41b0938a9c28bc165c0e6a989eec8a57342" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.56733</popularity>
+          </track>
+          <track>
+            <id>3d407e2c693244d88bd6fb9681e49bff</id>
+            <title>Tram 21</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,GB,DE,ES" /></links>
+            <track-number>4</track-number>
+            <length>269000</length>
+            <files>
+              <file id="16f85ab705c7eaa51a74cdc74d508047199e937b" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.48179</popularity>
+          </track>
+          <track>
+            <id>4fed16657cc04aa69f69b9deca1989cc</id>
+            <title>In Berlin</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,DE,ES,GB" /></links>
+            <track-number>5</track-number>
+            <length>254000</length>
+            <files>
+              <file id="5f39ede3d1f63685d421b23930d8a8881d3a8eb8" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.49547</popularity>
+          </track>
+          <track>
+            <id>84c923148ab34771a42b8c41968fc965</id>
+            <title>At Sea</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,ES,FR,DE" /></links>
+            <track-number>6</track-number>
+            <length>287000</length>
+            <files>
+              <file id="e5b7d93ad8431fd54e73208d786560248d1966db" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.47851</popularity>
+          </track>
+          <track>
+            <id>64f67f33b9824986b9b5e03abc5b2eb3</id>
+            <title>Between the Wolf and the Dog</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,ES,DE,FR" /></links>
+            <track-number>7</track-number>
+            <length>245000</length>
+            <files>
+              <file id="cb851ff1c7c971a247dd6150c1de129e60fcd4fb" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.45954</popularity>
+          </track>
+          <track>
+            <id>f84cd8282f984e6c8233c4f58f74a73f</id>
+            <title>Saturday</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="ES,DE,FR,GB" /></links>
+            <track-number>8</track-number>
+            <length>235000</length>
+            <files>
+              <file id="d8da754dcef45ceac89e7c447dd3ae71d23779f1" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.48642</popularity>
+          </track>
+          <track>
+            <id>48daf12f96f84793a526b579aa4d1f66</id>
+            <title>Five</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="FR,DE,GB,ES" /></links>
+            <track-number>9</track-number>
+            <length>385000</length>
+            <files>
+              <file id="4c5a99ef480c133dc365642f827f79e6e963c565" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.45412</popularity>
+          </track>
+          <track>
+            <id>de8a77d4292f4dd9b106f1bb5abcf8eb</id>
+            <title>Cut and Run</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,FR,DE,ES" /></links>
+            <track-number>10</track-number>
+            <length>207000</length>
+            <files>
+              <file id="7535328095a2ec09bcfbfc1d655862f9b55aa3a5" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.53218</popularity>
+          </track>
+          <track>
+            <id>e67549687c5046aaa3b46de9367aa9a3</id>
+            <title>The Lighthouse</title>
+            <artist-id>f6150726a8e94c89a7cf336d3f72be9c</artist-id>
+            <artist>Electrelane</artist>
+            <links>
+              <link type="7digital" countries="GB,FR,ES,DE" /></links>
+            <track-number>11</track-number>
+            <length>262000</length>
+            <files>
+              <file id="5e3062cfb5d3681ce6affa7cf40c581437900611" format="Ogg Vorbis,160000,1,32,4" />
+            </files>
+            <popularity>0.44376</popularity>
+          </track>
+        </disc>
+      </discs>
+    </album>
+  </albums>
+</artist>
