@@ -6,6 +6,7 @@ import se.despotify.BrowseType;
 import se.despotify.DespotifyManager;
 import se.despotify.ManagedConnection;
 import se.despotify.client.protocol.PacketType;
+import se.despotify.client.protocol.ResponseUnmarshaller;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.command.Command;
@@ -14,9 +15,11 @@ import se.despotify.domain.media.Album;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.GZIP;
 import se.despotify.util.Hex;
-import se.despotify.util.XML;
-import se.despotify.util.XMLElement;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -85,12 +88,9 @@ public class LoadAlbum extends Command<Album> {
     data = Arrays.copyOfRange(data, 0, data.length - 1);
     /* Load XML. */
 
-    String xml = new String(data, Charset.forName("UTF-8"));
-    if (log.isDebugEnabled()) {
-      log.debug(xml);
-    }
 
 //    try {
+//      String xml = new String(data, Charset.forName("UTF-8"));
 //      Writer out = new OutputStreamWriter(new FileOutputStream(new File("tmp/load_album_"+album.getId()+".xml")), "UTF8");
 //      out.write(xml);
 //      out.close();
@@ -98,20 +98,22 @@ public class LoadAlbum extends Command<Album> {
 //      e.printStackTrace();
 //    }
 
-
-    XMLElement root = XML.load(xml);
-
-    // load tracks
-
-
-    if (!"album".equals(root.getElement().getNodeName())) {
-      throw new DespotifyException("Expected document root to be of type <album>");
+    try {
+      XMLStreamReader xmlr = ResponseUnmarshaller.createReader(new InputStreamReader(new ByteArrayInputStream(data), Charset.forName("UTF-8")));
+      ResponseUnmarshaller responseUnmarshaller = new ResponseUnmarshaller(store, xmlr);
+      responseUnmarshaller.skip();
+      if (!"album".equals(xmlr.getLocalName())) {
+        throw new DespotifyException("Expected document root to be of type <album>");
+      }
+      album = responseUnmarshaller.unmarshallAlbum(new Date());
+    } catch (XMLStreamException e) {
+      throw new DespotifyException(e);
     }
-    Album album = Album.fromXMLElement(root, store, new Date());
-    if (this.album != album) {
+
+    if (!this.album.equals(album)) {
       throw new DespotifyException("Album in response has different UUID than the requested album!");
     }
 
-    return (Album)store.persist(album);
+    return (Album) store.persist(album);
   }
 }

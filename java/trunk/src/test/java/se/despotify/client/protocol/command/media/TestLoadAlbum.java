@@ -49,7 +49,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("spotify:album:05BIC4TZptbiQoF03QhojS", album.getSpotifyURI());
         assertEquals("http://open.spotify.com/album/05BIC4TZptbiQoF03QhojS", album.getHttpURL());
         assertEquals("The Legend Of Johnny Cash", album.getName());
-        assertTrue(album.getCover().matches(hex40));
+        assertTrue(album.getCover().getId().matches(hex40));
         assertEquals("02f8df4ad52d449caca8c6a25d2eca08", album.getId());
         assertNull(album.getPopularity());
 
@@ -63,7 +63,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Ring Of Fire", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
         assertEquals(155866l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(1, track.getTrackNumber().intValue());
@@ -77,7 +77,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("I Walk The Line", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
         assertEquals(164440l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(2, track.getTrackNumber().intValue());
@@ -91,7 +91,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Jackson", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
         assertEquals(165973l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(3, track.getTrackNumber().intValue());
@@ -105,7 +105,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Folsom Prison Blues", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
         assertEquals(169506l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(4, track.getTrackNumber().intValue());
@@ -119,7 +119,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("A Boy Named Sue", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
         assertEquals(225466l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(5, track.getTrackNumber().intValue());
@@ -133,7 +133,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Big River", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(151293l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -148,7 +148,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Get Rhythm", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(133240l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -163,7 +163,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Cry! Cry! Cry!", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(144226l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -178,7 +178,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Hey Porter", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(132906l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -193,7 +193,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("A Thing Called Love - Original Version", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(151360l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -208,7 +208,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Guess Things Happen That Way - 1958 Single Version", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(110000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -223,7 +223,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("San Quentin - Live Version", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(185880l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -238,7 +238,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Man In Black - Single Version", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(172226l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -253,7 +253,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Highwayman", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(183426l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -268,7 +268,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("The Wanderer", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(284173l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -283,7 +283,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("I've Been Everywhere", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(196386l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -298,7 +298,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Rusty Cage", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(169493l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -313,7 +313,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Personal Jesus", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(198960l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -328,7 +328,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Give My Love To Rose", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(207253l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -343,7 +343,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("One", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(231200l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -358,7 +358,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Hurt", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(218586l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -383,7 +383,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("spotify:album:2mLIJwfgNPGjpuKaN7njPm", album.getSpotifyURI());
         assertEquals("http://open.spotify.com/album/2mLIJwfgNPGjpuKaN7njPm", album.getHttpURL());
         assertEquals("Easy Tiger", album.getName());
-        assertEquals("95cdf93b035a5c568bc19981a9e618bd2f9a50bf", album.getCover());
+        assertTrue(album.getCover().getId().matches(hex40));
         assertEquals("4dc7cec0b8e441daaef85f46a915c7d4", album.getId());
         assertNull(album.getPopularity());
 
@@ -397,7 +397,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Goodnight Rose", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(200120l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -412,7 +412,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Two", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(158293l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -427,7 +427,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Everybody Knows", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(145133l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -442,7 +442,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Halloweenhead", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(203200l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -457,7 +457,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Oh My God, Whatever, Etc.", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(151960l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -472,7 +472,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Tears Of Gold", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(173493l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -487,7 +487,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("The Sun Also Sets", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(249846l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -502,7 +502,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Off Broadway", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(151386l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -517,7 +517,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Pearls On A String", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(143586l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -532,7 +532,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Rip Off", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(192720l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -547,7 +547,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Two Hearts", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(183213l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -562,7 +562,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("These Girls", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(170133l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -577,7 +577,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("I Taught Myself How To Grow Old", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(201146l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -592,7 +592,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Follow The Lights", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(182720l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -607,7 +607,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("My Love For You Is Real", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(292440l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -622,7 +622,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Blue Hotel", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(311333l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -637,7 +637,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Down In A Hole", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(276680l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -652,7 +652,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("This Is It - Cardinals Version", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(212333l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -667,7 +667,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("If I Am A Stranger - Live in The Studio", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(283360l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -682,7 +682,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Dear John - Live In The Studio", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(311786l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -707,7 +707,8 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("spotify:album:5CnZjFfPDmxOX7KnWLLqpC", album.getSpotifyURI());
         assertEquals("http://open.spotify.com/album/5CnZjFfPDmxOX7KnWLLqpC", album.getHttpURL());
         assertEquals("Protection", album.getName());
-        assertEquals("1946f99c0408e958f88c1811f1d9d92df0a4b16f", album.getCover());
+        assertTrue(album.getCover().getId().matches(hex40));
+
         assertEquals("b8a09d31b4994b79a01f966b86cb9394", album.getId());
         assertNull(album.getPopularity());
 
@@ -721,7 +722,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Protection", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(471560l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -736,7 +737,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Karmacoma", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(316440l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -751,7 +752,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Three", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(229066l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -766,7 +767,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Weather Storm", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(299960l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -781,7 +782,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Spying Glass", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(320973l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -796,7 +797,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Better Things", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(253933l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -811,7 +812,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Eurochild", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(311160l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -826,7 +827,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Sly", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(324640l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -841,7 +842,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Heat Miser", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(219000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -856,7 +857,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Light My Fire (live)", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(195493l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -881,7 +882,8 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("spotify:album:6eEhgZIrHftYRvgpAKJC2K", album.getSpotifyURI());
         assertEquals("http://open.spotify.com/album/6eEhgZIrHftYRvgpAKJC2K", album.getHttpURL());
         assertEquals("Miles Davis And The Jazz Giants", album.getName());
-        assertEquals("2df174a97a577044edaa482b5eb198b5bc20dddb", album.getCover());
+        assertTrue(album.getCover().getId().matches(hex40));
+
         assertEquals("cce79af3bd864a799806a557877dda7a", album.getId());
         assertNull(album.getPopularity());
 
@@ -895,7 +897,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Dig", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(452200l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -910,7 +912,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("The Serpent's Tooth - Take 1", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(419293l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -925,7 +927,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Four", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(240226l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -940,7 +942,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Walkin'", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(803533l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -955,7 +957,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Doxy", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(291973l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -970,7 +972,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Bags' Groove - Take 1", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(672640l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -985,7 +987,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("A Gal In Calico", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(314533l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1000,7 +1002,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Minor March", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(494306l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1015,7 +1017,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Vierd Blues", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(409093l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1040,7 +1042,8 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("spotify:album:3GETv5yNXeM0cnhq8XahWu", album.getSpotifyURI());
         assertEquals("http://open.spotify.com/album/3GETv5yNXeM0cnhq8XahWu", album.getHttpURL());
         assertEquals("No Shouts, No Calls", album.getName());
-        assertEquals("e1712082598617226c51214314392d7d19f989d3", album.getCover());
+        assertTrue(album.getCover().getId().matches(hex40));
+
         assertEquals("792d90d6e5c14679afd00e7ea28982ce", album.getId());
         assertNull(album.getPopularity());
 
@@ -1054,7 +1057,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("The Greater Times", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(222000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1069,7 +1072,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("To the East", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(294000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1084,7 +1087,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("After the Call", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(184000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1099,7 +1102,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Tram 21", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(269000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1114,7 +1117,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("In Berlin", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(254000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1129,7 +1132,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("At Sea", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(287000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1144,7 +1147,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Between the Wolf and the Dog", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(245000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1159,7 +1162,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Saturday", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(235000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1174,7 +1177,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Five", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(385000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1189,7 +1192,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("Cut and Run", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(207000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
@@ -1204,7 +1207,7 @@ public class TestLoadAlbum extends DespotifyClientTest {
         assertEquals("The Lighthouse", track.getTitle());
         assertNull(track.getCover());
         assertTrue(track.getFiles().size() > 0);
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
 
         assertEquals(262000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);

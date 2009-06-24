@@ -22,8 +22,7 @@ public class TestLoadTracks extends DespotifyClientTest {
   @Test
   public void test() throws Exception {
 
-    final String hex40 = "^[a-f0-9]{40}$";
-    
+
     manager.send(new LoadTracks(store, defaultTracks));
 
 //    for (Track track : defaultTracks) {
@@ -47,9 +46,9 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("spotify:track:4vdV2Eua6RkUoUM51jdH56", track.getSpotifyURI());
         assertEquals("http://open.spotify.com/track/4vdV2Eua6RkUoUM51jdH56", track.getHttpURL());
         assertEquals("One", track.getTitle());
-        assertEquals("3d44ff9d9b75a44b835f7e719a193e9033cae6af", track.getCover());
+        assertTrue(track.getCover().getId().matches(hex40));
         assertEquals(2, track.getFiles().size());
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
         assertEquals(231200l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(20, track.getTrackNumber().intValue());
@@ -81,9 +80,9 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("spotify:track:6iVTOPCmpABvG9jDZ2JozY", track.getSpotifyURI());
         assertEquals("http://open.spotify.com/track/6iVTOPCmpABvG9jDZ2JozY", track.getHttpURL());
         assertEquals("Two", track.getTitle());
-        assertEquals("95cdf93b035a5c568bc19981a9e618bd2f9a50bf", track.getCover());
+        assertTrue(track.getCover().getId().matches(hex40));
         assertEquals(1, track.getFiles().size());
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
         assertEquals(158293l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(2, track.getTrackNumber().intValue());
@@ -115,9 +114,9 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("spotify:track:7FKhuZtIPchBVNIhFnNL5W", track.getSpotifyURI());
         assertEquals("http://open.spotify.com/track/7FKhuZtIPchBVNIhFnNL5W", track.getHttpURL());
         assertEquals("Three", track.getTitle());
-        assertEquals("1946f99c0408e958f88c1811f1d9d92df0a4b16f", track.getCover());
+        assertTrue(track.getCover().getId().matches(hex40));
         assertEquals(1, track.getFiles().size());
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
         assertEquals(229066l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(3, track.getTrackNumber().intValue());
@@ -149,9 +148,9 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("spotify:track:3qqKWUVfiLMrNPacFRzTzh", track.getSpotifyURI());
         assertEquals("http://open.spotify.com/track/3qqKWUVfiLMrNPacFRzTzh", track.getHttpURL());
         assertEquals("Four", track.getTitle());
-        assertEquals("2df174a97a577044edaa482b5eb198b5bc20dddb", track.getCover());
+        assertTrue(track.getCover().getId().matches(hex40));
         assertEquals(1, track.getFiles().size());
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
         assertEquals(240226l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(3, track.getTrackNumber().intValue());
@@ -183,9 +182,9 @@ public class TestLoadTracks extends DespotifyClientTest {
         assertEquals("spotify:track:2dtvgPd3vsotKXtGk4dWlg", track.getSpotifyURI());
         assertEquals("http://open.spotify.com/track/2dtvgPd3vsotKXtGk4dWlg", track.getHttpURL());
         assertEquals("Five", track.getTitle());
-        assertEquals("e1712082598617226c51214314392d7d19f989d3", track.getCover());
+        assertTrue(track.getCover().getId().matches(hex40));
         assertEquals(1, track.getFiles().size());
-        assertTrue(track.getFiles().get(0).matches(hex40));
+        assertTrue(track.getFiles().get(0).getId().matches(hex40));
         assertEquals(385000l, track.getLength().longValue());
         assertTrue(track.getPopularity() > 0f);
         assertEquals(9, track.getTrackNumber().intValue());

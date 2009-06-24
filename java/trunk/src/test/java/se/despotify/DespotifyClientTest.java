@@ -22,6 +22,9 @@ import java.util.Random;
  */
 public abstract class DespotifyClientTest extends TestCase {
 
+  public final String hex40 = "^[a-f0-9]{40}$";
+  public final String hex32 = "^[a-f0-9]{32}$";
+
   protected final Logger log = LoggerFactory.getLogger(getClass());
 
   protected DespotifyManager manager;

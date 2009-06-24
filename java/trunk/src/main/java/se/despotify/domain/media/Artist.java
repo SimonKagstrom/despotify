@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.util.*;
 
 @Entity
-public class Artist extends Media {
+public class Artist extends RestrictedMedia {
 
   private static final long serialVersionUID = 1L;
 
@@ -42,6 +42,11 @@ public class Artist extends Media {
 
   @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Album> allAlbumsWithTrackPresent;
+
+
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private List<ExternalId> externalIds;
+
 
   public Artist() {
     super();
@@ -102,6 +107,14 @@ public class Artist extends Media {
 
   public void setPopularity(Float popularity) {
     this.popularity = popularity;
+  }
+
+  public List<ExternalId> getExternalIds() {
+    return externalIds;
+  }
+
+  public void setExternalIds(List<ExternalId> externalIds) {
+    this.externalIds = externalIds;
   }
 
   public List<Artist> getSimilarArtists() {

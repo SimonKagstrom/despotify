@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:include schemaLocation="common.xsd"/>
+  <xs:include schemaLocation="album.xsd"/>
+  <xs:include schemaLocation="image.xsd"/>
+
+  <xs:complexType name="artistType">
+    <xs:choice maxOccurs="unbounded" minOccurs="0">
+      <xs:element type="hex_32" name="id"/>
+      <xs:element type="xs:string" name="name"/>
+      <xs:element name="portrait" type="imageType"/>
+      <xs:element name="genres" type="comma_seperated"/>
+      <xs:element name="years-active" type="xs:string"/>
+      <xs:element type="xs:long" name="version"/>
+      <xs:element type="biosType" name="bios"/>
+      <xs:element type="similar-artistsType" name="similar-artists"/>
+      <xs:element type="albumsType" name="albums"/>
+      <xs:element type="restrictionsType" name="restrictions" minOccurs="0" maxOccurs="1"/>      
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="biosType">
+    <xs:sequence>
+      <xs:element type="bioType" name="bio"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="bioType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="text"/>
+      <xs:element type="portraitsType" name="portraits"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="portraitsType">
+    <xs:sequence>
+      <xs:element type="imageType" name="portrait" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <xs:complexType name="similar-artistsType">
+    <xs:sequence>
+      <xs:element type="artistType" name="artist" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

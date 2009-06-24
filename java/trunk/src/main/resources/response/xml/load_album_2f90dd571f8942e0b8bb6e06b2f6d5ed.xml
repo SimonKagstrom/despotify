@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+
+
+<album>
+  <version>1</version>
+  <name>The Mix</name>
+  <id>2f90dd571f8942e0b8bb6e06b2f6d5ed</id>
+  <artist>Kraftwerk</artist>
+  <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+  <album-type>album</album-type>
+  <year>1991</year>
+  <cover>bbcc9224149c24c494c5a74a1c805a6644e7ac15</cover>
+  <review><![CDATA[By the early '90s, it was quite apparent just how far-reaching <a href="spotify:artist:0dmPX6ovclgOy8WWJaFEUU">Kraftwerk</a>'s influence had been. From techno to hip-hop to industrial music to house, numerous others were undeniably indebted to the group. Dance clubs had long been a key part of <a href="spotify:artist:0dmPX6ovclgOy8WWJaFEUU">Kraftwerk</a>'s following, and the dance market was the obvious target of The Mix -- a collection of highly enjoyable, often clever remixes. While novices would do better to start out with Trans-Europe Express or <a href="spotify:album:6uiUwXWLqghcrLAdgLw32n">The Man-Machine</a>, hardcore <a href="spotify:artist:0dmPX6ovclgOy8WWJaFEUU">Kraftwerk</a> followers shouldn't pass up these remixes of such classics as "Trans-Europe Express," "The Robots," "Autobahn," and "Radioactivity." One could nitpick about the absence of "Neon Lights" and "Europe Endless," but the bottom line is that this CD was a welcome addition to the <a href="spotify:artist:0dmPX6ovclgOy8WWJaFEUU">Kraftwerk</a> catalog. ~ Alex Henderson, All Music Guide]]></review>
+  <copyright>
+    <c>(C) 1991 Klingklang Produkt under exclusive licence to EMI Records Ltd This label copy information is the subject of copyright protection. All rights reserved. (C) 1991 EMI Records Ltd</c>
+    <p>(P) 1991 The copyright in this sound recording is owned by Klingklang Produkt under exclusive licence to EMI Records Ltd</p>
+  </copyright>
+  <restrictions>
+    <restriction forbidden="AF,AT,AX,BL,BM,CA,CD,CH,DE,GG,GL,IM,JE,JP,KG,ME,MF,MK,MM,PM,PS,RS,TL,UM,US,VA,ZZ" catalogues="free,daypass,premium" />
+  </restrictions>
+  <forbidden>AF AT AX BL BM CA CD CH DE GG GL IM JE JP KG ME MF MK MM PM PS RS TL UM US VA ZZ</forbidden>
+  <links>
+    <link type="7digital" countries="GB,FR,ES" /></links>
+  <similar-albums></similar-albums>
+  <discs>
+    <disc>
+      <disc-number>1</disc-number>
+      <name></name>
+      <track>
+        <id>b9c6ffc2437d40e89cc7205f861db8a1</id>
+        <title>The Robots</title>
+        <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+        <artist>Kraftwerk</artist>
+        <links>
+          <link type="7digital" countries="ES,GB,FR" /></links>
+        <track-number>1</track-number>
+        <length>537040</length>
+        <files>
+          <file id="97dc6ef8f00378b6eb60c5ccb1d867035d30c9bd" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.69067</popularity>
+      </track>
+      <track>
+        <id>fc10c42363f54fbc8dd544f650d60bc4</id>
+        <title>Computer Love</title>
+        <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+        <artist>Kraftwerk</artist>
+        <links>
+          <link type="7digital" countries="GB,ES,FR" /></links>
+        <track-number>2</track-number>
+        <length>397533</length>
+        <files>
+          <file id="8f6041ff5a271a822c931bdf46e310034c2618a7" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.53895</popularity>
+      </track>
+      <track>
+        <id>6cf012a6561c4f2992a2f534a5153a9f</id>
+        <title>Pocket Calculator</title>
+        <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+        <artist>Kraftwerk</artist>
+        <links>
+          <link type="7digital" countries="GB,FR,ES" /></links>
+        <track-number>3</track-number>
+        <length>272293</length>
+        <files>
+          <file id="0f258f956c3a0cf75fbbe0c4f0dc5a2716d6ef7f" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.59387</popularity>
+      </track>
+      <track>
+        <id>b375d1d47b6e4f07bcabf2da5f2877fb</id>
+        <title>Dentaku</title>
+        <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+        <artist>Kraftwerk</artist>
+        <links>
+          <link type="7digital" countries="FR,GB,ES" /></links>
+        <track-number>4</track-number>
+        <length>208106</length>
+        <files>
+          <file id="b584fa6289e2806d67d59e6254b9f5dd5add7513" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.52419</popularity>
+      </track>
+      <track>
+        <id>3a7a965a2d8346d49af5c1e787ab77b5</id>
+        <title>Autobahn</title>
+        <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+        <artist>Kraftwerk</artist>
+        <links>
+          <link type="7digital" countries="GB,ES,FR" /></links>
+        <track-number>5</track-number>
+        <length>568160</length>
+        <files>
+          <file id="46d1a464bf19d0db213c9c456d8c9e11297801a8" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.52132</popularity>
+      </track>
+      <track>
+        <id>ef7fb311a6b94ab4bda8f53c3ffa9bfc</id>
+        <title>Radioactivity</title>
+        <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+        <artist>Kraftwerk</artist>
+        <links>
+          <link type="7digital" countries="FR,ES,GB" /></links>
+        <track-number>6</track-number>
+        <length>413640</length>
+        <files>
+          <file id="61cdaf05ce01320e5c74f329775014a8d4324904" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.60888</popularity>
+      </track>
+      <track>
+        <id>153bea358f824a879dd4600f373fb537</id>
+        <title>Trans-Europe Express</title>
+        <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+        <artist>Kraftwerk</artist>
+        <links>
+          <link type="7digital" countries="GB,ES,FR" /></links>
+        <track-number>7</track-number>
+        <length>200226</length>
+        <files>
+          <file id="82145e0d4fad5fb45311adaf78fe297eafa3d07f" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.6091</popularity>
+      </track>
+      <track>
+        <id>147c49039471405b8c2d9587501b5795</id>
+        <title>Abzug</title>
+        <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+        <artist>Kraftwerk</artist>
+        <links>
+          <link type="7digital" countries="ES,GB,FR" /></links>
+        <track-number>8</track-number>
+        <length>138133</length>
+        <files>
+          <file id="e8c9a2678bb97c59dec62190eecabe35db4affc6" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.47969</popularity>
+      </track>
+      <track>
+        <id>7a93f1190d6742a4936a30d3f7de74f2</id>
+        <title>Metal on Metal</title>
+        <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+        <artist>Kraftwerk</artist>
+        <links>
+          <link type="7digital" countries="FR,ES,GB" /></links>
+        <track-number>9</track-number>
+        <length>299040</length>
+        <files>
+          <file id="dba57832b58726c30fca3384c3ab463c149e1d0f" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.52419</popularity>
+      </track>
+      <track>
+        <id>1f9f8b34a4854108a712d659a0016978</id>
+        <title>Home Computer</title>
+        <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+        <artist>Kraftwerk</artist>
+        <links>
+          <link type="7digital" countries="ES,GB,FR" /></links>
+        <track-number>10</track-number>
+        <length>482626</length>
+        <files>
+          <file id="a9bf453c5383c8da220dce676637b691326d75f1" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.48488</popularity>
+      </track>
+      <track>
+        <id>3f93ef7ce91a4e47b6bfa3629a325886</id>
+        <title>Musique Non-Stop</title>
+        <artist-id>0715a50cb9c54c88bc2b9c1c06133ca0</artist-id>
+        <artist>Kraftwerk</artist>
+        <links>
+          <link type="7digital" countries="ES,GB,FR" /></links>
+        <track-number>11</track-number>
+        <length>397933</length>
+        <files>
+          <file id="9a7b69c642117b20e16f41bc2cebf9bc6302336f" format="Ogg Vorbis,160000,1,32,4" /></files>
+        <popularity>0.48355</popularity>
+      </track>
+    </disc>
+  </discs>
+</album>

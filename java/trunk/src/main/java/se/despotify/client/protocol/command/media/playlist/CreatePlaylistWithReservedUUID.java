@@ -118,10 +118,10 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
   @Override
   public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
-    ManagedConnection connection = connectionManager.getManagedConnection();
-
     if (user == null) {
+      ManagedConnection connection = connectionManager.getManagedConnection();
       user = connection.getSession().getUser();
+      connection.close();
     }
 
     if (playlist.isCollaborative() == null) {
@@ -179,6 +179,7 @@ public class CreatePlaylistWithReservedUUID extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "create playlist");
 
     /* Get response. */

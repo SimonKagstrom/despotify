@@ -599,7 +599,7 @@ public class Protocol {
 		ByteBuffer buffer  = ByteBuffer.allocate(20 + 16 + 2 + 2);
 
 		/* Request the AES key for this file by sending the file id and track id. */
-		buffer.put(Hex.toBytes(track.getFiles().get(0))); /* 20 bytes */
+		buffer.put(Hex.toBytes(track.getFiles().get(0).getId())); /* 20 bytes */
 		buffer.put(track.getByteUUID()); /* 16 bytes */
 		buffer.putShort((short)0x0000);
 		buffer.putShort((short)channel.getId());
@@ -652,7 +652,7 @@ public class Protocol {
 		buffer.putInt(200 * 1000);
 
 		/* 20 bytes file id. */
-		buffer.put(Hex.toBytes(track.getFiles().get(0)));
+		buffer.put(Hex.toBytes(track.getFiles().get(0).getId()));
 
 		if(offset % 4096 != 0 || length % 4096 != 0){
 			throw new IllegalArgumentException("Offset and length need to be a multiple of 4096.");

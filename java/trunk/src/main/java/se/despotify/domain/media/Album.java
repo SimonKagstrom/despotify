@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 import java.util.zip.Adler32;
-import java.io.Serializable;
 
 import org.hibernate.annotations.CollectionOfElements;
 
@@ -32,11 +31,18 @@ public class Album extends RestrictedMedia {
   @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Artist mainArtist;
 
-  private String cover;
+  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  @Column(name="cover")
+  private Image cover;
+
   private Float popularity;
+  private Integer year;
 
   @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "album")
   private List<Track> tracks;
+
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private List<ExternalId> externalIds;
 
   @CollectionOfElements
   @Column(length = 512)
@@ -49,6 +55,12 @@ public class Album extends RestrictedMedia {
   @CollectionOfElements
   @Column(length = 512)
   private List<String> discNames;
+
+  @Lob
+  private String review;
+
+  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private List<Album> similarAlbums;
 
   public Album() {
     super();
@@ -87,6 +99,15 @@ public class Album extends RestrictedMedia {
     visitor.visit(this);
   }
 
+  public synchronized void setDiscName(int index, String name) {
+    if (getDiscNames() == null) {
+      setDiscNames(new ArrayList<String>(5));
+    }
+    while(getDiscNames().size() <= index) {
+      getDiscNames().add(null);
+    }
+    getDiscNames().set(index, name);
+  }
 
   public String getName() {
     return name;
@@ -104,11 +125,11 @@ public class Album extends RestrictedMedia {
     this.mainArtist = mainArtist;
   }
 
-  public String getCover() {
+  public Image getCover() {
     return cover;
   }
 
-  public void setCover(String cover) {
+  public void setCover(Image cover) {
     this.cover = cover;
   }
 
@@ -126,6 +147,14 @@ public class Album extends RestrictedMedia {
 
   public void setTracks(List<Track> tracks) {
     this.tracks = tracks;
+  }
+
+  public List<ExternalId> getExternalIds() {
+    return externalIds;
+  }
+
+  public void setExternalIds(List<ExternalId> externalIds) {
+    this.externalIds = externalIds;
   }
 
   public List<String> getC() {
@@ -152,12 +181,37 @@ public class Album extends RestrictedMedia {
     this.discNames = discNames;
   }
 
+
+  public String getReview() {
+    return review;
+  }
+
+  public void setReview(String review) {
+    this.review = review;
+  }
+
   public String getType() {
     return type;
   }
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public Integer getYear() {
+    return year;
+  }
+
+  public void setYear(Integer year) {
+    this.year = year;
+  }
+
+  public List<Album> getSimilarAlbums() {
+    return similarAlbums;
+  }
+
+  public void setSimilarAlbums(List<Album> similarAlbums) {
+    this.similarAlbums = similarAlbums;
   }
 
   /**
@@ -189,7 +243,7 @@ public class Album extends RestrictedMedia {
     if (albumElement.hasChild("cover")) {
       String value = albumElement.getChildText("cover");
       if (!"".equals(value)) {
-        album.cover = value;
+        album.cover = store.getImage(value);
       }
     }
 

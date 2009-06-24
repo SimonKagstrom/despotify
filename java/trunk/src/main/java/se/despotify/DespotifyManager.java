@@ -144,6 +144,7 @@ public class DespotifyManager {
         thread.connection.close();
         thread.thread.stop();
 //        thread.thread.join(destroyConnectionJoinTimeOut);
+        System.currentTimeMillis();
       }
 
       @Override

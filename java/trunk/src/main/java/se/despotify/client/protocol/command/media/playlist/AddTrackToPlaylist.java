@@ -64,18 +64,20 @@ public class AddTrackToPlaylist extends Command<Boolean> {
   @Override
   public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
-    ManagedConnection connection = connectionManager.getManagedConnection();
 
     if (user == null) {
+      ManagedConnection connection = connectionManager.getManagedConnection();
       user = connection.getSession().getUser();
+      connection.close();
     }
+    
 
     if (playlist.getLoaded() == null) {
       new LoadPlaylist(store, playlist).send(connectionManager);
     }
 
+
     if (!playlist.isCollaborative() && !playlist.getAuthor().equals(user.getId())) {
-      connection.close();
       throw new DespotifyException("Playlist must be collaborative or owned by the current user!");
     }
 
@@ -91,7 +93,6 @@ public class AddTrackToPlaylist extends Command<Boolean> {
     long previousChecksum = playlist.calculateChecksum();
 
     if (position != null && position != playlist.getTracks().size()) {
-      connection.close();
       throw new IllegalArgumentException("position not implemented!");
     }
     
@@ -139,6 +140,7 @@ public class AddTrackToPlaylist extends Command<Boolean> {
     Channel.register(channel);
 
     /* Send packet. */
+    ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.changePlaylist, buffer, "add track to playlist");
 
     /* Get response. */

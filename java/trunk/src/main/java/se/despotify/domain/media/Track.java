@@ -1,6 +1,5 @@
 package se.despotify.domain.media;
 
-import org.hibernate.annotations.CollectionOfElements;
 import se.despotify.domain.Store;
 import se.despotify.util.Hex;
 import se.despotify.util.SpotifyURI;
@@ -30,15 +29,25 @@ public class Track extends RestrictedMedia {
   private Integer trackNumber;
   private Integer length;
 
-  @CollectionOfElements
-  private List<String> files;
+  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private List<File> files;
 
-  private String cover;
+  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private Image cover;
+
   private Float popularity;
 
   @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Track> similarTracks;
 
+  /**
+   * If this instance of track has been replaced with another track. 
+   */
+  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private List<Track> redirections;
+
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private List<ExternalId> externalIds;
 
   public Track() {
   }
@@ -136,19 +145,27 @@ public class Track extends RestrictedMedia {
     this.length = length;
   }
 
-  public List<String> getFiles() {
+  public List<Track> getRedirections() {
+    return redirections;
+  }
+
+  public void setRedirections(List<Track> redirections) {
+    this.redirections = redirections;
+  }
+
+  public List<File> getFiles() {
     return files;
   }
 
-  public void setFiles(List<String> files) {
+  public void setFiles(List<File> files) {
     this.files = files;
   }
 
-  public String getCover() {
+  public Image getCover() {
     return cover;
   }
 
-  public void setCover(String cover) {
+  public void setCover(Image cover) {
     this.cover = cover;
   }
 
@@ -158,6 +175,14 @@ public class Track extends RestrictedMedia {
 
   public void setPopularity(Float popularity) {
     this.popularity = popularity;
+  }
+
+  public List<ExternalId> getExternalIds() {
+    return externalIds;
+  }
+
+  public void setExternalIds(List<ExternalId> externalIds) {
+    this.externalIds = externalIds;
   }
 
   public List<Track> getSimilarTracks() {
@@ -279,13 +304,15 @@ public class Track extends RestrictedMedia {
     /* Set files. */
     if (trackElement.hasChild("files")) {
 
-      List<String> fileUUIDs = new ArrayList<String>();
+      List<File> files = new ArrayList<File>();
 
       for (XMLElement fileElement : trackElement.getChild("files").getChildren()) {
-        fileUUIDs.add(fileElement.getAttribute("id"));
+        File file = new File();
+        file.setId(fileElement.getAttribute("id"));
+        file.setFormat(fileElement.getAttribute("format"));
+        files.add(file);
       }
-
-      track.setFiles(fileUUIDs);
+      track.setFiles(files);
     }
 
     /* Set cover. */
@@ -293,7 +320,7 @@ public class Track extends RestrictedMedia {
     if (trackElement.hasChild("cover")) {
       String value = trackElement.getChildText("cover");
       if (!"".equals(value)) {
-        track.cover = value;
+        track.cover = store.getImage(value);
       }
     }
 

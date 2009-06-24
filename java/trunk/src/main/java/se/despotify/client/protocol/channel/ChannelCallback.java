@@ -109,7 +109,7 @@ public class ChannelCallback implements ChannelListener {
     long millisecondsSpent = System.currentTimeMillis() - started;
 
     if (packetDescription != null && log.isInfoEnabled()) {
-      log.info("received " + packetDescription + " containing" + arr.length + " bytes in " + millisecondsSpent + " milliseconds:\n" + Hex.log(arr, log));
+      log.info("received " + packetDescription + " containing " + arr.length + " bytes in " + millisecondsSpent + " milliseconds:\n" + Hex.log(arr, log));
     }
 
 		/* Return data bytes. */

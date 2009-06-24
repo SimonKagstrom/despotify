@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import se.despotify.BrowseType;
 import se.despotify.DespotifyManager;
 import se.despotify.ManagedConnection;
+import se.despotify.client.protocol.ResponseUnmarshaller;
 import se.despotify.client.protocol.PacketType;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
@@ -15,13 +16,14 @@ import se.despotify.exceptions.DespotifyException;
 import se.despotify.exceptions.ReceivedEmptyResponseException;
 import se.despotify.util.GZIP;
 import se.despotify.util.Hex;
-import se.despotify.util.XML;
-import se.despotify.util.XMLElement;
 
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
+import java.io.*;
 
 /**
  * @since 2009-apr-25 16:28:42
@@ -92,27 +94,34 @@ public class LoadArtist extends Command<Artist> {
       data = Arrays.copyOfRange(data, 0, data.length - 1);
 
 
-      String xml = new String(data, Charset.forName("UTF-8"));
-      if (log.isDebugEnabled()) {
-        log.debug(xml);
-      }
 
 
-      XMLElement root = XML.load(xml);
 
 //      try {
-//        Writer out = new OutputStreamWriter(new FileOutputStream(new File("tmp/load_artist_"+artist.getId()+".xml")), "UTF8");
+//        String xml = new String(data, Charset.forName("UTF-8"));
+//        Writer out = new OutputStreamWriter(new FileOutputStream(new java.io.File("tmp/load_artist_"+artist.getId()+".xml")), "UTF8");
 //        out.write(xml);
 //        out.close();
 //      } catch (IOException e) {
 //        e.printStackTrace();
 //      }
 
-      if (root.getElement().getNodeName().equals("artist")) {
-        Artist.fromXMLElement(root, store, now);
-      } else {
-        throw new DespotifyException("Root element is not named <artist>: " + root.getElement().getNodeName());
+
+      try {
+        XMLStreamReader xmlr = ResponseUnmarshaller.createReader(new InputStreamReader(new ByteArrayInputStream(data), Charset.forName("UTF-8")));
+        ResponseUnmarshaller responseUnmarshaller = new ResponseUnmarshaller(store, xmlr);
+        responseUnmarshaller.skip();
+        if (!"artist".equals(xmlr.getLocalName())) {
+          throw new DespotifyException("Expected document root to be of type <artist>");
+        }
+        Artist artist = responseUnmarshaller.unmarshallArtist(new Date());
+        if (!this.artist.equals(artist)) {
+          throw new DespotifyException("Artist in response has different UUID than the requested artist!");
+        }
+      } catch (XMLStreamException e) {
+        throw new DespotifyException(e);
       }
+
 
     }
 

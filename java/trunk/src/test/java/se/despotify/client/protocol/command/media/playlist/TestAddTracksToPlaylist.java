@@ -4,8 +4,6 @@ import org.junit.Test;
 import se.despotify.DespotifyClientTest;
 import se.despotify.domain.media.Playlist;
 
-import java.util.Random;
-
 /**
  * @since 2009-apr-23 09:56:01
  */
@@ -17,10 +15,10 @@ public class TestAddTracksToPlaylist extends DespotifyClientTest {
     String playlistName = randomPlaylistName();
 
 
-    manager.send(new LoadUserPlaylists(store, user));
+    new LoadUserPlaylists(store, user).send(manager);
     int playlistsFromStart = user.getPlaylists().getItems().size();
 
-    Playlist playlist = (Playlist)manager.send(new CreatePlaylist(store, user, playlistName, false));
+    Playlist playlist = new CreatePlaylist(store, user, playlistName, false).send(manager);
 
     assertEquals(playlistsFromStart + 1, user.getPlaylists().getItems().size());
 
@@ -34,7 +32,7 @@ public class TestAddTracksToPlaylist extends DespotifyClientTest {
 
     for (int i = 0; i < checksums.length; i++) {
       log.info("\n\n\n\n\n\n\n           ADD TRACK " + i + "\n\n\n\n\n\n\n\n\n");
-      manager.send(new AddTrackToPlaylist(store, user, playlist, defaultTracks[i], null));
+      new AddTrackToPlaylist(store, user, playlist, defaultTracks[i], null).send(manager);
       assertEquals(checksums[i], playlist.calculateChecksum());
       assertEquals(checksums[i], playlist.getChecksum().longValue());
       assertEquals(i + 1, playlist.getTracks().size());
@@ -46,7 +44,7 @@ public class TestAddTracksToPlaylist extends DespotifyClientTest {
 
     for (int i = checksums.length; i > 1; i--) {
       log.info("\n\n\n\n\n\n\n           REMOVE TRACK " + i + "\n\n\n\n\n\n\n\n\n");
-      manager.send(new RemoveTrackFromPlaylist(store, user, playlist, i));
+      new RemoveTrackFromPlaylist(store, user, playlist, i).send(manager);
       assertEquals(checksums[i - 2], playlist.calculateChecksum());
       assertEquals(checksums[i - 2], playlist.getChecksum().longValue());
       assertEquals(i - 1, playlist.getTracks().size());
@@ -55,7 +53,7 @@ public class TestAddTracksToPlaylist extends DespotifyClientTest {
 
     }
 
-    assertTrue((Boolean)manager.send(new RemovePlaylistFromUser(store, user, playlist)));
+    assertTrue(new RemovePlaylistFromUser(store, user, playlist).send(manager));
 
     assertEquals(playlistsFromStart, user.getPlaylists().getItems().size());
 
