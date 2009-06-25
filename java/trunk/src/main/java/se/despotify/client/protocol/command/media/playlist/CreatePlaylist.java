@@ -6,6 +6,7 @@ import se.despotify.domain.User;
 import se.despotify.domain.media.Playlist;
 import se.despotify.exceptions.DespotifyException;
 import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 import se.despotify.util.Hex;
 
 /**
@@ -33,6 +34,13 @@ public class CreatePlaylist extends Command<Playlist> {
 
   @Override
   public Playlist send(DespotifyManager connectionManager) throws DespotifyException {
+
+    if (user == null) {
+      ManagedConnection connection = connectionManager.getManagedConnection();
+      user = connection.getSession().getUser();
+      connection.close();
+    }
+
     byte[] playlistUUID = new ReserveRandomPlaylistUUID(store, user, playlistName, collaborative).send(connectionManager);
     String hexUUID = Hex.toHex(playlistUUID);
     Playlist playlist = store.getPlaylist(hexUUID);
