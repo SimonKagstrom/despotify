@@ -17,7 +17,7 @@ import java.util.*;
 
 /**
  * Spotify XML response parser
- * 
+ *
  * @author kalle
  * @since 2009-jun-24 00:40:32
  */
@@ -104,7 +104,7 @@ public class ResponseUnmarshaller {
         throw unexpected();
       }
     }
-   
+
     return tracks;
   }
 
@@ -139,22 +139,18 @@ public class ResponseUnmarshaller {
           Restriction restriction = new Restriction();
           for (int i = 0; i < xmlr.getAttributeCount(); i++) {
             String attribute = xmlr.getAttributeName(i).getLocalPart();
-            String[] vals = xmlr.getAttributeValue(i).split(",|\\s+");
-            List<String> list = new ArrayList<String>();
-            for (String val : vals) {
-              val = val.trim();
-              if (!"".equals(val)) {
-                list.add(val);
+            String value = xmlr.getAttributeValue(i).trim();
+            if (!"".equals(value)) {
+              List<String> values = Arrays.asList(value.split(",|\\s+"));
+              if ("allowed".equals(attribute)) {
+                restriction.setAllowed(new HashSet<String>(values));
+              } else if ("catalogues".equals(attribute)) {
+                restriction.setCatalogues(new HashSet<String>(values));
+              } else if ("forbidden".equals(attribute)) {
+                restriction.setForbidden(new HashSet<String>(values));
+              } else {
+                throw unexpected();
               }
-            }
-            if ("allowed".equals(attribute)) {
-              restriction.setAllowed(new HashSet<String>(list));
-            } else if ("catalogues".equals(attribute)) {
-              restriction.setCatalogues(new HashSet<String>(list));
-            } else if ("forbidden".equals(attribute)) {
-              restriction.setForbidden(new HashSet<String>(list));
-            } else {
-              throw unexpected();
             }
           }
           skip();
@@ -224,7 +220,7 @@ public class ResponseUnmarshaller {
           localName = xmlr.getLocalName();
           if ("file".equals(localName)) {
             File file = null;
-            for (int i = 0; i < xmlr.getAttributeCount(); i++) {              
+            for (int i = 0; i < xmlr.getAttributeCount(); i++) {
               String attribute = xmlr.getAttributeName(i).getLocalPart();
               if ("id".equals(attribute)) {
                 file = store.getFile(xmlr.getAttributeValue(i));
@@ -243,7 +239,7 @@ public class ResponseUnmarshaller {
       } else if ("links".equals(localName)) {
         skipLinks();
       } else if ("album-links".equals(localName)) {
-        skipLinks();        
+        skipLinks();
       } else if ("cover".equals(localName)) {
         track.setCover(store.getImage(xmlr.getElementText()));
       } else if ("popularity".equals(localName)) {
@@ -292,7 +288,7 @@ public class ResponseUnmarshaller {
             externalId.setType(xmlr.getAttributeValue(i));
           } else if ("id".equals(attribute)) {
             externalId.setExternalId(xmlr.getAttributeValue(i));
-          } else  {
+          } else {
             throw unexpected();
           }
         }
@@ -413,7 +409,7 @@ public class ResponseUnmarshaller {
           }
         }
       } else if ("external-ids".equals(localName)) {
-        album.setExternalIds(unmarshallExternalIds());      
+        album.setExternalIds(unmarshallExternalIds());
 
       } else if (!unmarshalRestrictedMedia(album)) {
         throw unexpected();
@@ -470,7 +466,10 @@ public class ResponseUnmarshaller {
       } else if ("portrait".equals(localName)) {
         artist.setPortrait(unmarshallImage());
       } else if ("genres".equals(localName)) {
-        artist.setGenres(new HashSet<String>(Arrays.asList(xmlr.getElementText().split(","))));
+        String string = xmlr.getElementText().trim();
+        if (!"".equals(string)) {
+          artist.setGenres(new HashSet<String>(Arrays.asList(string.split(","))));
+        }
       } else if ("years-active".equals(localName)) {
         artist.setYearsActive(new ArrayList<String>(Arrays.asList(xmlr.getElementText().split(","))));
       } else if ("version".equals(localName)) {
@@ -539,7 +538,7 @@ public class ResponseUnmarshaller {
           }
         }
       } else if ("external-ids".equals(localName)) {
-        artist.setExternalIds(unmarshallExternalIds());        
+        artist.setExternalIds(unmarshallExternalIds());
       } else if (!unmarshalRestrictedMedia(artist)) {
         throw unexpected();
       }
@@ -602,7 +601,7 @@ public class ResponseUnmarshaller {
     sb.append("</").append(tag).append(">");
 
 
-    return new XMLStreamException(sb.toString() +  "\n" + xmlr.getLocation().toString());
+    return new XMLStreamException(sb.toString() + "\n" + xmlr.getLocation().toString());
   }
 
 
