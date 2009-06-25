@@ -35,6 +35,18 @@ public class JpaStore extends Store {
     this.entityManager = entityManager;
   }
 
+  @Override
+  public File getFile(String hexUUID) {
+    File file = getById(hexUUID, File.class);
+    if (file == null) {
+      file = new File(hexUUID);
+      file = (File) persist(file);
+    } else {
+      System.currentTimeMillis(); // breakpoint
+    }
+    return file;
+  }
+
   public Playlist getPlaylist(String s) {
     Playlist playlist = getById(s, Playlist.class);
     if (playlist == null) {

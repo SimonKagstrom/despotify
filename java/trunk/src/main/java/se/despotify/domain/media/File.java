@@ -3,9 +3,7 @@ package se.despotify.domain.media;
 import org.hibernate.annotations.CollectionOfElements;
 import se.despotify.util.XMLElement;
 
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -16,22 +14,23 @@ import java.io.Serializable;
  * @author kalle
  * @since 2009-jun-08 04:13:16
  */
-@Embeddable
-public class File implements Serializable {
+@Entity
+public class File extends Media {
 
   private static final long serialVersionUID = 1l;
 
-  // todo @Column(length = 20)
-  private String id;
   private String format;
 
-
-  public String getId() {
-    return id;
+  public File() {
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public File(String hexUUID) {
+    setId(hexUUID);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   public String getFormat() {
@@ -40,6 +39,16 @@ public class File implements Serializable {
 
   public void setFormat(String format) {
     this.format = format;
+  }
+
+  @Override
+  public String getSpotifyURI() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String getHttpURL() {
+    throw new UnsupportedOperationException();
   }
 
   public static File fromXMLElement(XMLElement restrictionsNode) {
@@ -54,5 +63,7 @@ public class File implements Serializable {
     }
     return file;
   }
+
+
 
 }

@@ -31,8 +31,7 @@ public class Album extends RestrictedMedia {
   @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Artist mainArtist;
 
-  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-  @Column(name="cover")
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Image cover;
 
   private Float popularity;

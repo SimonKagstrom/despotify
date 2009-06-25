@@ -101,5 +101,9 @@ public class TestSpotifyURL extends DespotifyClientTest {
     }
 
 
+    @Override
+    public void visit(File file) {
+      fail();
+    }
   }
 }

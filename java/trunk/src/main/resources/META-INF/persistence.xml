@@ -6,10 +6,15 @@
 
 
   <persistence-unit name="despotify">
+    <class>se.despotify.domain.media.File</class>
+    <class>se.despotify.domain.media.ExternalId</class>
+
+
     <class>se.despotify.domain.User</class>
 
     <class>se.despotify.domain.media.Media</class>
     <class>se.despotify.domain.media.RestrictedMedia</class>
+    <class>se.despotify.domain.media.Restriction</class>
 
     <class>se.despotify.domain.media.Album</class>
     <class>se.despotify.domain.media.Artist</class>
@@ -19,6 +24,7 @@
     <class>se.despotify.domain.media.Composition</class>
     <class>se.despotify.domain.media.PlaylistContainer</class>
     <class>se.despotify.domain.media.Track</class>
+
   </persistence-unit>
 
 

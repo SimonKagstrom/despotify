@@ -3,9 +3,7 @@ package se.despotify.domain.media;
 import org.hibernate.annotations.CollectionOfElements;
 import se.despotify.util.XMLElement;
 
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -16,11 +14,15 @@ import java.io.Serializable;
  * @author kalle
  * @since 2009-jun-08 04:13:16
  */
-@Embeddable
+@Entity
 public class Restriction implements Serializable {
 
   private static final long serialVersionUID = 1l;
-
+  
+  @Id
+  @GeneratedValue
+  private Long id;
+  
   /**
    * AT,BE,CH,CN,CZ,DK,ES,FI,GB,HK,HU,IE,IL,IN,IT,MY,NL,NO,NZ,PL,PT,RU,SE,SG,SK,TR,TW,ZA
    */
@@ -57,6 +59,14 @@ public class Restriction implements Serializable {
     }
 
     // todo enumarate all attributes and warn if there are any unknown
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 
   public Set<String> getAllowed() {

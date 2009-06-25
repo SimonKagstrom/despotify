@@ -32,7 +32,7 @@ public class Track extends RestrictedMedia {
   @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<File> files;
 
-  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Image cover;
 
   private Float popularity;
@@ -307,8 +307,7 @@ public class Track extends RestrictedMedia {
       List<File> files = new ArrayList<File>();
 
       for (XMLElement fileElement : trackElement.getChild("files").getChildren()) {
-        File file = new File();
-        file.setId(fileElement.getAttribute("id"));
+        File file = store.getFile(fileElement.getAttribute("id"));        
         file.setFormat(fileElement.getAttribute("format"));
         files.add(file);
       }

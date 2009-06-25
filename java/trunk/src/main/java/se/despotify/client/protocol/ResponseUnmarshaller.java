@@ -139,12 +139,20 @@ public class ResponseUnmarshaller {
           Restriction restriction = new Restriction();
           for (int i = 0; i < xmlr.getAttributeCount(); i++) {
             String attribute = xmlr.getAttributeName(i).getLocalPart();
+            String[] vals = xmlr.getAttributeValue(i).split(",|\\s+");
+            List<String> list = new ArrayList<String>();
+            for (String val : vals) {
+              val = val.trim();
+              if (!"".equals(val)) {
+                list.add(val);
+              }
+            }
             if ("allowed".equals(attribute)) {
-              restriction.setAllowed(new HashSet<String>(Arrays.asList(xmlr.getAttributeValue(i).split(","))));
+              restriction.setAllowed(new HashSet<String>(list));
             } else if ("catalogues".equals(attribute)) {
-              restriction.setCatalogues(new HashSet<String>(Arrays.asList(xmlr.getAttributeValue(i).split(","))));
+              restriction.setCatalogues(new HashSet<String>(list));
             } else if ("forbidden".equals(attribute)) {
-              restriction.setForbidden(new HashSet<String>(Arrays.asList(xmlr.getAttributeValue(i).split(","))));
+              restriction.setForbidden(new HashSet<String>(list));
             } else {
               throw unexpected();
             }
@@ -215,11 +223,11 @@ public class ResponseUnmarshaller {
         while ((eventType = skip()) == XMLStreamConstants.START_ELEMENT) {
           localName = xmlr.getLocalName();
           if ("file".equals(localName)) {
-            File file = new File();
-            for (int i = 0; i < xmlr.getAttributeCount(); i++) {
+            File file = null;
+            for (int i = 0; i < xmlr.getAttributeCount(); i++) {              
               String attribute = xmlr.getAttributeName(i).getLocalPart();
               if ("id".equals(attribute)) {
-                file.setId(xmlr.getAttributeValue(i));
+                file = store.getFile(xmlr.getAttributeValue(i));
               } else if ("format".equals(attribute)) {
                 file.setFormat(xmlr.getAttributeValue(i));
               } else {
@@ -283,7 +291,7 @@ public class ResponseUnmarshaller {
           if ("type".equals(attribute)) {
             externalId.setType(xmlr.getAttributeValue(i));
           } else if ("id".equals(attribute)) {
-            externalId.setId(xmlr.getAttributeValue(i));
+            externalId.setExternalId(xmlr.getAttributeValue(i));
           } else  {
             throw unexpected();
           }

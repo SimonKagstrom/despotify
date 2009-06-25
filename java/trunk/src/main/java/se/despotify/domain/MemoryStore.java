@@ -15,10 +15,21 @@ public class MemoryStore extends Store implements Serializable {
 
   public Map<String, Playlist> playlists = new HashMap<String, Playlist>();
   public Map<String, Album> albums = new HashMap<String, Album>();
+  public Map<String, File> files = new HashMap<String, File>();
   public Map<String, Artist> artists = new HashMap<String, Artist>();
   public Map<String, Track> tracks = new HashMap<String, Track>();
   public Map<String, Image> images = new HashMap<String, Image>();
 
+  @Override
+  public File getFile(String hexUUID) {
+    File file = files.get(hexUUID);
+    if (file == null) {
+      file = new File(hexUUID);
+      files.put(file.getId(), file);
+    }
+    return file;
+  }
+  
   @Override
   public Playlist getPlaylist(String hexUUID) {
     Playlist playlist = playlists.get(hexUUID);

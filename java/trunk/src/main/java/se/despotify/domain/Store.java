@@ -23,6 +23,8 @@ public abstract class Store implements Serializable {
 
   public abstract Image getImage(String hexUUID);
 
+  public abstract File getFile(String hexUUID);
+
   public abstract Album getAlbum(String hexUUID);
 
   public abstract Artist getArtist(String hexUUID);
@@ -32,6 +34,11 @@ public abstract class Store implements Serializable {
   public final Playlist getPlaylist(byte[] UUID) {
     return getPlaylist(Hex.toHex(UUID));
   }
+
+  public final File getFile(byte[] UUID) {
+    return getFile(Hex.toHex(UUID));
+  }
+
 
   public final Album getAlbum(byte[] UUID) {
     return getAlbum(Hex.toHex(UUID));

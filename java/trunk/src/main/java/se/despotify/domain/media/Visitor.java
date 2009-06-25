@@ -15,4 +15,6 @@ public interface Visitor {
 
   public abstract void visit(Image image);
 
+  public abstract void visit(File file);
+
 }

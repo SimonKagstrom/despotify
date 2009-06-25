@@ -18,7 +18,7 @@ public abstract class Media implements Visitable<String>, org.domdrides.entity.E
   protected static Logger log = LoggerFactory.getLogger(Media.class);
 
   @Id
-  @Column(length = 48)
+  @Column(length = 50)
   protected String id;
 
   private Date loaded;
