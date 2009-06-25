@@ -15,6 +15,7 @@ public class Track extends RestrictedMedia {
 
   private static final long serialVersionUID = 1L;
 
+  @Column(length = 1024)
   private String title;
   @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Artist artist;
