@@ -103,36 +103,36 @@ public class LoadArtist extends Command<Artist> {
 
 //      timeUnmarshall.start();
 
-      byte[] inflatedData = GZIP.inflate(data);
-
-      /* Cut off that last 0xFF byte... */
-      inflatedData = Arrays.copyOfRange(inflatedData, 0, inflatedData.length - 1);
-
-      String xml = new String(inflatedData, UTF8);
-      if (log.isDebugEnabled()) {
-        log.debug(xml);
-      }
-      XMLElement root = XML.load(xml);
-
-      artist = Artist.fromXMLElement(root, store, new Date());
-
-//      try {
-//        XMLStreamReader xmlr = ResponseUnmarshaller.createReader(new InputStreamReader(new GZIPInputStream(new ByteArrayInputStream(data)), Charset.forName("UTF-8")));
-//        ResponseUnmarshaller responseUnmarshaller = new ResponseUnmarshaller(store, xmlr);
-//        responseUnmarshaller.skip();
-//        if (!"artist".equals(xmlr.getLocalName())) {
-//          throw new DespotifyException("Expected document root to be of type <artist>");
-//        }
+//      byte[] inflatedData = GZIP.inflate(data);
 //
-//        artist = responseUnmarshaller.unmarshallArtist(new Date());
-//        if (!this.artist.equals(artist)) {
-//          throw new DespotifyException("Artist in response has different UUID than the requested artist!");
-//        }
-//      } catch (XMLStreamException e) {
-//        throw new DespotifyException(e);
-//      } catch (IOException e) {
-//        throw new DespotifyException(e);
+//      /* Cut off that last 0xFF byte... */
+//      inflatedData = Arrays.copyOfRange(inflatedData, 0, inflatedData.length - 1);
+//
+//      String xml = new String(inflatedData, UTF8);
+//      if (log.isDebugEnabled()) {
+//        log.debug(xml);
 //      }
+//      XMLElement root = XML.load(xml);
+//
+//      artist = Artist.fromXMLElement(root, store, new Date());
+
+      try {
+        XMLStreamReader xmlr = ResponseUnmarshaller.createReader(new InputStreamReader(new GZIPInputStream(new ByteArrayInputStream(data)), Charset.forName("UTF-8")));
+        ResponseUnmarshaller responseUnmarshaller = new ResponseUnmarshaller(store, xmlr);
+        responseUnmarshaller.skip();
+        if (!"artist".equals(xmlr.getLocalName())) {
+          throw new DespotifyException("Expected document root to be of type <artist>");
+        }
+
+        artist = responseUnmarshaller.unmarshallArtist(new Date());
+        if (!this.artist.equals(artist)) {
+          throw new DespotifyException("Artist in response has different UUID than the requested artist!");
+        }
+      } catch (XMLStreamException e) {
+        throw new DespotifyException(e);
+      } catch (IOException e) {
+        throw new DespotifyException(e);
+      }
 
 //      timeUnmarshall.stop();
 
