@@ -1,6 +1,6 @@
 package se.despotify.similarity;
 
-import se.despotify.DespotifyManager;
+import se.despotify.ConnectionManager;
 import se.despotify.client.protocol.command.media.LoadTracks;
 import se.despotify.domain.Store;
 import se.despotify.domain.media.Track;
@@ -21,8 +21,8 @@ public class TrackSimilarity extends MediaSimilarity<Track> {
   private ArtistSimilarity artistSimilarity;
   private AlbumSimilarity albumSimilarity;
 
-  TrackSimilarity(Store despotifyStore, DespotifyManager despotifyManager, ArtistSimilarity artistSimilarity, AlbumSimilarity albumSimilarity) {
-    super(despotifyStore, Track.class, despotifyManager);
+  TrackSimilarity(Store despotifyStore, ConnectionManager connectionManager, ArtistSimilarity artistSimilarity, AlbumSimilarity albumSimilarity) {
+    super(despotifyStore, Track.class, connectionManager);
     this.artistSimilarity = artistSimilarity;
     this.albumSimilarity = albumSimilarity;
   }
@@ -39,10 +39,10 @@ public class TrackSimilarity extends MediaSimilarity<Track> {
 
     // todo load both at once
     if (track.getLoaded() == null) {
-      manager.send(new LoadTracks(store, track));
+      new LoadTracks(store, track).send(manager);
     }
     if (track1.getLoaded() == null) {
-      manager.send(new LoadTracks(store, track1));
+      new LoadTracks(store, track1).send(manager);
     }
 
     // todo if artist and title equals return 0.99d. i.e. same track in multiple albums.     

@@ -103,62 +103,6 @@ public class Result implements Serializable {
     this.tracks = tracks;
   }
 
-  /**
-   *
-   * @param resultElement
-   * @param store
-   * @return
-   */
-  public static Result fromXMLElement(XMLElement resultElement, Store store) {
-
-    if (resultElement == null) {
-      throw new IllegalArgumentException("resultElement is null");
-    }
-
-
-    Result result = new Result();
-
-    if (resultElement.hasChild("version")) {
-      result.version = Integer.parseInt(resultElement.getChildText("version"));
-    }
-
-    // todo only at search time?
-    if (resultElement.hasChild("did-you-mean")) {
-      result.suggestion = resultElement.getChildText("did-you-mean");
-    }
-
-    // set result quantities
-    if (resultElement.hasChild("total-artists")) {
-      result.totalArtists = Integer.parseInt(resultElement.getChildText("total-artists"));
-    }
-    if (resultElement.hasChild("total-albums")) {
-      result.totalAlbums = Integer.parseInt(resultElement.getChildText("total-albums"));
-    }
-    if (resultElement.hasChild("total-tracks")) {
-      result.totalTracks = Integer.parseInt(resultElement.getChildText("total-tracks"));
-    }
-
-
-    if (resultElement.hasChild("artists")) {
-      for (XMLElement artistElement : resultElement.getChild("artists").getChildren()) {
-        result.getArtists().add(Artist.fromXMLElement(artistElement, store, null));
-      }
-    }
-    if (resultElement.hasChild("albums")) {
-      for (XMLElement albumElement : resultElement.getChild("albums").getChildren()) {
-        result.getAlbums().add(Album.fromXMLElement(albumElement, store, null));
-      }
-    }
-    if (resultElement.hasChild("tracks")) {
-      for (XMLElement trackElement : resultElement.getChild("tracks").getChildren()) {
-        result.getTracks().add(Track.fromXMLElement(trackElement, store, null));
-      }
-    }
-
-    return result;
-
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

@@ -4,6 +4,7 @@ import org.domdrides.entity.Entity;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import se.despotify.domain.media.*;
+import se.despotify.util.MeanTimer;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -40,7 +41,7 @@ public class JpaStore extends Store {
     File file = getById(hexUUID, File.class);
     if (file == null) {
       file = new File(hexUUID);
-      file = (File) persist(file);
+      entityManager.persist(file);
     } else {
       System.currentTimeMillis(); // breakpoint
     }
@@ -51,7 +52,7 @@ public class JpaStore extends Store {
     Playlist playlist = getById(s, Playlist.class);
     if (playlist == null) {
       playlist = new Playlist(s);
-      playlist = (Playlist) persist(playlist);
+      entityManager.persist(playlist);
     } else {
       System.currentTimeMillis(); // breakpoint
     }
@@ -62,7 +63,7 @@ public class JpaStore extends Store {
     Image image = getById(s, Image.class);
     if (image == null) {
       image = new Image(s);
-      image = (Image) persist(image);
+      entityManager.persist(image);
     } else {
       System.currentTimeMillis(); // breakpoint
     }
@@ -73,7 +74,7 @@ public class JpaStore extends Store {
     Album album = getById(s, Album.class);
     if (album == null) {
       album = new Album(s);
-      album = (Album) persist(album);
+      entityManager.persist(album);
     } else {
       System.currentTimeMillis(); // breakpoint
     }
@@ -84,7 +85,7 @@ public class JpaStore extends Store {
     Artist artist = getById(s, Artist.class);
     if (artist == null) {
       artist = new Artist(s);
-      artist = (Artist) persist(artist);
+      entityManager.persist(artist);
     } else {
       System.currentTimeMillis(); // breakpoint
     }
@@ -95,7 +96,7 @@ public class JpaStore extends Store {
     Track track = getById(s, Track.class);
     if (track == null) {
       track = new Track(s);
-      track = (Track) persist(track);
+      entityManager.persist(track);
     } else {
       System.currentTimeMillis(); // breakpoint
     }
@@ -103,8 +104,12 @@ public class JpaStore extends Store {
   }
 
 
+  public static MeanTimer timer = new MeanTimer("media persist");
+
   public Media persist(Media media) {
+    timer.start();
     media = entityManager.merge(media);
+    timer.stop();
 //    entityManager.flush();
     return media;
   }

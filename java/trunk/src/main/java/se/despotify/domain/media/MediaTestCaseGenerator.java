@@ -1,6 +1,8 @@
 package se.despotify.domain.media;
 
 /**
+ * todo update this if you need it! im pretty sure it doesnt generate any good output.
+ *
  * @since 2009-apr-25 15:52:17
  */
 public class MediaTestCaseGenerator {

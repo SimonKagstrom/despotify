@@ -1,5 +1,8 @@
 package se.despotify.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 
 /**
@@ -7,6 +10,8 @@ import java.io.Serializable;
  * @since 2009-jun-25 23:59:03
  */
 public class MeanTimer<T> implements Serializable {
+
+  private static Logger log = LoggerFactory.getLogger(MeanTimer.class);
 
   private static final long serialVersionUID = 1l;
 
@@ -39,10 +44,15 @@ public class MeanTimer<T> implements Serializable {
     }
   }
 
+  private long lastLog = 0;
+
   public void stop() {
     stopped = System.currentTimeMillis();
     runs++;
     totalMillisecondsSpent += stopped - started;
+    if (stopped - lastLog > 20000) {
+      log.info(toString());
+    }
   }
 
   public void start() {
@@ -79,8 +89,8 @@ public class MeanTimer<T> implements Serializable {
 
 
   public static void appendHumanReadableTime(StringBuilder sb, double milliseconds) {
-    if (milliseconds < 2) {
-      sb.append(String.valueOf(milliseconds * 1000));
+    if (milliseconds < 1) {
+      sb.append(String.valueOf((int)(milliseconds * 1000)));
       sb.append(" nanoseconds");
     } else if (milliseconds < 10000) {
       sb.append(String.valueOf((int) (milliseconds)));

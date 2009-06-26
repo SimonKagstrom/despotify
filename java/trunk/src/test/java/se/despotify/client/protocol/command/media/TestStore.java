@@ -29,7 +29,7 @@ public class TestStore extends DespotifyClientTest {
 //    MediaTestCaseGenerator.createEqualsTest((Playlist)SpotifyURL.browse("spotify:user:kent.finell:playlist:6wvPFkLGKOVl1v3qRJD6HX", connection));
 
     playlist = store.getPlaylist(SpotifyURI.toHex("6wvPFkLGKOVl1v3qRJD6HX"));
-    manager.send(new LoadPlaylist(store, playlist));
+    new LoadPlaylist(store, playlist).send(manager);
 
     assertEquals("despotify apriori", playlist.getName());
     assertEquals(7l, playlist.getRevision().longValue());
@@ -97,7 +97,7 @@ public class TestStore extends DespotifyClientTest {
 
     // load all tracks
 
-    manager.send(new LoadTracks(store, playlist.getTracks()));
+    new LoadTracks(store, playlist.getTracks()).send(manager);
 
     // assert tracks
 
@@ -271,7 +271,7 @@ public class TestStore extends DespotifyClientTest {
     // load artists in tracks
 
     for (Track track : playlist.getTracks()) {
-      manager.send(new LoadArtist(store, track.getArtist()));
+      new LoadArtist(store, track.getArtist()).send(manager);
     }
 
     // assert artists

@@ -3,7 +3,7 @@ package se.despotify.client.protocol.command.media;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.BrowseType;
-import se.despotify.DespotifyManager;
+import se.despotify.ConnectionManager;
 import se.despotify.ManagedConnection;
 import se.despotify.client.protocol.ResponseUnmarshaller;
 import se.despotify.client.protocol.PacketType;
@@ -20,7 +20,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.zip.GZIPInputStream;
 import java.io.*;
@@ -47,7 +46,7 @@ public class LoadArtist extends Command<Artist> {
 
 
   @Override
-  public Artist send(DespotifyManager connectionManager) throws DespotifyException {
+  public Artist send(ConnectionManager connectionManager) throws DespotifyException {
 
     Date now = new Date();
 
@@ -103,19 +102,6 @@ public class LoadArtist extends Command<Artist> {
 
 //      timeUnmarshall.start();
 
-//      byte[] inflatedData = GZIP.inflate(data);
-//
-//      /* Cut off that last 0xFF byte... */
-//      inflatedData = Arrays.copyOfRange(inflatedData, 0, inflatedData.length - 1);
-//
-//      String xml = new String(inflatedData, UTF8);
-//      if (log.isDebugEnabled()) {
-//        log.debug(xml);
-//      }
-//      XMLElement root = XML.load(xml);
-//
-//      artist = Artist.fromXMLElement(root, store, new Date());
-
       try {
         XMLStreamReader xmlr = ResponseUnmarshaller.createReader(new InputStreamReader(new GZIPInputStream(new ByteArrayInputStream(data)), Charset.forName("UTF-8")));
         ResponseUnmarshaller responseUnmarshaller = new ResponseUnmarshaller(store, xmlr);
@@ -128,6 +114,7 @@ public class LoadArtist extends Command<Artist> {
         if (!this.artist.equals(artist)) {
           throw new DespotifyException("Artist in response has different UUID than the requested artist!");
         }
+        xmlr.close();
       } catch (XMLStreamException e) {
         throw new DespotifyException(e);
       } catch (IOException e) {

@@ -1,7 +1,6 @@
 package se.despotify.util;
 
-import se.despotify.Connection;
-import se.despotify.DespotifyManager;
+import se.despotify.ConnectionManager;
 import se.despotify.client.protocol.command.media.LoadAlbum;
 import se.despotify.client.protocol.command.media.LoadArtist;
 import se.despotify.client.protocol.command.media.LoadTracks;
@@ -70,7 +69,7 @@ public class SpotifyURL {
    * @param connectionManager service instance used to query for data.
    * @return  A visitable domain object representing parameter URL.
    */
-  public static Visitable browse(String URL, final Store store, final DespotifyManager connectionManager) {
+  public static Visitable browse(String URL, final Store store, final ConnectionManager connectionManager) {
     return match(URL, new Visitor<Visitable>(){
       public Visitable track(URLtype type, String URI) {
         Track track = store.getTrack(SpotifyURI.toHex(URI));

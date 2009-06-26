@@ -36,7 +36,7 @@ import java.util.*;
  * while a major artist can take up to one second.
  * ~200 ms mean time to unmarshall an artist when loading 200 random
  * ~50 ms using XML stream
- *
+ * <p/>
  * Dolly Parton takes 245 ms with XML stream and 4130 ms with DOM.
  * Kenny Rogers takes 131 ms with XML stream and 2815 ms with DOM.
  * Johnny Cash takes 480 ms with XML stream and 8503 ms with DOM.
@@ -97,6 +97,64 @@ public class ResponseUnmarshaller {
   public ResponseUnmarshaller(Store store, XMLStreamReader xmlr) {
     this.store = store;
     this.xmlr = xmlr;
+  }
+
+
+  public Result unmarshallSearchResult() throws XMLStreamException {
+    Date now = new Date();
+
+    Result result = new Result();
+
+    int eventType;
+    String localName;
+
+    while ((eventType = skip()) == XMLStreamConstants.START_ELEMENT) {
+      localName = xmlr.getLocalName();
+      if ("version".equals(localName)) {
+        skip();
+      } else if ("total-tracks".equals(localName)) {
+        result.setTotalTracks(getInteger());
+      } else if ("total-albums".equals(localName)) {
+        result.setTotalAlbums(getInteger());
+      } else if ("total-artists".equals(localName)) {
+        result.setTotalArtists(getInteger());
+      } else if ("tracks".equals(localName)) {
+        result.setTracks(new ArrayList<Track>());
+        while ((eventType = skip()) == XMLStreamConstants.START_ELEMENT) {
+          localName = xmlr.getLocalName();
+          if ("track".equals(localName)) {
+            result.getTracks().add(unmarshallTrack(now));
+          } else {
+            throw unexpected();
+          }
+        }
+      } else if ("albums".equals(localName)) {
+        result.setAlbums(new ArrayList<Album>());
+        while ((eventType = skip()) == XMLStreamConstants.START_ELEMENT) {
+          localName = xmlr.getLocalName();
+          if ("album".equals(localName)) {
+            result.getAlbums().add(unmarshallAlbum(null));
+          } else {
+            throw unexpected();
+          }
+        }
+      } else if ("artists".equals(localName)) {
+        result.setArtists(new ArrayList<Artist>());
+        while ((eventType = skip()) == XMLStreamConstants.START_ELEMENT) {
+          localName = xmlr.getLocalName();
+          if ("artist".equals(localName)) {
+            result.getArtists().add(unmarshallArtist(null));
+          } else {
+            throw unexpected();
+          }
+        }
+
+      } else {
+        throw unexpected();
+      }
+    }
+
+    return result;
   }
 
 
@@ -305,7 +363,6 @@ public class ResponseUnmarshaller {
 
     if (fullyLoaded != null) {
       track.setLoaded(fullyLoaded);
-      track = (Track) store.persist(track);
     }
 
     return track;
@@ -381,7 +438,7 @@ public class ResponseUnmarshaller {
           album.getMainArtist().setName(artistName);
           artistName = null;
         }
-      } else if ("artist".equals(localName)) {
+      } else if ("artist".equals(localName) || "artist-name".equals(localName)) {
         if (album == null || album.getMainArtist() == null) {
           artistName = xmlr.getElementText();
         } else {
@@ -389,6 +446,8 @@ public class ResponseUnmarshaller {
         }
       } else if ("album-type".equals(localName)) {
         album.setType(xmlr.getElementText());
+      } else if ("popularity".equals(localName)) {
+        album.setPopularity(getFloat());        
       } else if ("year".equals(localName)) {
         album.setYear(getInteger());
       } else if ("cover".equals(localName)) {
@@ -457,7 +516,6 @@ public class ResponseUnmarshaller {
 
     if (fullyLoaded != null) {
       album.setLoaded(fullyLoaded);
-      album = (Album) store.persist(album);
     }
 
     return album;
@@ -501,6 +559,8 @@ public class ResponseUnmarshaller {
         } else {
           artist.setName(xmlr.getElementText());
         }
+      } else if ("popularity".equals(localName)) {
+        artist.setPopularity(getFloat());
       } else if ("portrait".equals(localName)) {
         artist.setPortrait(unmarshallImage());
       } else if ("genres".equals(localName)) {
@@ -585,7 +645,6 @@ public class ResponseUnmarshaller {
 
     if (fullyLoaded != null) {
       artist.setLoaded(fullyLoaded);
-      artist = (Artist) store.persist(artist);
     }
 
     return artist;

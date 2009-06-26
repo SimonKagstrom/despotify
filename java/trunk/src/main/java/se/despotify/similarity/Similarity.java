@@ -1,6 +1,6 @@
 package se.despotify.similarity;
 
-import se.despotify.DespotifyManager;
+import se.despotify.ConnectionManager;
 import se.despotify.domain.Store;
 
 /**
@@ -16,9 +16,9 @@ public class Similarity {
   private TrackSimilarity trackSimilarity;
 
   private Store store;
-  private DespotifyManager manager;
+  private ConnectionManager manager;
 
-  public Similarity(Store store, DespotifyManager manager) {
+  public Similarity(Store store, ConnectionManager manager) {
     artistSimilarity = new ArtistSimilarity(store, manager);
     albumSimilarity = new AlbumSimilarity(store,manager, artistSimilarity);
     trackSimilarity = new TrackSimilarity(store,manager, artistSimilarity, albumSimilarity);
@@ -43,7 +43,7 @@ public class Similarity {
     return store;
   }
 
-  public DespotifyManager getManager() {
+  public ConnectionManager getManager() {
     return manager;
   }
 

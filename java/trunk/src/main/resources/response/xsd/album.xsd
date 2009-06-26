@@ -32,6 +32,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
+      <xs:element type="xs:float" name="popularity"/>
       <xs:element type="xs:string" name="review"/>
       <xs:element type="xs:string" name="year"/>
       <xs:element type="xs:string" name="cover"/>

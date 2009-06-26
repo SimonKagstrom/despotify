@@ -1,6 +1,6 @@
 package se.despotify.similarity;
 
-import se.despotify.DespotifyManager;
+import se.despotify.ConnectionManager;
 import se.despotify.domain.Store;
 import se.despotify.domain.media.Media;
 import se.despotify.exceptions.DespotifyException;
@@ -14,12 +14,12 @@ import java.io.Serializable;
 public abstract class MediaSimilarity<M extends Media> implements Serializable {
 
   protected final Store store;
-  protected final DespotifyManager manager;
+  protected final ConnectionManager manager;
   protected final Class<M> _class;
 
-  protected MediaSimilarity(Store store, Class<M> _class, DespotifyManager despotifyManager) {
+  protected MediaSimilarity(Store store, Class<M> _class, ConnectionManager connectionManager) {
     this.store = store;
-    this.manager = despotifyManager;
+    this.manager = connectionManager;
     this._class = _class;
   }
 

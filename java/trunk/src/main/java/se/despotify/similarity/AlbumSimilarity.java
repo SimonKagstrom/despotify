@@ -1,6 +1,6 @@
 package se.despotify.similarity;
 
-import se.despotify.DespotifyManager;
+import se.despotify.ConnectionManager;
 import se.despotify.client.protocol.command.media.LoadAlbum;
 import se.despotify.client.protocol.command.media.LoadTracks;
 import se.despotify.domain.Store;
@@ -22,8 +22,8 @@ public class AlbumSimilarity extends MediaSimilarity<Album> {
 
   private ArtistSimilarity artistSimilarity;
 
-  AlbumSimilarity(Store despotifyStore, DespotifyManager despotifyManager, ArtistSimilarity artistSimilarity) {
-    super(despotifyStore, Album.class, despotifyManager);
+  AlbumSimilarity(Store despotifyStore, ConnectionManager connectionManager, ArtistSimilarity artistSimilarity) {
+    super(despotifyStore, Album.class, connectionManager);
     this.artistSimilarity = artistSimilarity;
   }
 
@@ -36,11 +36,11 @@ public class AlbumSimilarity extends MediaSimilarity<Album> {
     double similarity = 0d;
 
     if (album.getLoaded() == null) {
-      album = (Album) new LoadAlbum(store, album).send(manager);
+      album = new LoadAlbum(store, album).send(manager);
     }
 
     if (album1.getLoaded() == null) {
-      album1 = (Album) manager.send(new LoadAlbum(store, album1));
+      album1 = new LoadAlbum(store, album1).send(manager);
     }
 
 
@@ -62,7 +62,7 @@ public class AlbumSimilarity extends MediaSimilarity<Album> {
       }
     }
     if (tracksToLoad.size() > 0) {
-      manager.send(new LoadTracks(store, tracksToLoad));
+      new LoadTracks(store, tracksToLoad).send(manager);
     }
 
     // sum up

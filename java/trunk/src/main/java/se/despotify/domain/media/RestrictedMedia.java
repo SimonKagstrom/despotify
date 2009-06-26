@@ -28,14 +28,4 @@ public abstract class RestrictedMedia extends Media {
     this.restrictions = restrictions;
   }
 
-  public static void fromXMLElement(XMLElement restrictionsNode, RestrictedMedia restrictedMedia) {
-    restrictedMedia.setRestrictions(new ArrayList<Restriction>());
-    for (XMLElement restrictionNode : restrictionsNode.getChildren()) {
-      if ("restriction".equals(restrictionNode.getTagName())) {
-        Restriction restriction = new Restriction();
-        Restriction.fromXMLElement(restrictionNode, restriction);
-        restrictedMedia.getRestrictions().add(restriction);
-      }
-    }
-  }
 }

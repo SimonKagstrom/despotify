@@ -13,7 +13,7 @@ import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
-import se.despotify.DespotifyManager;
+import se.despotify.ConnectionManager;
 import se.despotify.ManagedConnection;
 
 import java.nio.ByteBuffer;
@@ -39,7 +39,7 @@ public class LoadUserPlaylists extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
+  public Boolean send(ConnectionManager connectionManager) throws DespotifyException {
 
     ChannelCallback callback = new ChannelCallback();
 

@@ -15,7 +15,7 @@ import se.despotify.exceptions.DespotifyException;
 import se.despotify.util.Hex;
 import se.despotify.util.XML;
 import se.despotify.util.XMLElement;
-import se.despotify.DespotifyManager;
+import se.despotify.ConnectionManager;
 import se.despotify.ManagedConnection;
 
 import java.nio.ByteBuffer;
@@ -40,7 +40,7 @@ public class RemovePlaylistFromUser extends Command<Boolean> {
   }
 
   @Override
-  public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
+  public Boolean send(ConnectionManager connectionManager) throws DespotifyException {
 
     if (user.getPlaylists() == null) {
       log.warn("user playlists not loaded yet! should it be? loading..");

@@ -3,9 +3,7 @@ package se.despotify.client.protocol.command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.exceptions.DespotifyException;
-import se.despotify.ConnectionImpl;
-import se.despotify.DespotifyManager;
-import se.despotify.Connection;
+import se.despotify.ConnectionManager;
 
 import java.nio.charset.Charset;
 
@@ -20,6 +18,6 @@ public abstract class Command<T> {
   // this is here to make it easy to find the template code from a subclass..
   private static Logger log = LoggerFactory.getLogger(Command.class);
 
-  public abstract T send(DespotifyManager connectionManager) throws DespotifyException;
+  public abstract T send(ConnectionManager connectionManager) throws DespotifyException;
 
 }

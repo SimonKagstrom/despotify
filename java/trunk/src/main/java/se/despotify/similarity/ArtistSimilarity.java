@@ -1,6 +1,6 @@
 package se.despotify.similarity;
 
-import se.despotify.DespotifyManager;
+import se.despotify.ConnectionManager;
 import se.despotify.client.protocol.command.media.LoadArtist;
 import se.despotify.domain.Store;
 import se.despotify.domain.media.Album;
@@ -18,8 +18,8 @@ import java.util.Set;
 public class ArtistSimilarity extends MediaSimilarity<Artist> {
 
 
-  ArtistSimilarity(Store despotifyStore, DespotifyManager despotifyManager) {
-    super(despotifyStore, Artist.class, despotifyManager);
+  ArtistSimilarity(Store despotifyStore, ConnectionManager connectionManager) {
+    super(despotifyStore, Artist.class, connectionManager);
   }
 
   public double itemSimilarity(Artist artist, Artist artist1) throws DespotifyException {
@@ -29,10 +29,10 @@ public class ArtistSimilarity extends MediaSimilarity<Artist> {
     }
 
     if (artist.getLoaded() == null) {
-      artist = (Artist) manager.send(new LoadArtist(store, artist));
+      artist = new LoadArtist(store, artist).send(manager);
     }
     if (artist1.getLoaded() == null) {
-      artist1 = (Artist) manager.send(new LoadArtist(store, artist1));
+      artist1 = new LoadArtist(store, artist1).send(manager);
     }
 
     double similarity = 0d;

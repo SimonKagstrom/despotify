@@ -20,7 +20,7 @@ public class TestLoadTracks extends DespotifyClientTest {
 //    Track track = store.getTrack("47d4ae9b03e64bc39b5728925550ee5f");
 //    // 1c6794cce5664a51a2bc47f99496a90c good
 //    // 47d4ae9b03e64bc39b5728925550ee5f redirected from
-//    manager.send(new LoadTracks(store, track));
+//    new LoadTracks(store, track).send(manager);
 //    System.currentTimeMillis();
 //  }
 
@@ -57,7 +57,7 @@ public class TestLoadTracks extends DespotifyClientTest {
 
 //    for (Track track : defaultTracks) {
 //      MediaTestCaseGenerator.createEqualsTest(track, "track = store.getTrack(\"" + track.getHexUUID() + "\");\n" +
-//          "    manager.send(new LoadTracks(store, track));\n" +
+//          "    new LoadTracks(store, track).send(manager);\n" +
 //          "    track");
 //    }
 //    System.out.flush();
@@ -67,7 +67,7 @@ public class TestLoadTracks extends DespotifyClientTest {
     // generated tests
 
     track = store.getTrack("93f98ea75b4748f797668485a3d01bd0");
-    manager.send(new LoadTracks(store, track));
+    new LoadTracks(store, track).send(manager);
     track.accept(new VisitorAdapter() {
       @Override
       public void visit(Track track) {
@@ -101,7 +101,7 @@ public class TestLoadTracks extends DespotifyClientTest {
       }
     });
     track = store.getTrack("cf2cd530980e450d855977ba0a80ec6e");
-    manager.send(new LoadTracks(store, track));
+    new LoadTracks(store, track).send(manager);
     track.accept(new VisitorAdapter() {
       @Override
       public void visit(Track track) {
@@ -135,7 +135,7 @@ public class TestLoadTracks extends DespotifyClientTest {
       }
     });
     track = store.getTrack("fc1f1b5860f04a739971fcad9c1cd634");
-    manager.send(new LoadTracks(store, track));
+    new LoadTracks(store, track).send(manager);
     track.accept(new VisitorAdapter() {
       @Override
       public void visit(Track track) {
@@ -169,7 +169,7 @@ public class TestLoadTracks extends DespotifyClientTest {
       }
     });
     track = store.getTrack("7093f50c9ecf428eb780348c076f9f7f");
-    manager.send(new LoadTracks(store, track));
+    new LoadTracks(store, track).send(manager);
     track.accept(new VisitorAdapter() {
       @Override
       public void visit(Track track) {
@@ -203,7 +203,7 @@ public class TestLoadTracks extends DespotifyClientTest {
       }
     });
     track = store.getTrack("48daf12f96f84793a526b579aa4d1f66");
-    manager.send(new LoadTracks(store, track));
+    new LoadTracks(store, track).send(manager);
     track.accept(new VisitorAdapter() {
       @Override
       public void visit(Track track) {

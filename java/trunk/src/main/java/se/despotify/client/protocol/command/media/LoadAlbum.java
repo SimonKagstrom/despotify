@@ -3,7 +3,7 @@ package se.despotify.client.protocol.command.media;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.despotify.BrowseType;
-import se.despotify.DespotifyManager;
+import se.despotify.ConnectionManager;
 import se.despotify.ManagedConnection;
 import se.despotify.client.protocol.PacketType;
 import se.despotify.client.protocol.ResponseUnmarshaller;
@@ -41,7 +41,7 @@ public class LoadAlbum extends Command<Album> {
   }
 
   @Override
-  public Album send(DespotifyManager connectionManager) throws DespotifyException {
+  public Album send(ConnectionManager connectionManager) throws DespotifyException {
 
 /* Create channel callback */
     ChannelCallback callback = new ChannelCallback();
@@ -108,6 +108,7 @@ public class LoadAlbum extends Command<Album> {
         throw new DespotifyException("Expected document root to be of type <album>");
       }
       album = responseUnmarshaller.unmarshallAlbum(new Date());
+      xmlr.close();
     } catch (XMLStreamException e) {
       throw new DespotifyException(e);
     }

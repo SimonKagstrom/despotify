@@ -14,6 +14,7 @@
       <xs:element name="portrait" type="imageType"/>
       <xs:element name="genres" type="comma_seperated"/>
       <xs:element name="years-active" type="xs:string"/>
+      <xs:element type="xs:float" name="popularity"/>
       <xs:element type="xs:long" name="version"/>
       <xs:element type="biosType" name="bios"/>
       <xs:element type="similar-artistsType" name="similar-artists"/>

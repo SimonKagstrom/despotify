@@ -91,28 +91,6 @@ public class Image extends Media  {
     }
   }
 
-  public static Image fromXMLElement(XMLElement imageNode, Store store) {
-    Image image;
-
-    if (imageNode.hasChild("id")) {
-      image = store.getImage(imageNode.getChildText("id"));
-    } else if (Hex.pattern.matcher(imageNode.getText()).matches()) {
-      image = store.getImage(imageNode.getText());
-    } else {
-      throw new RuntimeException("Image hexUUID missing in XML node");
-    }
-
-    if (imageNode.hasChild("height")) {
-      image.setHeight(Integer.valueOf(imageNode.getChildText("height")));
-    }
-
-    if (imageNode.hasChild("width")) {
-      image.setWidth(Integer.valueOf(imageNode.getChildText("width")));
-    }
-
-    return image;
-  }
-
   @Override
   public String toString() {
     return "Image{" +

@@ -9,9 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * an intermediate facade towards a connection
- * on order to drop the connection from a user
- * on time out or so.
+ * an intermediate facade for a connection
+ * in order to drop the connection from a user on time out or so
+ * and then getting it again.
+ * perhaps overkill now that it use commons pool..
+ *
+ * at least it makes is easy to release the lease to the connection pool.
  * 
  * @author kalle
  * @since 2009-jun-14 18:00:27
@@ -21,13 +24,11 @@ public class ManagedConnection implements Connection {
   private static Logger log = LoggerFactory.getLogger(ManagedConnection.class);
 
   private ConnectionImpl decorated;
-  private DespotifyManager manager;
-  private boolean hasLock;
+  private ConnectionManager manager;
 
-  public ManagedConnection(DespotifyManager manager, ConnectionImpl decorated) {
+  public ManagedConnection(ConnectionManager manager, ConnectionImpl decorated) {
     this.manager = manager;
     this.decorated = decorated;
-    hasLock = true;
   }
 
   private void checkConnection() throws DespotifyException {
@@ -108,7 +109,7 @@ public class ManagedConnection implements Connection {
 
   @Override
   public boolean isConnected() {
-    return hasLock && decorated.isConnected();
+    return decorated.isConnected();
   }
 
 
@@ -120,10 +121,6 @@ public class ManagedConnection implements Connection {
   @Override
   public void run() {
     decorated.run();
-  }
-
-  void setHasLock(boolean hasLock) {
-    this.hasLock = hasLock;
   }
 
 }
