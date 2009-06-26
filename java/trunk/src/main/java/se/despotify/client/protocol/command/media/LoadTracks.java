@@ -6,6 +6,7 @@ import se.despotify.BrowseType;
 import se.despotify.DespotifyManager;
 import se.despotify.ManagedConnection;
 import se.despotify.client.protocol.PacketType;
+import se.despotify.client.protocol.ResponseUnmarshaller;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.command.Command;
@@ -13,21 +14,29 @@ import se.despotify.domain.Store;
 import se.despotify.domain.media.Result;
 import se.despotify.domain.media.Track;
 import se.despotify.exceptions.DespotifyException;
-import se.despotify.util.GZIP;
-import se.despotify.util.Hex;
-import se.despotify.util.XML;
-import se.despotify.util.XMLElement;
+import se.despotify.util.*;
 
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
+import java.io.Reader;
+import java.io.InputStreamReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  * @since 2009-apr-25 16:28:42
  */
 public class LoadTracks extends Command<Object> {
+
+//  public static final MeanTimer timeRequest = new MeanTimer("request and get zipped xml response");
+//  public static final MeanTimer timeUnmarshall = new MeanTimer("unmarshall zipped xml response");
 
   protected static Logger log = LoggerFactory.getLogger(LoadTracks.class);
 
@@ -48,6 +57,10 @@ public class LoadTracks extends Command<Object> {
   public Boolean send(DespotifyManager connectionManager) throws DespotifyException {
 
     // todo send multiple requests if more than 200 tracks!
+
+    if (tracks.length == 0) {
+      throw new DespotifyException("No tracks supplied to be loaded!");
+    }
 
     if (tracks.length > 240) {
       throw new DespotifyException("Can only load up to 240 track at the time.");
@@ -86,52 +99,35 @@ public class LoadTracks extends Command<Object> {
     Channel.register(channel);
 
     /* Send packet. */
+//    timeRequest.start();
+
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.browse, buffer, "load track");
-
-    /* Get data and inflate it. */
-    byte[] data = GZIP.inflate(callback.getData("gzipped load track response"));
+    byte[] compressedData = callback.getData("gzipped load tracks reponse");
     connection.close();
 
-    if (log.isInfoEnabled()) {
-      log.info("load track response, " + data.length + " uncompressed bytes:\n" + Hex.log(data, log));
+//    timeRequest.stop();
+
+    try {
+
+//      timeUnmarshall.start();
+
+      Reader reader = new InputStreamReader(new GZIPInputStream(new ByteArrayInputStream(compressedData)), UTF8);
+      XMLStreamReader xmlr = ResponseUnmarshaller.createReader(reader);
+      ResponseUnmarshaller unmarshaller = new ResponseUnmarshaller(store, xmlr);
+      unmarshaller.skip();
+      List<Track> tracks = unmarshaller.unmarshallLoadTracks();
+
+//      timeUnmarshall.stop();
+
+    } catch (IOException e) {
+      throw new DespotifyException(e);
+    } catch (XMLStreamException e) {
+      throw new DespotifyException(e);
     }
 
-    if (data.length == 0) {
-      throw new DespotifyException("Received an empty response");
-    }
-
-    /* Cut off that last 0xFF byte... */
-    data = Arrays.copyOfRange(data, 0, data.length - 1);
-    /* Load XML. */
-
-    String xml = new String(data, Charset.forName("UTF-8"));
-    if (log.isDebugEnabled()) {
-      log.debug(xml);
-    }
-
-//    try {
-//      Writer out = new OutputStreamWriter(new FileOutputStream(new File("tmp/load_tracks_"+System.currentTimeMillis()+".xml")), "UTF8");
-//      out.write(xml);
-//      out.close();
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-    
-
-    XMLElement root = XML.load(xml);
-
-    // load tracks
-
-
-    Result result = Result.fromXMLElement(root, store);
-
-    Date now = new Date();
-    for(int i = 0; i<result.getTracks().size(); i++) {
-      Track track = result.getTracks().get(i);
-      track.setLoaded(now);
-      result.getTracks().set(i, (Track)store.persist(track));
-    }
+//    System.out.println(timeRequest);
+//    System.out.println(timeUnmarshall);
 
     return true;
 

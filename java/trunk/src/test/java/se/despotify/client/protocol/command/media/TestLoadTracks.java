@@ -2,8 +2,13 @@ package se.despotify.client.protocol.command.media;
 
 import org.junit.Test;
 import se.despotify.DespotifyClientTest;
+import se.despotify.util.Timer;
+import se.despotify.domain.MemoryStore;
 import se.despotify.domain.media.Track;
 import se.despotify.domain.media.VisitorAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @since 2009-apr-25 16:26:54
@@ -19,11 +24,36 @@ public class TestLoadTracks extends DespotifyClientTest {
 //    System.currentTimeMillis();
 //  }
 
+//  @Test
+//  public void testLoadLots() throws Exception {
+//
+//    manager.getManagedConnection().close();
+//
+//    MemoryStore store = new MemoryStore();
+//    List<Track> tracks = new ArrayList<Track>();
+//    Timer timer = new Timer("");
+//
+//    int runs = 100;
+//    int size = 200;
+//
+//    for (int i = 0; i < runs; i++) {
+//      tracks.clear();
+//      store.reset();
+//      for (int i2 = 0; i2 < size; i2++) {
+//        tracks.add(store.getTrack(twoHundredGoodTrackIds[i2]));
+//      }
+//      timer.start();
+//      new LoadTracks(store, tracks).send(manager);
+//      timer.stop();
+//    }
+//
+//    System.out.println(timer);
+//  }
+
   @Test
-  public void test() throws Exception {
+  public void testUnmarshalling() throws Exception {
 
-
-    manager.send(new LoadTracks(store, defaultTracks));
+    new LoadTracks(store, defaultTracks).send(manager);
 
 //    for (Track track : defaultTracks) {
 //      MediaTestCaseGenerator.createEqualsTest(track, "track = store.getTrack(\"" + track.getHexUUID() + "\");\n" +
@@ -210,5 +240,6 @@ public class TestLoadTracks extends DespotifyClientTest {
 
     // end generated tests
   }
+
 
 }

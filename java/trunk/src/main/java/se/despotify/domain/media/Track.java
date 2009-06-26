@@ -7,8 +7,8 @@ import se.despotify.util.XMLElement;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Track extends RestrictedMedia {
@@ -42,7 +42,7 @@ public class Track extends RestrictedMedia {
   private List<Track> similarTracks;
 
   /**
-   * If this instance of track has been replaced with another track. 
+   * If this instance of track has been replaced with another track.
    */
   @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Track> redirections;
@@ -203,7 +203,6 @@ public class Track extends RestrictedMedia {
   }
 
   /**
-   *
    * @param trackElement
    * @param store
    * @param fullyLoadedDate set this not null only if the xml contains data for the complete album
@@ -279,8 +278,7 @@ public class Track extends RestrictedMedia {
         track.year = Integer.parseInt(trackElement.getChildText("year"));
       }
       catch (NumberFormatException e) {
-        log.error("Could not read year from track");
-        track.year = null;
+// ignored
       }
     }
 
@@ -308,7 +306,7 @@ public class Track extends RestrictedMedia {
       List<File> files = new ArrayList<File>();
 
       for (XMLElement fileElement : trackElement.getChild("files").getChildren()) {
-        File file = store.getFile(fileElement.getAttribute("id"));        
+        File file = store.getFile(fileElement.getAttribute("id"));
         file.setFormat(fileElement.getAttribute("format"));
         files.add(file);
       }
@@ -338,7 +336,7 @@ public class Track extends RestrictedMedia {
     if (fullyLoadedDate != null) {
       track.setLoaded(fullyLoadedDate);
     }
-    
+
     return track;
 
   }

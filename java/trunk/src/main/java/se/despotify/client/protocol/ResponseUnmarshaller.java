@@ -17,6 +17,29 @@ import java.util.*;
 
 /**
  * Spotify XML response parser
+ * <p/>
+ * Uses XML stream to parse the data.
+ * <p/>
+ * <p/>
+ * Benchmarks compared with previous DOM based solution:
+ * <p/>
+ * 5 tracks takes ~30 milliseconds to request gzipped XML.
+ * ~30 ms mean time to unmarshall 5 tracks using DOM.
+ * ~7 ms using XML stream
+ * <p/>
+ * <p/>
+ * 200 tracks takes ~120 milliseconds to request gzipped XML.
+ * ~400 ms mean time to unmarshall 200 tracks using DOM.
+ * ~50 ms using XML stream
+ * <p/>
+ * The average artist takes ~50 ms to request gzipped XML
+ * while a major artist can take up to one second.
+ * ~200 ms mean time to unmarshall an artist when loading 200 random
+ * ~50 ms using XML stream
+ *
+ * Dolly Parton takes 245 ms with XML stream and 4130 ms with DOM.
+ * Kenny Rogers takes 131 ms with XML stream and 2815 ms with DOM.
+ * Johnny Cash takes 480 ms with XML stream and 8503 ms with DOM.
  *
  * @author kalle
  * @since 2009-jun-24 00:40:32
@@ -30,32 +53,32 @@ public class ResponseUnmarshaller {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-    a();
-    b();
-    c();
+    loadArtist();
+    loadAlbum();
+    loadTracks();
   }
 
-  public static void a() throws Exception {
+  public static void loadArtist() throws Exception {
     Store store = new MemoryStore();
-    XMLStreamReader xmlr = createReader(new InputStreamReader(new FileInputStream(new java.io.File("tmp/load_artist_4f9873e19e5a4b4096c216c98bcdb010.xml")), "UTF8"));
+    XMLStreamReader xmlr = createReader(new InputStreamReader(new FileInputStream(new java.io.File("src/main/resources/response/xml/load_artist_4f9873e19e5a4b4096c216c98bcdb010.xml")), "UTF8"));
     ResponseUnmarshaller unmarshaller = new ResponseUnmarshaller(store, xmlr);
     unmarshaller.skip();
     Artist artist = unmarshaller.unmarshallArtist(new Date());
     System.currentTimeMillis();
   }
 
-  public static void b() throws Exception {
+  public static void loadAlbum() throws Exception {
     Store store = new MemoryStore();
-    XMLStreamReader xmlr = createReader(new InputStreamReader(new FileInputStream(new java.io.File("tmp/load_album_2f90dd571f8942e0b8bb6e06b2f6d5ed.xml")), "UTF8"));
+    XMLStreamReader xmlr = createReader(new InputStreamReader(new FileInputStream(new java.io.File("src/main/resources/response/xml/load_album_2f90dd571f8942e0b8bb6e06b2f6d5ed.xml")), "UTF8"));
     ResponseUnmarshaller unmarshaller = new ResponseUnmarshaller(store, xmlr);
     unmarshaller.skip();
     Album album = unmarshaller.unmarshallAlbum(new Date());
     System.currentTimeMillis();
   }
 
-  public static void c() throws Exception {
+  public static void loadTracks() throws Exception {
     Store store = new MemoryStore();
-    XMLStreamReader xmlr = createReader(new InputStreamReader(new FileInputStream(new java.io.File("tmp/load_tracks_1245076237936.xml")), "UTF8"));
+    XMLStreamReader xmlr = createReader(new InputStreamReader(new FileInputStream(new java.io.File("src/main/resources/response/xml/load_tracks_1245076237936.xml")), "UTF8"));
     ResponseUnmarshaller unmarshaller = new ResponseUnmarshaller(store, xmlr);
     unmarshaller.skip();
     List<Track> tracks = unmarshaller.unmarshallLoadTracks();
@@ -179,6 +202,7 @@ public class ResponseUnmarshaller {
 
     // sometimes album name occurs prior to the album id.
     String albumName = null;
+    String albumArtistName = null;
 
     int eventType;
     while ((eventType = skip()) == XMLStreamConstants.START_ELEMENT) {
@@ -186,34 +210,46 @@ public class ResponseUnmarshaller {
       if ("id".equals(localName)) {
         track = store.getTrack(xmlr.getElementText());
       } else if ("title".equals(localName)) {
-        track.setTitle(xmlr.getElementText());
+        track.setTitle(getString());
       } else if ("artist-id".equals(localName)) {
-        track.setArtist(store.getArtist(xmlr.getElementText()));
+        track.setArtist(store.getArtist(getString()));
       } else if ("artist".equals(localName)) {
-        track.getArtist().setName(xmlr.getElementText());
+        track.getArtist().setName(getString());
+      } else if ("album-artist".equals(localName)) {
+        if (track.getAlbum().getMainArtist() == null) {
+          albumArtistName = getString();
+        } else {
+          track.getAlbum().getMainArtist().setName(getString());
+        }
+      } else if ("album-artist-id".equals(localName)) {
+        track.getAlbum().setMainArtist((store.getArtist(getString())));
+        if (albumArtistName != null) {
+          track.getAlbum().getMainArtist().setName(albumArtistName);
+          albumArtistName = null;
+        }
       } else if ("album".equals(localName)) {
         if (track.getAlbum() == null) {
-          albumName = xmlr.getElementText();
+          albumName = getString();
         } else {
           track.getAlbum().setName(xmlr.getElementText());
         }
       } else if ("album-id".equals(localName)) {
-        track.setAlbum(store.getAlbum(xmlr.getElementText()));
+        track.setAlbum(store.getAlbum(getString()));
         if (albumName != null) {
           track.getAlbum().setName(albumName);
           albumName = null;
         }
       } else if ("year".equals(localName)) {
-        track.setYear(Integer.valueOf(xmlr.getElementText()));
+        track.setYear(getInteger());
       } else if ("track-number".equals(localName)) {
-        track.setTrackNumber(Integer.valueOf(xmlr.getElementText()));
+        track.setTrackNumber(getInteger());
       } else if ("length".equals(localName)) {
-        track.setLength(Integer.valueOf(xmlr.getElementText()));
+        track.setLength(getInteger());
       } else if ("redirect".equals(localName)) {
         if (redirects == null) {
           redirects = new ArrayList<Track>();
         }
-        redirects.add(store.getTrack(xmlr.getElementText()));
+        redirects.add(store.getTrack(getString()));
       } else if ("files".equals(localName)) {
         track.setFiles(new ArrayList<File>());
         while ((eventType = skip()) == XMLStreamConstants.START_ELEMENT) {
@@ -241,15 +277,15 @@ public class ResponseUnmarshaller {
       } else if ("album-links".equals(localName)) {
         skipLinks();
       } else if ("cover".equals(localName)) {
-        track.setCover(store.getImage(xmlr.getElementText()));
+        track.setCover(store.getImage(getString()));
       } else if ("popularity".equals(localName)) {
-        track.setPopularity(Float.valueOf(xmlr.getElementText()));
+        track.setPopularity(getFloat());
       } else if ("similar-tracks".equals(localName)) {
         track.setSimilarTracks(new ArrayList<Track>());
         while ((eventType = skip()) == XMLStreamConstants.START_ELEMENT) {
           localName = xmlr.getLocalName();
           if ("id".equals(localName)) {
-            track.getSimilarTracks().add(store.getTrack(xmlr.getElementText()));
+            track.getSimilarTracks().add(store.getTrack(getString()));
           } else {
             throw unexpected();
           }
@@ -269,6 +305,7 @@ public class ResponseUnmarshaller {
 
     if (fullyLoaded != null) {
       track.setLoaded(fullyLoaded);
+      track = (Track) store.persist(track);
     }
 
     return track;
@@ -420,6 +457,7 @@ public class ResponseUnmarshaller {
 
     if (fullyLoaded != null) {
       album.setLoaded(fullyLoaded);
+      album = (Album) store.persist(album);
     }
 
     return album;
@@ -547,6 +585,7 @@ public class ResponseUnmarshaller {
 
     if (fullyLoaded != null) {
       artist.setLoaded(fullyLoaded);
+      artist = (Artist) store.persist(artist);
     }
 
     return artist;

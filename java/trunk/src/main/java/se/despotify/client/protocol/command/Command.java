@@ -7,11 +7,15 @@ import se.despotify.ConnectionImpl;
 import se.despotify.DespotifyManager;
 import se.despotify.Connection;
 
+import java.nio.charset.Charset;
+
 /**
  *
  * @since 2009-apr-24 02:47:36
  */
 public abstract class Command<T> {
+
+  public static final Charset UTF8 = Charset.forName("UTF-8");
 
   // this is here to make it easy to find the template code from a subclass..
   private static Logger log = LoggerFactory.getLogger(Command.class);

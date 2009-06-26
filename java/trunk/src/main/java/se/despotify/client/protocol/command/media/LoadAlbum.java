@@ -76,8 +76,10 @@ public class LoadAlbum extends Command<Album> {
 
 
     /* Get data and inflate it. */
-    byte[] data = GZIP.inflate(callback.getData("gzipped load album response"));
+    byte[] data = callback.getData("gzipped load album response");
     connection.close();
+
+    data = GZIP.inflate(data);
 
     if (log.isInfoEnabled()) {
       log.info("load album response, " + data.length + " uncompressed bytes:\n" + Hex.log(data, log));

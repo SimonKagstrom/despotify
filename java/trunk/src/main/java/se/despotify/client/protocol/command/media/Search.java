@@ -2,23 +2,30 @@ package se.despotify.client.protocol.command.media;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.despotify.DespotifyManager;
+import se.despotify.ManagedConnection;
 import se.despotify.client.protocol.PacketType;
+import se.despotify.client.protocol.ResponseUnmarshaller;
 import se.despotify.client.protocol.channel.Channel;
 import se.despotify.client.protocol.channel.ChannelCallback;
 import se.despotify.client.protocol.command.Command;
 import se.despotify.domain.Store;
 import se.despotify.domain.media.Result;
+import se.despotify.domain.media.Track;
 import se.despotify.exceptions.DespotifyException;
-import se.despotify.util.GZIP;
-import se.despotify.util.Hex;
-import se.despotify.util.XML;
-import se.despotify.util.XMLElement;
-import se.despotify.DespotifyManager;
-import se.despotify.ManagedConnection;
+import se.despotify.util.*;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 /**
  * @since 2009-apr-25 20:07:48
@@ -76,22 +83,29 @@ public class Search extends Command<Result> {
     Channel.register(channel);
 
     /* Send packet. */
+    Timer timeSendPacket = new Timer("send packet");
     ManagedConnection connection = connectionManager.getManagedConnection();
     connection.getProtocol().sendPacket(PacketType.search, buffer, "search");
 
     /* Get data and inflate it. */
-    byte[] data = GZIP.inflate(callback.getData("gzipped search response"));
+    byte[] compressedData = callback.getData("gzipped search response");
     connection.close();
+    timeSendPacket.stop();
+
+    Timer timeOld = new Timer("old");
+    Timer timeInflate = new Timer("inflate only");
+    byte[] inflatedData = GZIP.inflate(compressedData);
+    timeInflate.stop();
 
     if (log.isInfoEnabled()) {
-      log.info("received search response packet, " + data.length + " uncompressed bytes:\n" + Hex.log(data, log));
+      log.info("received search response packet, " + inflatedData.length + " uncompressed bytes:\n" + Hex.log(inflatedData, log));
     }
 
 
     /* Cut off that last 0xFF byte... */
-    data = Arrays.copyOfRange(data, 0, data.length - 1);
+    inflatedData = Arrays.copyOfRange(inflatedData, 0, inflatedData.length - 1);
 
-    String xml = new String(data, Charset.forName("UTF-8"));
+    String xml = new String(inflatedData, UTF8);
     if (log.isDebugEnabled()) {
       log.debug(xml);
     }
@@ -99,7 +113,17 @@ public class Search extends Command<Result> {
 
     /* Create result from XML. */
 
-    return Result.fromXMLElement(root, store);
+    Result result = Result.fromXMLElement(root, store);
+
+    timeOld.stop();
+
+
+
+    System.out.println(timeSendPacket);
+    System.out.println(timeInflate);
+    System.out.println(timeOld);
+//    System.out.println(timeNew);
+    return result;
 
   }
 }

@@ -2,15 +2,35 @@ package se.despotify.client.protocol.command.media;
 
 import org.junit.Test;
 import se.despotify.DespotifyClientTest;
-import se.despotify.util.SpotifyURI;
 import se.despotify.domain.MemoryStore;
 import se.despotify.domain.media.Artist;
 import se.despotify.domain.media.VisitorAdapter;
+import se.despotify.util.SpotifyURI;
+import se.despotify.util.Timer;
 
 /**
  * @since 2009-apr-25 18:28:29
  */
 public class TestLoadArtist extends DespotifyClientTest {
+
+//  @Test
+//  public void testLoadLots() throws Exception {
+//
+//    manager.getManagedConnection().close();
+//
+//    MemoryStore store = new MemoryStore();
+//    Timer timer = new Timer("");
+//
+//    for (String artistId : twoHundredGoodArtistIds) {
+//      Artist artist = store.getArtist(artistId);
+//      timer.start();
+//      new LoadArtist(store, artist).send(manager);
+//      timer.stop();
+//    }
+//
+//    System.out.println(timer);
+//  }
+
 
   @Test
   public void test() throws Exception {
@@ -21,20 +41,20 @@ public class TestLoadArtist extends DespotifyClientTest {
 
 
     Artist dolly = store.getArtist(SpotifyURI.toHex("32vWCbZh0xZ4o9gkz4PsEU"));
-    manager.send(new LoadArtist(store, dolly));
+    new LoadArtist(store, dolly).send(manager);
 
 
     for (Artist artist : defaultArtists) {
-      manager.send(new LoadArtist(store, artist));
+      new LoadArtist(store, artist).send(manager);
     }
 
 //    for (Artist artist : defaultArtists) {
 //      MediaTestCaseGenerator.createEqualsTest(artist, "artist = store.getArtist(\"" + artist.getHexUUID() + "\");\n" +
-//          "    manager.send(new LoadArtist(store, artist));\n" +
+//          "    new LoadArtist(store, artist).send(manager);\n" +
 //          "    artist");
 //    }
 //    System.out.flush();
-    
+
 
     MemoryStore store = new MemoryStore();
 
@@ -44,7 +64,7 @@ public class TestLoadArtist extends DespotifyClientTest {
 
 
     artist = store.getArtist("d00d9e7b82894fb8851a109c82568eb5");
-    manager.send(new LoadArtist(store, artist));
+    new LoadArtist(store, artist).send(manager);
     artist.accept(new VisitorAdapter() {
       @Override
       public void visit(Artist artist) {
@@ -58,7 +78,7 @@ public class TestLoadArtist extends DespotifyClientTest {
       }
     });
     artist = store.getArtist("4f9873e19e5a4b4096c216c98bcdb010");
-    manager.send(new LoadArtist(store, artist));
+    new LoadArtist(store, artist).send(manager);
     artist.accept(new VisitorAdapter() {
       @Override
       public void visit(Artist artist) {
@@ -72,7 +92,7 @@ public class TestLoadArtist extends DespotifyClientTest {
       }
     });
     artist = store.getArtist("db614c7060fc47baa7be732d88ae446d");
-    manager.send(new LoadArtist(store, artist));
+    new LoadArtist(store, artist).send(manager);
     artist.accept(new VisitorAdapter() {
       @Override
       public void visit(Artist artist) {
@@ -86,7 +106,7 @@ public class TestLoadArtist extends DespotifyClientTest {
       }
     });
     artist = store.getArtist("f4d5d82d09124feda0633a2671f8c81a");
-    manager.send(new LoadArtist(store, artist));
+    new LoadArtist(store, artist).send(manager);
     artist.accept(new VisitorAdapter() {
       @Override
       public void visit(Artist artist) {
@@ -100,7 +120,7 @@ public class TestLoadArtist extends DespotifyClientTest {
       }
     });
     artist = store.getArtist("f6150726a8e94c89a7cf336d3f72be9c");
-    manager.send(new LoadArtist(store, artist));
+    new LoadArtist(store, artist).send(manager);
     artist.accept(new VisitorAdapter() {
       @Override
       public void visit(Artist artist) {

@@ -22,6 +22,8 @@
       <xs:element type="xs:string" name="artist" minOccurs="0" maxOccurs="1"/>
       <xs:element type="xs:string" name="album" minOccurs="0" maxOccurs="1"/>
       <xs:element type="xs:string" name="album-id" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:string" name="album-artist" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:string" name="album-artist-id" minOccurs="0" maxOccurs="1"/>
       <xs:element type="xs:short" name="year" minOccurs="0" maxOccurs="1"/>
       <xs:element type="xs:byte" name="track-number" minOccurs="0" maxOccurs="1"/>
       <xs:element type="xs:int" name="length" minOccurs="0" maxOccurs="1"/>

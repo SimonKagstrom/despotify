@@ -20,6 +20,15 @@ public class MemoryStore extends Store implements Serializable {
   public Map<String, Track> tracks = new HashMap<String, Track>();
   public Map<String, Image> images = new HashMap<String, Image>();
 
+  public void reset() {
+    playlists.clear();
+    albums.clear();
+    files.clear();
+    artists.clear();
+    tracks.clear();
+    images.clear();
+  }
+
   @Override
   public File getFile(String hexUUID) {
     File file = files.get(hexUUID);
@@ -84,4 +93,5 @@ public class MemoryStore extends Store implements Serializable {
   public Media persist(Media media) {
     return media;
   }
+
 }
