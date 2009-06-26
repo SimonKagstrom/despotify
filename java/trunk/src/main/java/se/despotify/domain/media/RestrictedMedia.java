@@ -19,6 +19,26 @@ public abstract class RestrictedMedia extends Media {
   @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Restriction> restrictions;
 
+  private Float popularity;
+
+  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  private List<ExternalId> externalIds;
+
+  public Float getPopularity() {
+    return popularity;
+  }
+
+  public void setPopularity(Float popularity) {
+    this.popularity = popularity;
+  }
+
+  public List<ExternalId> getExternalIds() {
+    return externalIds;
+  }
+
+  public void setExternalIds(List<ExternalId> externalIds) {
+    this.externalIds = externalIds;
+  }
 
   public List<Restriction> getRestrictions() {
     return restrictions;

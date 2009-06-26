@@ -36,8 +36,6 @@ public class Track extends RestrictedMedia {
   @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Image cover;
 
-  private Float popularity;
-
   @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Track> similarTracks;
 
@@ -46,9 +44,6 @@ public class Track extends RestrictedMedia {
    */
   @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Track> redirections;
-
-  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-  private List<ExternalId> externalIds;
 
   public Track() {
   }
@@ -170,22 +165,6 @@ public class Track extends RestrictedMedia {
     this.cover = cover;
   }
 
-  public Float getPopularity() {
-    return popularity;
-  }
-
-  public void setPopularity(Float popularity) {
-    this.popularity = popularity;
-  }
-
-  public List<ExternalId> getExternalIds() {
-    return externalIds;
-  }
-
-  public void setExternalIds(List<ExternalId> externalIds) {
-    this.externalIds = externalIds;
-  }
-
   public List<Track> getSimilarTracks() {
     return similarTracks;
   }
@@ -216,7 +195,6 @@ public class Track extends RestrictedMedia {
         ", length=" + length +
         ", files=" + files +
         ", cover='" + cover + '\'' +
-        ", popularity=" + popularity +
         '}';
   }
 

@@ -43,11 +43,6 @@ public class Artist extends RestrictedMedia {
   private List<Album> allAlbumsWithTrackPresent;
 
 
-  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-  private List<ExternalId> externalIds;
-
-  private Float popularity;
-
   public Artist() {
     super();
   }
@@ -103,21 +98,6 @@ public class Artist extends RestrictedMedia {
     this.portrait = portrait;
   }
 
-  public Float getPopularity() {
-    return popularity;
-  }
-
-  public void setPopularity(Float popularity) {
-    this.popularity = popularity;
-  }
-
-  public List<ExternalId> getExternalIds() {
-    return externalIds;
-  }
-
-  public void setExternalIds(List<ExternalId> externalIds) {
-    this.externalIds = externalIds;
-  }
 
   public List<Artist> getSimilarArtists() {
     return similarArtists;
@@ -175,119 +155,12 @@ public class Artist extends RestrictedMedia {
     this.tracks = tracks;
   }
 
-
-
-
-
-//  public static Artist fromXMLElement(XMLElement artistNode, Store store, Date fullyLoadedDate) {
-//    Artist artist = store.getArtist(artistNode.getChildText("id"));
-//
-//    /* Set name. */
-//    if (artistNode.hasChild("name")) {
-//      artist.name = artistNode.getChildText("name");
-//    }
-//
-//    /* Set portrait. */
-//    if (artistNode.hasChild("portrait")) {
-//      XMLElement portraitNode = artistNode.getChild("portrait");
-//      if (!"".equals(portraitNode.getText().trim())) {
-//        artist.portrait = Image.fromXMLElement(portraitNode, store);
-//      }
-//    }
-//
-//    /* Set popularity. */
-//    if (artistNode.hasChild("popularity")) {
-//      artist.popularity = Float.parseFloat(artistNode.getChildText("popularity"));
-//    }
-//
-//    XMLElement biosNode = artistNode.getChild("bios");
-//    if (biosNode != null) {
-//
-//      List<Biography> biographies = new ArrayList<Biography>();
-//
-//      for (XMLElement bioNode : biosNode.getChildren()) {
-//        if (!"bio".equals(bioNode.getElement().getNodeName())) {
-//          log.warn("Unknown bios child node " + bioNode.getElement().getNodeName());
-//        } else {
-//          Biography biography = new Biography();
-//          biography.setText(bioNode.getChildText("text"));
-//          if (bioNode.hasChild("portraits")) {
-//            biography.setPortraits(new ArrayList<Image>());
-//            for (XMLElement portraitNode : bioNode.getChild("portraits").getChildren()) {
-//              biography.getPortraits().add(Image.fromXMLElement(portraitNode, store));
-//            }
-//          }
-//          biographies.add(biography);
-//        }
-//        artist.biographies = biographies;
-//      }
-//    }
-//
-//    if (artistNode.hasChild("years-active")) {
-//      artist.yearsActive = new ArrayList<String>(Arrays.asList(artistNode.getChildText("years-active").split(",")));
-//    }
-//
-//    if (artistNode.hasChild("genres")) {
-//      String[] genreIds = artistNode.getChildText("genres").split(",");
-//      Set<String> genres = new LinkedHashSet<String>(genreIds.length);
-//      for (String genre : genreIds) {
-//        if (!"".equals(genre)) {
-//          genres.add(genre);
-//        }
-//      }
-//      artist.genres = genres;
-//    }
-//
-//    XMLElement albumsNode = artistNode.getChild("albums");
-//    if (albumsNode != null) {
-//      List<Album> allAlbumsWithTrackPresent = new ArrayList<Album>();
-//      for (XMLElement albumNode : albumsNode.getChildren()) {
-//        Album album = Album.fromXMLElement(albumNode, store, fullyLoadedDate);
-//
-//        // add to all albums
-//        allAlbumsWithTrackPresent.add(album);
-//
-//        // add to main artist albums
-//        if (artist.equals(album.getMainArtist())) {
-//          if (artist.getMainArtistAlbums() == null) {
-//            artist.setMainArtistAlbums(new ArrayList<Album>());
-//          }
-//          if (!artist.getMainArtistAlbums().contains(album)) {
-//            artist.getMainArtistAlbums().add(album);
-//          }
-//        }
-//
-//      }
-//      artist.allAlbumsWithTrackPresent = allAlbumsWithTrackPresent;
-//    }
-//
-//    /* Set similar artists. */
-//    if (artistNode.hasChild("similar-artists")) {
-//
-//      List<Artist> similarArtists = new ArrayList<Artist>();
-//
-//      for (XMLElement similarArtistElement : artistNode.getChild("similar-artists").getChildren()) {
-//        similarArtists.add(Artist.fromXMLElement(similarArtistElement, store, null));
-//      }
-//
-//      artist.setSimilarArtists(similarArtists);
-//    }
-//
-//    if (fullyLoadedDate != null) {
-//      artist.setLoaded(fullyLoadedDate);
-//    }
-//
-//    return artist;
-//  }
-
-
   @Override
   public String toString() {
     return "Artist{" +
         "id='" + id + '\'' +
         ", name='" + name + '\'' +
         ", portrait='" + portrait + '\'' +
-        ", popularity=" + popularity +
         ", similarArtists=" + (similarArtists == null ? null : similarArtists.size()) +
         '}';
   }

@@ -34,14 +34,10 @@ public class Album extends RestrictedMedia {
   @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Image cover;
 
-  private Float popularity;
   private Integer year;
 
   @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "album")
   private List<Track> tracks;
-
-  @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-  private List<ExternalId> externalIds;
 
   @CollectionOfElements
   @Column(length = 512)
@@ -132,28 +128,12 @@ public class Album extends RestrictedMedia {
     this.cover = cover;
   }
 
-  public Float getPopularity() {
-    return popularity;
-  }
-
-  public void setPopularity(Float popularity) {
-    this.popularity = popularity;
-  }
-
   public List<Track> getTracks() {
     return tracks;
   }
 
   public void setTracks(List<Track> tracks) {
     this.tracks = tracks;
-  }
-
-  public List<ExternalId> getExternalIds() {
-    return externalIds;
-  }
-
-  public void setExternalIds(List<ExternalId> externalIds) {
-    this.externalIds = externalIds;
   }
 
   public List<String> getC() {
@@ -219,7 +199,6 @@ public class Album extends RestrictedMedia {
         "id='" + id + '\'' +
         ", name='" + name + '\'' +
         ", type='" + type + '\'' +
-        ", popularity=" + popularity +
         ", discNames=" + discNames +
         ", mainArtist=" + (mainArtist == null ? null : mainArtist.getId()) +
         ", cover='" + cover + '\'' +
