@@ -92,6 +92,7 @@ int footer_keypress(wint_t ch, bool code)
 
   switch (ch) {
     case 'H' - '@':
+    case 127:
     case KEY_BACKSPACE:
       if (g_input.pos) {
         memmove(g_input.wbuf + g_input.pos - 1,
@@ -157,6 +158,7 @@ int footer_keypress(wint_t ch, bool code)
       return 0;
 
     default:
+      // Printable characters.
       if (!code && ch >= ' ') {
         if (g_input.len < (BUF_MAX - 1)) {
           memmove(g_input.wbuf + g_input.pos + 1,
@@ -167,8 +169,10 @@ int footer_keypress(wint_t ch, bool code)
           ++g_input.pos;
         }
       }
+      // Silently drop unhandled control characters so we don't trigger global
+      // bindings and lose focus.
       else
-        return ch;
+        return 0;
   }
 
   ui_dirty(UI_FOOTER);

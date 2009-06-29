@@ -22,8 +22,11 @@
 #define UI_FOREACH_START(uis, var, start)          UI_FOREACH_START_END(uis, var, start, UI_END)
 #define UI_FOREACH(uis, var)                       UI_FOREACH_START_END(uis, var, 0,     UI_END)
 
+#define UI_COLORS 8
+
 static ui_t      g_ui_elements[UI_END];
 static int       g_stdscr_initialized = 0;
+static short     g_colors[UI_COLORS][3];
 static ui_elem_t g_ui_focus;
 
 extern session_t g_session;
@@ -47,6 +50,11 @@ void stdscr_init()
       && use_default_colors() == OK) {
     // Define some more comfortable colors if supported.
     if (can_change_color()) {
+      // Backup current definitions.
+      for (int i = 0; i < UI_COLORS; ++i) {
+        color_content(i, &g_colors[i][0], &g_colors[i][1], &g_colors[i][2]);
+      }
+
       init_color(COLOR_BLACK, 256, 256, 256); // Dark gray
       init_color(COLOR_RED,   384,   0,   0); // Dark red
     }
@@ -70,6 +78,13 @@ void stdscr_cleanup()
 {
   if (!g_stdscr_initialized)
     return;
+
+  // Reset redefined colors.
+  if (can_change_color()) {
+    for (int i = 0; i < UI_COLORS; ++i) {
+      init_color(i, g_colors[i][0], g_colors[i][1], g_colors[i][2]);
+    }
+  }
 
   noraw();
   endwin();

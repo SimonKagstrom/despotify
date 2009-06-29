@@ -58,14 +58,14 @@ void splash_draw(ui_t *ui)
 
   int x = DSFY_MAX((ui->width - LOGO_WIDTH) / 2, 0);
 
-  wattron(ui->win, COLOR_PAIR(UI_STYLE_DIM));
+  wattron(ui->win, A_BOLD | COLOR_PAIR(UI_STYLE_DIM));
   for (int i = 0; i < LOGO_HEIGHT; ++i) {
     mvwaddnwstr(ui->win, ++line, x, g_wlogo[i], ui->width - x);
   }
-  wattroff(ui->win, COLOR_PAIR(UI_STYLE_DIM));
+  wattroff(ui->win, A_BOLD | COLOR_PAIR(UI_STYLE_DIM));
 
   mvwprintw(ui->win, line, x + 34, "despotify.se");
-  mvwchgat(ui->win, line, x + 34, 12, A_REVERSE, UI_STYLE_DIM, NULL);
+  mvwchgat(ui->win, line, x + 34, 12, A_BOLD | A_REVERSE, UI_STYLE_DIM, NULL);
 
   line += 2;
 
