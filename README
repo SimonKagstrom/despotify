@@ -1,0 +1,71 @@
+$Id$
+
+Despotify - the open source Spotify client
+http://despotify.se/
+
+
+Source code
+~~~~~~~~~~
+The latest version of the source code can be checked out from our Subversion repository
+  $ svn checkout https://despotify.svn.sourceforge.net/svnroot/despotify despotify
+
+
+Directories
+~~~~~~~~~~~
+The checked out source code contains a number of directories
+  java/		This is where one of the available Java implementations go
+  src/		This is where the C based client, library and Python bindings go
+  web/		This is where the source code for our web site goes (http://despotify.se)
+
+
+Build instructions for the simple client and library
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You'll need a few libraries to be able to build despotify
+If you're running Debian/Ubuntu they can be installed with the following commands
+  # aptitude install libssl-dev zlib1g-dev libvorbis-dev libtool
+  # aptitude install libpulse-dev # For pulseaudio backend
+  # aptitude install libgstreamer-plugins-base0.10-0 libgstreamer0.10-dev # For GStreamer backend
+  # aptitude install libao-dev # For libao backend
+
+If you encounter any problems, ask a friend or ask in the channel
+#despotify on EFNet (example EFNet servers: irc.swepipe.se, efnet.xs4all.nl)
+
+
+1. Goto the directory src/ where the despotify library and client is located
+   $ cd src
+
+2. Optionial (..because just running make will do this for you otherwise)
+ - 2.1 Copy Makefile.local.mk.dist to Makefile.local.mk
+       $ cp Makefile.local.mk.dist Makefile.local.mk
+
+ - 2.2 Make local adjustments such as specifying additional path for where 
+       the compiler's linker should look for libraries (modify LDFLAGS)
+       or install to a different prefix (i.e. /usr/local instead of /usr)
+       $ nano Makefile.local.mk
+
+3. Run make
+   $ make
+
+4. Install
+   $ sudo make install
+
+5. You'll now have a client called 'simple' and a gateway called 'gateway'
+   installed under ${INSTALL_PREFIX}/bin (usually this will be /usr/bin)
+
+
+Also checkout
+~~~~~~~~~~~~~
+http://jotify.felixbruns.de/
+- Felix Bruns' Java implementation of a Spotify compatible library and GUI client
+
+http://github.com/nevyn/spot
+- Nevyn's Spotify compatible client for the iPhone/iPod platform
+
+http://www.spotify.com/
+- Home of Spotify 
+
+
+Final notes
+~~~~~~~~~~~
+This project is neither endorsed by nor associated with Spotify :-)
