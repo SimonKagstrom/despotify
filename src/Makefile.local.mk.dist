@@ -27,3 +27,6 @@ LINUX_BACKEND = gstreamer
 ## Add more CFLAGS
 # CFLAGS += -DDEBUG_SNDQUEUE
 # CFLAGS += -DDEBUG_PACKETS
+
+## Adjust linking flags
+# LDFLAGS += -L/usr/local/lib
