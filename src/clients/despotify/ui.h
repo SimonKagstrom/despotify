@@ -8,8 +8,10 @@
 
 
 #define _XOPEN_SOURCE_EXTENDED // wchar_t in ncurses.
+#include <wchar.h>
 #include <ncurses.h>
 #include <stdbool.h>
+
 
 #define DSFY_MAX(a, b) ((a) > (b) ? (a) : (b))
 #define DSFY_MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -65,6 +67,7 @@ typedef struct ui {
   ui_draw_cb_t  draw_cb;
   ui_keypress_cb_t keypress_cb;
 } ui_t;
+
 
 void stdscr_init();
 void stdscr_cleanup();

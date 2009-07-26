@@ -17,7 +17,7 @@ SILENTDIR := -s
 SILENTLIB := --quiet
 endif
 
-INSTALL_PREFIX = /usr
+INSTALL_PREFIX ?= ${DESTDIR}/usr
 LINUX_BACKEND = gstreamer
 
 include Makefile.local.mk

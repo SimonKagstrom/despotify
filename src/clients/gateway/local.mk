@@ -31,9 +31,9 @@ gateway: $(GATEWAY_OBJS) $(LIB)
 	$(SILENT)$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(LIB) $(GATEWAY_OBJS)
 
 install: gateway 
-	@echo "Copying gateway binary to $(INSTALL_PREFIX)/bin/gateway"
-	$(LT) --mode=install install gateway $(INSTALL_PREFIX)/bin/gateway
+	@echo "Copying gateway binary to $(INSTALL_PREFIX)/bin/despotify-gateway"
+	$(LT) --mode=install install gateway $(INSTALL_PREFIX)/bin/despotify-gateway
 
 uninstall:
 	@echo "Removing gateway..."
-	rm -f $(INSTALL_PREFIX)/bin/gateway
+	rm -f $(INSTALL_PREFIX)/bin/despotify-gateway

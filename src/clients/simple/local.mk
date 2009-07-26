@@ -21,6 +21,7 @@ clean:
 
 install: simple
 	@echo "Copying simple binary to $(INSTALL_PREFIX)/bin/simple"
+	install -d $(INSTALL_PREFIX)/bin/
 	$(LT) --mode=install install simple $(INSTALL_PREFIX)/bin/simple
 
 uninstall:
