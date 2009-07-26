@@ -19,5 +19,5 @@ $Id$
 
 * Replace the current buffer functions with esbuf --rKA
 
-* provide debian patch
+* merge software into distro
 

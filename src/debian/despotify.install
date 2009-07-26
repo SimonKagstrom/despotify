@@ -1,4 +1,7 @@
 usr/bin/despotify
+usr/bin/despotify-simple 
+usr/bin/despotify-gateway
+
 usr/include/despotify.h
 usr/lib/pkgconfig
 usr/lib/pkgconfig/despotify.pc

@@ -1,5 +1,6 @@
-OBJS = simple.o
+package?=despotify
 
+OBJS = simple.o
 LIBDIR = ../../lib
 LIB = $(LIBDIR)/libdespotify.la
 
@@ -20,10 +21,10 @@ clean:
 	rm -f $(OBJS) Makefile.dep
 
 install: simple
-	@echo "Copying simple binary to $(INSTALL_PREFIX)/bin/simple"
+	@echo "Copying simple binary to $(INSTALL_PREFIX)/bin/${package}-simple"
 	install -d $(INSTALL_PREFIX)/bin/
-	$(LT) --mode=install install simple $(INSTALL_PREFIX)/bin/simple
+	$(LT) --mode=install install simple $(INSTALL_PREFIX)/bin/${package}-simple
 
 uninstall:
 	@echo "Removing simple..."
-	rm -f $(INSTALL_PREFIX)/bin/simple
+	rm -f $(INSTALL_PREFIX)/bin/${package}-simple

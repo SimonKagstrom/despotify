@@ -1,4 +1,10 @@
-despotify (0.0.20090726) UNRELEASED; urgency=low
+despotify (0.0.0-0) UNRELEASED; urgency=low
+
+  * TODO: update version on build 0.0.YYYYMMDD (last commit's date)
+
+ -- UNDEFINED <root@localhost>  Sun, 26 Jul 2009 21:09:19 +0200
+
+despotify (0.0.20090726-0) UNRELEASED; urgency=low
 
   * Merged into upstream tree
 
