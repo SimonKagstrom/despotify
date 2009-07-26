@@ -1,0 +1,25 @@
+Source: despotify
+Section: sound
+Priority: extra
+Maintainer: UNDEFINED <root@localhost>
+Build-Depends: debhelper (>= 7),
+               libtool,
+               libexpat1-dev,
+               libncurses5-dev,
+               libpulse-dev,
+               libssl-dev,
+               libvorbis-dev,
+               zlib1g-dev,
+	       libncursesw5-dev
+Standards-Version: 3.7.3
+Homepage: http://despotify.se
+
+Package: despotify
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: An open source Spotify client.
+ * C implementation based on F/OSS code
+ * Proof of Concept multi-OS client with curses (text-based) UI
+ * Proof of Concept gateway to the Spotify service (text-based 
+   protocol, for supporting REST).
+

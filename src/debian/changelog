@@ -1,0 +1,17 @@
+despotify (0.0.20090726) UNRELEASED; urgency=low
+
+  * Merged into upstream tree
+
+ -- UNDEFINED <root@localhost>  Sun, 26 Jul 2009 17:29:05 +0200
+
+despotify (0.svn20090605-r339~ppa1~jaunty1) jaunty; urgency=low
+
+  * Automated backport by prevu. No source changes
+
+ -- Tim Kornhammar <tim.kornhammar@gmail.com>  Fri, 05 Jun 2009 13:20:25 +0200
+
+despotify (0.svn20090605-r339) jaunty; urgency=low
+
+  * Svn update.
+
+ -- Tim Kornhammar <tim.kornhammar@gmail.com>  Fri, 05 Jun 2009 13:20:04 +0200

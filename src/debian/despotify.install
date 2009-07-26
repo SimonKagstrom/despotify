@@ -1,0 +1,9 @@
+usr/bin/despotify
+usr/include/despotify.h
+usr/lib/pkgconfig
+usr/lib/pkgconfig/despotify.pc
+usr/lib/libdespotify.so
+usr/lib/libdespotify.la
+usr/lib/libdespotify.so.0
+usr/lib/libdespotify.a
+usr/lib/libdespotify.so.0.0.0
