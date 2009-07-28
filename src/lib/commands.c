@@ -53,7 +53,7 @@ int cmd_send_cache_hash (SESSION * session)
 	buf_append_data(buf, session->cache_hash, sizeof (session->cache_hash));
 
 	ret = packet_write (session, 0x0f, buf->ptr, buf->len);
-	DSFYDEBUG ("cmd_send_cache_hash: packet_write() returned %d\n", ret);
+	DSFYDEBUG ("packet_write() returned %d\n", ret);
 	buf_free(buf);
 
 	return ret;
@@ -75,14 +75,14 @@ int cmd_requestad (SESSION * session, unsigned char ad_type)
 	ch = channel_register (buf, dump_generic, NULL);
 
 	DSFYDEBUG
-		("cmd_requestad: allocated channel %d, retrieving ads with type id %d\n",
+		("allocated channel %d, retrieving ads with type id %d\n",
 		 ch->channel_id, ad_type);
 
         buf_append_u16(b, ch->channel_id);
 	buf_append_u8(b, ad_type);
 
 	ret = packet_write (session, CMD_REQUESTAD, b->ptr, b->len);
-	DSFYDEBUG ("cmd_requestad: packet_write() returned %d\n", ret);
+	DSFYDEBUG ("packet_write() returned %d\n", ret);
 
 	buf_free(b);
 
@@ -107,14 +107,14 @@ int cmd_request_image (SESSION * session, unsigned char *hash,
 
 	ch = channel_register (buf, callback, private);
 	DSFYDEBUG
-		("cmd_requestimg: allocated channel %d, retrieving img with UUID %s\n",
+		("allocated channel %d, retrieving img with UUID %s\n",
 		 ch->channel_id, buf + 6);
 
 	buf_append_u16(b, ch->channel_id);
 	buf_append_data(b, hash, 20);
 
 	ret = packet_write (session, CMD_IMAGE, b->ptr, b->len);
-	DSFYDEBUG ("cmd_requestimg: packet_write() returned %d\n", ret);
+	DSFYDEBUG ("packet_write() returned %d\n", ret);
             
         buf_free(b);
 	
@@ -141,7 +141,7 @@ int cmd_search (SESSION * session, char *searchtext, unsigned int offset,
 	snprintf (buf, sizeof (buf), "Search-%s", searchtext);
 	ch = channel_register (buf, callback, private);
 
-	DSFYDEBUG ("cmd_search: allocated channel %d, searching for '%s'\n",
+	DSFYDEBUG ("allocated channel %d, searching for '%s'\n",
 		   ch->channel_id, searchtext);
 
 	buf_append_u16(b, ch->channel_id);
@@ -154,7 +154,7 @@ int cmd_search (SESSION * session, char *searchtext, unsigned int offset,
 	buf_append_data(b, searchtext, searchtext_length);
 
 	ret = packet_write (session, CMD_SEARCH, b->ptr, b->len);
-	DSFYDEBUG ("cmd_search: packet_write() returned %d\n", ret)
+	DSFYDEBUG ("packet_write() returned %d\n", ret)
 
 	buf_free(b);
 	
@@ -171,8 +171,7 @@ int cmd_token_notify (SESSION * session)
 	
 	ret = packet_write (session, CMD_TOKENNOTIFY, NULL, 0);
 	if (ret != 0) {
-		DSFYDEBUG
-			("cmd_token_notify(): packet_write(cmd=0x4f) returned %d, aborting!\n",
+		DSFYDEBUG ("packet_write(cmd=0x4f) returned %d, aborting!\n",
 			 ret)
 	}
 
@@ -198,7 +197,7 @@ int cmd_aeskey (SESSION * session, unsigned char *file_id,
 	hex_bytes_to_ascii (file_id, buf + 4, 20);
 	ch = channel_register (buf, callback, private);
 	DSFYDEBUG
-		("cmd_key(): allocated channel %d, retrieving AES key for file '%.40s'\n",
+		("allocated channel %d, retrieving AES key for file '%.40s'\n",
 		 ch->channel_id, buf);
 
 	/* Force DATA state to be able to handle these packets with the channel infrastructure */
@@ -208,9 +207,7 @@ int cmd_aeskey (SESSION * session, unsigned char *file_id,
 	ret = packet_write (session, CMD_REQKEY, b->ptr, b->len);
 	buf_free(b);
 	if (ret != 0) {
-		DSFYDEBUG
-			("cmd_key(): packet_write(cmd=0x0c) returned %d, aborting!\n",
-			 ret)
+		DSFYDEBUG ("packet_write(cmd=0x0c) returned %d, aborting!\n", ret)
 	}
 
 	return ret;
@@ -237,8 +234,7 @@ int cmd_action (SESSION * session, unsigned char *file_id,
 	if ((ret =
 	     packet_write (session, CMD_REQUESTPLAY, (unsigned char *) "",
 			   0)) != 0) {
-		DSFYDEBUG
-			("cmd_action(): packet_write(0x4f) returned %d, aborting!\n",
+		DSFYDEBUG ("packet_write(0x4f) returned %d, aborting!\n",
 			 ret)
 			return ret;
 	}
@@ -251,8 +247,7 @@ int cmd_action (SESSION * session, unsigned char *file_id,
 	ret = packet_write (session, 0x20, b->ptr, b->len);
 	bufr_free(b);
 	if (ret != 0) {
-		DSFYDEBUG
-			("cmd_action(): packet_write(cmd=0x20) returned %d, aborting!\n",
+		DSFYDEBUG ("packet_write(cmd=0x20) returned %d, aborting!\n",
 			 ret);
                 return ret;
 	}
@@ -310,13 +305,12 @@ int cmd_getsubstreams (SESSION * session, unsigned char *file_id,
 		 buf, offset, offset << 2, length, length << 2);
 
 	ret = packet_write (session, 0x08, b->ptr, b->len);
-	DSFYDEBUG("1\n");
 	buf_free(b);
 
 	if (ret != 0) {
 		channel_unregister (ch);
 		DSFYDEBUG
-			("cmd_getsubstreams(): packet_write(cmd=0x08) returned %d, aborting!\n",
+			("packet_write(cmd=0x08) returned %d, aborting!\n",
 			 ret);
 	}
 
@@ -358,7 +352,7 @@ int cmd_browse (SESSION * session, unsigned char kind, unsigned char *idlist,
 	if ((ret =
 	     packet_write (session, CMD_BROWSE, b->ptr, b->len)) != 0) {
 		DSFYDEBUG
-			("cmd_browse(): packet_write(cmd=0x30) returned %d, aborting!\n",
+			("packet_write(cmd=0x30) returned %d, aborting!\n",
 			 ret)
 	}
 
@@ -395,7 +389,7 @@ int cmd_getplaylist (SESSION * session, unsigned char *playlist_id,
 	if ((ret =
 	     packet_write (session, CMD_GETPLAYLIST, b->ptr, b->len)) != 0) {
 		DSFYDEBUG
-			("cmd_getplaylist(): packet_write(cmd=0x35) returned %d, aborting!\n",
+			("packet_write(cmd=0x35) returned %d, aborting!\n",
 			 ret);
 	}
 
@@ -434,7 +428,7 @@ int cmd_changeplaylist (SESSION * session, unsigned char *playlist_id,
 
 	if ((ret =
 	     packet_write (session, CMD_CHANGEPLAYLIST, b->ptr, b->len)) != 0) {
-		DSFYDEBUG ("cmd_changeplaylist(): packet_write(cmd=0x36) "
+		DSFYDEBUG ("packet_write(cmd=0x36) "
 			   "returned %d, aborting!\n", ret);
 	}
 
@@ -450,7 +444,7 @@ int cmd_ping_reply (SESSION * session)
 
 	if ((ret = packet_write (session, CMD_PONG, (void*)&pong, 4)) != 0) {
 		DSFYDEBUG
-			("cmd_ping_reply(): packet_write(cmd=0x49) returned %d, aborting!\n",
+			("packet_write(cmd=0x49) returned %d, aborting!\n",
 			 ret);
 	}
 

@@ -28,18 +28,16 @@ int handle_secret_block (SESSION * session, unsigned char *payload, int len)
 	}
 
 	t = (unsigned int *) payload;
-	DSFYDEBUG
-		("handle_secret_block(): Initial time %u (%ld seconds from now)\n",
+	DSFYDEBUG ("Initial time %u (%ld seconds from now)\n",
 		 ntohl (*t), time (NULL) - ntohl (*t));
 	t++;
-	DSFYDEBUG
-		("handle_secret_block(): Invalid at %u (%ld in the future)\n",
+	DSFYDEBUG ("Future time %u (%ld seconds in the future)\n",
 		 ntohl (*t), ntohl (*t) - time (NULL));
 
 	t++;
-	DSFYDEBUG ("handle_secret_block(): Next value is %u\n", ntohl (*t));
+	DSFYDEBUG ("Next value is %u\n", ntohl (*t));
 	t++;
-	DSFYDEBUG ("handle_secret_block(): Next value is %u\n", ntohl (*t));
+	DSFYDEBUG ("Next value is %u\n", ntohl (*t));
 
 	assert (memcmp (session->rsa_pub_exp, payload + 16, 128) == 0);
 
@@ -71,8 +69,7 @@ int handle_ping (SESSION * session, unsigned char *payload, int len)
 int handle_channel (int cmd, unsigned char *payload, int len)
 {
 	if (cmd == CMD_CHANNELERR) {
-		DSFYDEBUG
-			("handle_channel_error: Channel %d got error %d (0x%02x)\n",
+		DSFYDEBUG ("Channel %d got error %d (0x%02x)\n",
 			 ntohs (*(unsigned short *) payload),
 			 ntohs (*(unsigned short *) (payload + 2)),
 			 ntohs (*(unsigned short *) (payload + 2)))

@@ -131,7 +131,7 @@ int session_connect (SESSION * session)
 			return -1;
 
 		service += strlen (host) + 7;
-		DSFYDEBUG ("session_connect(): Connecting to %s:%d\n", host,
+		DSFYDEBUG ("Connecting to %s:%d\n", host,
 			   port);
 
 		memset (&sin, 0, sizeof (sin));

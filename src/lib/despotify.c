@@ -54,7 +54,7 @@ static void* despotify_thread(void* arg)
 {
     struct despotify_session* ds = arg;
 
-    DSFYDEBUG("Networking thread started");
+    DSFYDEBUG("Networking thread started\n");
 
     while (1) {
         SESSION* s = ds->session;
