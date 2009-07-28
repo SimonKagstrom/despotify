@@ -26,35 +26,51 @@
 
 bool despotify_init()
 {
-    if (audio_init())
+    DSFYDEBUG("Initializing audio\n");
+    if (audio_init()) {
+        DSFYDEBUG("Failed to initialize audio\n");
         return false;
+    }
 
-    if (network_init() != 0)
+    DSFYDEBUG("Initializing networking\n");
+    if (network_init() != 0) {
+        DSFYDEBUG("Failed to initialize networking\n");
         return false;
+    }
+
     return true;
 }
 
 bool despotify_cleanup()
 {
+    DSFYDEBUG("Uninitializing networking\n");
     if (network_cleanup() != 0)
         return false;
+
     return true;
 }
 
 static void* despotify_thread(void* arg)
 {
     struct despotify_session* ds = arg;
+
+    DSFYDEBUG("Networking thread started");
+
     while (1) {
         SESSION* s = ds->session;
         PHEADER hdr;
         unsigned char* payload;
 
-        int err = packet_read(s, &hdr, &payload);
-        if (!err) {
-            err = handle_packet(s, hdr.cmd, payload, hdr.len);
-            DSFYfree(payload); /* Allocated in packet_read() */
-        }
+        if(packet_read(s, &hdr, &payload))
+		break;
+
+        handle_packet(s, hdr.cmd, payload, hdr.len);
+        DSFYfree(payload); /* Allocated in packet_read() */
+
+	pthread_testcancel();
     }
+
+    DSFYDEBUG("Networking thread exiting\n");
 
     return NULL;
 }
@@ -146,18 +162,32 @@ bool despotify_authenticate(struct despotify_session* ds,
 
 void despotify_exit(struct despotify_session* ds)
 {
+    DSFYDEBUG("Calling despotify_free() and requesting disconnection\n");
     despotify_free(ds, true);
 }
 
 void despotify_free(struct despotify_session* ds, bool should_disconnect)
 {
+    int r;
     assert(ds != NULL && ds->session != NULL);
 
-    if (should_disconnect)
+    if (should_disconnect) {
+        DSFYDEBUG("Disconnection requested, calling session_disconnect()\n");
         session_disconnect(ds->session);
+    }
+
+    DSFYDEBUG("Canceling despotify networking thread\n");
+    r = pthread_cancel(ds->thread);
+    DSFYDEBUG("pthread_cancel() returned %d\n", r);
+
+    r = pthread_join(ds->thread, NULL);
+    DSFYDEBUG("Joined despotify networking thread, return value is %d\n", r);
+
 
     session_free(ds->session);
     free(ds);
+
+    DSFYDEBUG("Session uninitialized and free'd\n");
 }
 
 const char* despotify_get_error(struct despotify_session* ds)
