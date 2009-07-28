@@ -43,7 +43,7 @@ int coreaudio_init_device (void *unused)
 	else if (adev_id == kAudioDeviceUnknown)
 		return -1;
 
-	value = 32 * 1024;
+	value = 27 * 1024;
 	sz = sizeof (value);
 	if ((s =
 	     AudioDeviceSetProperty (adev_id, 0, 0, false,
