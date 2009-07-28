@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include <CoreAudio/AudioHardware.h>
+#include <CoreAudio/CoreAudioTypes.h>
 
 #include "audio.h"
 #include "sndqueue.h"
@@ -33,23 +34,45 @@ int coreaudio_init_device (void *unused)
 {
 	OSStatus s;
 	UInt32 sz;
-	int value;
+	AudioValueRange avr;
+	UInt32 framesize = 512;
+
 
 	sz = sizeof (adev_id);
-	if ((s =
-	     AudioHardwareGetProperty
-	     (kAudioHardwarePropertyDefaultOutputDevice, &sz, &adev_id)))
+	s = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &sz, &adev_id);
+	if(s != 0) {
+		fprintf(stderr, "AudioHardwareGetProperty() failed with error %ld\n", s);
 		return -1;
-	else if (adev_id == kAudioDeviceUnknown)
+	}
+	else if (adev_id == kAudioDeviceUnknown) {
+		fprintf(stderr, "AudioHardwareGetProperty() returned device kAudioDeviceUnknown\n");
 		return -1;
+	}
 
-	value = 27 * 1024;
-	sz = sizeof (value);
-	if ((s =
-	     AudioDeviceSetProperty (adev_id, 0, 0, false,
-				     kAudioDevicePropertyBufferSize, sz,
-				     &value)))
+
+	/* Find out the bounds of buffer frame size */
+	sz = sizeof(avr);
+	if ((s = AudioDeviceGetProperty(adev_id, 0, false,
+				kAudioDevicePropertyBufferFrameSizeRange, &sz, &avr))) {
+		printf("AudioDeviceGetProperty() failed with error %ld\n", s);
 		return -1;
+	}
+
+	/* Keep the requested number of frames within bounds */
+	if (framesize < avr.mMinimum)
+		framesize = avr.mMinimum;
+	else if (framesize > avr.mMaximum)
+		framesize = avr.mMaximum;
+
+
+	/* Set buffer frame size for device */
+	sz = sizeof (framesize);
+	s = AudioDeviceSetProperty (adev_id, 0, 0, false,
+					kAudioDevicePropertyBufferFrameSize, sz, &framesize);
+	if (s != kAudioHardwareNoError) {
+		fprintf(stderr, "AudioDeviceSetProperty() failed with error %ld\n", s);
+		return -1;
+	}
 
 	return 0;
 }
