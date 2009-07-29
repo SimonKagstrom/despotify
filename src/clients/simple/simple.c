@@ -192,7 +192,9 @@ void command_loop(struct despotify_session* ds)
         wprintf(L"\n> ");
         fflush(stdout);
         bzero(buf, sizeof buf);
-        fgets(buf, sizeof buf -1, stdin);
+        if(fgets(buf, sizeof buf -1, stdin) == NULL)
+		break;
+
         buf[strlen(buf) - 1] = 0; /* remove newline */
 
         /* list */
