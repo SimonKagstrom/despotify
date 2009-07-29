@@ -316,6 +316,16 @@ void snd_ioctl (snd_SESSION * session, int cmd, void *data, int length)
 
 	pthread_mutex_lock (&session->fifo->lock);
 
+	DSFYDEBUG("Current FIFO totbytes=%d, pushed data length is %d\n", session->fifo->totbytes, length);
+	/* Drop the first 167 bytes due to Spotify's weird replay gain header(?) at the start of each stream */
+	/* XXX - Ugly hack but I'm too tired to do the math right now ;) */
+	if(session->fifo->totbytes < 167 && length > 167) {
+		memcpy(buff->data, data + 167, length - 167);
+		buff->length = length - 167;
+		DSFYDEBUG("Dropping the first 167 bytes of data in this stream, new length is %d\n", buff->length);
+	}
+
+
 	/* Hook in entry in linked list */
 	if (session->fifo->end != NULL) {
 		session->fifo->end->next = buff;
@@ -327,7 +337,7 @@ void snd_ioctl (snd_SESSION * session, int cmd, void *data, int length)
 	if (session->fifo->start == NULL)
 		session->fifo->start = buff;
 
-	session->fifo->totbytes += length;
+	session->fifo->totbytes += buff->length;
 
 	DSFYDEBUG_SNDQUEUE
 		("snd_ioctl(): added a new buffer with %d bytes data, signalling receiver\n",

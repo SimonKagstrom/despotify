@@ -205,8 +205,6 @@ static OSStatus audio_callback (AudioDeviceID dev,
 
 	AUDIOCTX *actx = (AUDIOCTX *) private;
 
-	DSFYDEBUG ("audio_callback()\n");
-
 	/* Zero buffer */
 	for (i = 0; i < samples_available * num_channels; i++)
 		dst[i] = 0.0f;
