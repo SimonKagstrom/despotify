@@ -97,6 +97,9 @@ SESSION *session_init_client (void)
 	session->user_info.server_host[0] = 0;
 	session->user_info.server_port = 0;
 
+	pthread_mutex_init(&session->login_mutex, NULL);
+	pthread_cond_init(&session->login_cond, NULL);
+
 	return session;
 }
 
@@ -193,6 +196,9 @@ void session_free (SESSION * session)
 
 	if (session->rsa)
 		RSA_free (session->rsa);
+
+	pthread_cond_destroy(&session->login_cond);
+	pthread_mutex_destroy(&session->login_mutex);
 
 	free (session);
 }
