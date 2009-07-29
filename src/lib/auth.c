@@ -141,7 +141,7 @@ int send_client_auth (SESSION * session)
 		     buf->len);
 #endif
 
-        ret = sock_send(session->ap_sock, buf->ptr, buf->len);
+        ret = send(session->ap_sock, buf->ptr, buf->len, 0);
 	if (ret <= 0) {
 		DSFYDEBUG("send_client_auth(): connection lost\n");
 		buf_free(buf);

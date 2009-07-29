@@ -81,7 +81,7 @@ int send_client_initial_packet (SESSION * session)
 #ifdef DEBUG_LOGIN
 	hexdump8x32 ("initial client packet", b->ptr, b->len);
 #endif
-        ret = sock_send(session->ap_sock, b->ptr, b->len);
+        ret = send (session->ap_sock, b->ptr, b->len, 0);
 	if (ret <= 0) {
 		DSFYDEBUG("connection lost\n");
 		buf_free(b);

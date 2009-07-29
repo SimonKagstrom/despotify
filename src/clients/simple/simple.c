@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <wchar.h>
 #include "despotify.h"
+#include "util.h"
 
 struct playlist* get_playlist(struct playlist* rootlist, int num)
 {
@@ -567,6 +568,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    DSFYDEBUG("$Id$");
     if (!despotify_init())
     {
         wprintf(L"despotify_init() failed\n");
