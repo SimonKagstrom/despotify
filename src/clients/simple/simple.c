@@ -568,7 +568,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    DSFYDEBUG("$Id$");
+    DSFYDEBUG("$Id$\n");
     if (!despotify_init())
     {
         wprintf(L"despotify_init() failed\n");
