@@ -115,7 +115,7 @@ static int http_reply_need_auth (RESTSESSION * r)
 	buf_append_data (b, "\r\n", 2);
 
 	ret = 0;
-	if (sock_send (r->socket, b->ptr, b->len) != b->len)
+	if (send (r->socket, b->ptr, b->len, 0) != b->len)
 		ret = -1;
 
 	buf_free (b);
@@ -142,7 +142,7 @@ static int http_reply (RESTSESSION * r, int status, struct buf * response)
 	buf_append_data (b, response->ptr, response->len);
 
 	ret = 0;
-	if (sock_send (r->socket, b->ptr, b->len) != b->len)
+	if (send (r->socket, b->ptr, b->len, 0) != b->len)
 		ret = -1;
 
 	buf_free (b);
