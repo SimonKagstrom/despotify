@@ -117,44 +117,63 @@ void session_auth_set (SESSION * session, const char *username, const char *pass
 
 int session_connect (SESSION * session)
 {
-	struct sockaddr_in sin;
-	char host[1025 + 1], *service_list, *service;
-	int port;
+	struct addrinfo h, *airoot, *ai;
+	char host[1025 + 1], port[6], *service_list, *service;
 
 	/* Lookup service hosts in DNS */
         service_list = dns_srv_list ("_spotify-client._tcp.spotify.com");
 	if (!service_list) {
-            DSFYDEBUG("service lookup failed. falling back to ap.spotify.com\n");
+            DSFYDEBUG ("Service lookup failed. falling back to ap.spotify.com\n");
             service_list = malloc(200);
-            strcpy(service_list, "ap.spotify.com:4070\n");
+            strcpy (service_list, "ap.spotify.com:4070\n");
         }
 
+
+
 	for (service = service_list; *service;) {
-		if (sscanf (service, "%[^:]:%d\n", host, &port) != 2)
+		if (sscanf (service, "%[^:]:%5s\n", host, port) != 2)
 			return -1;
 
 		service += strlen (host) + 7;
-		DSFYDEBUG ("Connecting to %s:%d\n", host,
+		DSFYDEBUG ("Connecting to %s:%s\n", host,
 			   port);
 
-		memset (&sin, 0, sizeof (sin));
-		sin.sin_family = PF_INET;
-		sin.sin_port = htons (port);
-		sin.sin_addr.s_addr = dns_resolve_name (host);
-		if (sin.sin_addr.s_addr == INADDR_NONE)
+		memset(&h, 0, sizeof(h));
+		h.ai_family = PF_UNSPEC;
+		h.ai_socktype = SOCK_STREAM;
+		h.ai_protocol = IPPROTO_TCP;
+		if (getaddrinfo (host, port, &h, &airoot)) {
+			DSFYDEBUG ("getaddrinfo(%s,%s) failed with error %d\n",
+					host, port, errno);
 			continue;
+		}
 
-		session->ap_sock = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (connect (session->ap_sock, (struct sockaddr *) &sin,
-			     sizeof (sin)) != -1)
+		for(ai = airoot; ai; ai = ai->ai_next) {
+			if (ai->ai_family != AF_INET
+				&& ai->ai_family != AF_INET6)
+				continue;
+
+			session->ap_sock = socket (ai->ai_family,
+					ai->ai_socktype, ai->ai_protocol);
+			if (session->ap_sock < 0)
+				continue;
+
+			if (connect (session->ap_sock,
+				(struct sockaddr *) ai->ai_addr,
+				ai->ai_addrlen) != -1)
+				break;
+
+			sock_close (session->ap_sock);
+			session->ap_sock = -1;
+		}
+
+		freeaddrinfo (airoot);
+		if (session->ap_sock != -1)
 			break;
-
-		sock_close (session->ap_sock);
-		session->ap_sock = -1;
 	}
 
 	free (service_list);
-	if (sin.sin_addr.s_addr == INADDR_NONE)
+	if (session->ap_sock == -1)
 		return -1;
 
 	/*
@@ -162,11 +181,11 @@ int session_connect (SESSION * session)
 	 * (too lazy to do getpeername() later ;)
 	 */
 	DSFYstrncpy (session->server_host, host, sizeof session->server_host);
-	session->server_port = port;
+	session->server_port = atoi(port);
 
 	DSFYstrncpy (session->user_info.server_host, host,
 		     sizeof session->user_info.server_host);
-	session->user_info.server_port = port;
+	session->user_info.server_port = atoi(port);
 
 	return 0;
 }
