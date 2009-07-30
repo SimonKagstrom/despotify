@@ -66,8 +66,6 @@ static void* despotify_thread(void* arg)
 
         handle_packet(s, hdr.cmd, payload, hdr.len);
         DSFYfree(payload); /* Allocated in packet_read() */
-
-	pthread_testcancel();
     }
 
     DSFYDEBUG("Networking thread exiting\n");
@@ -85,6 +83,7 @@ struct despotify_session* despotify_init_client(void(*callback)(struct despotify
     if (!ds->session)
         return NULL;
 
+    ds->thread = NULL;
     pthread_cond_init(&ds->sync_cond, NULL);
     pthread_mutex_init(&ds->sync_mutex, NULL);
 
@@ -176,12 +175,14 @@ void despotify_free(struct despotify_session* ds, bool should_disconnect)
         session_disconnect(ds->session);
     }
 
-    DSFYDEBUG("Canceling despotify networking thread\n");
-    r = pthread_cancel(ds->thread);
-    DSFYDEBUG("pthread_cancel() returned %d\n", r);
-
-    r = pthread_join(ds->thread, NULL);
-    DSFYDEBUG("Joined despotify networking thread, return value is %d\n", r);
+    if (ds->thread != NULL) {
+        DSFYDEBUG("Canceling despotify networking thread\n");
+        r = pthread_cancel(ds->thread);
+        DSFYDEBUG("pthread_cancel() returned %d\n", r);
+    
+        r = pthread_join(ds->thread, NULL);
+        DSFYDEBUG("Joined despotify networking thread, return value is %d\n", r);
+    }
 
 
     session_free(ds->session);
