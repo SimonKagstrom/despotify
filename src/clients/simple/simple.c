@@ -576,7 +576,7 @@ int main(int argc, char** argv)
     setlocale(LC_ALL, "");
 
     if (argc < 3) {
-        wrapper_wprintf(L"Usage: %s <username> <password> [listen port]\n", argv[0]);
+        wrapper_wprintf(L"Usage: %s <username> <password> [remote control port]\n", argv[0]);
         return 1;
     }
 
