@@ -15,12 +15,25 @@
 #include "despotify.h"
 #include "util.h"
 
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+static int listen_fd = -1;
+static int client_fd = -1;
+char *wrapper_read_command(void);
+int wrapper_listen(int port);
+void wrapper_wprintf(wchar_t *fmt, ...);
+
+
 struct playlist* get_playlist(struct playlist* rootlist, int num)
 {
     struct playlist* p = rootlist;
 
     if (!p) {
-        wprintf(L"Stored lists not loaded. Run 'list' without parameter to load.\n");
+        wrapper_wprintf(L"Stored lists not loaded. Run 'list' without parameter to load.\n");
     }
     else {
         /* skip to playlist number <num> */
@@ -29,7 +42,7 @@ struct playlist* get_playlist(struct playlist* rootlist, int num)
 
 
         if (!p)
-            wprintf(L"Invalid playlist number %d\n", num);
+            wrapper_wprintf(L"Invalid playlist number %d\n", num);
     }
 
     return p;
@@ -38,12 +51,12 @@ struct playlist* get_playlist(struct playlist* rootlist, int num)
 void print_list_of_lists(struct playlist* rootlist)
 {
     if (!rootlist) {
-        wprintf(L" <no stored playlists>\n");
+        wrapper_wprintf(L" <no stored playlists>\n");
     }
     else {
         int count=1;
         for (struct playlist* p = rootlist; p; p = p->next)
-            wprintf(L"%2d: %-40s %3d %c %s\n", count++, p->name, p->num_tracks,
+            wrapper_wprintf(L"%2d: %-40s %3d %c %s\n", count++, p->name, p->num_tracks,
                    p->is_collaborative ? '*' : ' ', p->author);
     }
 }
@@ -51,61 +64,61 @@ void print_list_of_lists(struct playlist* rootlist)
 void print_tracks(struct track* head)
 {
     if (!head) {
-        wprintf(L" <empty playlist>\n");
+        wrapper_wprintf(L" <empty playlist>\n");
         return;
     }
 
     int count = 1;
     for (struct track* t = head; t; t = t->next) {
         if (t->has_meta_data) {
-            wprintf(L"%3d: %-40s %2d:%02d ", count++, t->title,
+            wrapper_wprintf(L"%3d: %-40s %2d:%02d ", count++, t->title,
                    t->length / 60000, t->length % 60000 / 1000);
             for (struct artist* a = t->artist; a; a = a->next)
-                wprintf(L"%s%s", a->name, a->next ? ", " : "");
-            wprintf(L" %s\n", t->playable ? "" : "(Unplayable)");
+                wrapper_wprintf(L"%s%s", a->name, a->next ? ", " : "");
+            wrapper_wprintf(L" %s\n", t->playable ? "" : "(Unplayable)");
         }
         else
-            wprintf(L"%3d: N/A\n", count++);
+            wrapper_wprintf(L"%3d: N/A\n", count++);
     }
 }
 
 void print_track_full(struct track* t)
 {
     if(t->has_meta_data) {
-        wprintf(L"\nTitle: %s\nAlbum: %s\nArtist(s): ",
+        wrapper_wprintf(L"\nTitle: %s\nAlbum: %s\nArtist(s): ",
                t->title, t->album);
 
         for (struct artist* a = t->artist; a; a = a->next)
-            wprintf(L"%s%s", a->name, a->next ? ", " : "");
+            wrapper_wprintf(L"%s%s", a->name, a->next ? ", " : "");
 
-        wprintf(L"\nYear: %d\nLength: %02d:%02d\n\n",
+        wrapper_wprintf(L"\nYear: %d\nLength: %02d:%02d\n\n",
                t->year, t->length / 60000, t->length % 60000 / 1000);
     } else {
-        wprintf(L" <track has no metadata>\n");
+        wrapper_wprintf(L" <track has no metadata>\n");
     }
 }
 
 void print_album(struct album_browse* a)
 {
-    wprintf(L"\nName: %s\nYear: %d\n",
+    wrapper_wprintf(L"\nName: %s\nYear: %d\n",
             a->name, a->year);
     print_tracks(a->tracks);
 }
 
 void print_artist(struct artist_browse* a)
 {
-    wprintf(L"\nName: %s\n"
+    wrapper_wprintf(L"\nName: %s\n"
            "Genres: %s\n"
            "Years active: %s\n"
            "%d albums:\n",
            a->name, a->genres, a->years_active, a->num_albums);
     for (struct album_browse* al = a->albums; al; al = al->next)
-        wprintf(L" %s (%d)\n", al->name, al->year);
+        wrapper_wprintf(L" %s (%d)\n", al->name, al->year);
 }
 
 void print_playlist(struct playlist* pls)
 {
-    wprintf(L"\nName: %s\nAuthor: %s\n",
+    wrapper_wprintf(L"\nName: %s\nAuthor: %s\n",
            pls->name, pls->author);
     print_tracks(pls->tracks);
 }
@@ -113,23 +126,23 @@ void print_playlist(struct playlist* pls)
 void print_search(struct search_result *search)
 {
     if (search->suggestion[0])
-        wprintf(L"\nDid you mean \"%s\"?\n", search->suggestion);
+        wrapper_wprintf(L"\nDid you mean \"%s\"?\n", search->suggestion);
 
     if (search->total_artists > 0) {
-        wprintf(L"\nArtists found (%d):\n", search->total_artists);
+        wrapper_wprintf(L"\nArtists found (%d):\n", search->total_artists);
 
         for (struct artist* artist = search->artists; artist; artist = artist->next)
-            wprintf(L" %s\n", artist->name);
+            wrapper_wprintf(L" %s\n", artist->name);
     }
 
     if (search->total_albums > 0) {
-        wprintf(L"\nAlbums found (%d):\n", search->total_albums);
+        wrapper_wprintf(L"\nAlbums found (%d):\n", search->total_albums);
         for (struct album* album = search->albums; album; album = album->next)
-            wprintf(L" %s\n", album->name);
+            wrapper_wprintf(L" %s\n", album->name);
     }
 
     if (search->total_tracks > 0) {
-        wprintf(L"\nTracks found (%d/%d):\n", search->playlist->num_tracks, search->total_tracks);
+        wrapper_wprintf(L"\nTracks found (%d/%d):\n", search->playlist->num_tracks, search->total_tracks);
         print_tracks(search->tracks);
     }
 }
@@ -137,15 +150,15 @@ void print_search(struct search_result *search)
 void print_info(struct despotify_session* ds)
 {
     struct user_info* user = ds->user_info;
-    wprintf(L"Username       : %s\n", user->username);
-    wprintf(L"Country        : %s\n", user->country);
-    wprintf(L"Account type   : %s\n", user->type);
-    wprintf(L"Account expiry : %s", ctime(&user->expiry));
-    wprintf(L"Host           : %s:%d\n", user->server_host, user->server_port);
-    wprintf(L"Last ping      : %s", ctime(&user->last_ping));
+    wrapper_wprintf(L"Username       : %s\n", user->username);
+    wrapper_wprintf(L"Country        : %s\n", user->country);
+    wrapper_wprintf(L"Account type   : %s\n", user->type);
+    wrapper_wprintf(L"Account expiry : %s", ctime(&user->expiry));
+    wrapper_wprintf(L"Host           : %s:%d\n", user->server_host, user->server_port);
+    wrapper_wprintf(L"Last ping      : %s", ctime(&user->last_ping));
 
     if (strncmp(user->type, "premium", 7)) {
-        wprintf(L"\n=================================================\n"
+        wrapper_wprintf(L"\n=================================================\n"
                "                  N O T I C E\n"
                "       You do not have a premium account.\n"
                "     Spotify services will not be available.\n"
@@ -155,7 +168,7 @@ void print_info(struct despotify_session* ds)
 
 void print_help(void)
 {
-    wprintf(L"\nAvailable commands:\n\n"
+    wrapper_wprintf(L"\nAvailable commands:\n\n"
            "list [num]              List stored playlists\n"
            "rename [num] [string]   Rename playlist\n"
            "collab [num]            Toggle playlist collaboration\n"
@@ -179,7 +192,7 @@ void print_help(void)
 void command_loop(struct despotify_session* ds)
 {
     bool loop = true;
-    char buf[80];
+    char *buf;
     struct playlist* rootlist = NULL;
     struct playlist* searchlist = NULL;
     struct playlist* lastlist = NULL;
@@ -191,11 +204,8 @@ void command_loop(struct despotify_session* ds)
     do {
         wprintf(L"\n> ");
         fflush(stdout);
-        bzero(buf, sizeof buf);
-        if(fgets(buf, sizeof buf -1, stdin) == NULL)
+	if((buf = wrapper_read_command()) == NULL)
 		break;
-
-        buf[strlen(buf) - 1] = 0; /* remove newline */
 
         /* list */
         if (!strncmp(buf, "list", 4)) {
@@ -229,13 +239,13 @@ void command_loop(struct despotify_session* ds)
 
                 if (p) {
                     if (despotify_rename_playlist(ds, p, name))
-                        wprintf(L"Renamed playlist %d to \"%s\".\n", num, name);
+                        wrapper_wprintf(L"Renamed playlist %d to \"%s\".\n", num, name);
                     else
-                        wprintf(L"Rename failed: %s\n", despotify_get_error(ds));
+                        wrapper_wprintf(L"Rename failed: %s\n", despotify_get_error(ds));
                 }
             }
             else
-                wprintf(L"Usage: rename [num] [string]\n");
+                wrapper_wprintf(L"Usage: rename [num] [string]\n");
         }
 
         /* collab */
@@ -249,15 +259,15 @@ void command_loop(struct despotify_session* ds)
 
                 if (p) {
                     if (despotify_set_playlist_collaboration(ds, p, !p->is_collaborative))
-                        wprintf(L"Changed playlist %d collaboration to %s.\n",
+                        wrapper_wprintf(L"Changed playlist %d collaboration to %s.\n",
                                 num, p->is_collaborative ? "ON" : "OFF");
                     else
-                        wprintf(L"Setting playlist collaboration state failed: %s\n",
+                        wrapper_wprintf(L"Setting playlist collaboration state failed: %s\n",
                                 despotify_get_error(ds));
                 }
             }
             else
-                wprintf(L"Usage: collab [num]\n");
+                wrapper_wprintf(L"Usage: collab [num]\n");
         }
 
         /* search */
@@ -269,14 +279,14 @@ void command_loop(struct despotify_session* ds)
                 despotify_stop(ds); /* since we replace the list */
                 search = despotify_search(ds, buf + 7, MAX_SEARCH_RESULTS);
                 if (!search) {
-                    wprintf(L"Search failed: %s\n", despotify_get_error(ds));
+                    wrapper_wprintf(L"Search failed: %s\n", despotify_get_error(ds));
                     continue;
                 }
                 searchlist = search->playlist;
             }
             else if (searchlist && (searchlist->num_tracks < search->total_tracks))
                 if (!despotify_search_more(ds, search, searchlist->num_tracks, MAX_SEARCH_RESULTS)) {
-                    wprintf(L"Search failed: %s\n", despotify_get_error(ds));
+                    wrapper_wprintf(L"Search failed: %s\n", despotify_get_error(ds));
                     continue;
                 }
 
@@ -287,18 +297,18 @@ void command_loop(struct despotify_session* ds)
                 lastlist = searchlist;
             }
             else
-                wprintf(L"No previous search\n");
+                wrapper_wprintf(L"No previous search\n");
         }
 
         /* artist */
         else if (!strncmp(buf, "artist", 6)) {
             int num = atoi(buf + 7);
             if (!num) {
-                wprintf(L"usage: artist [num]\n");
+                wrapper_wprintf(L"usage: artist [num]\n");
                 continue;
             }
             if (!lastlist) {
-                wprintf(L"No playlist\n");
+                wrapper_wprintf(L"No playlist\n");
                 continue;
             }
 
@@ -318,11 +328,11 @@ void command_loop(struct despotify_session* ds)
         else if (!strncmp(buf, "album", 5)) {
             int num = atoi(buf + 6);
             if (!num) {
-                wprintf(L"usage: album [num]\n");
+                wrapper_wprintf(L"usage: album [num]\n");
                 continue;
             }
             if (!lastlist) {
-                wprintf(L"No playlist\n");
+                wrapper_wprintf(L"No playlist\n");
                 continue;
             }
 
@@ -338,7 +348,7 @@ void command_loop(struct despotify_session* ds)
                     despotify_free_album_browse(a);
                 }
                 else
-                    wprintf(L"Got no album for id %s\n", t->album_id);
+                    wrapper_wprintf(L"Got no album for id %s\n", t->album_id);
             }
         }
 
@@ -346,11 +356,11 @@ void command_loop(struct despotify_session* ds)
         else if (!strncmp(buf, "playalbum", 9)) {
             int num = atoi(buf + 10);
             if (!num) {
-                wprintf(L"usage: playalbum [num]\n");
+                wrapper_wprintf(L"usage: playalbum [num]\n");
                 continue;
             }
             if (!lastlist) {
-                wprintf(L"No playlist\n");
+                wrapper_wprintf(L"No playlist\n");
                 continue;
             }
 
@@ -370,7 +380,7 @@ void command_loop(struct despotify_session* ds)
                 if (playalbum)
                     despotify_play(ds, playalbum->tracks, true);
                 else
-                    wprintf(L"Got no album for id %s\n", t->album_id);
+                    wrapper_wprintf(L"Got no album for id %s\n", t->album_id);
             }
         }
 
@@ -378,7 +388,7 @@ void command_loop(struct despotify_session* ds)
         else if (!strncmp(buf, "uri", 3)) {
             char *uri = buf + 4;
             if(strlen(uri) == 0) {
-                wprintf(L"usage: info <uri>\n");
+                wrapper_wprintf(L"usage: info <uri>\n");
                 continue;
             }
 
@@ -431,7 +441,7 @@ void command_loop(struct despotify_session* ds)
                     break;
 
                 default:
-                    wprintf(L"%s is a invalid Spotify URI\n", uri);
+                    wrapper_wprintf(L"%s is a invalid Spotify URI\n", uri);
             }
 
             despotify_free_link(link);
@@ -441,11 +451,11 @@ void command_loop(struct despotify_session* ds)
         else if (!strncmp(buf, "portrait", 8)) {
             int num = atoi(buf + 9);
             if (!num) {
-                wprintf(L"usage: portrait [num]\n");
+                wrapper_wprintf(L"usage: portrait [num]\n");
                 continue;
             }
             if (!lastlist) {
-                wprintf(L"No playlist\n");
+                wrapper_wprintf(L"No playlist\n");
                 continue;
             }
 
@@ -458,7 +468,7 @@ void command_loop(struct despotify_session* ds)
                 int len;
                 void* portrait = despotify_get_image(ds, a->portrait_id, &len);
                 if (portrait && len) {
-                    wprintf(L"Writing %d bytes into portrait.jpg\n", len);
+                    wrapper_wprintf(L"Writing %d bytes into portrait.jpg\n", len);
                     FILE* f = fopen("portrait.jpg", "w");
                     if (f) {
                         fwrite(portrait, len, 1, f);
@@ -468,14 +478,14 @@ void command_loop(struct despotify_session* ds)
                 }
             }
             else
-                wprintf(L"Artist %s has no portrait.\n", a->name);
+                wrapper_wprintf(L"Artist %s has no portrait.\n", a->name);
             despotify_free_artist_browse(a);
         }
 
         /* play */
         else if (!strncmp(buf, "play", 4) || !strncmp(buf, "next", 4)) {
             if (!lastlist) {
-                wprintf(L"No list to play from. Use 'list' or 'search' to select a list.\n");
+                wrapper_wprintf(L"No list to play from. Use 'list' or 'search' to select a list.\n");
                 continue;
             }
 
@@ -488,7 +498,7 @@ void command_loop(struct despotify_session* ds)
                     t = t->next;
 
                 if (!t) {
-                    wprintf(L"Invalid track number %d\n", listoffset);
+                    wrapper_wprintf(L"Invalid track number %d\n", listoffset);
                 }
             }
             else {
@@ -499,7 +509,7 @@ void command_loop(struct despotify_session* ds)
 
             if (t) {
                 despotify_play(ds, t, true);
-                wprintf(L"New track: %s / %s (%d:%02d)\n",
+                wrapper_wprintf(L"New track: %s / %s (%d:%02d)\n",
                         t->title, t->artist->name,
                         t->length / 60000, t->length % 60000 / 1000);
             }
@@ -553,7 +563,7 @@ void callback(struct despotify_session* ds, int signal, void* data, void* callba
     switch (signal) {
         case DESPOTIFY_TRACK_CHANGE: {
             struct track* t = data;
-            wprintf(L"New track: %s / %s (%d:%02d)\n",
+            wrapper_wprintf(L"New track: %s / %s (%d:%02d)\n",
                     t->title, t->artist->name,
                     t->length / 60000, t->length % 60000 / 1000);
             break;
@@ -566,21 +576,26 @@ int main(int argc, char** argv)
     setlocale(LC_ALL, "");
 
     if (argc < 3) {
-        wprintf(L"Usage: %s <username> <password>\n", argv[0]);
+        wrapper_wprintf(L"Usage: %s <username> <password> [listen port]\n", argv[0]);
         return 1;
     }
 
     DSFYDEBUG("$Id$\n");
     if (!despotify_init())
     {
-        wprintf(L"despotify_init() failed\n");
+        wrapper_wprintf(L"despotify_init() failed\n");
         return 1;
     }
 
     struct despotify_session* ds = despotify_init_client(callback, NULL);
     if (!ds) {
-        wprintf(L"despotify_init_client() failed\n");
+        wrapper_wprintf(L"despotify_init_client() failed\n");
         return 1;
+    }
+
+    if(argc == 4 && wrapper_listen(atoi(argv[3]))) {
+        wrapper_wprintf(L"wrapper_listen() failed to listen on local port %s\n", argv[3]);
+    	return 1;
     }
 
     if (!despotify_authenticate(ds, argv[1], argv[2])) {
@@ -597,9 +612,158 @@ int main(int argc, char** argv)
 
     if (!despotify_cleanup())
     {
-        wprintf(L"despotify_cleanup() failed\n");
+        wrapper_wprintf(L"despotify_cleanup() failed\n");
         return 1;
     }
 
     return 0;
+}
+
+
+int wrapper_listen(int port) {
+	struct sockaddr_in sin;
+	int value;
+
+	memset(&sin, 0, sizeof(sin));
+	sin.sin_family = PF_INET;
+	sin.sin_port = htons(port);
+	sin.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+	if((listen_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+		return -1;
+	
+	value = 1;
+	setsockopt(listen_fd, SOL_SOCKET, SO_REUSEPORT, &value, sizeof(int));
+
+	if(bind(listen_fd, (struct sockaddr *)&sin, sizeof(sin)) < 0
+		|| listen(listen_fd, 1) < 0) {
+		close(listen_fd);
+		listen_fd = -1;
+
+		return -1;
+	}
+
+	return 0;
+}
+
+char *wrapper_read_command(void) {
+	static char sock_buf[256] = { 0 };
+	static char stdin_buf[256] = { 0 };
+	static int sock_buf_len;
+	static int stdin_buf_len;
+	static char *command = NULL;
+
+	fd_set rfds;
+	int max_fd = 0;
+	char *ptr;
+	int ret;
+
+	if(command) {
+		free(command);
+		command = NULL;
+	}
+
+	for(;;) {
+		FD_ZERO(&rfds);
+		if(isatty(0))
+			FD_SET(0, &rfds);
+	
+		if(listen_fd != -1 && client_fd == -1) {
+			FD_SET(listen_fd, &rfds);
+			max_fd = listen_fd;
+		}
+		else if(client_fd != -1) {
+			FD_SET(client_fd, &rfds);
+			max_fd = client_fd;
+		}
+
+		if(select(max_fd + 1, &rfds, NULL, NULL, NULL) < 0)
+			break;
+
+		if(FD_ISSET(0, &rfds)) {
+			ret = read(0, stdin_buf + stdin_buf_len, sizeof(stdin_buf) - stdin_buf_len - 1);
+			if(ret > 0) {
+				stdin_buf_len += ret;
+				stdin_buf[stdin_buf_len] = 0;
+			}
+		}
+
+		if(listen_fd >= 0 && FD_ISSET(listen_fd, &rfds)) {
+			client_fd = accept(listen_fd, NULL, NULL);
+			continue;
+		}
+
+		if(client_fd >= 0 && FD_ISSET(client_fd, &rfds)) {
+			ret = read(client_fd, sock_buf + sock_buf_len, sizeof(sock_buf) - sock_buf_len - 1);
+			if(ret > 0) {
+				sock_buf_len += ret;
+				sock_buf[sock_buf_len] = 0;
+			}
+			else {
+				close(client_fd);
+				client_fd = -1;
+				sock_buf_len = 0;
+				*sock_buf = 0;
+			}
+		}
+
+		if((ptr = strchr(stdin_buf, '\n')) != NULL) {
+			*ptr++ = 0;
+			if(strlen(stdin_buf))
+				command = strdup(stdin_buf);
+			stdin_buf_len -= ptr - stdin_buf;
+			memmove(stdin_buf, ptr, stdin_buf_len + 1);
+			if(command)
+				break;
+		}
+		else if((ptr = strchr(sock_buf, '\n')) != NULL) {
+			*ptr++ = 0;
+			if(strlen(sock_buf))
+				command = strdup(sock_buf);
+			sock_buf_len -= ptr - sock_buf;
+			memmove(sock_buf, ptr, sock_buf_len + 1);
+			if(command)
+				break;
+		}
+	}
+
+	return command;
+}
+
+
+void wrapper_wprintf(wchar_t *fmt, ...) {
+	wchar_t wstr[4096];
+	char mbstr[4096];
+	char *ptr;
+	va_list ap;
+	int ret, written;
+
+	va_start(ap, fmt);
+	ret = vswprintf(wstr, sizeof(wstr) - 1, fmt, ap);
+	va_end(ap);
+
+	if(ret >= (int)sizeof(wstr))
+		return;
+
+	wcstombs(mbstr, wstr, sizeof(mbstr) - 1);
+	mbstr[sizeof(mbstr) - 1] = 0;
+
+	if(isatty(0))
+		wprintf(L"%S", wstr);
+	
+	if(client_fd == -1)
+		return;
+
+	ptr = mbstr;
+	ret = strlen(mbstr);
+	while(ret > 0) {
+		if((written = write(client_fd, ptr, ret)) <= 0) {
+			close(client_fd);
+			client_fd = -1;
+			break;
+		}
+
+		ptr += written;
+		ret -= written;
+	}
 }
