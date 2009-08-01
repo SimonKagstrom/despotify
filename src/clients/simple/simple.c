@@ -212,7 +212,11 @@ void command_loop(struct despotify_session* ds)
 
         /* list */
         if (!strncmp(buf, "list", 4)) {
-            int num = atoi(buf + 5);
+            int num = 0;
+
+	    if(strlen(buf) > 5)
+	    	num = atoi(buf + 5);
+
             if (num) {
                 struct playlist* p = get_playlist(rootlist, num);
 
@@ -305,7 +309,11 @@ void command_loop(struct despotify_session* ds)
 
         /* artist */
         else if (!strncmp(buf, "artist", 6)) {
-            int num = atoi(buf + 7);
+            int num = 0;
+
+	    if(strlen(buf) > 7)
+	    	num = atoi(buf + 7);
+
             if (!num) {
                 wrapper_wprintf(L"usage: artist [num]\n");
                 continue;
@@ -329,7 +337,11 @@ void command_loop(struct despotify_session* ds)
 
         /* album */
         else if (!strncmp(buf, "album", 5)) {
-            int num = atoi(buf + 6);
+            int num = 0;
+	    
+	    if(strlen(buf) > 6)
+	    	atoi(buf + 6);
+
             if (!num) {
                 wrapper_wprintf(L"usage: album [num]\n");
                 continue;
@@ -357,7 +369,11 @@ void command_loop(struct despotify_session* ds)
 
         /* playalbum */
         else if (!strncmp(buf, "playalbum", 9)) {
-            int num = atoi(buf + 10);
+            int num = 0;
+	    
+	    if(strlen(buf) > 10)
+	    	num = atoi(buf + 10);
+
             if (!num) {
                 wrapper_wprintf(L"usage: playalbum [num]\n");
                 continue;
@@ -452,7 +468,11 @@ void command_loop(struct despotify_session* ds)
 
         /* portrait */
         else if (!strncmp(buf, "portrait", 8)) {
-            int num = atoi(buf + 9);
+            int num = 0;
+	    
+	    if(strlen(buf) > 9)
+	    	num = atoi(buf + 9);
+
             if (!num) {
                 wrapper_wprintf(L"usage: portrait [num]\n");
                 continue;
