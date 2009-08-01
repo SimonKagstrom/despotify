@@ -24,10 +24,6 @@
 #include "util.h"
 
 
-#ifndef SO_REUSEPORT
-# define SO_REUSEPORT 15 //TODO
-#endif
-
 static int listen_fd = -1;
 static int client_fd = -1;
 char *wrapper_read_command(void);
@@ -640,7 +636,7 @@ int wrapper_listen(int port) {
 		return -1;
 	
 	value = 1;
-	setsockopt(listen_fd, SOL_SOCKET, SO_REUSEPORT, &value, sizeof(int));
+	setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(int));
 
 	if(bind(listen_fd, (struct sockaddr *)&sin, sizeof(sin)) < 0
 		|| listen(listen_fd, 1) < 0) {
