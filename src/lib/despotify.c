@@ -83,7 +83,7 @@ struct despotify_session* despotify_init_client(void(*callback)(struct despotify
     if (!ds->session)
         return NULL;
 
-    ds->thread = NULL;
+    ds->thread = (pthread_t)0;
     pthread_cond_init(&ds->sync_cond, NULL);
     pthread_mutex_init(&ds->sync_mutex, NULL);
 
@@ -175,7 +175,7 @@ void despotify_free(struct despotify_session* ds, bool should_disconnect)
         session_disconnect(ds->session);
     }
 
-    if (ds->thread != NULL) {
+    if (ds->thread) {
         DSFYDEBUG("Canceling despotify networking thread\n");
         r = pthread_cancel(ds->thread);
         DSFYDEBUG("pthread_cancel() returned %d\n", r);
