@@ -8,17 +8,25 @@
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
 #include <wchar.h>
-#include "despotify.h"
-#include "util.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
+#include "despotify.h"
+#include "util.h"
+
+
+#ifndef SO_REUSEPORT
+# define SO_REUSEPORT 15 //TODO
+#endif
 
 static int listen_fd = -1;
 static int client_fd = -1;
