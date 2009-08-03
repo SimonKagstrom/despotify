@@ -894,11 +894,13 @@ void despotify_free_playlist(struct playlist* p)
 struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
 {
     /* load list of lists */
+    DSFYDEBUG("Requesting meta playlist\n");
     struct playlist* metalist = despotify_get_playlist(ds, NULL);
     struct playlist* root = NULL;
     struct playlist* prev = NULL;
 
     for (struct playlist* p = metalist; p && p->playlist_id[0]; p = p->next) {
+        DSFYDEBUG("Requesting playlist with ID '%s'\n", p->playlist_id);
         struct playlist* new = despotify_get_playlist(ds, p->playlist_id);
         if (prev)
             prev->next = new;
