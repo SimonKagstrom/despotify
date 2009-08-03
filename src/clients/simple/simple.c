@@ -340,7 +340,7 @@ void command_loop(struct despotify_session* ds)
             int num = 0;
 	    
 	    if(strlen(buf) > 6)
-	    	atoi(buf + 6);
+	    	num = atoi(buf + 6);
 
             if (!num) {
                 wrapper_wprintf(L"usage: album [num]\n");
