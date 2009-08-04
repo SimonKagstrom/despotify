@@ -11,3 +11,35 @@ gateway   -- This is a REST gateway to the spotify servers, i.e. it
              interfaces HTTP requests with spotify. (like a bridge)
 PHP       -- This isn't a standalone client, per se, but a PHP class
              that simplifies communication with the gateway.
+
+
+BUILDING ON LINUX
+=================
+For building on Debian/Ubuntu, you need to install the following packages:
+  aptitude install libssl-dev zlib1g-dev libvorbis-dev libtool
+
+For audio output you need to pick one of the below packages to install
+  # Audio with GStreamer backend (default)
+  aptitude install libgstreamer-plugins-base0.10-0 libgstreamer0.10-dev
+
+  # Audio with libao backend
+  aptitude install libao-dev
+
+  # Audio with PulseAudio backend (has a known issue with playing next song)
+  aptitude install libpulse-dev
+
+Which audio back is selected is controlled via the file src/Makefile.local.mk.
+That file is created from src/Makefile.local.mk.dist when make is run.
+Uncomment the audio backend you would like to use in Makefile.local.mk:
+  ## Choose audio backend
+  LINUX_BACKEND = gstreamer
+  # LINUX_BACKEND = pulseaudio
+  # LINUX_BACKEND = libao
+
+
+BUILDING ON MACOSX
+==================
+The following extra packages are required to build despotify on Mac OS X
+  ncurses openssl zlib libvorbis expat
+
+They can be installed from MacPorts or manually.
