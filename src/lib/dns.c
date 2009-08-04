@@ -89,15 +89,24 @@ char *dns_srv_list (char *hostname)
 		n_srv++;
 	}
     #elif defined __use_winsock__
-	PDNS_RECORD p = NULL;
-	if (DnsQuery_A(hostname, DNS_TYPE_SRV, DNS_QUERY_STANDARD, NULL, &p, NULL) != 0) return NULL;
+	PDNS_RECORD pRoot = NULL, p;
+
+	if (DnsQuery_A(hostname, DNS_TYPE_SRV, DNS_QUERY_STANDARD, NULL, &pRoot, NULL) != 0)
+		return NULL;
+
 	i = 0;
-	for (; p->pNext != NULL && i < 10; p = p->pNext) {
+	for (p = pRoot; pt != NULL && i < 10; p = p->pNext) {
+		if(p->wType != DNS_TYPE_SRV)
+			continue;
+
 		svr[i] = strdup (p->Data.SRV.pNameTarget);
 		svr_prio[i] = p->Data.SRV.wPriority;
 		svr_port[i++] = p->Data.SRV.wPort;
 	}
+
 	n_srv = i;
+	DnsRecordListFree(pRoot, DnsFreeRecordListDeep);
+
     #endif
 
 	lowest_prio = 0;
