@@ -50,7 +50,7 @@ If you encounter any problems, ask a friend or ask in the channel
 4. Install
    $ sudo make install
 
-5. You'll now have a client called 'simple' and a gateway called 'gateway'
+5. You'll now have a client called 'despotify-simple' and a gateway called 'gateway'
    installed under ${INSTALL_PREFIX}/bin (usually this will be /usr/bin)
 
 

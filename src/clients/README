@@ -1,10 +1,12 @@
 Here you can find various clients.
 
 simple    -- This is a simple client used for testing, with a CLI.
-             It will be installed as despotify-simple
+             It will be installed by default, as despotify-simple
              Remote control via a local TCP-port is possible
-despotify -- This is the original ncurses client, it's built by the
-             toplevel makefile
+despotify -- This is an ncurses client with vim-like key bindings
+             It will installed by default, as despotify
+maemify   -- GTK or Maemo 4 (Nokia N810 Internet Table) GUI client
+             Not built by default
 gateway   -- This is a REST gateway to the spotify servers, i.e. it
              interfaces HTTP requests with spotify. (like a bridge)
 PHP       -- This isn't a standalone client, per se, but a PHP class
