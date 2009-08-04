@@ -10,7 +10,11 @@ LIB = $(LIBDIR)/libdespotify.la
 NCURSES_INCLUDE ?= /usr/include/ncursesw
 
 CFLAGS += -I$(LIBDIR) -I$(NCURSES_INCLUDE)
-LDFLAGS += -lncursesw
+ifeq ($(shell uname -s),Darwin)
+    LDFLAGS += -lncurses
+else
+    LDFLAGS += -lncursesw
+endif
 
 DESPOTIFY_OBJS = commands.o event.o main.o session.o ui.o ui_footer.o ui_help.o ui_log.o ui_sidebar.o ui_splash.o ui_tracklist.o
 
