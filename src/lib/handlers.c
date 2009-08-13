@@ -14,6 +14,7 @@
 
 #include "channel.h"
 #include "commands.h"
+#include "handlers.h"
 #include "packet.h"
 #include "util.h"
 #include "xml.h"
@@ -126,7 +127,7 @@ static int handle_welcome (SESSION * session)
 }
 
 int handle_packet (SESSION * session,
-		   int cmd, unsigned char *payload, int len)
+		   int cmd, unsigned char *payload, unsigned short len)
 {
 	int error = 0;
 
