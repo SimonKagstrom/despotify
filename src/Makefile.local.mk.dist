@@ -30,3 +30,8 @@ LINUX_BACKEND = gstreamer
 
 ## Adjust linking flags
 # LDFLAGS += -L/usr/local/lib
+
+## If you're on Mac OS X and have installed libvorbisfile
+## via 'port install ..', try uncommenting these lines
+# CFLAGS += /opt/local/include
+# LDFLAGS += /opt/local/lib
