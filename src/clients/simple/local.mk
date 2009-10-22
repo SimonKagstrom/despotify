@@ -4,7 +4,7 @@ OBJS = simple.o
 LIBDIR = ../../lib
 LIB = $(LIBDIR)/libdespotify.la
 
-CFLAGS += -I$(LIBDIR) -std=c99
+CFLAGS += -I$(LIBDIR)
 
 all: simple
 
