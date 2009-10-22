@@ -399,7 +399,7 @@ static size_t snd_read_and_dequeue_callback (void *ptr, size_t size,
 	}
 
 	DSFYDEBUG ("Processing one buffer at fifo->start."
-			" %ld items of size %ld requested\n", size, nmemb);
+                   " %z items of size %z requested\n", size, nmemb);
 
 	/* We have data .. process one buffer */
 	b = session->fifo->start;
