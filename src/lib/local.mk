@@ -63,7 +63,7 @@ endif
 ifeq ($(shell uname -s),FreeBSD)
     LIB_OBJS += pulseaudio.lo
     CFLAGS += -I/usr/local/include
-    LDFLAGS += -L/usr/local/include -lpulse -lpulse-simple
+    LDFLAGS += -L/usr/local/lib -lpulse -lpulse-simple
 endif
 
 libdespotify.la: $(LIB_OBJS)
