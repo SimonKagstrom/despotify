@@ -109,7 +109,7 @@ int channel_process (unsigned char *buf, unsigned short len, int error)
 	unsigned short header_len, consumed_len;
 	
 	/* Extract channel ID */
-	channel_id = *(unsigned short *) buf;
+	memcpy (&channel_id, buf, 2);
 	channel_id = ntohs (channel_id);
 	buf += 2;
 	len -= 2;
@@ -147,7 +147,7 @@ int channel_process (unsigned char *buf, unsigned short len, int error)
 		consumed_len = 0;
 		while (consumed_len < len) {
 			/* Extract length of next data */
-			memcpy(&header_len,ptr,sizeof(unsigned short));
+			memcpy (&header_len, ptr, 2);
 			header_len = ntohs (header_len);
 
 			ptr += 2;
