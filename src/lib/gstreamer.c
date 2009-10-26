@@ -133,8 +133,8 @@ static void need_data_cb (GstAppSrc * src, guint length, gpointer data)
 
 	buffer = g_new (uint8_t, length);
 	while ((r =
-		pcm_read (actx->pcmprivate, (char *) buffer, length, 0, 2, 1,
-			  NULL)) == OV_HOLE)
+		pcm_read (actx->pcmprivate, (char *) buffer, length, 
+			  SYSTEM_ENDIAN, 2, 1, NULL)) == OV_HOLE)
 		DSFYDEBUG ("pcm_read() == %s, retrying.\n", "OV_HOLE");
 
 	if (r == 0) {

@@ -11,6 +11,26 @@
 
 #include "audio.h"
 
+#if defined(__linux__) 
+	#include <endian.h>
+#endif
+#if defined(__FreeBSD__)
+	#include <machine/endian.h>
+#endif
+
+
+#if defined(__BYTE_ORDER)
+	#if __BYTE_ORDER == __LITTLE_ENDIAN
+		#define SYSTEM_ENDIAN 0
+	#else
+		#define SYSTEM_ENDIAN 1
+	#endif
+#else
+	#warning "Unknown endian - Assuming little endian"
+	#define SYSTEM_ENDIAN 0
+#endif
+
+
 /* Default buffer treshold value is 80 % */
 #define BUFFER_THRESHOLD 80;
 

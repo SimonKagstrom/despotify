@@ -145,8 +145,8 @@ int libao_play (AUDIOCTX * actx)
 			break;
 
 		/* Read some data ... */
-		r = pcm_read (actx->pcmprivate, (char *) buf, sizeof (buf), 0,
-			      2, 1, NULL);
+		r = pcm_read (actx->pcmprivate, (char *) buf, sizeof (buf), 
+			      SYSTEM_ENDIAN, 2, 1, NULL);
 
 		if (r == OV_HOLE) {	/* vorbis got garbage */
 			DSFYDEBUG ("pcm_read() == OV_HOLE\n");

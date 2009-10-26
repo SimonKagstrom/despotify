@@ -147,7 +147,7 @@ int channel_process (unsigned char *buf, unsigned short len, int error)
 		consumed_len = 0;
 		while (consumed_len < len) {
 			/* Extract length of next data */
-			header_len = *(unsigned short *) ptr;
+			memcpy(&header_len,ptr,sizeof(unsigned short));
 			header_len = ntohs (header_len);
 
 			ptr += 2;

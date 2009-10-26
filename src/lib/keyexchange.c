@@ -258,6 +258,7 @@ int read_server_initial_packet (SESSION * session)
             int len2 = ntohs(chalen[2]);
             int len3 = ntohs(chalen[3]);
             int totlen = puzzle_len + len1 + len2 + len3;
+            int normalize = 0;
 
             struct buf* b = buf_new();
             buf_extend(b, totlen);
@@ -276,7 +277,8 @@ int read_server_initial_packet (SESSION * session)
 
             if (b->ptr[0] == 1) {
                 session->puzzle_denominator = b->ptr[1];
-                session->puzzle_magic = ntohl( *((int*)(b->ptr + 2)));
+                memcpy(&normalize, b->ptr+2, sizeof(int));
+                session->puzzle_magic = ntohl(normalize);
             }
             else {
                 DSFYDEBUG("Unexpected puzzle challenge\n");

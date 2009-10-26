@@ -215,7 +215,7 @@ static OSStatus audio_callback (AudioDeviceID dev,
 		if ((ret =
 		     pcm_read (actx->pcmprivate, (char *) buf,
 			       samples_available * sizeof (short) *
-			       num_channels, 0, 2, 1, NULL)) <= 0) {
+			       num_channels, SYSTEM_ENDIAN, 2, 1, NULL)) <= 0) {
 
 			DSFYDEBUG ("pcm_read(): got short count, error %d\n",
 				   ret);
