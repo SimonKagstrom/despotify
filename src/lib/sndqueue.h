@@ -16,6 +16,8 @@
 #endif
 #if defined(__FreeBSD__)
 	#include <machine/endian.h>
+	#define __BYTE_ORDER _BYTE_ORDER
+	#define __LITTLE_ENDIAN _LITTLE_ENDIAN
 #endif
 
 
