@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    appdata->ds = despotify_init_client(callback, NULL);
+    appdata->ds = despotify_init_client(callback, NULL, false);
     if (!appdata->ds) {
         printf("despotify_init_client() failed\n");
         return 1;

@@ -21,7 +21,7 @@
 #include "util.h"
 #include "xml.h"
 
-#define BUFFER_SIZE (160*1024 * 5 / 8) /* 160 kbit * 5 seconds */
+#define BUFFER_SIZE (ds->track->file_bitrate / 1000 * 1024 * 10 / 8) /* bitrate * 10 seconds */
 #define MAX_BROWSE_REQ 244 /* max entries to load in one browse request */
 
 bool despotify_init()
@@ -73,7 +73,7 @@ static void* despotify_thread(void* arg)
     return NULL;
 }
 
-struct despotify_session* despotify_init_client(void(*callback)(struct despotify_session*, int, void*, void*), void* callback_data)
+struct despotify_session* despotify_init_client(void(*callback)(struct despotify_session*, int, void*, void*), void* callback_data, bool high_bitrate)
 {
     struct despotify_session* ds = calloc(1,sizeof(struct despotify_session));
     if (!ds)
@@ -90,6 +90,7 @@ struct despotify_session* despotify_init_client(void(*callback)(struct despotify
     ds->user_info = &ds->session->user_info;
     ds->client_callback = callback;
     ds->client_callback_data = callback_data;
+    ds->high_bitrate = high_bitrate;
 
     return ds;
 }
@@ -239,7 +240,7 @@ static int despotify_aes_callback(CHANNEL* ch,
         DSFYDEBUG ("Got AES key\n");
 
         //snd_mark_dlding(ds->snd_session);
-        snd_start(ds->snd_session);
+        snd_start(ds->snd_session, t->file_bitrate);
     }
     return 0;
 }
@@ -257,9 +258,6 @@ static int despotify_substream_callback(CHANNEL * ch,
 
     case CHANNEL_DATA: {
             int block;
-
-            DSFYDEBUG("id=%d: CHANNEL_DATA with %d bytes of song data (previously processed a total of %d bytes)\n",
-                      ch->channel_id, len, ch->total_data_len);
             unsigned char* plaintext = (unsigned char *) malloc (len + 1024);
 
             /* Decrypt each 1024 byte block */
@@ -672,7 +670,7 @@ struct search_result* despotify_search(struct despotify_session* ds,
         search->playlist = ds->playlist;
         search->tracks = ds->playlist->tracks;
 
-        ds->playlist->num_tracks = xml_parse_search(search, ds->playlist->tracks, b->ptr, b->len);
+        ds->playlist->num_tracks = xml_parse_search(search, ds->playlist->tracks, b->ptr, b->len, ds->high_bitrate);
 
         buf_free(b);
     }
@@ -722,7 +720,7 @@ struct search_result* despotify_search_more(struct despotify_session *ds,
         t = t->next = calloc(1, sizeof(struct track));
 
         ds->playlist->num_tracks += xml_parse_tracklist(t, b->ptr, b->len,
-                                                        false);
+                                                        false, ds->high_bitrate);
         buf_free(b);
     }
 
@@ -785,7 +783,7 @@ static bool despotify_load_tracks(struct despotify_session *ds)
         struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
         if (b) {
             track_count += xml_parse_tracklist(firsttrack, b->ptr, b->len,
-                                               true);
+                                               true, ds->high_bitrate);
             buf_free(b);
         }
 
@@ -1057,7 +1055,7 @@ struct artist_browse* despotify_get_artist(struct despotify_session* ds,
 
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
-        xml_parse_browse_artist(ds->artist_browse, b->ptr, b->len);
+        xml_parse_browse_artist(ds->artist_browse, b->ptr, b->len, ds->high_bitrate);
         buf_free(b);
     }
     buf_free(ds->response);
@@ -1123,7 +1121,7 @@ struct album_browse* despotify_get_album(struct despotify_session* ds,
 
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
-        xml_parse_browse_album(ds->album_browse, b->ptr, b->len);
+        xml_parse_browse_album(ds->album_browse, b->ptr, b->len, ds->high_bitrate);
         buf_free(b);
     }
     buf_free(ds->response);
@@ -1169,7 +1167,7 @@ struct track* despotify_get_tracks(struct despotify_session* ds, char* track_ids
 
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
-        xml_parse_tracklist(first, b->ptr, b->len, false);
+        xml_parse_tracklist(first, b->ptr, b->len, false, ds->high_bitrate);
         buf_free(b);
     }
 

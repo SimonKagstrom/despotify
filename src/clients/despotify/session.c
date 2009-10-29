@@ -50,7 +50,7 @@ void sess_connect()
 
   sess_disconnect();
 
-  if (!(g_session.dsfy = despotify_init_client(sess_callback, NULL)))
+  if (!(g_session.dsfy = despotify_init_client(sess_callback, NULL, true)))
     panic("despotify_init_client(...) failed");
 
   // Login with credentials set by sess_username/sess_password.

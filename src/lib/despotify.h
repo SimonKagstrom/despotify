@@ -14,6 +14,7 @@ struct track
     bool playable;
     unsigned char track_id[33];
     unsigned char file_id[41];
+    unsigned int file_bitrate;
     unsigned char album_id[33];
     unsigned char cover_id[41];
     unsigned char *key;
@@ -155,6 +156,7 @@ struct despotify_session
 
     bool list_of_lists;
     bool play_as_list;
+    bool high_bitrate;
 
     /* client callback */
     void(*client_callback)(struct despotify_session*, int, void*, void*);
@@ -169,7 +171,7 @@ bool despotify_init(void);
 bool despotify_cleanup(void);
 
 /* Session stuff. */
-struct despotify_session *despotify_init_client(void(*callback)(struct despotify_session*, int, void*, void*), void*);
+struct despotify_session *despotify_init_client(void(*callback)(struct despotify_session*, int, void*, void*), void*, bool);
 
 void despotify_exit(struct despotify_session *ds);
 

@@ -19,15 +19,24 @@ bool xml_parse_confirm(struct playlist* pl,
 
 int xml_parse_search(struct search_result* search,
                      struct track* firsttrack,
-                     unsigned char* xml, int len);
+                     unsigned char* xml,
+                     int len,
+                     bool high_bitrate);
 
 int xml_parse_tracklist(struct track* firsttrack,
-                         unsigned char* xml,
-                         int len,
-                         bool ordered);
+                        unsigned char* xml,
+                        int len,
+                        bool ordered,
+                        bool high_bitrate);
 
-bool xml_parse_browse_artist(struct artist_browse* a, unsigned char* xml, int len);
-bool xml_parse_browse_album(struct album_browse* a, unsigned char* xml, int len);
+bool xml_parse_browse_artist(struct artist_browse* a,
+                             unsigned char* xml,
+                             int len,
+                             bool high_bitrate);
+bool xml_parse_browse_album(struct album_browse* a,
+                            unsigned char* xml,
+                            int len,
+                            bool high_bitrate);
 
 void xml_free_playlist(struct playlist* pl);
 void xml_free_track(struct track* head);

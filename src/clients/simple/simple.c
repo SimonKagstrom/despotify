@@ -396,8 +396,13 @@ void command_loop(struct despotify_session* ds)
                 despotify_stop(ds);
                 playalbum = despotify_get_album(ds, t->album_id);
 
-                if (playalbum)
+                if (playalbum) {
                     despotify_play(ds, playalbum->tracks, true);
+                    wrapper_wprintf(L"New track: %s / %s (%d:%02d) %d kbit/s\n",
+                                    t->title, t->artist->name,
+                                    t->length / 60000, t->length % 60000 / 1000,
+                                    t->file_bitrate / 1000 );
+                }
                 else
                     wrapper_wprintf(L"Got no album for id %s\n", t->album_id);
             }
@@ -532,9 +537,10 @@ void command_loop(struct despotify_session* ds)
 
             if (t) {
                 despotify_play(ds, t, true);
-                wrapper_wprintf(L"New track: %s / %s (%d:%02d)\n",
-                        t->title, t->artist->name,
-                        t->length / 60000, t->length % 60000 / 1000);
+                wrapper_wprintf(L"New track: %s / %s (%d:%02d) %d kbit/s\n",
+                                t->title, t->artist->name,
+                                t->length / 60000, t->length % 60000 / 1000,
+                                t->file_bitrate / 1000 );
             }
         }
 
@@ -586,9 +592,10 @@ void callback(struct despotify_session* ds, int signal, void* data, void* callba
     switch (signal) {
         case DESPOTIFY_TRACK_CHANGE: {
             struct track* t = data;
-            wrapper_wprintf(L"New track: %s / %s (%d:%02d)\n",
-                    t->title, t->artist->name,
-                    t->length / 60000, t->length % 60000 / 1000);
+            wrapper_wprintf(L"New track: %s / %s (%d:%02d) %d kbit/s\n",
+                            t->title, t->artist->name,
+                            t->length / 60000, t->length % 60000 / 1000,
+                            t->file_bitrate / 1000);
             break;
         }
     }
@@ -610,7 +617,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    struct despotify_session* ds = despotify_init_client(callback, NULL);
+    struct despotify_session* ds = despotify_init_client(callback, NULL, true);
     if (!ds) {
         wrapper_wprintf(L"despotify_init_client() failed\n");
         return 1;

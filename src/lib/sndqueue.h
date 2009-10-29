@@ -117,6 +117,8 @@ typedef struct snd_session
 	/* time tell callback */
         time_tell_callback time_tell;
 
+        /* bitrate of currently playing file */
+        unsigned int bitrate;
 } snd_SESSION;
 
 void snd_reset (snd_SESSION * session);
@@ -129,7 +131,7 @@ void snd_set_timetell_callback (snd_SESSION * session,
                                 time_tell_callback callback);
 
 int snd_stop (void *);
-void snd_start (snd_SESSION * session);
+void snd_start (snd_SESSION * session, unsigned int bitrate);
 void snd_ioctl (struct snd_session *session, int cmd, void *data, int length);
 long pcm_read (void *private, char *buffer, int length, int bigendianp,
 	       int word, int sgned, int *bitstream);

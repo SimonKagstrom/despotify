@@ -174,14 +174,14 @@ long pcm_read (void *private, char *buffer, int length, int bigendianp,
 	/* Make sure we've always got 10 seconds of data buffered */
 	if ((session->dlstate != DL_END) &&
 			session->fifo->totbytes <
-			ov_raw_tell (session->vf) + 10 * 160 * 1024 / 8) {
+			ov_raw_tell (session->vf) + 10 * session->bitrate / 8) {
 
 		DSFYDEBUG_SNDQUEUE
 			("pcm_read(): Locking session->fifo since we're low on data (FIFO total %.3fkB, vorbis offset %.3fkB, want %.3fkB)\n",
 			 session->fifo->totbytes / 1024.0,
 			 ov_raw_tell (session->vf) / 1024.0,
 			 ((int) ov_raw_tell (session->vf) +
-			  10 * 160 * 1024 / 8 -
+			  10 * session->bitrate / 8 -
 			  session->fifo->totbytes) / 1024.0);
 		pthread_mutex_lock (&session->lock);
 
@@ -191,7 +191,9 @@ long pcm_read (void *private, char *buffer, int length, int bigendianp,
 
 			/* Call audio request function */
 			DSFYDEBUG
-				("Low on data, calling session->audio_request(session=%p)\n",
+				("Low on data (%d / %lld), calling session->audio_request(session=%p)\n",
+                                 session->fifo->totbytes,
+                                 ov_raw_tell(session->vf),
 				 session->audio_request_arg);
 
 			session->audio_request (session->audio_request_arg);
@@ -399,7 +401,8 @@ static size_t snd_read_and_dequeue_callback (void *ptr, size_t size,
 	}
 
 	DSFYDEBUG ("Processing one buffer at fifo->start."
-                   " %zd items of size %zd requested\n", size, nmemb);
+                   " %zd items of size %zd requested. Totbytes: %d\n",
+                   size, nmemb, session->fifo->totbytes );
 
 	/* We have data .. process one buffer */
 	b = session->fifo->start;
@@ -475,7 +478,7 @@ static size_t snd_read_and_dequeue_callback (void *ptr, size_t size,
  */
 
 /* Start the thread */
-void snd_start (snd_SESSION * session)
+void snd_start (snd_SESSION * session, unsigned int bitrate)
 {
 	pthread_attr_t atr;
 
@@ -483,6 +486,8 @@ void snd_start (snd_SESSION * session)
 
 	pthread_attr_init (&atr);
 	pthread_attr_setdetachstate (&atr, PTHREAD_CREATE_DETACHED);
+
+        session->bitrate = bitrate;
 
 	if (pthread_create (&session->thr_id, &atr, snd_thread, (void *) session)) {
 		perror ("pthread_create");
