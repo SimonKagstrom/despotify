@@ -192,7 +192,8 @@ int gstreamer_prepare_device (AUDIOCTX * actx)
 	assert (priv != NULL);
 
 	/* create a new gmainloop */
-	priv->loop = g_main_loop_new (NULL, FALSE);
+        GMainContext *context = g_main_context_new();
+	priv->loop = g_main_loop_new (context, FALSE);
 
 	/* create a new gstreamer pipeline */
 	priv->pipeline = gst_pipeline_new (NULL);
