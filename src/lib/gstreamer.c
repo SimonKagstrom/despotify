@@ -239,17 +239,26 @@ int gstreamer_prepare_device (AUDIOCTX * actx)
 	return 0;
 }
 
+void g_idle_add_x(GSourceFunc function, gpointer data)
+{
+    gst_PRIVATE *priv = (gst_PRIVATE *) data;
+
+    GSource *src = g_idle_source_new();
+    g_source_set_callback(src, function, data,NULL);
+    g_source_attach(src, g_main_loop_get_context(priv->loop));
+}
+
 int gstreamer_pause (AUDIOCTX * actx)
 {
 	DSFYDEBUG ("%s\n", __FUNCTION__);
-	g_idle_add (pause_cb, actx->driverprivate);
+       g_idle_add_x (pause_cb, actx->driverprivate);
 	return 0;
 }
 
 int gstreamer_resume (AUDIOCTX * actx)
 {
 	DSFYDEBUG ("%s\n", __FUNCTION__);
-	g_idle_add (resume_cb, actx->driverprivate);
+       g_idle_add_x (resume_cb, actx->driverprivate);
 	return 0;
 }
 
@@ -275,7 +284,7 @@ int gstreamer_stop (AUDIOCTX * actx)
 
 	DSFYDEBUG ("%s\n", __FUNCTION__);
 
-	g_idle_add (stop_cb, priv);
+       g_idle_add_x (stop_cb, priv);
 	actx->driverprivate = NULL;
 
 	return 0;
