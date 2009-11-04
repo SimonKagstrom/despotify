@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #include "despotify.h"
 #include "ezxml.h"
@@ -54,7 +55,11 @@ void xmlatof(float* dest, ezxml_t xml, ...)
     va_end(ap);
 
     if (r) {
+        /* some locales use "wrong" decimal sign, and atof() follows locale
+           strictly. so we change to a known locale temporarily. */
+        char* prevlocale = setlocale(LC_NUMERIC, "C");
         *dest = (float)atof(r->txt);
+        setlocale(LC_NUMERIC, prevlocale);
     }
 }
 
