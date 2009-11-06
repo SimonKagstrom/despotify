@@ -1359,7 +1359,7 @@ char* despotify_track_to_uri(struct track* track, char* dest)
     return dest;
 }
 
-struct pcm_data* despotify_get_pcm(struct despotify_session* ds)
+int despotify_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
 {
-    return snd_get_pcm(ds);
+    return snd_get_pcm(ds, pcm);
 }

@@ -68,7 +68,7 @@ static void thread_exit(void)
 static void* thread_loop(void* arg)
 {
     struct despotify_session* ds = arg;
-    struct pcm_data* pcm;
+    struct pcm_data pcm;
     
     pthread_mutex_init(&thread_mutex, NULL);
     pthread_cond_init(&thread_cond, NULL);
@@ -83,9 +83,11 @@ static void* thread_loop(void* arg)
                 break;
 
             case PLAY: {
-                pcm = despotify_get_pcm(ds);
-                audio_play_pcm(audio_device, pcm);
-                free(pcm);
+                int rc = despotify_get_pcm(ds, &pcm);
+                if (rc == 0)
+                    audio_play_pcm(audio_device, &pcm);
+                else
+                    wrapper_wprintf(L"despotify_get_pcm() returned error %d\n", rc);
                 break;
             }
 

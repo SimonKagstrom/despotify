@@ -295,7 +295,7 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
 }
 
     
-struct pcm_data* snd_get_pcm(struct despotify_session* ds)
+int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
 {
     if (!ds->vf) {
         ov_callbacks callbacks;
@@ -305,7 +305,7 @@ struct pcm_data* snd_get_pcm(struct despotify_session* ds)
         /* Allocate Vorbis struct */
         ds->vf = calloc(1, sizeof (OggVorbis_File));
         if (!ds->vf)
-            exit (-1);
+            return -1;
 
         /* Initialize Vorbis struct with the appropriate callbacks */
         callbacks.read_func = snd_ov_read_callback;
@@ -323,7 +323,7 @@ struct pcm_data* snd_get_pcm(struct despotify_session* ds)
                       ret == OV_ENOTVORBIS? "not Vorbis":
                       ret == OV_EBADHEADER? "bad header":
                       "unknown, check <vorbis/codec.h>")
-                return NULL;
+                return ret * 10;
         }
         DSFYDEBUG ("Returned from ov_open_callbacks()\n");
 
@@ -331,7 +331,6 @@ struct pcm_data* snd_get_pcm(struct despotify_session* ds)
     
     vorbis_info* vi = ov_info(ds->vf, -1);
 
-    struct pcm_data* pcm = malloc(sizeof(struct pcm_data));
     pcm->samplerate = vi->rate;
     pcm->channels = vi->channels;
 
@@ -349,13 +348,12 @@ struct pcm_data* snd_get_pcm(struct despotify_session* ds)
             DSFYDEBUG ("pcm_read() == %zd\n", r);
             if (r == 0)	/* EOF */
                 break;
-            exit (-1);
+            return r;
         }
 
         pcm->len = r;
         break;
     }
 
-
-    return pcm;
+    return 0;
 }

@@ -292,7 +292,7 @@ bool despotify_stop(struct despotify_session *ds);
 
 struct track* despotify_get_current_track(struct despotify_session* ds);
 
-struct pcm_data* despotify_get_pcm(struct despotify_session*);
+int despotify_get_pcm(struct despotify_session*, struct pcm_data*);
 
 /* URI utils */
 struct link* despotify_link_from_uri(char* uri);

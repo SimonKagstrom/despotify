@@ -69,5 +69,5 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* ds);
 long snd_pcm_read(struct despotify_session* ds,
                   char *buffer, int length, int bigendianp,
                   int word, int sgned, int *bitstream);
-struct pcm_data* snd_get_pcm(struct despotify_session*);
+int snd_get_pcm(struct despotify_session*, struct pcm_data*);
 #endif
