@@ -300,7 +300,6 @@ static int despotify_substream_callback(CHANNEL * ch,
 
             /* Push data onto the sound buffer queue */
             snd_ioctl(ds, SND_CMD_DATA, plaintext, len);
-            DSFYfree(plaintext);
 
             break;
         }

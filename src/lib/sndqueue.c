@@ -60,8 +60,9 @@ void snd_destroy (struct despotify_session* ds)
 
 		/* free buffers */
 		while (ds->fifo->start) {
-                        void* b = ds->fifo->start;
+                        struct snd_buffer* b = ds->fifo->start;
 			ds->fifo->start = ds->fifo->start->next;
+			free (b->ptr);
 			free (b);
 		}
 
@@ -124,8 +125,9 @@ int snd_stop (struct despotify_session *ds)
 
 	/* free the ogg fifo */
 	while (ds->fifo->start) {
-		void* b = ds->fifo->start;
+		struct snd_buffer* b = ds->fifo->start;
 		ds->fifo->start = ds->fifo->start->next;
+		free(b->ptr);
 		free(b);
 	}
 
@@ -140,19 +142,16 @@ int snd_stop (struct despotify_session *ds)
 
 void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
 {
-        struct snd_buffer* buff = calloc(1, sizeof(struct snd_buffer) + length);
+        struct snd_buffer* buff = malloc(sizeof(struct snd_buffer));
 	if (!buff) {
 		perror ("malloc failed");
 		exit (-1);
 	}
 
+        buff->length = length;
 	buff->cmd = cmd;
-
-	if (length > 0) {
-		/* Copy data into buffer */
-		memcpy (buff->data, data, length);
-		buff->length = length;
-	}
+        buff->consumed = 0;
+        buff->ptr = data;
 
         pthread_mutex_lock (&ds->fifo->lock);
         
@@ -161,8 +160,8 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
            weird replay gain header(?) at the start of each stream */
 	/* XXX - Ugly hack but I'm too tired to do the math right now ;) */
 	if (ds->fifo->totbytes < 167 && length > 167) {
-		memcpy(buff->data, data + 167, length - 167);
-		buff->length = length - 167;
+		memmove(buff->ptr, buff->ptr + 167, length - 167);
+		buff->length -= 167;
 		DSFYDEBUG("Dropping the first 167 bytes of data in this stream, new length is %d\n", buff->length);
 	}
 
@@ -200,9 +199,6 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
  */
 size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
 {
-	size_t length;
-	int ptrsize = size * nmemb;
-	int remaining;
         struct despotify_session* ds = session;
 
         pthread_mutex_lock(&ds->fifo->lock);
@@ -245,6 +241,7 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
 		if (b == ds->fifo->end)
 			ds->fifo->end = NULL;
 
+		DSFYfree (b->ptr);
 		DSFYfree (b);
 
                 pthread_mutex_unlock(&ds->fifo->lock);
@@ -259,14 +256,16 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
                 return 0;
 	}
 
-	remaining = b->length - b->consumed;
+        int length;
+	int remaining = b->length - b->consumed;
+	int ptrsize = size * nmemb;
 
 	if (remaining < ptrsize)
 		length = remaining;	/* The entire buffer will fit */
 	else
 		length = ptrsize;	/* Don't overrun ptrsize */
 
-	memcpy (ptr, &b->data[b->consumed], length);
+	memcpy (ptr, &b->ptr[b->consumed], length);
 
 	b->consumed += length;
 
@@ -278,6 +277,7 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
 		if (b == ds->fifo->end)
 			ds->fifo->end = NULL;
 
+		DSFYfree (b->ptr);
 		DSFYfree (b);
 	}
 

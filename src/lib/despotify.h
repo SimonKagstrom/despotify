@@ -132,9 +132,9 @@ struct snd_buffer /* internal use */
     int length; /* Total length of this buffer */
     int cmd; /* command for the player... 1 == DATA, 0 == INIT */
     int consumed; /* Number of bytes consumed */
+    char* ptr;
 
     struct snd_buffer* next;
-    unsigned char data[1];
 };
 
 struct snd_fifo /* internal use */
