@@ -2,9 +2,8 @@
 # $Id$
 # 
 
-LIB_OBJS = aes.lo audio.lo auth.lo buf.lo channel.lo commands.lo dns.lo ezxml.lo handlers.lo keyexchange.lo packet.lo puzzle.lo session.lo shn.lo sndqueue.lo util.lo network.lo despotify.lo sha1.lo hmac.lo xml.lo 
+LIB_OBJS = aes.lo auth.lo buf.lo channel.lo commands.lo dns.lo ezxml.lo handlers.lo keyexchange.lo packet.lo puzzle.lo session.lo shn.lo sndqueue.lo util.lo network.lo despotify.lo sha1.lo hmac.lo xml.lo 
 
-CFLAGS += -Igstapp/
 LDFLAGS += -rpath /usr/lib
 LDCONFIG = ldconfig
 
@@ -14,8 +13,7 @@ all: libdespotify.la
 
 # Mac OS X specifics
 ifeq ($(shell uname -s),Darwin)
-    LIB_OBJS += coreaudio.lo
-    LDFLAGS += -lresolv -framework CoreAudio
+    LDFLAGS += -lresolv
     LDCONFIG = true
 endif
 
@@ -27,43 +25,6 @@ endif
 # Linux specifics
 ifeq ($(shell uname -s),Linux)
     LDFLAGS += -lresolv
-    ifeq ($(LINUX_BACKEND),gstreamer)
-        CFLAGS += $(shell pkg-config --cflags gstreamer-base-0.10)
-        LDFLAGS += $(shell pkg-config --libs-only-l --libs-only-L gstreamer-base-0.10)
-
-        LIB_OBJS += gstreamer.lo
-        LIB_OBJS += gstapp/gstappsrc.lo gstapp/gstappbuffer.lo gstapp/gstapp-marshal.lo
-
-gstapp/gstapp-marshal.h: gstapp/gstapp-marshal.list
-	glib-genmarshal --header --prefix=gst_app_marshal gstapp/gstapp-marshal.list > gstapp/gstapp-marshal.h.tmp
-	mv gstapp/gstapp-marshal.h.tmp gstapp/gstapp-marshal.h
-
-gstapp/gstapp-marshal.c: gstapp/gstapp-marshal.list gstapp/gstapp-marshal.h
-	echo "#include \"gstapp-marshal.h\"" >> gstapp/gstapp-marshal.c.tmp
-	glib-genmarshal --body --prefix=gst_app_marshal gstapp/gstapp-marshal.list >> gstapp/gstapp-marshal.c.tmp
-	mv gstapp/gstapp-marshal.c.tmp gstapp/gstapp-marshal.c
-
-        ifeq ($(MAEMO4),1)
-            CFLAGS += -DMAEMO4
-        endif
-    endif
-
-    ifeq ($(LINUX_BACKEND),libao)
-        LIB_OBJS += libao.lo
-        LDFLAGS += -lao
-    endif
-
-    ifeq ($(LINUX_BACKEND),pulseaudio)
-        LIB_OBJS += pulseaudio.lo
-        LDFLAGS += -lpulse -lpulse-simple
-    endif
-endif
-
-# FreeBSD specifics
-ifeq ($(shell uname -s),FreeBSD)
-    LIB_OBJS += pulseaudio.lo
-    CFLAGS += -I/usr/local/include
-    LDFLAGS += -L/usr/local/lib -lpulse -lpulse-simple
 endif
 
 libdespotify.la: $(LIB_OBJS)

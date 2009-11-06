@@ -6,6 +6,7 @@
  */
 
 #include <locale.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -20,16 +21,84 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include "audio.h"
 #include "despotify.h"
 #include "util.h"
 
 
 static int listen_fd = -1;
 static int client_fd = -1;
+static void* audio_device;
 char *wrapper_read_command(void);
 int wrapper_listen(int port);
 void wrapper_wprintf(wchar_t *fmt, ...);
 
+/****** PCM thread stuff: ***********/
+static pthread_t thread;
+static pthread_mutex_t thread_mutex;
+static pthread_cond_t thread_cond;
+static enum {
+    PAUSE,
+    PLAY,
+    EXIT
+} play_state = PAUSE;
+
+static void thread_play(void)
+{
+    pthread_mutex_lock(&thread_mutex);
+    play_state = PLAY;
+    pthread_cond_signal(&thread_cond);
+    pthread_mutex_unlock(&thread_mutex);
+}
+
+static void thread_pause(void)
+{
+    pthread_mutex_lock(&thread_mutex);
+    play_state = PAUSE;
+    pthread_mutex_unlock(&thread_mutex);
+}
+
+static void thread_exit(void)
+{
+    pthread_mutex_lock(&thread_mutex);
+    play_state = EXIT;
+    pthread_mutex_unlock(&thread_mutex);
+}
+
+static void* thread_loop(void* arg)
+{
+    struct despotify_session* ds = arg;
+    struct pcm_data* pcm;
+    
+    pthread_mutex_init(&thread_mutex, NULL);
+    pthread_cond_init(&thread_cond, NULL);
+
+    bool loop = true;
+    while (loop) {
+        switch (play_state) {
+            case PAUSE:
+                pthread_mutex_lock(&thread_mutex);
+                pthread_cond_wait(&thread_cond, &thread_mutex);
+                pthread_mutex_unlock(&thread_mutex);
+                break;
+
+            case PLAY: {
+                pcm = despotify_get_pcm(ds);
+                audio_play_pcm(audio_device, pcm);
+                free(pcm);
+                break;
+            }
+
+            case EXIT:
+                loop = false;
+                break;
+        }
+    }
+
+    return NULL;
+}
+
+/**************** UI (main) thread stuff: ***************/
 
 struct playlist* get_playlist(struct playlist* rootlist, int num)
 {
@@ -280,10 +349,12 @@ void command_loop(struct despotify_session* ds)
         /* search */
         else if (!strncmp(buf, "search", 6)) {
             if (buf[7]) {
+                thread_pause();
+                despotify_stop(ds); /* since we replace the list */
+
                 if (search)
                     despotify_free_search(search);
 
-                despotify_stop(ds); /* since we replace the list */
                 search = despotify_search(ds, buf + 7, MAX_SEARCH_RESULTS);
                 if (!search) {
                     wrapper_wprintf(L"Search failed: %s\n", despotify_get_error(ds));
@@ -390,18 +461,16 @@ void command_loop(struct despotify_session* ds)
 
 
             if (t) {
+                thread_pause();
+                despotify_stop(ds);
+
                 if (playalbum)
                     despotify_free_album_browse(playalbum);
 
-                despotify_stop(ds);
                 playalbum = despotify_get_album(ds, t->album_id);
 
                 if (playalbum) {
                     despotify_play(ds, playalbum->tracks, true);
-                    wrapper_wprintf(L"New track: %s / %s (%d:%02d) %d kbit/s\n",
-                                    t->title, t->artist->name,
-                                    t->length / 60000, t->length % 60000 / 1000,
-                                    t->file_bitrate / 1000 );
                 }
                 else
                     wrapper_wprintf(L"Got no album for id %s\n", t->album_id);
@@ -535,28 +604,24 @@ void command_loop(struct despotify_session* ds)
                     t = t->next;
             }
 
-            if (t) {
+            if (t)
                 despotify_play(ds, t, true);
-                wrapper_wprintf(L"New track: %s / %s (%d:%02d) %d kbit/s\n",
-                                t->title, t->artist->name,
-                                t->length / 60000, t->length % 60000 / 1000,
-                                t->file_bitrate / 1000 );
-            }
         }
 
         /* stop */
         else if (!strncmp(buf, "stop", 4)) {
+            thread_pause();
             despotify_stop(ds);
         }
 
         /* pause */
         else if (!strncmp(buf, "pause", 5)) {
-            despotify_pause(ds);
+            thread_pause();
         }
 
         /* resume */
         else if (!strncmp(buf, "resume", 5)) {
-            despotify_resume(ds);
+            thread_play();
         }
 
         /* info */
@@ -590,14 +655,21 @@ void callback(struct despotify_session* ds, int signal, void* data, void* callba
     (void)data; (void)ds; (void)callback_data;
 
     switch (signal) {
-        case DESPOTIFY_TRACK_CHANGE: {
+        case DESPOTIFY_NEW_TRACK: {
             struct track* t = data;
             wrapper_wprintf(L"New track: %s / %s (%d:%02d) %d kbit/s\n",
                             t->title, t->artist->name,
                             t->length / 60000, t->length % 60000 / 1000,
                             t->file_bitrate / 1000);
+            thread_play();
             break;
         }
+
+        case DESPOTIFY_TIME_TELL:
+            /*
+            wrapper_wprintf(L"Time: %.2f\n", *((double*)data));
+            */
+            break;
     }
 }
 
@@ -623,6 +695,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    pthread_create(&thread, NULL, &thread_loop, ds);
+
     if(argc == 4 && wrapper_listen(atoi(argv[3]))) {
         wrapper_wprintf(L"wrapper_listen() failed to listen on local port %s\n", argv[3]);
     	return 1;
@@ -634,12 +708,16 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    audio_device = audio_init();
+
     print_info(ds);
 
     command_loop(ds);
 
+    thread_exit();
+    audio_exit(audio_device);
     despotify_exit(ds);
-
+    
     if (!despotify_cleanup())
     {
         wrapper_wprintf(L"despotify_cleanup() failed\n");

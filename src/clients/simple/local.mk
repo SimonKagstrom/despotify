@@ -6,6 +6,12 @@ LIB = $(LIBDIR)/libdespotify.la
 
 CFLAGS += -I$(LIBDIR)
 
+ifeq ($(LINUX_BACKEND),libao)
+ OBJS += libao.o
+ LDFLAGS += -lao
+endif
+
+
 all: simple
 
 # These are the files we depgen for. :-)

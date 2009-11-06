@@ -120,10 +120,39 @@ enum link_type {
     LINK_TYPE_TRACK
 };
 
-struct link {
+struct link
+{
     char* uri;
     char* arg;
     enum link_type type;
+};
+
+struct snd_buffer /* internal use */
+{
+    int length; /* Total length of this buffer */
+    int cmd; /* command for the player... 1 == DATA, 0 == INIT */
+    int consumed; /* Number of bytes consumed */
+
+    struct snd_buffer* next;
+    unsigned char data[1];
+};
+
+struct snd_fifo /* internal use */
+{
+    pthread_mutex_t lock;
+    pthread_cond_t cs;
+    int totbytes; /* Total number of bytes added to queue */
+
+    struct snd_buffer* start;	/* First buffer */
+    struct snd_buffer* end;	/* Last buffer */
+};
+
+struct pcm_data
+{
+    int samplerate;
+    int channels;
+    int len;
+    char buf[4096];
 };
 
 struct despotify_session
@@ -131,7 +160,6 @@ struct despotify_session
     bool initialized;
     struct session* session;
     struct user_info* user_info;
-    struct snd_session* snd_session;
     const char *last_error;
 
     /* AES CTR state */
@@ -159,12 +187,38 @@ struct despotify_session
     bool high_bitrate;
 
     /* client callback */
-    void(*client_callback)(struct despotify_session*, int, void*, void*);
+    void(*client_callback)(struct despotify_session* session,
+                           int signal,
+                           void* signal_data,
+                           void* client_callback_data);
     void *client_callback_data;
+
+    /* internal data: */
+    void* vf;
+    struct snd_fifo* fifo;
+    enum {
+	DL_IDLE,
+	DL_DOWNLOADING,
+        DL_END
+    } dlstate;
 };
 
 /* callback signals */
-#define DESPOTIFY_TRACK_CHANGE 1 /* no data */
+enum {
+    DESPOTIFY_NEW_TRACK = 1,
+    /* Called when a new track starts playing, such as after
+       despotify_play() or on track transition.
+
+       data: pointer to 'struct track' */
+
+    DESPOTIFY_TIME_TELL,
+    /* Called regularly to allow client to display elapsed time.
+
+       Note that it may be called more often than you want to redraw. Use a
+       suitable filter.
+
+       data: pointer to 'double' indicated elapsed time in seconds */
+};
 
 /* Global init / deinit library. */
 bool despotify_init(void);
@@ -228,14 +282,17 @@ bool despotify_set_playlist_collaboration(struct despotify_session *ds,
 void despotify_free_playlist(struct playlist* playlist);
 
 /* Playback control. */
+
+/* Note: after calling despotify_play(), wait for the DESPOTIFY_NEW_TRACK
+   callback before calling despotify_get_pcm() */
 bool despotify_play(struct despotify_session *ds,
                     struct track *song,
                     bool play_as_list);
 bool despotify_stop(struct despotify_session *ds);
-bool despotify_pause(struct despotify_session *ds);
-bool despotify_resume(struct despotify_session *ds);
+
 struct track* despotify_get_current_track(struct despotify_session* ds);
 
+struct pcm_data* despotify_get_pcm(struct despotify_session*);
 
 /* URI utils */
 struct link* despotify_link_from_uri(char* uri);
@@ -256,5 +313,9 @@ char* despotify_track_to_uri(struct track* album, char* dest);
 
 void despotify_id2uri(char* id, char* uri);
 void despotify_uri2id(char* uri, char* id);
+
+/* internal functions */
+int despotify_snd_read_stream(struct despotify_session* ds);
+int despotify_snd_end_of_track(struct despotify_session* ds);
 
 #endif
