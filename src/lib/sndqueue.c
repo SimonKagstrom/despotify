@@ -74,16 +74,10 @@ void snd_destroy (struct despotify_session* ds)
 }
 
 /* called by snd_get_pcm() */
-long snd_pcm_read(struct despotify_session* ds,
-                  char *buffer, int length, int bigendianp,
-                  int word, int sgned, int *bitstream)
+static void snd_fill_fifo(struct despotify_session* ds)
 {
-    if (ds->client_callback) {
-        double point = ov_time_tell(ds->vf);
-        ds->client_callback(ds, DESPOTIFY_TIME_TELL, &point,
-                            ds->client_callback_data);
-    }
-
+    pthread_mutex_lock(&ds->fifo->lock);
+    
 	/* Make sure we've always got 10 seconds of data buffered */
 	if ((ds->dlstate != DL_END) &&
             ds->fifo->totbytes <
@@ -97,12 +91,13 @@ long snd_pcm_read(struct despotify_session* ds,
 			  10 * ds->bitrate / 8 -
 			  ds->fifo->totbytes) / 1024.0);
 
-		/* threshold level of the available buffer has been consumed, request more data */
+		/* threshold level of the available buffer has been consumed,
+		   request more data */
+
 		if ( ds->dlstate == DL_IDLE) {
 
 			/* Call audio request function */
-			DSFYDEBUG
-				("Low on data (%d / %lld), calling despotify_snd_read_stream\n",
+			DSFYDEBUG("Low on data (%d / %lld), calling despotify_snd_read_stream\n",
                                  ds->fifo->totbytes,
                                  ov_raw_tell(ds->vf));
 			despotify_snd_read_stream(ds);
@@ -111,15 +106,13 @@ long snd_pcm_read(struct despotify_session* ds,
 			ds->dlstate = DL_DOWNLOADING;
 		}
 
-		DSFYDEBUG_SNDQUEUE
-			("pcm_read(): Unlocking ds->fifo after being low on data\n");
+		DSFYDEBUG_SNDQUEUE("pcm_read(): Unlocking ds->fifo after being low on data\n");
 	}
 
-	DSFYDEBUG_SNDQUEUE
-		("pcm_read(): Calling ov_read(len=%d), totbytes=%d, ov_raw_tell=%lld\n",
-		 length, ds->fifo->totbytes, ov_raw_tell (ds->vf));
-	return (ov_read(ds->vf, buffer, length, bigendianp,
-                        word, sgned, bitstream));
+	DSFYDEBUG_SNDQUEUE("pcm_read(): Calling ov_read(len=%d), totbytes=%d, ov_raw_tell=%lld\n",
+                           length, ds->fifo->totbytes, ov_raw_tell (ds->vf));
+
+    pthread_mutex_unlock(&ds->fifo->lock);    
 }
 
 /* This function stops the player thread */
@@ -234,8 +227,8 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
 	}
 
 	DSFYDEBUG_SNDQUEUE ("Processing one buffer at ds->fifo->start."
-                   " %zd items of size %zd requested. Totbytes: %d\n",
-                   size, nmemb, ds->fifo->totbytes );
+                            " %zd items of size %zd requested. Totbytes: %d\n",
+                            size, nmemb, ds->fifo->totbytes );
 
 	/* We have data .. process one buffer */
 	struct snd_buffer* b = ds->fifo->start;
@@ -318,7 +311,8 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
 
         int ret = ov_open_callbacks(ds, ds->vf, NULL, 0, callbacks);
         if (ret) {
-            DSFYDEBUG("ov_open_callbacks(): error %d (%s), exiting..\n",
+            DSFYfree(ds->vf);
+            DSFYDEBUG("ov_open_callbacks(): error %d (%s)\n",
                       ret,
                       ret == OV_ENOTVORBIS? "not Vorbis":
                       ret == OV_EBADHEADER? "bad header":
@@ -335,9 +329,18 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
     pcm->channels = vi->channels;
 
     while (1) {
-        /* get some PCM data */
-        ssize_t r = snd_pcm_read(ds, pcm->buf, sizeof(pcm->buf),
-                                 SYSTEM_ENDIAN, 2, 1, NULL);
+        /* get ogg data */
+        snd_fill_fifo(ds);
+
+        if (ds->client_callback) {
+            double point = ov_time_tell(ds->vf);
+            ds->client_callback(ds, DESPOTIFY_TIME_TELL, &point,
+                                ds->client_callback_data);
+        }
+
+        /* decode to pcm */
+        ssize_t r = ov_read(ds->vf, pcm->buf, sizeof(pcm->buf),
+                            SYSTEM_ENDIAN, 2, 1, NULL);
         if (r == OV_HOLE) {
             /* vorbis got garbage */
             DSFYDEBUG ("pcm_read() == OV_HOLE\n");
