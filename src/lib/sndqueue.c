@@ -205,7 +205,7 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
         pthread_mutex_lock(&ds->fifo->lock);
         
 	/* Check queue status */
-	if (ds->fifo->start == NULL) {
+	while (ds->fifo->start == NULL) {
                 /* queue is empty */
 		DSFYDEBUG ("FIFO is empty.\n");
 
