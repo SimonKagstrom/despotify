@@ -152,6 +152,7 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
 	buff->cmd = cmd;
         buff->consumed = 0;
         buff->ptr = data;
+	buff->next = NULL;
 
         pthread_mutex_lock (&ds->fifo->lock);
         
