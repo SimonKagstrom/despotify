@@ -89,7 +89,7 @@ static void snd_fill_fifo(struct despotify_session* ds)
 			 ds->fifo->totbytes / 1024.0,
 			 ov_raw_tell (ds->vf) / 1024.0,
 			 ((int) ov_raw_tell (ds->vf) +
-			  10 * ds->bitrate / 8 -
+			  10 * ds->track->file_bitrate / 8 -
 			  ds->fifo->totbytes) / 1024.0);
 
 		/* threshold level of the available buffer has been consumed,
@@ -110,10 +110,8 @@ static void snd_fill_fifo(struct despotify_session* ds)
 		DSFYDEBUG_SNDQUEUE("pcm_read(): Unlocking ds->fifo after being low on data\n");
 	}
 
-	DSFYDEBUG_SNDQUEUE("pcm_read(): Calling ov_read(len=%d), totbytes=%d, ov_raw_tell=%lld\n",
-                           length, ds->fifo->totbytes, ov_raw_tell (ds->vf));
 
-    pthread_mutex_unlock(&ds->fifo->lock);    
+	pthread_mutex_unlock(&ds->fifo->lock);    
 }
 
 /* This function stops the player thread */
