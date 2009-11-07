@@ -11,6 +11,11 @@ ifeq ($(LINUX_BACKEND),libao)
  LDFLAGS += -lao
 endif
 
+ifeq ($(shell uname -s),Darwin)
+ OBJS += coreaudio.o
+ LDFLAGS += -framework CoreAudio
+endif
+
 
 all: simple
 
