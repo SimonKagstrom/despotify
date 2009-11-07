@@ -181,10 +181,10 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
 
 	DSFYDEBUG_SNDQUEUE("added a new buffer with %d bytes data, signalling receiver\n", length);
 
-	pthread_mutex_unlock (&ds->fifo->lock);
-
 	/* Signal receiver */
 	pthread_cond_signal (&ds->fifo->cs);
+
+	pthread_mutex_unlock (&ds->fifo->lock);
 }
 
 /*
