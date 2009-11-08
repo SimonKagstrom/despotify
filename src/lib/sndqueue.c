@@ -243,11 +243,11 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
 		DSFYfree (b->ptr);
 		DSFYfree (b);
 
-                pthread_mutex_unlock(&ds->fifo->lock);
-                
                 /* Stop sound processing, reset buffers and counters */
                 snd_stop(ds);
 
+                pthread_mutex_unlock(&ds->fifo->lock);
+                
 		DSFYDEBUG("Calling despotify_end_of_track\n");
                 despotify_snd_end_of_track(ds);
 
