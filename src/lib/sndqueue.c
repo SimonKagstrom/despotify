@@ -247,7 +247,6 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
                 
                 /* Stop sound processing, reset buffers and counters */
                 snd_stop(ds);
-                snd_reset(ds);
 
 		DSFYDEBUG("Calling despotify_end_of_track\n");
                 despotify_snd_end_of_track(ds);
