@@ -25,9 +25,10 @@ typedef struct {
 	int playing;
 	pthread_mutex_t mutex;
 	pthread_cond_t event;
+	pthread_cond_t hold;
 	short *buf;
-	unsigned int buflen;
-	unsigned int bufsize;
+	int buflen;
+	int bufsize;
 } CoreAudioDevice;
 
 
@@ -52,6 +53,7 @@ void *audio_init(void) {
 	CoreAudioDevice *device;
 
 
+	DSFYDEBUG("Initializing CoreAudio\n");
 	sz = sizeof (adev_id);
 	s = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &sz, &adev_id);
 	if(s != 0) {
@@ -104,9 +106,9 @@ void *audio_init(void) {
 	fmt.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagIsPacked;
 	fmt.mSampleRate = 44100;
 	fmt.mChannelsPerFrame = 2;
+	fmt.mBytesPerFrame = sizeof(Float32) * fmt.mChannelsPerFrame;
 	fmt.mFramesPerPacket = 1;
-	fmt.mBytesPerFrame = fmt.mBytesPerPacket =
-		sizeof (short) * fmt.mChannelsPerFrame;
+	fmt.mBytesPerPacket = fmt.mFramesPerPacket * fmt.mBytesPerFrame;
 	fmt.mReserved = 0;
 
 
@@ -122,7 +124,7 @@ void *audio_init(void) {
 	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mSampleRate %f\n",
 		   fmt.mSampleRate);
 	DSFYDEBUG
-		("kAudioDevicePropertyStreamFormat: mFormatFlags 0x%08lx (IsSignedInteger:%s, isFloat:%s, isBigEndian:%s, kLinearPCMFormatFlagIsNonInterleaved:%s, kAudioFormatFlagIsPacked:%s)\n",
+		("kAudioDevicePropertyStreamFormat: mFormatFlags 0x%08x (IsSignedInteger:%s, isFloat:%s, isBigEndian:%s, kLinearPCMFormatFlagIsNonInterleaved:%s, kAudioFormatFlagIsPacked:%s)\n",
 		 fmt.mFormatFlags,
 		 fmt.mFormatFlags & kLinearPCMFormatFlagIsSignedInteger ?
 		 "yes" : "no",
@@ -134,16 +136,16 @@ void *audio_init(void) {
 		 "yes" : "no",
 		 fmt.mFormatFlags & kAudioFormatFlagIsPacked ? "yes" : "no");
 
-	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBitsPerChannel %lu\n",
+	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBitsPerChannel %u\n",
 		   fmt.mBitsPerChannel);
 	DSFYDEBUG
-		("kAudioDevicePropertyStreamFormat: mChannelsPerFrame %lu\n",
+		("kAudioDevicePropertyStreamFormat: mChannelsPerFrame %u\n",
 		 fmt.mChannelsPerFrame);
-	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mFramesPerPacket %lu\n",
+	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mFramesPerPacket %u\n",
 		   fmt.mFramesPerPacket);
-	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBytesPerFrame %lu\n",
+	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBytesPerFrame %u\n",
 		   fmt.mBytesPerFrame);
-	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBytesPerPacket %lu\n",
+	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBytesPerPacket %u\n",
 		   fmt.mBytesPerPacket);
 
 
@@ -153,8 +155,12 @@ void *audio_init(void) {
 		return NULL;
 
 
+	device->adev_id = adev_id;
+	device->playing = 0;
+	device->buflen = 0;
+	device->bufsize = sizeof(short) * 32768;
 	if (AudioDeviceCreateIOProcID
-			(adev_id, audio_callback, device, &device->proc_id)) {
+			(device->adev_id, audio_callback, device, &device->proc_id)) {
 		DSFYDEBUG ("AudioDeviceCreateIOProcID() returned FAIL!\n");
 
 		free(device);
@@ -162,15 +168,12 @@ void *audio_init(void) {
 	}
 
 
-	device->adev_id = adev_id;
-	device->playing = 0;
-	device->buflen = 0;
-	device->bufsize = sizeof(short) * 8192;
 	device->buf = (short *)malloc(device->bufsize);
 	pthread_mutex_init(&device->mutex, NULL);
 	pthread_cond_init(&device->event, NULL);
+	pthread_cond_init(&device->hold, NULL);
 
-	DSFYDEBUG("audio_init(): CoreAudio initalized\n");
+	DSFYDEBUG("Done initializing CoreAudio\n");
 
 	return device;
 }
@@ -179,11 +182,14 @@ void *audio_init(void) {
 int audio_exit(void *private) {
 	CoreAudioDevice *device = (CoreAudioDevice *)private;
 
-	DSFYDEBUG("audio_exit(): CoreAudio exiting..\n");
+	DSFYDEBUG("Attempting exit with device at %p\n", device);
+	if(!device)
+		return -1;
 
 	pthread_mutex_lock(&device->mutex);
 	if(device->playing) {
 		device->playing = 0;
+		DSFYDEBUG("Currently playing, signalling event and stopping CoreAudio\n");
 		pthread_cond_signal(&device->event);
 		if(AudioDeviceStop (device->adev_id, device->proc_id)) {
 			DSFYDEBUG ("audio_exit(): AudioDeviceStop() failed\n");
@@ -193,13 +199,13 @@ int audio_exit(void *private) {
 	pthread_mutex_unlock(&device->mutex);
 
 
+	DSFYDEBUG("Destryoing mutex and condition variables\n");
+	pthread_cond_destroy(&device->hold);
 	pthread_cond_destroy(&device->event);
 	pthread_mutex_destroy(&device->mutex);
 
 	free(device->buf);
 
-
-	DSFYDEBUG("audio_exit(): CoreAudio has exited\n");
 	return 0;
 }
 
@@ -208,40 +214,51 @@ int audio_play_pcm (void* private, struct pcm_data* pcm) {
 	CoreAudioDevice *device = (CoreAudioDevice *)private;
 	int bytes_to_copy;
 
-	DSFYDEBUG("audio_play_pcm(): Adding a buffer\n");
-	if(pcm->channels != 2) {
-		DSFYDEBUG ("audio_play_pcm(): Unsupported number of channels: %d!\n", pcm->channels)
+	if(!device) {
+		DSFYDEBUG ("Attempt to play with no output device\n");
+		return -1;
+	}
+	else if(pcm->channels != 2) {
+		DSFYDEBUG ("Unsupported number of channels: %d!\n", pcm->channels)
 		return -1;
 	}
 	else if(pcm->samplerate != 44100) {
-		DSFYDEBUG ("audio_play_pcm(): Unsupported sample rate: %d!\n", pcm->samplerate)
+		DSFYDEBUG ("Unsupported sample rate: %d!\n", pcm->samplerate)
 		return -1;
 	}
 
 	pthread_mutex_lock(&device->mutex);
+
+
+	/* Sleep if the we can't handle the sent PCM data right now */
+	while(device->buflen + pcm->len >= device->bufsize) {
+		DSFYDEBUG ("Buffer too full, sleeping..\n");
+		pthread_cond_wait(&device->hold, &device->mutex);
+		DSFYDEBUG("Buffer has shrunk in size, now have %d bytes free\n", device->bufsize - device->buflen);
+	}
+
 	bytes_to_copy = device->bufsize - device->buflen;
 	if(pcm->len < bytes_to_copy)
 		bytes_to_copy = pcm->len;
 
-	DSFYDEBUG("audio_play_pcm(): Appending %d bytes (PCM buffer had %d, already had %d)\n", bytes_to_copy, pcm->len, device->buflen);
-	memcpy(device->buf + device->buflen, pcm->buf, bytes_to_copy);
+
+	memcpy((void *)device->buf + device->buflen, pcm->buf, bytes_to_copy);
 	device->buflen += bytes_to_copy;
-	pthread_cond_signal(&device->event);
 
 	if(!device->playing) {
+		device->playing = 1;
+
+		DSFYDEBUG ("Not yet playing, calling AudioDeviceStart()\n");
 		if (AudioDeviceStart (device->adev_id, device->proc_id)) {
-			DSFYDEBUG ("audio_play_pcm(): AudioDeviceStart() failed\n");
+			DSFYDEBUG ("AudioDeviceStart() failed\n");
 			pthread_mutex_unlock(&device->mutex);
 			return -1;
 		}
 
-		device->playing = 1;
-		DSFYDEBUG ("audio_play_pcm(): AudioDeviceStart() succeeded\n");
 	}
 
+	pthread_cond_signal(&device->event);
 	pthread_mutex_unlock(&device->mutex);
-
-	DSFYDEBUG ("audio_play_pcm(): Done!\n");
 
 	return 0;
 }
@@ -256,62 +273,54 @@ static OSStatus audio_callback (AudioDeviceID dev,
 				void *private)
 {
 	CoreAudioDevice *device = (CoreAudioDevice *)private;
-	int ret;
-
+	int channel, num_channels = 2;
 	Float32 *dst = bufout->mBuffers[0].mData;
-	int num_channels = 2;
 	int samples_to_write;
-	int buffered_samples;
 	int sample_size;
-	int channel, sample;
+	short *src;
+	int bytes_consumed;
 
-	DSFYDEBUG ("CoreAudio: audio_callback(): Hello!\n");
-	sample_size = sizeof(float) * num_channels;
+	sample_size = sizeof(Float32) * num_channels;
 	samples_to_write = bufout->mBuffers[0].mDataByteSize / sample_size;
 
-	/* Zero buffer */
-	for (sample = 0; sample < samples_to_write; sample++)
-		for(channel = 0; channel < num_channels; channel++)
-			dst[2 * sample + channel] = 0.0f;
 
-
-	ret = 0;
 	pthread_mutex_lock(&device->mutex);
-	sample = 0;
 	while (samples_to_write) {
-		while(device->buflen == 0 && device->playing == 1)
+		while(device->buflen == 0 && device->playing == 1) {
+			DSFYDEBUG ("Zero bytes available and playing, waiting..\n");
 			pthread_cond_wait(&device->event, &device->mutex);
-
-		if(!device->playing) 
-			break;
-
-
-		buffered_samples = device->buflen / sizeof (short) / num_channels;
-		for (sample = 0; sample < buffered_samples; sample++) {
-
-			for (channel = 0; channel < num_channels; channel++) {
-				if (device->buf[2 * sample + channel] <= 0)
-					*dst++ = (float) (device->buf
-							  [2 * sample +
-							   channel]) /
-						32767.0;
-				else
-					*dst++ = (float) (device->buf
-							  [2 * sample +
-							   channel]) /
-						32768.0;
-			}
-
-			if(--samples_to_write == 0)
-				break;
 		}
 
-		device->buflen -= sample * sizeof(short) * num_channels;
-		memmove(device->buf, device->buf + sample*sizeof(short)*num_channels, device->buflen);
+		if(!device->playing) {
+			DSFYDEBUG ("Stopping playback due to device->playing==0\n");
+			break;
+		}
+
+
+		src = device->buf;
+		bytes_consumed = 0;
+		for(; samples_to_write > 0 && bytes_consumed < device->buflen; samples_to_write--) {
+			for (channel = 0; channel < num_channels; channel++) {
+				if (*src <= 0)
+					*dst++ = *src++ / 32767.0;
+				else
+					*dst++ = *src++ / 32768.0;
+			}
+
+			bytes_consumed += sizeof(short) * num_channels;
+		}
+			
+		device->buflen -= bytes_consumed;
+		if(device->buflen > 0)
+			memcpy(device->buf, (void *)device->buf + bytes_consumed, device->buflen);
+	}
+
+	if(device->buflen < device->bufsize/2) {
+		DSFYDEBUG("Buffer half empty, signalling condition in audio_pcm_play()\n");
+		pthread_cond_signal(&device->hold);
 	}
 
 	pthread_mutex_unlock(&device->mutex);
-	DSFYDEBUG ("CoreAudio: audio_callback(): Done!\n");
 
 	return 0;
 }
