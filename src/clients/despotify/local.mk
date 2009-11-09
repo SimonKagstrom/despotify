@@ -9,14 +9,18 @@ LIB = $(LIBDIR)/libdespotify.la
 
 NCURSES_INCLUDE ?= /usr/include/ncursesw
 
+DESPOTIFY_OBJS = commands.o event.o main.o session.o ui.o ui_footer.o ui_help.o ui_log.o ui_sidebar.o ui_splash.o ui_tracklist.o
+
 CFLAGS += -I$(LIBDIR) -I$(NCURSES_INCLUDE)
 ifeq ($(shell uname -s),Darwin)
-    LDFLAGS += -lncurses
+    DESPOTIFY_OBJS += coreaudio.o
+    # The default ncurses library on Mac OS X supports wide characters
+    # so force linking with the one in /usr/lib
+    LDFLAGS = -L/usr/lib -lncurses -framework CoreAudio
 else
     LDFLAGS += -lncursesw
 endif
 
-DESPOTIFY_OBJS = commands.o event.o main.o session.o ui.o ui_footer.o ui_help.o ui_log.o ui_sidebar.o ui_splash.o ui_tracklist.o
 
 .PHONY: all clean install uninstall
 all: despotify 
