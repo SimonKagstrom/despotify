@@ -63,6 +63,8 @@ static void thread_exit(void)
     pthread_mutex_lock(&thread_mutex);
     play_state = EXIT;
     pthread_mutex_unlock(&thread_mutex);
+
+    pthread_join(thread, NULL);
 }
 
 static void* thread_loop(void* arg)
