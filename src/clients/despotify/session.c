@@ -72,9 +72,7 @@ static void* thread_loop(void* arg)
                 break;
 
             case PLAY: {
-                log_append("thread_loop(): PLAY, requesting PCM");
                 int rc = despotify_get_pcm(ds, &pcm);
-                log_append("thread_loop(): PLAY, returned %d, commencing playback", rc);
                 if (rc == 0)
                     audio_play_pcm(audio_device, &pcm);
                 else {
@@ -90,7 +88,6 @@ static void* thread_loop(void* arg)
         }
     }
 
-    log_append("thread_loop() exiting");
     return NULL;
 }
 
