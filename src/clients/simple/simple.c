@@ -97,6 +97,9 @@ static void* thread_loop(void* arg)
         }
     }
 
+    pthread_cond_destroy(&thread_cond);
+    pthread_mutex_destroy(&thread_mutex);
+
     return NULL;
 }
 
