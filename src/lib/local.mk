@@ -24,7 +24,7 @@ endif
 
 # Linux specifics
 ifeq ($(shell uname -s),Linux)
-    LDFLAGS += -lresolv
+    LDFLAGS += -lresolv -lpthread
 endif
 
 libdespotify.la: $(LIB_OBJS)
