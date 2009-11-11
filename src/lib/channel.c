@@ -193,11 +193,6 @@ int channel_process (unsigned char *buf, unsigned short len, int error)
 	if (len == 0)
 		ch->state = CHANNEL_END;
 
-	DSFYDEBUG
-		("channel %d: Entering callback (state: %s) for channel '%s', %d bytes data\n",
-		 ch->channel_id,
-		 ch->state == CHANNEL_DATA ? "data" : ch->state ==
-		 CHANNEL_ERROR ? "error" : "end", ch->name, len);
 	ret = ch->callback (ch, buf, len);
 	ch->total_data_len += len;
 
