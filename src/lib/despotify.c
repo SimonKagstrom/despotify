@@ -136,7 +136,11 @@ bool despotify_authenticate(struct despotify_session* ds,
     DSFYDEBUG("do_key_exchange() completed\n");
 
     auth_generate_auth_hash(ds->session);
-    key_init(ds->session);
+    if (key_init(ds->session) < 0)
+    {
+        ds->last_error = "Key computation failed.";
+        return false;
+    }
 
     if (do_auth(ds->session) < 0)
     {
@@ -305,14 +309,17 @@ static int despotify_substream_callback(CHANNEL * ch,
         }
 
     case CHANNEL_ERROR:
-            DSFYDEBUG("got CHANNEL_ERROR\n");
-            /* XXX - handle cleanly */
-            exit (1);
+            DSFYDEBUG("got CHANNEL_ERROR #%d\n", ds->errorcount);
+            ds->dlstate = DL_IDLE;
+            ds->errorcount += 1;
+            if (ds->errorcount > 3)
+                exit(-1);
             break;
 
     case CHANNEL_END:
             DSFYDEBUG("got CHANNEL_END, processed %d bytes data\n",
                       ch->total_data_len);
+            ds->errorcount = 0;
 
             /* Reflect the current offset in the player context */
             ds->offset += ch->total_data_len;

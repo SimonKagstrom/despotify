@@ -302,14 +302,13 @@ int read_server_initial_packet (SESSION * session)
  * have been exchanged.
  *
  */
-void key_init (SESSION * session)
+int key_init (SESSION * session)
 {
 	BIGNUM *pub_key;
 	unsigned char message[53];
 	unsigned char hmac_output[20 * 5];
 	unsigned char *ptr, *hmac_ptr;
 	unsigned int mac_len;
-	int i;
 
 	/*
 	 * Compute DH shared key
@@ -321,15 +320,14 @@ void key_init (SESSION * session)
 	 *
 	 */
 	pub_key = BN_bin2bn (session->remote_pub_key, 96, NULL);
-	if ((i =
-	     DH_compute_key (session->shared_key, pub_key,
-			     session->dh)) < 0) {
+        int i = DH_compute_key (session->shared_key, pub_key, session->dh);
+	if (i < 0) {
 		FILE *fd = fopen ("/tmp/despotify-spotify-pubkey", "w");
 		fwrite (pub_key, 1, 96, fd);
 		fclose (fd);
 		fprintf (stderr,
 			 "Failed to compute shared key, error code %d\n", i);
-		exit (1);
+                return -1;
 	}
 
 #ifdef DEBUG_LOGIN
@@ -433,4 +431,6 @@ void key_init (SESSION * session)
 	hexdump8x32 ("key_init, key_send", session->key_send, 32);
 	hexdump8x32 ("key_init, key_recv", session->key_recv, 32);
 #endif
+
+        return 0;
 }

@@ -201,6 +201,7 @@ struct despotify_session
 	DL_DOWNLOADING,
         DL_END
     } dlstate;
+    int errorcount;
 };
 
 /* callback signals */
