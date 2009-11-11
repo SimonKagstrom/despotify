@@ -288,6 +288,11 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
     
 int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
 {
+    if (!ds->track) {
+        pcm->len = 0;
+        return 0;
+    }
+
     if (!ds->vf) {
         ov_callbacks callbacks;
 

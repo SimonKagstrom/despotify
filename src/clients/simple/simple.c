@@ -677,6 +677,11 @@ void callback(struct despotify_session* ds, int signal, void* data, void* callba
             wrapper_wprintf(L"Time: %.2f\n", *((double*)data));
             */
             break;
+
+        case DESPOTIFY_END_OF_PLAYLIST:
+            wrapper_wprintf(L"End of playlist\n");
+            thread_pause();
+            break;
     }
 }
 

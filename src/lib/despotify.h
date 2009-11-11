@@ -219,6 +219,9 @@ enum {
        suitable filter.
 
        data: pointer to 'double' indicated elapsed time in seconds */
+
+    DESPOTIFY_END_OF_PLAYLIST,
+    /* Called after last track in playlist has finished playing */
 };
 
 /* Global init / deinit library. */

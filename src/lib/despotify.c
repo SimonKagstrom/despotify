@@ -378,17 +378,23 @@ int despotify_snd_end_of_track(struct despotify_session* ds)
         ds->track = ds->track->next;
     } while (ds->track && !ds->track->playable);
 
+    snd_stop(ds);
+    ds->offset = 0;
+
     int error = 0;
     if (ds->track && ds->play_as_list) {
         char fid[20], tid[16];
         hex_ascii_to_bytes(ds->track->file_id, fid, sizeof fid);
         hex_ascii_to_bytes(ds->track->track_id, tid, sizeof tid);
 
-        snd_stop(ds);
-        ds->offset = 0;
-
         /* request key for next track */
         error = cmd_aeskey(ds->session, fid, tid, despotify_aes_callback, ds);
+    }
+    else {        
+        if (ds->client_callback)
+            ds->client_callback(ds, DESPOTIFY_END_OF_PLAYLIST,
+                                NULL, ds->client_callback_data);
+
     }
 
     return error;
