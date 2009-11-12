@@ -166,7 +166,8 @@ void sess_connect()
 
 void sess_disconnect()
 {
-  thread_exit();
+  if (thread)
+    thread_exit();
 
   if (g_session.state == SESS_ONLINE) {
     sess_stop();
