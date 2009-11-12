@@ -49,6 +49,7 @@ static void thread_exit(void)
 {
     pthread_mutex_lock(&thread_mutex);
     play_state = EXIT;
+    pthread_cond_signal(&thread_cond);
     pthread_mutex_unlock(&thread_mutex);
 
     pthread_join(thread, NULL);
