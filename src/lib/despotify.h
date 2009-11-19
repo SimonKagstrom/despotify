@@ -244,6 +244,9 @@ bool despotify_authenticate(struct despotify_session *ds,
                         despotify_authenticate(session, user, password); \
                     } while (0)
 
+void despotify_set_buffer_size(struct despotify_session* ds, int size);
+void despotify_set_watermark(struct despotify_session* ds, int watermark);
+
 void despotify_free(struct despotify_session *ds, bool should_disconnect);
 
 const char *despotify_get_error(struct despotify_session *ds);
@@ -287,8 +290,6 @@ void despotify_free_playlist(struct playlist* playlist);
 
 /* Playback control. */
 
-/* Note: after calling despotify_play(), wait for the DESPOTIFY_NEW_TRACK
-   callback before calling despotify_get_pcm() */
 bool despotify_play(struct despotify_session *ds,
                     struct track *song,
                     bool play_as_list);
