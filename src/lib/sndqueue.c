@@ -42,7 +42,7 @@ bool snd_init(struct despotify_session *ds)
         if (!ds->fifo)
 		return false;
         ds->fifo->maxbytes = 1024 * 1024; /* 1 MB default buffer size */
-        ds->fifo->watermark = 100 * 1024; /* 100 KB default watermark */
+        ds->fifo->watermark = 200 * 1024; /* 200 KB default watermark */
 
         if (pthread_mutex_init (&ds->fifo->lock, NULL)) {
             DSFYfree (ds->fifo);
