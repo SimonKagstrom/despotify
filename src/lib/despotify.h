@@ -7,6 +7,7 @@
 
 #define STRING_LENGTH 256
 #define MAX_SEARCH_RESULTS 100 /* max search results per request */
+#define SUBSTREAM_SIZE (100 * 1024)
 
 struct track
 {
@@ -132,7 +133,7 @@ struct snd_buffer /* internal use */
     int length; /* Total length of this buffer */
     int cmd; /* command for the player... 1 == DATA, 0 == INIT */
     int consumed; /* Number of bytes consumed */
-    char* ptr;
+    unsigned char* ptr;
 
     struct snd_buffer* next;
 };
@@ -142,6 +143,9 @@ struct snd_fifo /* internal use */
     pthread_mutex_t lock;
     pthread_cond_t cs;
     int totbytes; /* Total number of bytes added to queue */
+    int maxbytes; /* Maximum size of queue */
+    int watermark; /* Low watermark */
+    int lastcmd;
 
     struct snd_buffer* start;	/* First buffer */
     struct snd_buffer* end;	/* Last buffer */
@@ -196,11 +200,7 @@ struct despotify_session
     /* internal data: */
     void* vf;
     struct snd_fifo* fifo;
-    enum {
-	DL_IDLE,
-	DL_DOWNLOADING,
-        DL_END
-    } dlstate;
+    int dlstate;
     int errorcount;
 };
 
@@ -320,6 +320,5 @@ void despotify_uri2id(char* uri, char* id);
 
 /* internal functions */
 int despotify_snd_read_stream(struct despotify_session* ds);
-int despotify_snd_end_of_track(struct despotify_session* ds);
 
 #endif

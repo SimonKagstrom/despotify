@@ -13,12 +13,18 @@
 #include "sndqueue.h"
 #include "util.h"
 
+enum {
+    DL_FILLING,
+    DL_FILLING_BUSY,
+    DL_DRAINING
+};
+
 /* Reset for new song */
 void snd_reset(struct despotify_session* ds)
 {
-	DSFYDEBUG ("snd_reset(): Setting state to DL_IDLE\n");
+	DSFYDEBUG("Setting state to DL_FILLING\n");
 	ds->fifo->totbytes = 0;
-	ds->dlstate = DL_IDLE;
+	ds->dlstate = DL_FILLING;
         ov_clear(ds->vf);
         DSFYfree(ds->vf);
 }
@@ -28,12 +34,15 @@ bool snd_init(struct despotify_session *ds)
 {
 	DSFYDEBUG ("Initializing sound FIFO etc (happens once)\n");
 
-	ds->dlstate = DL_IDLE;
+	DSFYDEBUG("Setting state to DL_FILLING\n");
+	ds->dlstate = DL_FILLING;
 
 	/* This is the fifo that will hold fragments of compressed audio */
         ds->fifo = calloc(1, sizeof(struct snd_fifo));
         if (!ds->fifo)
 		return false;
+        ds->fifo->maxbytes = 1024 * 1024; /* 1 MB default buffer size */
+        ds->fifo->watermark = 100 * 1024; /* 100 KB default watermark */
 
         if (pthread_mutex_init (&ds->fifo->lock, NULL)) {
             DSFYfree (ds->fifo);
@@ -74,52 +83,42 @@ void snd_destroy (struct despotify_session* ds)
 	}
 }
 
-/* called by snd_get_pcm() */
 static void snd_fill_fifo(struct despotify_session* ds)
 {
-    pthread_mutex_lock(&ds->fifo->lock);
-    
-	/* Make sure we've always got 10 seconds of data buffered */
-	if ((ds->dlstate != DL_END) &&
-            ds->fifo->totbytes <
-            ov_raw_tell (ds->vf) + 10 * ds->track->file_bitrate / 8) {
+    switch (ds->dlstate) {
+        case DL_DRAINING:
+            if (ds->fifo->totbytes < ds->fifo->watermark ) {
+                DSFYDEBUG("Low on data (%d / %d), fetching another channel\n",
+                          ds->fifo->totbytes, ds->fifo->maxbytes);
+                despotify_snd_read_stream(ds);
+                ds->dlstate = DL_FILLING_BUSY;
+            }
+            break;
 
-		DSFYDEBUG_SNDQUEUE
-			("we're low on data (FIFO total %.3fkB, vorbis offset %.3fkB, want %.3fkB)\n",
-			 ds->fifo->totbytes / 1024.0,
-			 ov_raw_tell (ds->vf) / 1024.0,
-			 ((int) ov_raw_tell (ds->vf) +
-			  10 * ds->track->file_bitrate / 8 -
-			  ds->fifo->totbytes) / 1024.0);
+        case DL_FILLING:
+            if (ds->fifo->totbytes < (ds->fifo->maxbytes - SUBSTREAM_SIZE)) {
+                despotify_snd_read_stream(ds);
+                ds->dlstate = DL_FILLING_BUSY;
+            }
+            else
+                ds->dlstate = DL_DRAINING;
+            break;
 
-		/* threshold level of the available buffer has been consumed,
-		   request more data */
-
-		if ( ds->dlstate == DL_IDLE) {
-
-			/* Call audio request function */
-			DSFYDEBUG("Low on data (%d / %lld), calling despotify_snd_read_stream\n",
-                                 ds->fifo->totbytes,
-                                 ov_raw_tell(ds->vf));
-			despotify_snd_read_stream(ds);
-
-			DSFYDEBUG("read_stream() has been called, setting snd state to DL_DOWNLOADING\n");
-			ds->dlstate = DL_DOWNLOADING;
-		}
-
-		DSFYDEBUG_SNDQUEUE("pcm_read(): Unlocking ds->fifo after being low on data\n");
-	}
-
-
-	pthread_mutex_unlock(&ds->fifo->lock);    
+        case DL_FILLING_BUSY:
+            break;
+    }
 }
-
+            
 /* This function stops the player thread */
 int snd_stop (struct despotify_session *ds)
 {
 	int ret = 0;
 
 	DSFYDEBUG ("Entering with arg %p. dl state is %d\n", ds, ds->dlstate);
+
+        /* Don't request more data in pcm_read(),
+           even if the buffer gets low */
+        ds->dlstate = DL_DRAINING;
 
 	/* free the ogg fifo */
 	while (ds->fifo->start) {
@@ -140,6 +139,13 @@ int snd_stop (struct despotify_session *ds)
 
 void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
 {
+        /* end of channel. "can I have another one?" */
+        if (cmd == SND_CMD_CHANNEL_END) {
+            ds->dlstate = DL_FILLING; /* step down from DL_FILLING_BUSY */
+            snd_fill_fifo(ds);
+            return;
+        }
+
         struct snd_buffer* buff = malloc(sizeof(struct snd_buffer));
 	if (!buff) {
 		perror ("malloc failed");
@@ -153,16 +159,27 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
 	buff->next = NULL;
 
         pthread_mutex_lock (&ds->fifo->lock);
-        
+
 	DSFYDEBUG_SNDQUEUE("Current FIFO totbytes=%d, pushed data length is %d\n", ds->fifo->totbytes, length);
-	/* Drop the first 167 bytes due to Spotify's
-           weird replay gain header(?) at the start of each stream */
-	/* XXX - Ugly hack but I'm too tired to do the math right now ;) */
-	if (ds->fifo->totbytes < 167 && length > 167) {
-		memmove(buff->ptr, buff->ptr + 167, length - 167);
-		buff->length -= 167;
-		DSFYDEBUG("Dropping the first 167 bytes of data in this stream, new length is %d\n", buff->length);
-	}
+
+	/* Drop the first ogg page if it is Spotify's
+           spec-violating single-page same-serial-number stream */
+	if (ds->fifo->lastcmd == SND_CMD_START && (buff->ptr[5] == 6)) {
+            int offset = 28; /* size of ogg header */
+
+            /* calculate size of page */
+            for (int i=0; i < buff->ptr[26]; i++)
+                offset += buff->ptr[i+27];
+
+            if (offset < buff->length) {
+                memmove(buff->ptr, buff->ptr + offset, length - offset);
+                buff->length -= offset;
+                DSFYDEBUG("Dropping the first %d bytes of data in this stream, new length is %d\n", offset, buff->length);
+            }
+            else {
+                DSFYDEBUG("Corrupt first OGG packet gave offset %d. Skipping.", offset);
+            }
+        }
 
 	/* Hook in entry in linked list */
 	if (ds->fifo->end != NULL) {
@@ -177,12 +194,15 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
 
 	ds->fifo->totbytes += buff->length;
 
-	DSFYDEBUG_SNDQUEUE("added a new buffer with %d bytes data, signalling receiver\n", length);
+        /* start of track. start fetching data */
+        if (cmd == SND_CMD_START)
+            snd_fill_fifo(ds);
 
 	/* Signal receiver */
 	pthread_cond_signal (&ds->fifo->cs);
-
 	pthread_mutex_unlock (&ds->fifo->lock);
+
+        ds->fifo->lastcmd = cmd;
 }
 
 /*
@@ -191,101 +211,140 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
  * 
  * This functions dequeues buffers from the fifo
  *
- * This function is first called from snd_thread when ov_open_callbacks() 
- * is called in order to init the ogg-layer. Then it is called from
- * whatever thread calls pcm_read(). On mac os x this is the coreaudio-thread.
- *
  */
 size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
 {
-        struct despotify_session* ds = session;
+    struct despotify_session* ds = session;
 
-        pthread_mutex_lock(&ds->fifo->lock);
+    /* check fifo if draining */
+    if (ds->dlstate == DL_DRAINING)
+        snd_fill_fifo(ds);
+
+    pthread_mutex_lock(&ds->fifo->lock);
+
+    int totlength = 0;
+    bool loop = true;
+
+    /* process data */
+    while (loop) {
+        /* Check queue status */
+        if (ds->fifo->start == NULL) {
+            _DSFYDEBUG ("Waiting for data (%d bytes)\n", ds->fifo->totbytes);
+            pthread_cond_wait (&ds->fifo->cs, &ds->fifo->lock);
+            _DSFYDEBUG ("Got data\n");
+        }
+
+        DSFYDEBUG_SNDQUEUE("Processing one buffer at ds->fifo->start."
+                           " %zd items of size %zd requested. Totbytes: %d\n",
+                           size, nmemb, ds->fifo->totbytes );
+
+        struct snd_buffer* b = ds->fifo->start;
+        if (!b)
+            break;
+
+        _DSFYDEBUG("loop cmd:%d bytes:%d\n", b->cmd, ds->fifo->totbytes);
+
+        switch (b->cmd)
+        {
+            case SND_CMD_START:
+                /* first packet of a track */
+		DSFYDEBUG ("Got SND_CMD_START\n");
+
+		/* Increment by one */
+                ds->fifo->start = ds->fifo->start->next;
+
+                /* notify client */
+                if (ds->client_callback)
+                    ds->client_callback(ds, DESPOTIFY_NEW_TRACK,
+                                        b->ptr,
+                                        ds->client_callback_data);
+                if (b->ptr)
+                    DSFYfree (b->ptr);
+                DSFYfree (b);
+                break;
+                
+            case SND_CMD_DATA:
+            {
+                /* data packet */
+                int remaining = b->length - b->consumed;
+                int ptrsize = size * nmemb;
+                int length;
+                
+                if (totlength + remaining < ptrsize)
+                    length = remaining;	/* The entire buffer will fit */
+                else {
+                    length = ptrsize - totlength; /* Don't overrun ptrsize */
+                }
+
+                memcpy (ptr + totlength, b->ptr + b->consumed, length);
+
+                b->consumed += length;
+                totlength += length;
         
-	/* Check queue status */
-	while (ds->fifo->start == NULL) {
-                /* queue is empty */
-		DSFYDEBUG ("FIFO is empty.\n");
+                /* If we have used the entire buffer, free it */
+                if (b->consumed == b->length) {
+                    ds->fifo->start = ds->fifo->start->next;
+                    ds->fifo->totbytes -= b->length;
 
-		if (ds->dlstate == DL_IDLE) {
-                    DSFYDEBUG("State is DL_IDLE, calling despotify_snd_read_stream()\n");
-                    /* Request more data */
-                    despotify_snd_read_stream(ds);
-                    DSFYDEBUG ("Returned from despotify_snd_read_stream()\n");
-		}
+                    /* If this was the last entry */
+                    if (b == ds->fifo->end)
+			ds->fifo->end = NULL;
+                    
+                    DSFYfree (b->ptr);
+                    DSFYfree (b);
+                }
 
-		/* pthread_cond_wait will lock the queue again
-                   as soon as we are signaled */
-		DSFYDEBUG ("Waiting for more data using pthread condition ds->fifo->cs\n");
-		pthread_cond_wait (&ds->fifo->cs, &ds->fifo->lock);
-		DSFYDEBUG ("Condition (ds->fifo->cs) signalled, ds->fifo->lock unlocked!\n");
-	}
+                /* exit if input is empty or output is full */
+                if (!ds->fifo->start || totlength == (int)(size*nmemb))
+                    loop = false;
+                break;
+            }
 
-	DSFYDEBUG_SNDQUEUE ("Processing one buffer at ds->fifo->start."
-                            " %zd items of size %zd requested. Totbytes: %d\n",
-                            size, nmemb, ds->fifo->totbytes );
-
-	/* We have data .. process one buffer */
-	struct snd_buffer* b = ds->fifo->start;
-
-	/* Check if this is the last pkt */
-	if (b->cmd == SND_CMD_END) {
-		/* Call end callback and return 0 */
+            case SND_CMD_END:
+                /* last packet of a track, return 0 bytes to signal EOF */
 		DSFYDEBUG ("Got SND_CMD_END\n");
+
+                /* if there already are bytes to return,
+                   send them first and then come back here empty */
+                if (totlength) {
+                    loop = false;
+                    break;
+                }
 
 		/* Increment by one */
 		ds->fifo->start = ds->fifo->start->next;
 
 		/* If this was the last entry */
 		if (b == ds->fifo->end)
-			ds->fifo->end = NULL;
-
-		DSFYfree (b->ptr);
-		DSFYfree (b);
-
-                /* Stop sound processing, reset buffers and counters */
-                snd_stop(ds);
-
-                pthread_mutex_unlock(&ds->fifo->lock);
+                    ds->fifo->end = NULL;
                 
-		DSFYDEBUG("Calling despotify_end_of_track\n");
-                despotify_snd_end_of_track(ds);
-
-                return 0;
-	}
-
-        int length;
-	int remaining = b->length - b->consumed;
-	int ptrsize = size * nmemb;
-
-	if (remaining < ptrsize)
-		length = remaining;	/* The entire buffer will fit */
-	else
-		length = ptrsize;	/* Don't overrun ptrsize */
-
-	memcpy (ptr, &b->ptr[b->consumed], length);
-
-	b->consumed += length;
-
-	/* If we have used the entire buffer, free it */
-	if (b->consumed == b->length) {
-		ds->fifo->start = ds->fifo->start->next;
-
-		/* If this was the last entry */
-		if (b == ds->fifo->end)
-			ds->fifo->end = NULL;
-
-		DSFYfree (b->ptr);
+                if (b->ptr)
+                    DSFYfree (b->ptr);
 		DSFYfree (b);
-	}
 
-        pthread_mutex_unlock(&ds->fifo->lock);
-	/* Return number of bytes read to ogg-layer */
-	/* If the ogg-layer needs more data it will call us again */
-	return length;
+		_DSFYDEBUG("Calling despotify_end_of_track\n");
+
+                if (!ds->fifo->start) {
+                    snd_stop(ds);
+
+                    if (ds->client_callback)
+                        ds->client_callback(ds, DESPOTIFY_END_OF_PLAYLIST,
+                                            NULL, ds->client_callback_data);
+                }
+                /* return 0 bytes as EOF marker to decoder */
+                loop = false;
+                break;
+        }
+    }
+
+    pthread_mutex_unlock(&ds->fifo->lock);
+
+    /* Return number of bytes read to ogg-layer */
+    _DSFYDEBUG("Returning %d bytes. %d left.\n",
+               totlength, ds->fifo->totbytes);
+    return totlength;
 }
 
-    
 int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
 {
     if (!ds->track) {
@@ -294,8 +353,6 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
     }
 
     if (!ds->vf) {
-        ov_callbacks callbacks;
-
         DSFYDEBUG ("Initializing vorbisfile struct\n");
 
         /* Allocate Vorbis struct */
@@ -304,13 +361,14 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
             return -1;
 
         /* Initialize Vorbis struct with the appropriate callbacks */
+        ov_callbacks callbacks;
         callbacks.read_func = snd_ov_read_callback;
         callbacks.seek_func = NULL;
         callbacks.close_func = NULL;
         callbacks.tell_func = NULL;
         
         /* Now call ov_open_callbacks(). This will trigger the read_func */
-        DSFYDEBUG("Calling ov_open_callbacks()\n");
+        _DSFYDEBUG("Calling ov_open_callbacks()\n");
 
         int ret = ov_open_callbacks(ds, ds->vf, NULL, 0, callbacks);
         if (ret) {
@@ -322,8 +380,6 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
                       "unknown, check <vorbis/codec.h>")
                 return ret * 10;
         }
-        DSFYDEBUG ("Returned from ov_open_callbacks()\n");
-
     }
     
     vorbis_info* vi = ov_info(ds->vf, -1);
@@ -332,15 +388,9 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
     pcm->channels = vi->channels;
 
     while (1) {
-        /* get ogg data */
+        /* top up fifo */
         snd_fill_fifo(ds);
-
-        if (ds->client_callback) {
-            double point = ov_time_tell(ds->vf);
-            ds->client_callback(ds, DESPOTIFY_TIME_TELL, &point,
-                                ds->client_callback_data);
-        }
-
+        
         /* decode to pcm */
         ssize_t r = ov_read(ds->vf, pcm->buf, sizeof(pcm->buf),
                             SYSTEM_ENDIAN, 2, 1, NULL);
@@ -350,14 +400,25 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
             continue;
         }
         
-        if (r <= 0) {
+        if (r < 0) {
             DSFYDEBUG ("pcm_read() == %zd\n", r);
-            if (r == 0)	/* EOF */
-                break;
             return r;
         }
 
+        if (r == 0) {
+            /* end of file */
+            ov_clear(ds->vf);
+            DSFYfree(ds->vf);
+            return 0;
+        }
+
         pcm->len = r;
+
+        if (ds->client_callback) {
+            double point = ov_time_tell(ds->vf);
+            ds->client_callback(ds, DESPOTIFY_TIME_TELL, &point,
+                                ds->client_callback_data);
+        }
         break;
     }
 

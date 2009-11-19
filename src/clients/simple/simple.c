@@ -89,8 +89,10 @@ static void* thread_loop(void* arg)
                 int rc = despotify_get_pcm(ds, &pcm);
                 if (rc == 0)
                     audio_play_pcm(audio_device, &pcm);
-                else
+                else {
                     wrapper_wprintf(L"despotify_get_pcm() returned error %d\n", rc);
+                    exit(-1);
+                }
                 break;
             }
 
@@ -479,6 +481,7 @@ void command_loop(struct despotify_session* ds)
 
                 if (playalbum) {
                     despotify_play(ds, playalbum->tracks, true);
+                    thread_play();
                 }
                 else
                     wrapper_wprintf(L"Got no album for id %s\n", t->album_id);
@@ -612,8 +615,10 @@ void command_loop(struct despotify_session* ds)
                     t = t->next;
             }
 
-            if (t)
+            if (t) {
                 despotify_play(ds, t, true);
+                thread_play();
+            }
         }
 
         /* stop */
@@ -660,6 +665,7 @@ void command_loop(struct despotify_session* ds)
 
 void callback(struct despotify_session* ds, int signal, void* data, void* callback_data)
 {
+    static int seconds = -1;
     (void)data; (void)ds; (void)callback_data;
 
     switch (signal) {
@@ -674,9 +680,10 @@ void callback(struct despotify_session* ds, int signal, void* data, void* callba
         }
 
         case DESPOTIFY_TIME_TELL:
-            /*
-            wrapper_wprintf(L"Time: %.2f\n", *((double*)data));
-            */
+            if ((int)(*((double*)data)) != seconds) {
+                seconds = *((double*)data);
+                wrapper_wprintf(L"Time: %d:%02d\r", seconds / 60, seconds % 60);
+            }
             break;
 
         case DESPOTIFY_END_OF_PLAYLIST:
@@ -723,10 +730,21 @@ int main(int argc, char** argv)
 
     audio_device = audio_init();
 
+#if 0
+    {
+        struct track* t = despotify_get_track(ds, "d1b264bb6bcd46be852ceba8ac5e6582");
+        despotify_play(ds, t, false);
+        thread_play();
+
+        while(1) {
+            sleep(1);
+        }
+    }
+#else
     print_info(ds);
 
     command_loop(ds);
-
+#endif
     thread_exit();
     audio_exit(audio_device);
     despotify_exit(ds);
@@ -869,8 +887,10 @@ void wrapper_wprintf(wchar_t *fmt, ...) {
 	wcstombs(mbstr, wstr, sizeof(mbstr) - 1);
 	mbstr[sizeof(mbstr) - 1] = 0;
 
-	if(isatty(0))
+	if(isatty(0)) {
 		wprintf(L"%S", wstr);
+                fflush(stdout);
+        }
 	
 	if(client_fd == -1)
 		return;

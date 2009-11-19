@@ -38,9 +38,10 @@
 
 enum
 {
-	SND_CMD_INIT = 0,
-	SND_CMD_DATA = 1,
-	SND_CMD_END = 2
+    SND_CMD_START,
+    SND_CMD_DATA,
+    SND_CMD_END,
+    SND_CMD_CHANNEL_END
 };
 
 typedef int (*audio_request_callback) (void *);

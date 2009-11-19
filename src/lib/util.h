@@ -16,6 +16,8 @@
 #define DSFYDEBUG(...)
 #endif
 
+#define _DSFYDEBUG(...)
+
 #ifdef DEBUG_SNDQUEUE
 #define DSFYDEBUG_SNDQUEUE(...) DSFYDEBUG(__VA_ARGS__)
 #else

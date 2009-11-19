@@ -21,7 +21,6 @@
 #include "util.h"
 #include "xml.h"
 
-#define BUFFER_SIZE (ds->track->file_bitrate / 1000 * 1024 * 10 / 8) /* bitrate * 10 seconds */
 #define MAX_BROWSE_REQ 244 /* max entries to load in one browse request */
 
 bool despotify_init()
@@ -238,11 +237,13 @@ static int despotify_aes_callback(CHANNEL* ch,
 
         DSFYDEBUG ("Got AES key\n");
 
-        /* notify client */
-        if (ds->client_callback)
-            ds->client_callback(ds, DESPOTIFY_NEW_TRACK,
-                                ds->track, ds->client_callback_data);
+        /* Add SND_CMD_START to buffer chain,
+           with a copy of the track struct */
+        struct track* copy = malloc(sizeof(struct track));
+        memcpy(copy, ds->track, sizeof(struct track));
+        snd_ioctl(ds, SND_CMD_START, copy, 0);
     }
+
     return 0;
 }
 
@@ -304,13 +305,11 @@ static int despotify_substream_callback(CHANNEL * ch,
 
             /* Push data onto the sound buffer queue */
             snd_ioctl(ds, SND_CMD_DATA, plaintext, len);
-
             break;
         }
 
     case CHANNEL_ERROR:
             DSFYDEBUG("got CHANNEL_ERROR #%d\n", ds->errorcount);
-            ds->dlstate = DL_IDLE;
             ds->errorcount += 1;
             if (ds->errorcount > 3)
                 exit(-1);
@@ -324,22 +323,32 @@ static int despotify_substream_callback(CHANNEL * ch,
             /* Reflect the current offset in the player context */
             ds->offset += ch->total_data_len;
 
-            if (ch->total_data_len == BUFFER_SIZE) {
-                /* We have finished downloading the requested data */
-                ds->dlstate = DL_IDLE;
-            }
-            else {
+            if (ch->total_data_len < SUBSTREAM_SIZE) {
                 DSFYDEBUG("Stream returned short coutn (%d of %d requested), marking END\n",
-                          ch->total_data_len, BUFFER_SIZE);
+                          ch->total_data_len, SUBSTREAM_SIZE);
 
                 /* Add SND_CMD_END to buffer chain */
                 snd_ioctl(ds, SND_CMD_END, NULL, 0);
 
-                /* Don't request more data in pcm_read(),
-                   even if the buffer gets low */
-                ds->dlstate = DL_END;
-            }
 
+                /* find next playable track */
+                do {
+                    ds->track = ds->track->next;
+                } while (ds->track && !ds->track->playable);
+                
+                ds->offset = 0;
+
+                int error = 0;
+                if (ds->track && ds->play_as_list) {
+                    char fid[20], tid[16];
+                    hex_ascii_to_bytes(ds->track->file_id, fid, sizeof fid);
+                    hex_ascii_to_bytes(ds->track->track_id, tid, sizeof tid);
+                    
+                    /* request key for next track */
+                    error = cmd_aeskey(ds->session, fid, tid, despotify_aes_callback, ds);
+                }
+            }
+            snd_ioctl(ds, SND_CMD_CHANNEL_END, NULL, 0);
             break;
 
     default:
@@ -352,12 +361,12 @@ static int despotify_substream_callback(CHANNEL * ch,
 /* called by pcm_read() when it wants more data */
 int despotify_snd_read_stream(struct despotify_session* ds)
 {
-    DSFYDEBUG("Calling cmd_getsubstreams() with offset %d and len %d\n", ds->offset, BUFFER_SIZE);
+    DSFYDEBUG("Calling cmd_getsubstreams() with offset %d and len %d\n", ds->offset, SUBSTREAM_SIZE);
     char fid[20];
     hex_ascii_to_bytes(ds->track->file_id, fid, sizeof fid);
 
     if (cmd_getsubstreams(ds->session, fid,
-                          ds->offset, BUFFER_SIZE,
+                          ds->offset, SUBSTREAM_SIZE,
                           200 * 1000, /* unknown, static value */
                           despotify_substream_callback, ds))
     {
@@ -365,39 +374,7 @@ int despotify_snd_read_stream(struct despotify_session* ds)
         return -1;
     }
 
-    /* we are downloading - don't request more */
-    ds->dlstate = DL_DOWNLOADING;
-
     return 0;
-}
-
-int despotify_snd_end_of_track(struct despotify_session* ds)
-{
-    /* find next playable track */
-    do {
-        ds->track = ds->track->next;
-    } while (ds->track && !ds->track->playable);
-
-    snd_stop(ds);
-    ds->offset = 0;
-
-    int error = 0;
-    if (ds->track && ds->play_as_list) {
-        char fid[20], tid[16];
-        hex_ascii_to_bytes(ds->track->file_id, fid, sizeof fid);
-        hex_ascii_to_bytes(ds->track->track_id, tid, sizeof tid);
-
-        /* request key for next track */
-        error = cmd_aeskey(ds->session, fid, tid, despotify_aes_callback, ds);
-    }
-    else {        
-        if (ds->client_callback)
-            ds->client_callback(ds, DESPOTIFY_END_OF_PLAYLIST,
-                                NULL, ds->client_callback_data);
-
-    }
-
-    return error;
 }
 
 bool despotify_play(struct despotify_session* ds,
