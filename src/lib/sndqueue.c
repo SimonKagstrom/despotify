@@ -139,10 +139,9 @@ int snd_stop (struct despotify_session *ds)
 
 void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
 {
-        /* end of channel. "can I have another one?" */
+        /* end of substream */
         if (cmd == SND_CMD_CHANNEL_END) {
             ds->dlstate = DL_FILLING; /* step down from DL_FILLING_BUSY */
-            snd_fill_fifo(ds);
             return;
         }
 
@@ -194,10 +193,6 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
 
 	ds->fifo->totbytes += buff->length;
 
-        /* start of track. start fetching data */
-        if (cmd == SND_CMD_START)
-            snd_fill_fifo(ds);
-
 	/* Signal receiver */
 	pthread_cond_signal (&ds->fifo->cs);
 	pthread_mutex_unlock (&ds->fifo->lock);
@@ -215,10 +210,6 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
 size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
 {
     struct despotify_session* ds = session;
-
-    /* check fifo if draining */
-    if (ds->dlstate == DL_DRAINING)
-        snd_fill_fifo(ds);
 
     pthread_mutex_lock(&ds->fifo->lock);
 
@@ -352,6 +343,9 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
         return 0;
     }
 
+    /* top up fifo */
+    snd_fill_fifo(ds);
+
     if (!ds->vf) {
         DSFYDEBUG ("Initializing vorbisfile struct\n");
 
@@ -388,9 +382,6 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
     pcm->channels = vi->channels;
 
     while (1) {
-        /* top up fifo */
-        snd_fill_fifo(ds);
-        
         /* decode to pcm */
         ssize_t r = ov_read(ds->vf, pcm->buf, sizeof(pcm->buf),
                             SYSTEM_ENDIAN, 2, 1, NULL);
@@ -419,6 +410,10 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
             ds->client_callback(ds, DESPOTIFY_TIME_TELL, &point,
                                 ds->client_callback_data);
         }
+
+        /* top up fifo */
+        snd_fill_fifo(ds);
+
         break;
     }
 
