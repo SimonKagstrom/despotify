@@ -1,0 +1,9 @@
+
+# About
+DespotifyPHP is a PHP interface for communicating with the Despotify gateway.
+
+# Getting started
+Include src/Despotify.php. Create an instance of the Despotify class, then you can do everything from this function. For more information check out the examples directory and the source files and their comments.
+
+# Examples
+See the examples directory.
