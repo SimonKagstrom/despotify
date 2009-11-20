@@ -16,7 +16,8 @@
 enum {
     DL_FILLING,
     DL_FILLING_BUSY,
-    DL_DRAINING
+    DL_DRAINING,
+    DL_END_OF_LIST
 };
 
 /* Reset for new song */
@@ -139,10 +140,22 @@ int snd_stop (struct despotify_session *ds)
 
 void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
 {
-        /* end of substream */
-        if (cmd == SND_CMD_CHANNEL_END) {
-            ds->dlstate = DL_FILLING; /* step down from DL_FILLING_BUSY */
-            return;
+        switch (cmd) {
+            case SND_CMD_CHANNEL_END:
+                /* end of substream */
+                if (ds->dlstate != DL_END_OF_LIST) {
+                    DSFYDEBUG("ds->dlstate = DL_FILLING\n");
+                    ds->dlstate = DL_FILLING; /* step down from DL_FILLING_BUSY */
+                }
+                return;
+
+            case SND_CMD_END:
+                /* end of track. end of playlist? */
+                if (!ds->track) {
+                    DSFYDEBUG("ds->dlstate = DL_END_OF_LIST\n");
+                    ds->dlstate = DL_END_OF_LIST;
+                }
+                break;
         }
 
         struct snd_buffer* buff = malloc(sizeof(struct snd_buffer));
@@ -181,9 +194,8 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
         }
 
 	/* Hook in entry in linked list */
-	if (ds->fifo->end != NULL) {
-		ds->fifo->end->next = buff;
-	}
+	if (ds->fifo->end)
+            ds->fifo->end->next = buff;
 
 	ds->fifo->end = buff;
 
@@ -249,6 +261,9 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
                     ds->client_callback(ds, DESPOTIFY_NEW_TRACK,
                                         b->ptr,
                                         ds->client_callback_data);
+                /* If this was the last entry */
+                if (b == ds->fifo->end)
+                    ds->fifo->end = NULL;
                 if (b->ptr)
                     DSFYfree (b->ptr);
                 DSFYfree (b);
@@ -309,6 +324,9 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
 		if (b == ds->fifo->end)
                     ds->fifo->end = NULL;
                 
+                /* If this was the last entry */
+                if (b == ds->fifo->end)
+                    ds->fifo->end = NULL;
                 if (b->ptr)
                     DSFYfree (b->ptr);
 		DSFYfree (b);
@@ -338,7 +356,7 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
 
 int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
 {
-    if (!ds->track) {
+    if (!ds || !ds->fifo || !ds->fifo->start) {
         pcm->len = 0;
         return 0;
     }

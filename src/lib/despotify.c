@@ -337,15 +337,14 @@ static int despotify_substream_callback(CHANNEL * ch,
                 DSFYDEBUG("Stream returned short coutn (%d of %d requested), marking END\n",
                           ch->total_data_len, SUBSTREAM_SIZE);
 
-                /* Add SND_CMD_END to buffer chain */
-                snd_ioctl(ds, SND_CMD_END, NULL, 0);
-
-
                 /* find next playable track */
                 do {
                     ds->track = ds->track->next;
                 } while (ds->track && !ds->track->playable);
                 
+                /* Add SND_CMD_END to buffer chain */
+                snd_ioctl(ds, SND_CMD_END, NULL, 0);
+
                 ds->offset = 0;
 
                 int error = 0;
