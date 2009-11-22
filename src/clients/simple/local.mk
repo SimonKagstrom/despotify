@@ -6,14 +6,12 @@ LIB = $(LIBDIR)/libdespotify.la
 
 CFLAGS += -I$(LIBDIR)
 
-ifeq ($(LINUX_BACKEND),libao)
- OBJS += libao.o
- LDFLAGS += -lao
-endif
-
 ifeq ($(shell uname -s),Darwin)
  OBJS += coreaudio.o
  LDFLAGS += -framework CoreAudio
+else ifeq ($(LINUX_BACKEND),libao)
+ OBJS += libao.o
+ LDFLAGS += -lpthread -lao
 endif
 
 
