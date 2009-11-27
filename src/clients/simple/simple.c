@@ -666,7 +666,7 @@ void command_loop(struct despotify_session* ds)
 void callback(struct despotify_session* ds, int signal, void* data, void* callback_data)
 {
     static int seconds = -1;
-    (void)data; (void)ds; (void)callback_data;
+    (void)ds; (void)callback_data; /* don't warn about unused parameters */
 
     switch (signal) {
         case DESPOTIFY_NEW_TRACK: {
@@ -675,7 +675,6 @@ void callback(struct despotify_session* ds, int signal, void* data, void* callba
                             t->title, t->artist->name,
                             t->length / 60000, t->length % 60000 / 1000,
                             t->file_bitrate / 1000);
-            thread_play();
             break;
         }
 
