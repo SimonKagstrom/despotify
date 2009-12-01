@@ -168,6 +168,55 @@ int snd_stop (struct despotify_session *ds)
 	return ret;
 }
 
+int snd_next(struct despotify_session *ds)
+{
+    while (ds->dlstate < DL_DRAINING) {
+        DSFYDEBUG("dlstate = %d. waiting...\n", ds->dlstate);
+        ds->dlabort = true;
+        sleep(1);
+    }
+    ds->dlabort = false;
+
+    pthread_mutex_lock(&ds->fifo->lock);
+
+    /* go through fifo and look for next track */
+    struct snd_buffer* b;
+    struct snd_buffer* next;
+    for (b = ds->fifo->start; b; b = next) {
+        if (b->cmd == SND_CMD_START)
+            break;
+
+        if (b->ptr)
+            free(b->ptr);
+        ds->fifo->totbytes -= b->length;
+        next = b->next;
+        free(b);
+    }
+
+    ds->fifo->start = b;
+
+    if (!b) {
+        /* we didn't have next track in memory */
+        ds->fifo->end = NULL;
+        pthread_mutex_unlock(&ds->fifo->lock);
+        return 0;
+    }
+    
+    pthread_mutex_unlock(&ds->fifo->lock);
+
+    /* notify client */
+    if (ds->client_callback)
+        ds->client_callback(ds, DESPOTIFY_NEW_TRACK,
+                            b->ptr,
+                            ds->client_callback_data);
+
+    /* tell decoder to start over */
+    ov_clear(ds->vf);
+    DSFYfree(ds->vf);
+
+    return 1;
+}
+
 void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
 {
         switch (cmd) {

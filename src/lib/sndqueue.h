@@ -57,6 +57,7 @@ void snd_set_timetell_callback (struct despotify_session* ds,
                                 time_tell_callback callback);
 
 int snd_stop (struct despotify_session* ds);
+int snd_next (struct despotify_session *ds);
 void snd_start (struct despotify_session* ds);
 void snd_ioctl (struct despotify_session *session, int cmd, void *data, int length);
 long pcm_read (struct despotify_session* ds, char *buffer, int length,

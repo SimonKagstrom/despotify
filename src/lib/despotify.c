@@ -419,6 +419,20 @@ bool despotify_play(struct despotify_session* ds,
     return true;
 }
 
+void despotify_next(struct despotify_session* ds)
+{
+    if (snd_next(ds))
+        return;
+
+    /* find next playable track */
+    do {
+        ds->track = ds->track->next;
+    } while (ds->track && !ds->track->playable);
+
+    if (ds->track)
+        despotify_play(ds, ds->track, ds->play_as_list);
+}
+
 bool despotify_stop(struct despotify_session* ds)
 {
     if (!ds->fifo)

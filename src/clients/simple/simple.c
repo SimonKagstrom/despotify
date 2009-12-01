@@ -605,19 +605,15 @@ void command_loop(struct despotify_session* ds)
                 for (int i=1; i<listoffset && t; i++)
                     t = t->next;
 
-                if (!t) {
-                    wrapper_wprintf(L"Invalid track number %d\n", listoffset);
+                if (t) {
+                    despotify_play(ds, t, true);
+                    thread_play();
                 }
+                else
+                    wrapper_wprintf(L"Invalid track number %d\n", listoffset);
             }
             else {
-                t = despotify_get_current_track(ds);
-                if (t)
-                    t = t->next;
-            }
-
-            if (t) {
-                despotify_play(ds, t, true);
-                thread_play();
+                despotify_next(ds);
             }
         }
 

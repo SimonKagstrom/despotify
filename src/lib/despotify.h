@@ -294,6 +294,7 @@ void despotify_free_playlist(struct playlist* playlist);
 bool despotify_play(struct despotify_session *ds,
                     struct track *song,
                     bool play_as_list);
+void despotify_next(struct despotify_session *ds);
 bool despotify_stop(struct despotify_session *ds);
 
 struct track* despotify_get_current_track(struct despotify_session* ds);
