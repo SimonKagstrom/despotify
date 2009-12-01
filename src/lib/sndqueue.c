@@ -170,13 +170,6 @@ int snd_stop (struct despotify_session *ds)
 
 int snd_next(struct despotify_session *ds)
 {
-    while (ds->dlstate < DL_DRAINING) {
-        DSFYDEBUG("dlstate = %d. waiting...\n", ds->dlstate);
-        ds->dlabort = true;
-        sleep(1);
-    }
-    ds->dlabort = false;
-
     pthread_mutex_lock(&ds->fifo->lock);
 
     /* go through fifo and look for next track */
@@ -222,10 +215,15 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
         switch (cmd) {
             case SND_CMD_CHANNEL_END:
                 /* end of substream */
-                if (ds->dlstate != DL_END_OF_LIST) {
-                    DSFYDEBUG("ds->dlstate = DL_FILLING\n");
-                    ds->dlstate = DL_FILLING; /* step down from DL_FILLING_BUSY */
+                if (ds->dlabort) {
+                    DSFYDEBUG("ds->dlstate = DL_DRAINING\n");
+                    ds->dlstate = DL_DRAINING;
                 }
+                else
+                    if (ds->dlstate != DL_END_OF_LIST) {
+                        DSFYDEBUG("ds->dlstate = DL_FILLING\n");
+                        ds->dlstate = DL_FILLING; /* step down from DL_FILLING_BUSY */
+                    }
                 return;
 
             case SND_CMD_END:
