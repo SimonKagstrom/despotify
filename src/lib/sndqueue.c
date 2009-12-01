@@ -20,12 +20,20 @@ enum {
     DL_END_OF_LIST
 };
 
+static void shortsleep(void)
+{
+    /* sleep 100 ms */
+    struct timespec delay = {0, 100000000};
+    nanosleep(&delay, NULL);
+}
+
+
 /* Reset for new song */
 void snd_reset(struct despotify_session* ds)
 {
-	DSFYDEBUG("Setting state to DL_FILLING\n");
+	DSFYDEBUG("Setting state to DL_DRAINING\n");
 	ds->fifo->totbytes = 0;
-	ds->dlstate = DL_FILLING;
+	ds->dlstate = DL_DRAINING;
         ov_clear(ds->vf);
         DSFYfree(ds->vf);
 }
@@ -86,26 +94,36 @@ void snd_destroy (struct despotify_session* ds)
 
 static void snd_fill_fifo(struct despotify_session* ds)
 {
+    if (ds->dlabort) {
+        while (ds->dlstate == DL_FILLING_BUSY) {
+            DSFYDEBUG("dlstate = %d. waiting...\n", ds->dlstate);
+            shortsleep();
+        }
+        ds->dlstate = DL_DRAINING;
+        return;
+    }
+
     switch (ds->dlstate) {
         case DL_DRAINING:
             if (ds->fifo->totbytes < ds->fifo->watermark ) {
                 DSFYDEBUG("Low on data (%d / %d), fetching another channel\n",
                           ds->fifo->totbytes, ds->fifo->maxbytes);
-                despotify_snd_read_stream(ds);
+                DSFYDEBUG("dlstate = DL_FILLING_BUSY\n");
                 ds->dlstate = DL_FILLING_BUSY;
+                despotify_snd_read_stream(ds);
             }
             break;
 
         case DL_FILLING:
             if (ds->fifo->totbytes < (ds->fifo->maxbytes - SUBSTREAM_SIZE)) {
-                despotify_snd_read_stream(ds);
+                DSFYDEBUG("dlstate = DL_FILLING_BUSY\n");
                 ds->dlstate = DL_FILLING_BUSY;
+                despotify_snd_read_stream(ds);
             }
-            else
+            else {
+                DSFYDEBUG("buffer filled. setting dlstate DL_DRAINING\n");
                 ds->dlstate = DL_DRAINING;
-            break;
-
-        case DL_FILLING_BUSY:
+            }
             break;
     }
 }
@@ -117,9 +135,18 @@ int snd_stop (struct despotify_session *ds)
 
 	DSFYDEBUG ("Entering with arg %p. dl state is %d\n", ds, ds->dlstate);
 
+        while (ds->dlstate < DL_DRAINING) {
+            DSFYDEBUG("dlstate = %d. waiting...\n", ds->dlstate);
+            ds->dlabort = true;
+            shortsleep();
+        }
+        
         /* Don't request more data in pcm_read(),
            even if the buffer gets low */
+        DSFYDEBUG("dlstate = DL_DRAINING\n");
         ds->dlstate = DL_DRAINING;
+
+        pthread_mutex_lock (&ds->fifo->lock);
 
 	/* free the ogg fifo */
 	while (ds->fifo->start) {
@@ -134,6 +161,9 @@ int snd_stop (struct despotify_session *ds)
 
 	/* Reset the session */
 	snd_reset(ds);
+
+        ds->dlabort = false;
+        pthread_mutex_unlock (&ds->fifo->lock);
 
 	return ret;
 }
@@ -156,6 +186,12 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
                     ds->dlstate = DL_END_OF_LIST;
                 }
                 break;
+        }
+
+        if (ds->dlabort) {
+            if (data)
+                free(data);
+            return;
         }
 
         struct snd_buffer* buff = malloc(sizeof(struct snd_buffer));
@@ -358,6 +394,7 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
 {
     if (!ds || !ds->fifo || !ds->fifo->start) {
         pcm->len = 0;
+        shortsleep();
         return 0;
     }
 

@@ -202,6 +202,7 @@ struct despotify_session
     struct snd_fifo* fifo;
     int dlstate;
     int errorcount;
+    bool dlabort;
 };
 
 /* callback signals */
