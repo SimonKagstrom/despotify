@@ -6,7 +6,7 @@ cdef class Playlist(SpotifyObject):
 
     def get_uri(self):
         cdef char uri_id[23]
-        cdef str id = self.id[:-2] # Remove last two characters from id, as per despotify_playlist_to_uri
+        cdef bytes id = self.id[:-2] # Remove last two characters from id, as per despotify_playlist_to_uri
 
         despotify_id2uri(id, uri_id)
         return 'spotify:user:%s:playlist:%s' % (self.author, uri_id)

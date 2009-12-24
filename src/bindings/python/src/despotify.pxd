@@ -129,7 +129,7 @@ cdef extern from "despotify.h":
     char * despotify_get_error(despotify_session *)
     bint despotify_cleanup()
 
-    despotify_session *despotify_init_client(void(*)(despotify_session *, int, void*, void*), void*)
+    despotify_session *despotify_init_client(void(*)(despotify_session *, int, void*, void*), void*, bint)
 
     bint despotify_authenticate(despotify_session *, char *, char *)
     void despotify_exit(despotify_session *)
@@ -174,7 +174,5 @@ cdef extern from "despotify.h":
     char * despotify_search_to_uri(search_result *, char *)
     char * despotify_track_to_uri(track *, char *)
 
-    bint despotify_pause(despotify_session *)
     bint despotify_play(despotify_session *, track *, bint)
     bint despotify_stop(despotify_session *)
-    bint despotify_resume(despotify_session *)

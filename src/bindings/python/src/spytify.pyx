@@ -24,17 +24,18 @@ cdef class Spytify:
     This should be any scripts "entrypoint" into this module; any other
     class will most likely be instantiated by this class and returned.
     """
-    def __init__(self, str user, str pw, object callback=None):
+    def __init__(self, bytes user, bytes pw, bool high_bitrate=True, object callback=None):
         """Create a new Spytify instance, and connect to Spotify.
 
         Args:
             user: Username to authenticate with
             pw: Password to authenticate with
+            high_bitrate: Wether or not to request high bitrate data.
         """
         self.stored_playlists = None
         self.callback = callback
 
-        self.ds = despotify_init_client(callback_handler, <void*>self)
+        self.ds = despotify_init_client(callback_handler, <void*>self, high_bitrate)
         if not self.ds:
             raise SpytifyError(despotify_get_error(self.ds))
 
@@ -77,7 +78,8 @@ cdef class Spytify:
         if len(parts) > 2 and parts[0] != 'spotify':
             raise SpytifyError('URI not meant for us: %s' % uri)
 
-        cdef str type, uri_id
+        cdef str type
+        cdef bytes uri_id
         cdef char id[32] 
         type, uri_id = parts[-2].lower(), parts[-1]
 
@@ -90,7 +92,7 @@ cdef class Spytify:
         else:
             raise SpytifyError('URI specifies invalid type: %s' % type)
 
-    def search(self, str searchtext, int max_hits=MAX_SEARCH_RESULTS):
+    def search(self, bytes searchtext, int max_hits=MAX_SEARCH_RESULTS):
         """Search for a string like the normal Spotify client.
 
         Args:
@@ -127,16 +129,6 @@ cdef class Spytify:
             track: Play this track.
         """
         if not despotify_play(self.ds, track.data, False):
-            raise SpytifyError(despotify_get_error(self.ds))
-
-    def pause(self):
-        """Pause playback."""
-        if not despotify_pause(self.ds):
-            raise SpytifyError(despotify_get_error(self.ds))
-
-    def resume(self):
-        """Resume playback after pausing."""
-        if not despotify_resume(self.ds):
             raise SpytifyError(despotify_get_error(self.ds))
 
     def stop(self):
