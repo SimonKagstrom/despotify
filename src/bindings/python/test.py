@@ -61,6 +61,15 @@ def main():
 
         time.sleep(10)
 
+        print "Pausing."
+        s.pause()
+        time.sleep(2)
+
+        print "Aaaand back again."
+        s.resume()
+
+        time.sleep(5)
+
     s.close()
 
 if __name__ == '__main__':

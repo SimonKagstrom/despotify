@@ -1,4 +1,5 @@
 from despotify cimport *
+cimport audio_thread
 
 cdef class SessionStruct
 cdef class SpotifyObject(SessionStruct)
@@ -32,8 +33,10 @@ cdef class SpotifyObject(SessionStruct):
     pass
 
 cdef class Spytify(SessionStruct):
+    cdef handle(self, int signal, void* data)
     cdef RootList stored_playlists
     cdef object callback
+    cdef audio_thread.thread_state* thread
 
 cdef class AlbumData:
     cdef album* data

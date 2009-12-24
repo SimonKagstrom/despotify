@@ -16,7 +16,7 @@ include "playlist.pxi"
 include "searchresult.pxi"
 
 cdef void callback_handler(despotify_session* ds, int signal, void* data, void *python_obj):
-    (<object>python_obj).handle(signal)
+    (<Spytify>python_obj).handle(signal, data)
 
 cdef class Spytify:
     """Class representing a connection to the Spotify service.
@@ -42,7 +42,9 @@ cdef class Spytify:
         if not despotify_authenticate(self.ds, user, pw):
             raise SpytifyError(despotify_get_error(self.ds))
 
-    def handle(self, int signal):
+        self.thread = audio_thread.thread_init(self.ds)
+
+    cdef handle(self, int signal, void* data):
         if self.callback:
             self.callback(self, signal)
 
@@ -122,6 +124,8 @@ cdef class Spytify:
         if not despotify_play(self.ds, starting_track_ptr, True):
             raise SpytifyError(despotify_get_error(self.ds))
 
+        audio_thread.thread_play(self.thread)
+
     def play(self, Track track):
         """Start playback of a given track.
 
@@ -131,13 +135,24 @@ cdef class Spytify:
         if not despotify_play(self.ds, track.data, False):
             raise SpytifyError(despotify_get_error(self.ds))
 
+        audio_thread.thread_play(self.thread)
+
     def stop(self):
         """Stop playback."""
         if not despotify_stop(self.ds):
             raise SpytifyError(despotify_get_error(self.ds))
 
+    def pause(self):
+        """Pause playback."""
+        audio_thread.thread_pause(self.thread)
+
+    def resume(self):
+        """Resume playback."""
+        audio_thread.thread_play(self.thread)
+
     def close(self):
         """Close the session with the server."""
+        audio_thread.thread_exit(self.thread)
         despotify_exit(self.ds)
 
 def bytestr_to_hexstr(str bytes):
