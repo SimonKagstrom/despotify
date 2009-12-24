@@ -31,5 +31,5 @@ LINUX_BACKEND = libao
 
 ## If you're on Mac OS X and have installed libvorbisfile
 ## via 'port install ..', try uncommenting these lines
-# CFLAGS += /opt/local/include
-# LDFLAGS += /opt/local/lib
+# CFLAGS += -I/opt/local/include
+# LDFLAGS += -L/opt/local/lib
