@@ -16,7 +16,6 @@
 
 #include <ao/ao.h>
 #include "audio.h"
-#include "util.h"
 
 void* audio_init(void)
 {

@@ -16,8 +16,6 @@
 #include <CoreAudio/CoreAudioTypes.h>
 
 #include "audio.h"
-#include "util.h"
-
 
 typedef struct {
 	AudioDeviceID adev_id;
