@@ -135,9 +135,11 @@ int snd_stop (struct despotify_session *ds)
 
 	DSFYDEBUG ("Entering with arg %p. dl state is %d\n", ds, ds->dlstate);
 
-        while (ds->dlstate < DL_DRAINING) {
-            DSFYDEBUG("dlstate = %d. waiting...\n", ds->dlstate);
+        if (ds->dlstate < DL_DRAINING)
             ds->dlabort = true;
+            
+        while (ds->dlstate == DL_FILLING_BUSY) {
+            DSFYDEBUG("dlstate = %d. waiting...\n", ds->dlstate);
             shortsleep();
         }
         
@@ -417,7 +419,10 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
 		_DSFYDEBUG("Calling despotify_end_of_track\n");
 
                 if (!ds->fifo->start) {
+                    /* (snd_stop locks the mutex internally) */
+                    pthread_mutex_unlock(&ds->fifo->lock);
                     snd_stop(ds);
+                    pthread_mutex_lock(&ds->fifo->lock);
 
                     if (ds->client_callback)
                         ds->client_callback(ds, DESPOTIFY_END_OF_PLAYLIST,
