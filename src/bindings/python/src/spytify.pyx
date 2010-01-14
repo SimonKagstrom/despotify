@@ -2,6 +2,8 @@ import atexit
 
 cdef extern from "Python.h":
     ctypedef int Py_intptr_t
+    void PyEval_InitThreads()
+
 
 class SpytifyError(Exception):
     pass
@@ -15,7 +17,8 @@ include "track.pxi"
 include "playlist.pxi"
 include "searchresult.pxi"
 
-cdef void callback_handler(despotify_session* ds, int signal, void* data, void *python_obj):
+cdef void callback_handler(despotify_session* ds, int signal, 
+                           void* data, void *python_obj) with gil:
     (<Spytify>python_obj).handle(signal, data)
 
 cdef class Spytify:
@@ -42,6 +45,7 @@ cdef class Spytify:
         if not despotify_authenticate(self.ds, user, pw):
             raise SpytifyError(despotify_get_error(self.ds))
 
+        PyEval_InitThreads()
         self.thread = audio_thread.thread_init(self.ds)
 
     cdef handle(self, int signal, void* data):
