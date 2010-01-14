@@ -1,0 +1,27 @@
+Troubleshooting
+~~~~~~~~~~~~~~~
+
+On OS X, using pkgconfig from ports, you might get this error:
+(But only if you've changed the bindings)
+
+ Package despotify was not found in the pkg-config search path.
+ Perhaps you should add the directory containing `despotify.pc'
+ to the PKG_CONFIG_PATH environment variable
+ No package 'despotify' found
+
+Then a bunch of GCC errors saying "No such file or directory".
+
+This happens because despotify doesn't install it's pkgconfig file
+to the same location as ports installs its stuff to. It's easily fixed
+by running this before build:
+
+  export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+
+Thanks to Simo Salminen for reporting this.
+
+If you have other problems that you can't figure out, ask in 
+our channel, #despotify on EFNet, or send me an email!
+
+-- 
+Kindest regards, 
+  Jørgen P. Tjernø, <jorgen@devsoft.no>
