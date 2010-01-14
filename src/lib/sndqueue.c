@@ -492,6 +492,10 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
         /* decode to pcm */
         ssize_t r = ov_read(ds->vf, pcm->buf, sizeof(pcm->buf),
                             SYSTEM_ENDIAN, 2, 1, NULL);
+
+        /* assume no valid data read. */
+        pcm->len = 0;
+
         if (r == OV_HOLE) {
             /* vorbis got garbage */
             DSFYDEBUG ("pcm_read() == OV_HOLE\n");
@@ -510,6 +514,7 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
             return 0;
         }
 
+        /* valid data *was* read, update length. */
         pcm->len = r;
 
         if (ds->client_callback) {
