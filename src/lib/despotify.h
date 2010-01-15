@@ -8,6 +8,7 @@
 #define STRING_LENGTH 256
 #define MAX_SEARCH_RESULTS 100 /* max search results per request */
 #define SUBSTREAM_SIZE (100 * 1024)
+#define TIMEOUT 10 /* timeout in seconds */
 
 struct track
 {

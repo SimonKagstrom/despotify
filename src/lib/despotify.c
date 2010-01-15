@@ -1,7 +1,10 @@
 #include <assert.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include <zlib.h>
 
@@ -595,6 +598,40 @@ static int despotify_gzip_callback(CHANNEL*  ch,
     return 0;
 }
 
+
+/****************************************************
+ *
+ *  Timeouts
+ *
+ */
+bool despotify_wait_timeout(struct despotify_session* ds){
+    struct timeval  tv;
+    struct timespec ts;
+
+    /* Get system time */
+    gettimeofday(&tv, NULL);
+
+    /* Setup timespec structure */
+    ts.tv_sec  = tv.tv_sec;
+    ts.tv_nsec = tv.tv_usec * 1000;
+    ts.tv_sec += TIMEOUT;
+
+    /* timed wait until response is ready */
+    pthread_mutex_lock(&ds->sync_mutex);
+
+    if (pthread_cond_timedwait(&ds->sync_cond, &ds->sync_mutex, &ts) == ETIMEDOUT) {
+        pthread_mutex_unlock(&ds->sync_mutex);
+
+        DSFYDEBUG("Timeout while waiting on sync condition\n");
+
+        return false;
+    }
+
+    pthread_mutex_unlock(&ds->sync_mutex);
+
+    return true;
+}
+
 /****************************************************
  *
  *  Search
@@ -623,9 +660,10 @@ struct search_result* despotify_search(struct despotify_session* ds,
     }
 
     /* wait until search is ready */
-    pthread_mutex_lock(&ds->sync_mutex);
-    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
-    pthread_mutex_unlock(&ds->sync_mutex);
+    if (!despotify_wait_timeout(ds)) {
+        ds->last_error = "Timeout when searching";
+        return NULL;
+    }
 
     /* Add tracks */
     if (!ds->playlist->tracks)
@@ -673,9 +711,10 @@ struct search_result* despotify_search_more(struct despotify_session *ds,
     }
 
     /* wait until search is ready */
-    pthread_mutex_lock(&ds->sync_mutex);
-    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
-    pthread_mutex_unlock(&ds->sync_mutex);
+    if (!despotify_wait_timeout(ds)) {
+        ds->last_error = "Timeout when searching";
+        return NULL;
+    }
 
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
@@ -743,9 +782,10 @@ static bool despotify_load_tracks(struct despotify_session *ds)
         }
 
         /* wait until track fetch is ready */
-        pthread_mutex_lock(&ds->sync_mutex);
-        pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
-        pthread_mutex_unlock(&ds->sync_mutex);
+        if (!despotify_wait_timeout(ds)) {
+            ds->last_error = "Timeout while loading tracks";
+            return NULL;
+        }
 
         /* add tracks to playlist */
         struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
@@ -816,7 +856,7 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
     int error = cmd_getplaylist(ds->session, pid, PLAYLIST_CURRENT,
                                 despotify_plain_callback, ds);
     if (error) {
-        DSFYDEBUG("Failed getting playlists\n");
+        DSFYDEBUG("Failed getting playlist\n");
         ds->last_error = "Network error.";
         session_disconnect(ds->session);
 
@@ -824,9 +864,10 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
     }
 
     /* wait until playlist fetch is ready */
-    pthread_mutex_lock(&ds->sync_mutex);
-    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
-    pthread_mutex_unlock(&ds->sync_mutex);
+    if (!despotify_wait_timeout(ds)) {
+        ds->last_error = "Timeout while loading playlist";
+        return NULL;
+    }
 
     buf_append_u8(ds->response, 0); /* null terminate xml string */
     ds->playlist = xml_parse_playlist(ds->playlist,
@@ -909,16 +950,17 @@ bool despotify_rename_playlist(struct despotify_session *ds,
                                    despotify_plain_callback, ds);
 
     if (error) {
-        DSFYDEBUG("Failed getting playlists\n");
+        DSFYDEBUG("Failed renaming playlist\n");
         ds->last_error = "Network error.";
         session_disconnect(ds->session);
         return false;
     }
 
     /* wait until server responds */
-    pthread_mutex_lock(&ds->sync_mutex);
-    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
-    pthread_mutex_unlock(&ds->sync_mutex);
+    if (!despotify_wait_timeout(ds)) {
+        ds->last_error = "Timeout while renaming playlist";
+        return NULL;
+    }
 
     buf_append_u8(ds->response, 0); /* null terminate xml string */
 
@@ -965,16 +1007,17 @@ bool despotify_set_playlist_collaboration(struct despotify_session *ds,
                                    despotify_plain_callback, ds);
 
     if (error) {
-        DSFYDEBUG("Failed getting playlists\n");
+        DSFYDEBUG("Failed setting playlist collaboration\n");
         ds->last_error = "Network error.";
         session_disconnect(ds->session);
         return false;
     }
 
     /* wait until server responds */
-    pthread_mutex_lock(&ds->sync_mutex);
-    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
-    pthread_mutex_unlock(&ds->sync_mutex);
+    if (!despotify_wait_timeout(ds)) {
+        ds->last_error = "Timeout while setting playlist collaboration";
+        return NULL;
+    }
 
     buf_append_u8(ds->response, 0); /* null terminate xml string */
 
@@ -1016,10 +1059,11 @@ struct artist_browse* despotify_get_artist(struct despotify_session* ds,
         return false;
     }
 
-    /* wait until track fetch is ready */
-    pthread_mutex_lock(&ds->sync_mutex);
-    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
-    pthread_mutex_unlock(&ds->sync_mutex);
+    /* wait until artist fetch is ready */
+    if (!despotify_wait_timeout(ds)) {
+        ds->last_error = "Timeout while browsing artist";
+        return NULL;
+    }
 
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
@@ -1052,9 +1096,10 @@ void* despotify_get_image(struct despotify_session* ds, char* image_id, int* len
     }
 
     /* wait until image fetch is ready */
-    pthread_mutex_lock(&ds->sync_mutex);
-    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
-    pthread_mutex_unlock(&ds->sync_mutex);
+    if (!despotify_wait_timeout(ds)) {
+        ds->last_error = "Timeout while loading image";
+        return NULL;
+    }
 
     void* image = ds->response->ptr;
     if (len)
@@ -1082,10 +1127,11 @@ struct album_browse* despotify_get_album(struct despotify_session* ds,
         return false;
     }
 
-    /* wait until track fetch is ready */
-    pthread_mutex_lock(&ds->sync_mutex);
-    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
-    pthread_mutex_unlock(&ds->sync_mutex);
+    /* wait until album fetch is ready */
+    if (!despotify_wait_timeout(ds)) {
+        ds->last_error = "Timeout while browsing album";
+        return NULL;
+    }
 
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
@@ -1129,9 +1175,10 @@ struct track* despotify_get_tracks(struct despotify_session* ds, char* track_ids
     }
 
     /* wait until track fetch is ready */
-    pthread_mutex_lock(&ds->sync_mutex);
-    pthread_cond_wait(&ds->sync_cond, &ds->sync_mutex);
-    pthread_mutex_unlock(&ds->sync_mutex);
+    if (!despotify_wait_timeout(ds)) {
+        ds->last_error = "Timeout while browsing track(s)";
+        return NULL;
+    }
 
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
