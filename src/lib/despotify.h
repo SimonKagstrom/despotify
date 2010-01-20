@@ -190,6 +190,7 @@ struct despotify_session
     bool list_of_lists;
     bool play_as_list;
     bool high_bitrate;
+    bool use_cache;
 
     /* client callback */
     void(*client_callback)(struct despotify_session* session,
@@ -231,7 +232,7 @@ bool despotify_init(void);
 bool despotify_cleanup(void);
 
 /* Session stuff. */
-struct despotify_session *despotify_init_client(void(*callback)(struct despotify_session*, int, void*, void*), void*, bool);
+struct despotify_session *despotify_init_client(void(*callback)(struct despotify_session*, int, void*, void*), void*, bool, bool);
 
 void despotify_exit(struct despotify_session *ds);
 
@@ -281,7 +282,7 @@ void despotify_free_search(struct search_result *search);
 
 /* Playlist handling. */
 struct playlist* despotify_get_playlist(struct despotify_session *ds,
-                                        char* playlist_id);
+                                        char* playlist_id, bool cache_do_store);
 struct playlist* despotify_get_stored_playlists(struct despotify_session *ds);
 bool despotify_rename_playlist(struct despotify_session *ds,
                                struct playlist *playlist, char *name);

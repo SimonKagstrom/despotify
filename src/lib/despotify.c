@@ -11,6 +11,7 @@
 #include "aes.h"
 #include "auth.h"
 #include "buf.h"
+#include "cache.h"
 #include "channel.h"
 #include "commands.h"
 #include "despotify.h"
@@ -20,6 +21,7 @@
 #include "network.h"
 #include "packet.h"
 #include "session.h"
+#include "sha1.h"
 #include "sndqueue.h"
 #include "util.h"
 #include "xml.h"
@@ -69,7 +71,7 @@ static void* despotify_thread(void* arg)
     return NULL;
 }
 
-struct despotify_session* despotify_init_client(void(*callback)(struct despotify_session*, int, void*, void*), void* callback_data, bool high_bitrate)
+struct despotify_session* despotify_init_client(void(*callback)(struct despotify_session*, int, void*, void*), void* callback_data, bool high_bitrate, bool use_cache)
 {
     struct despotify_session* ds = calloc(1,sizeof(struct despotify_session));
     if (!ds)
@@ -87,6 +89,10 @@ struct despotify_session* despotify_init_client(void(*callback)(struct despotify
     ds->client_callback = callback;
     ds->client_callback_data = callback_data;
     ds->high_bitrate = high_bitrate;
+    ds->use_cache = use_cache;
+
+    if (use_cache)
+        cache_init();
 
     return ds;
 }
@@ -749,7 +755,7 @@ void despotify_free_search(struct search_result *search) {
  *
  */
 
-static bool despotify_load_tracks(struct despotify_session *ds)
+static bool despotify_load_tracks(struct despotify_session *ds, bool cache_do_store)
 {
     struct playlist* pl = ds->playlist;
 
@@ -760,6 +766,8 @@ static bool despotify_load_tracks(struct despotify_session *ds)
 
     /* construct an array of 16-byte track ids */
     char* tracklist = malloc(MAX_BROWSE_REQ * 16);
+    SHA1_CTX sha_ctx;
+    unsigned char hash[20], tracks_hash[33];
     int track_count = 0;
 
     /* don't request too many tracks at once */
@@ -770,6 +778,29 @@ static bool despotify_load_tracks(struct despotify_session *ds)
         struct track* firsttrack = t;
         for (count = 0; t && count < MAX_BROWSE_REQ; t = t->next, count++)
             hex_ascii_to_bytes(t->track_id, tracklist + count * 16, 16);
+
+        /* create a hash of the tracklist */
+        SHA1Init(&sha_ctx);
+        SHA1Update(&sha_ctx, tracklist, count * 16);
+        SHA1Final(hash, &sha_ctx);
+
+        hex_bytes_to_ascii(hash, tracks_hash, 20);
+
+        /* check cache */
+        if (ds->use_cache && cache_contains(tracks_hash)) {
+            unsigned char* data;
+            int len;
+
+            DSFYDEBUG("Loading cached tracks...\n");
+
+            if ((data = cache_load(tracks_hash, &len)) != NULL) {
+                track_count += xml_parse_tracklist(firsttrack, data, len,
+                                               true, ds->high_bitrate);
+                free(data);
+
+                continue;
+            }
+        }
 
         int error = cmd_browse(ds->session, BROWSE_TRACK, tracklist, count, 
                                despotify_gzip_callback, ds);
@@ -790,6 +821,10 @@ static bool despotify_load_tracks(struct despotify_session *ds)
         /* add tracks to playlist */
         struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
         if (b) {
+            /* store tracks xml in cache. */
+            if (cache_do_store)
+                cache_store(tracks_hash, b->ptr, b->len);
+
             track_count += xml_parse_tracklist(firsttrack, b->ptr, b->len,
                                                true, ds->high_bitrate);
             buf_free(b);
@@ -834,10 +869,36 @@ static bool despotify_load_tracks(struct despotify_session *ds)
 }
 
 struct playlist* despotify_get_playlist(struct despotify_session *ds,
-                                        char* playlist_id)
+                                        char* playlist_id, bool cache_do_store)
 {
-    ds->response = buf_new();
     ds->playlist = calloc(1, sizeof(struct playlist));
+
+    /* check cache */
+    if (ds->use_cache && playlist_id && cache_contains(playlist_id)) {
+        unsigned char* data;
+        int len;
+
+        DSFYDEBUG("Loading cached playlist '%s'...\n", playlist_id);
+
+        if ((data = cache_load(playlist_id, &len)) != NULL) {
+            ds->playlist = xml_parse_playlist(ds->playlist, data, len, false);
+            free(data);
+
+            DSFYstrncpy(ds->playlist->playlist_id, playlist_id, sizeof ds->playlist->playlist_id);
+
+            /* fill the playlist with track info */
+            if (!despotify_load_tracks(ds, cache_do_store)) {
+                ds->last_error = "Failed loading track info";
+                DSFYDEBUG("%s", ds->last_error);
+                free(ds->playlist);
+                return NULL;
+            }
+
+            return ds->playlist;
+        }
+    }
+
+    ds->response = buf_new();
 
     static const char* load_lists =
         "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<playlist>\n";
@@ -870,6 +931,11 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
     }
 
     buf_append_u8(ds->response, 0); /* null terminate xml string */
+
+    /* store playlist xml in cache. */
+    if (cache_do_store && playlist_id)
+        cache_store(playlist_id, ds->response->ptr, ds->response->len);
+
     ds->playlist = xml_parse_playlist(ds->playlist,
                                       ds->response->ptr,
                                       ds->response->len,
@@ -883,9 +949,10 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
 
     if (playlist_id) {
         /* fill the playlist with track info */
-        if (!despotify_load_tracks(ds)) {
+        if (!despotify_load_tracks(ds, cache_do_store)) {
             ds->last_error = "Failed loading track info";
             DSFYDEBUG("%s", ds->last_error);
+            free(ds->playlist);
             return NULL;
         }
     }
@@ -900,15 +967,43 @@ void despotify_free_playlist(struct playlist* p)
 
 struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
 {
+    /* save cache setting */
+    bool old_use_cache = ds->use_cache;
+
+    /* disable caching for meta playlist */
+    ds->use_cache = false;
+
     /* load list of lists */
     DSFYDEBUG("Requesting meta playlist\n");
-    struct playlist* metalist = despotify_get_playlist(ds, NULL);
+    struct playlist* metalist = despotify_get_playlist(ds, NULL, false);
     struct playlist* root = NULL;
     struct playlist* prev = NULL;
 
+    /* check meta playlist revision */
+    DSFYDEBUG("Meta-Playlist revisions (remote: %d, local: %d)\n",
+                        metalist->revision, cache_get_meta_playlist_revision());
+
+    if (!old_use_cache) {
+        DSFYDEBUG("Not using cache for playlists.\n");
+    }
+    else if (metalist->revision > cache_get_meta_playlist_revision()) {
+        cache_set_meta_playlist_revision(metalist->revision);
+
+        /* disable caching if something changed */
+        ds->use_cache = false;
+
+        DSFYDEBUG("Stored playlists changed! Requesting playlist data...\n");
+    }
+    else {
+        /* reset cache setting to old value */
+        ds->use_cache = old_use_cache;
+
+        DSFYDEBUG("Stored playlists didn't change! use_cache = %d\n", ds->use_cache);
+    }
+
     for (struct playlist* p = metalist; p && p->playlist_id[0]; p = p->next) {
         DSFYDEBUG("Requesting playlist with ID '%s'\n", p->playlist_id);
-        struct playlist* new = despotify_get_playlist(ds, p->playlist_id);
+        struct playlist* new = despotify_get_playlist(ds, p->playlist_id, old_use_cache);
         if (prev)
             prev->next = new;
         else
@@ -916,6 +1011,9 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
         prev = new;
     }
     xml_free_playlist(metalist);
+
+    /* reset cache setting to old value */
+    ds->use_cache = old_use_cache;
 
     return root;
 }
@@ -1044,8 +1142,24 @@ bool despotify_set_playlist_collaboration(struct despotify_session *ds,
 struct artist_browse* despotify_get_artist(struct despotify_session* ds,
                                            char* artist_id)
 {
-    ds->response = buf_new();
     ds->artist_browse = calloc(1, sizeof(struct artist_browse));
+
+    /* check cache */
+    if (ds->use_cache && cache_contains(artist_id)) {
+        unsigned char* data;
+        int len;
+
+        DSFYDEBUG("Loading cached artist '%s'...\n", artist_id);
+
+        if ((data = cache_load(artist_id, &len)) != NULL) {
+            xml_parse_browse_artist(ds->artist_browse, data, len, ds->high_bitrate);
+            free(data);
+
+            return ds->artist_browse;
+        }
+    }
+
+    ds->response = buf_new();
 
     unsigned char id[16];
     hex_ascii_to_bytes(artist_id, id, sizeof id);
@@ -1067,6 +1181,10 @@ struct artist_browse* despotify_get_artist(struct despotify_session* ds,
 
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
+        /* store artist xml in cache. */
+        if (ds->use_cache)
+            cache_store(artist_id, b->ptr, b->len);
+
         xml_parse_browse_artist(ds->artist_browse, b->ptr, b->len, ds->high_bitrate);
         buf_free(b);
     }
@@ -1082,6 +1200,13 @@ void despotify_free_artist_browse(struct artist_browse* a)
 
 void* despotify_get_image(struct despotify_session* ds, char* image_id, int* len)
 {
+    /* check cache */
+    if (ds->use_cache && cache_contains(image_id)) {
+        DSFYDEBUG("Loading cached image '%s'...\n", image_id);
+
+        return (void *)cache_load(image_id, len);
+    }
+
     ds->response = buf_new();
 
     unsigned char id[20];
@@ -1101,7 +1226,12 @@ void* despotify_get_image(struct despotify_session* ds, char* image_id, int* len
         return NULL;
     }
 
+    /* store image in cache. */
+    if (ds->use_cache)
+        cache_store(image_id, ds->response->ptr, ds->response->len);
+
     void* image = ds->response->ptr;
+
     if (len)
         *len = ds->response->len;
     free(ds->response); /* free() instead of buf_free() since ptr must
@@ -1112,8 +1242,24 @@ void* despotify_get_image(struct despotify_session* ds, char* image_id, int* len
 struct album_browse* despotify_get_album(struct despotify_session* ds,
                                          char* album_id)
 {
-    ds->response = buf_new();
     ds->album_browse = calloc(1, sizeof(struct album_browse));
+
+    /* check cache */
+    if (ds->use_cache && cache_contains(album_id)) {
+        unsigned char* data;
+        int len;
+
+        DSFYDEBUG("Loading cached album '%s'...\n", album_id);
+
+        if ((data = cache_load(album_id, &len)) != NULL) {
+            xml_parse_browse_album(ds->album_browse, data, len, ds->high_bitrate);
+            free(data);
+
+            return ds->album_browse;
+        }
+    }
+
+    ds->response = buf_new();
 
     unsigned char id[16];
     hex_ascii_to_bytes(album_id, id, sizeof id);
@@ -1135,6 +1281,10 @@ struct album_browse* despotify_get_album(struct despotify_session* ds,
 
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
+        /* store album xml in cache. */
+        if (ds->use_cache)
+            cache_store(album_id, b->ptr, b->len);
+
         xml_parse_browse_album(ds->album_browse, b->ptr, b->len, ds->high_bitrate);
         buf_free(b);
     }
@@ -1150,7 +1300,6 @@ void despotify_free_album_browse(struct album_browse* a)
 
 struct track* despotify_get_tracks(struct despotify_session* ds, char* track_ids[], int num_tracks)
 {
-
     if (num_tracks > MAX_BROWSE_REQ) {
         ds->last_error = "Too many ids in track browse request";
         return NULL;
@@ -1347,7 +1496,18 @@ struct playlist* despotify_link_get_playlist(struct despotify_session* ds, struc
     despotify_uri2id(link->arg, buf);
     strncat(buf, "02", 2); /* Playlist uris are missing the last 2 chars of the id */
 
-    return despotify_get_playlist(ds, buf);
+    /* save cache setting */
+    bool old_use_cache = ds->use_cache;
+
+    /* disable caching */
+    ds->use_cache = false;
+
+    struct playlist *playlist = despotify_get_playlist(ds, buf, old_use_cache);
+
+    /* reset cache setting to old value */
+    ds->use_cache = old_use_cache;
+
+    return playlist;
 }
 
 struct track* despotify_link_get_track(struct despotify_session* ds, struct link* link)

@@ -6,12 +6,6 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
-#ifdef DEBUG
-#define DSFYDEBUG(...) { FILE *fd = fopen("/tmp/despotify-libao.log","at"); fprintf(fd, "%s:%d %s() ", __FILE__, __LINE__, __func__); fprintf(fd, __VA_ARGS__); fclose(fd); }
-#else
-#define DSFYDEBUG(...)
-#endif
-
 #include "despotify.h"
 
 void* audio_init (void);

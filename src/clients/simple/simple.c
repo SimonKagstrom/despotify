@@ -704,7 +704,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    struct despotify_session* ds = despotify_init_client(callback, NULL, true);
+    struct despotify_session* ds = despotify_init_client(callback, NULL, true, true);
     if (!ds) {
         wrapper_wprintf(L"despotify_init_client() failed\n");
         return 1;

@@ -17,6 +17,12 @@
 #include <ao/ao.h>
 #include "audio.h"
 
+#ifdef DEBUG
+#define DSFYDEBUG(...) { FILE *fd = fopen("/tmp/despotify-libao.log","at"); fprintf(fd, "%s:%d %s() ", __FILE__, __LINE__, __func__); fprintf(fd, __VA_ARGS__); fclose(fd); }
+#else
+#define DSFYDEBUG(...)
+#endif
+
 void* audio_init(void)
 {
     ao_device *device;

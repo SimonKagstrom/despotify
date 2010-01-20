@@ -136,7 +136,7 @@ void sess_connect()
 
   sess_disconnect();
 
-  if (!(g_session.dsfy = despotify_init_client(sess_callback, NULL, true)))
+  if (!(g_session.dsfy = despotify_init_client(sess_callback, NULL, true, true)))
     panic("despotify_init_client(...) failed");
 
   play_state = PAUSE;

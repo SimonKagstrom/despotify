@@ -2,7 +2,7 @@
 # $Id$
 # 
 
-LIB_OBJS = aes.lo auth.lo buf.lo channel.lo commands.lo dns.lo ezxml.lo handlers.lo keyexchange.lo packet.lo puzzle.lo session.lo shn.lo sndqueue.lo util.lo network.lo despotify.lo sha1.lo hmac.lo xml.lo 
+LIB_OBJS = aes.lo auth.lo buf.lo cache.lo channel.lo commands.lo dns.lo ezxml.lo handlers.lo keyexchange.lo packet.lo puzzle.lo session.lo shn.lo sndqueue.lo util.lo network.lo despotify.lo sha1.lo hmac.lo xml.lo 
 
 LDFLAGS += -rpath /usr/lib
 LDCONFIG = ldconfig
