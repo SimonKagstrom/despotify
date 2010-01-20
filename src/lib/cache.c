@@ -1,33 +1,53 @@
+#include <dirent.h>
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <dirent.h>
 
 #include "util.h"
 #include "cache.h"
 
-char *home_directory;
-char cache_filename[256];
+char cache_directory[PATH_MAX];
+char cache_filename[PATH_MAX];
 
-void cache_init(){
-    if((home_directory = getenv("HOME")) == NULL){
-        DSFYDEBUG("Error getting home directory.\n");
+bool cache_init(){
+    char *ptr;
+
+    if((ptr = getenv("XDG_CACHE_HOME")) != NULL){
+        snprintf(cache_directory, PATH_MAX, "%s/despotify", ptr);
+    }
+    else{
+        DSFYDEBUG("Error getting $XDG_CACHE_HOME. Trying $HOME...\n");
+
+        if((ptr = getenv("HOME")) != NULL){
+            snprintf(cache_directory, PATH_MAX, "%s/.cache/despotify", ptr);
+        }
+        else{
+            DSFYDEBUG("Error getting $HOME.\n");
+
+            return false;
+        }
     }
 
-    /* Build cache filename. */
-    snprintf(cache_filename, 256, "%s/%s", home_directory, CACHE_DIRECTORY);
-    
-    if(mkdir(cache_filename, 0755) != 0){
-        DSFYDEBUG("Error creating cache directory.\n");
+    if(mkdir(cache_directory, 0755) != 0){
+        if(errno == EEXIST){
+            DSFYDEBUG("Cache directory already exists.\n");
+
+            return true;
+        }
+
+        DSFYDEBUG("Error creating cache directory. errno = %d\n", errno);
+
+        return false;
     }
+
+    return true;
 }
 
 void cache_clear(){
-    /* Build cache filename. */
-    snprintf(cache_filename, 256, "%s/%s", home_directory, CACHE_DIRECTORY);
-
-    DIR *dir = opendir(cache_filename);
+    DIR *dir = opendir(cache_directory);
     struct dirent *dirp;
 
     if(!dir){
@@ -43,7 +63,7 @@ void cache_clear(){
         }
 
         /* Build cache filename. */
-        snprintf(cache_filename, 256, "%s/%s/%s", home_directory, CACHE_DIRECTORY, dirp->d_name);
+        snprintf(cache_filename, PATH_MAX, "%s/%s", cache_directory, dirp->d_name);
 
         remove(cache_filename);
     }
@@ -51,7 +71,7 @@ void cache_clear(){
 
 bool cache_contains(unsigned char *id){
     /* Build cache filename. */
-    snprintf(cache_filename, 256, "%s/%s/%s", home_directory, CACHE_DIRECTORY, id);
+    snprintf(cache_filename, PATH_MAX, "%s/%s", cache_directory, id);
 
     /* Try to open file for reading. */
     FILE *file = fopen(cache_filename, "r");
@@ -70,7 +90,7 @@ unsigned char *cache_load(unsigned char *id, unsigned int *size){
     unsigned long fsize;
 
     /* Build cache filename. */
-    snprintf(cache_filename, 256, "%s/%s/%s", home_directory, CACHE_DIRECTORY, id);
+    snprintf(cache_filename, PATH_MAX, "%s/%s", cache_directory, id);
 
     /* Try to open file for reading. */
     FILE *file = fopen(cache_filename, "r");
@@ -115,7 +135,7 @@ unsigned char *cache_load(unsigned char *id, unsigned int *size){
 
 void cache_remove(unsigned char *id){
     /* Build cache filename. */
-    snprintf(cache_filename, 256, "%s/%s/%s", home_directory, CACHE_DIRECTORY, id);
+    snprintf(cache_filename, PATH_MAX, "%s/%s", cache_directory, id);
 
     /* Remove cache file. */
     if(remove(cache_filename) != 0){
@@ -125,7 +145,7 @@ void cache_remove(unsigned char *id){
 
 void cache_store(unsigned char *id, unsigned char *data, unsigned int size){
     /* Build cache filename. */
-    snprintf(cache_filename, 256, "%s/%s/%s", home_directory, CACHE_DIRECTORY, id);
+    snprintf(cache_filename, PATH_MAX, "%s/%s", cache_directory, id);
 
     /* Try to open file for writing. */
     FILE *file = fopen(cache_filename, "w");
@@ -150,7 +170,7 @@ unsigned int cache_get_meta_playlist_revision(){
     unsigned int revision;
 
     /* Build cache filename. */
-    snprintf(cache_filename, 256, "%s/%s/meta_playlist_revision", home_directory, CACHE_DIRECTORY);
+    snprintf(cache_filename, PATH_MAX, "%s/meta_playlist_revision", cache_directory);
 
     /* Try to open file for reading. */
     FILE *file = fopen(cache_filename, "r");
@@ -175,7 +195,7 @@ unsigned int cache_get_meta_playlist_revision(){
 
 void cache_set_meta_playlist_revision(unsigned int revision){
     /* Build cache filename. */
-    snprintf(cache_filename, 256, "%s/%s/meta_playlist_revision", home_directory, CACHE_DIRECTORY);
+    snprintf(cache_filename, PATH_MAX, "%s/meta_playlist_revision", cache_directory);
 
     /* Try to open file for writing. */
     FILE *file = fopen(cache_filename, "w");

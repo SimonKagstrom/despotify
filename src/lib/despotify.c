@@ -91,8 +91,11 @@ struct despotify_session* despotify_init_client(void(*callback)(struct despotify
     ds->high_bitrate = high_bitrate;
     ds->use_cache = use_cache;
 
-    if (use_cache)
-        cache_init();
+    if (use_cache && !cache_init()) {
+        DSFYDEBUG("cache_init() failed. Caching disabled!\n");
+
+        ds->use_cache = false;
+    }
 
     return ds;
 }

@@ -3,10 +3,7 @@
 
 #include <stdbool.h>
 
-/* This is relative to the users home directory. */
-#define CACHE_DIRECTORY ".cache/despotify"
-
-void cache_init();
+bool cache_init();
 void cache_clear();
 bool cache_contains(unsigned char *id);
 unsigned char *cache_load(unsigned char *id, unsigned int *size);
