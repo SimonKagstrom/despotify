@@ -218,11 +218,19 @@ const char* despotify_get_error(struct despotify_session* ds)
 
 void despotify_set_buffer_size(struct despotify_session* ds, int size)
 {
+    assert(ds != NULL);
+    if (!ds->fifo)
+        snd_init(ds);
+
     ds->fifo->maxbytes = size;
 }
 
 void despotify_set_watermark(struct despotify_session* ds, int watermark)
 {
+    assert(ds != NULL);
+    if (!ds->fifo)
+        snd_init(ds);
+
     ds->fifo->watermark = watermark;
 }
 
