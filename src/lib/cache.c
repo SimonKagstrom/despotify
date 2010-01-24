@@ -22,7 +22,12 @@ bool cache_init(){
         DSFYDEBUG("Error getting $XDG_CACHE_HOME. Trying $HOME...\n");
 
         if((ptr = getenv("HOME")) != NULL){
-            snprintf(cache_directory, PATH_MAX, "%s/.cache/despotify", ptr);
+            snprintf(cache_directory, PATH_MAX, "%s/.cache", ptr);
+            if(mkdir(cache_directory, 0755) != 0 && errno != EEXIST){
+                DSFYDEBUG("Error creating cache directory. errno = %d\n", errno);
+                return false;
+            }
+            snprintf(cache_directory, PATH_MAX, "%s/despotify", cache_directory);
         }
         else{
             DSFYDEBUG("Error getting $HOME.\n");
