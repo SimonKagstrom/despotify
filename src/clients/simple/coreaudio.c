@@ -16,6 +16,7 @@
 #include <CoreAudio/CoreAudioTypes.h>
 
 #include "audio.h"
+#include "util.h"
 
 typedef struct {
 	AudioDeviceID adev_id;
@@ -217,11 +218,11 @@ int audio_play_pcm (void* private, struct pcm_data* pcm) {
 		return -1;
 	}
 	else if(pcm->channels != 2) {
-		DSFYDEBUG ("Unsupported number of channels: %d!\n", pcm->channels)
+		DSFYDEBUG ("Unsupported number of channels: %d!\n", pcm->channels);
 		return -1;
 	}
 	else if(pcm->samplerate != 44100) {
-		DSFYDEBUG ("Unsupported sample rate: %d!\n", pcm->samplerate)
+		DSFYDEBUG ("Unsupported sample rate: %d!\n", pcm->samplerate);
 		return -1;
 	}
 
