@@ -406,6 +406,24 @@ int despotify_snd_read_stream(struct despotify_session* ds)
     return 0;
 }
 
+bool despotify_is_track_restricted(struct track* track, const char* country)
+{
+    bool allowed = true;
+    bool forbidden = false;
+    
+    char *ccountry = calloc(strlen(country) + 2, sizeof(char));
+    strcpy(ccountry, country);
+    strcat(ccountry, ",");
+
+    if(track->allowed && strlen(track->allowed) > 0)
+        allowed = strstr(track->allowed, ccountry) != NULL;
+
+    if(track->forbidden && strlen(track->allowed) > 0)
+        forbidden = strstr(track->forbidden, ccountry) != NULL;
+    
+    return !allowed || forbidden;
+}
+
 bool despotify_play(struct despotify_session* ds,
                     struct track* t, bool play_as_list)
 {
@@ -1348,6 +1366,13 @@ struct track* despotify_get_tracks(struct despotify_session* ds, char* track_ids
 
     buf_free(ds->response);
     free(tracklist);
+    
+    struct track* t;
+    for(t = first; t; t = t->next) {
+        t->geo_restricted = despotify_is_track_restricted(t, ds->user_info->country);
+        if(t->geo_restricted)
+            t->playable = false;
+    }
 
     return first;
 }

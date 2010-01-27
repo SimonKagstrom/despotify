@@ -270,6 +270,23 @@ static int parse_tracks(ezxml_t xml, struct track* t, bool ordered, bool high_bi
             }
         }
         
+        for ( ezxml_t restriction = ezxml_get(track, "restrictions", 0, "restriction", -1); restriction; restriction = restriction->next) {
+            char *catalogues = (char*)ezxml_attr(restriction, "catalogues");
+            if(catalogues && strstr(catalogues, "premium") != NULL) {
+                char* allowed = (char*)ezxml_attr(restriction, "allowed");
+                if(allowed) {
+                    DSFYstrncpy(t->allowed, allowed, sizeof t->allowed);
+                    strcat(t->allowed, ",");
+                }
+                
+                char* forbidden = (char*)ezxml_attr(restriction, "forbidden");
+                if(forbidden) {
+                    DSFYstrncpy(t->forbidden, forbidden, sizeof t->forbidden);
+                    strcat(t->forbidden, ",");
+                }
+            }
+        }
+
         xmlatoi(&t->year, track, "year", -1);
         xmlatoi(&t->length, track, "length", -1);
         xmlatoi(&t->tracknumber, track, "track-number", -1);

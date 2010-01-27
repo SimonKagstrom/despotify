@@ -17,6 +17,7 @@
 #define CMD_CHANNELABRT	0x0b
 #define CMD_REQKEY	0x0c
 #define CMD_AESKEY	0x0d
+#define CMD_AESKEYERR 0x0e
 #define CMD_SHAHASH     0x10
 #define CMD_IMAGE	0x19
 #define CMD_TOKENNOTIFY	0x4f

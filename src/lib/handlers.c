@@ -102,6 +102,36 @@ int handle_aeskey (unsigned char *payload, int len)
 	return ret;
 }
 
+int handle_aeskeyerr (unsigned char *payload) {
+    CHANNEL *ch;
+    struct despotify_session* ds;
+    int ret = 0;
+
+    DSFYDEBUG("Server said 0x0e (AES key error) for channel %d\n",
+           ntohs (*(unsigned short *) (payload + 2)))
+		if ((ch =
+		     channel_by_id (ntohs
+				    (*(unsigned short *) (payload + 2)))) !=
+			   NULL) {
+
+        ds = ch->private;
+        
+        if(ds->client_callback)
+	       ds->client_callback(ds, DESPOTIFY_TRACK_PLAY_ERROR, 
+                               NULL, 
+                               ds->client_callback_data);
+
+		channel_unregister (ch);
+	}
+	else {
+		DSFYDEBUG
+			("Command 0x0e: Failed to find channel with ID %d\n",
+			 ntohs (*(unsigned short *) (payload + 2)));
+	}
+
+    return ret;
+}
+
 static int handle_countrycode (SESSION * session, unsigned char *payload, int len)
 {
 	int i;
@@ -151,6 +181,10 @@ int handle_packet (SESSION * session,
 	case CMD_AESKEY:
 		error = handle_aeskey (payload, len);
 		break;
+
+    case CMD_AESKEYERR:
+        error = handle_aeskeyerr (payload);
+        break;
 
 	case CMD_SHAHASH:
 		break;

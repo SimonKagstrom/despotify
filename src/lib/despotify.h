@@ -14,12 +14,17 @@ struct track
 {
     bool has_meta_data;
     bool playable;
+    bool geo_restricted;
     unsigned char track_id[33];
     unsigned char file_id[41];
     unsigned int file_bitrate;
     unsigned char album_id[33];
     unsigned char cover_id[41];
     unsigned char *key;
+    
+    char allowed[STRING_LENGTH];
+    char forbidden[STRING_LENGTH];
+
     char title[STRING_LENGTH];
     struct artist* artist;
     char album[STRING_LENGTH];
@@ -225,6 +230,11 @@ enum {
 
     DESPOTIFY_END_OF_PLAYLIST,
     /* Called after last track in playlist has finished playing */
+
+    DESPOTIFY_TRACK_PLAY_ERROR,
+    /* Called if an error occurred while attempting to play the track.
+     
+       E.g. Georestrictions. */
 };
 
 /* Global init / deinit library. */
