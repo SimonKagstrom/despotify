@@ -275,14 +275,18 @@ static int parse_tracks(ezxml_t xml, struct track* t, bool ordered, bool high_bi
             if(catalogues && strstr(catalogues, "premium") != NULL) {
                 char* allowed = (char*)ezxml_attr(restriction, "allowed");
                 if(allowed) {
-                    DSFYstrncpy(t->allowed, allowed, sizeof t->allowed);
-                    strcat(t->allowed, ",");
-                }
+                    t->allowed = calloc(strlen(allowed)+1, sizeof(char));
+                    DSFYstrncpy(t->allowed, allowed, strlen(allowed)+1);
+                } else {
+                    t->allowed = NULL;
+                }    
                 
                 char* forbidden = (char*)ezxml_attr(restriction, "forbidden");
                 if(forbidden) {
-                    DSFYstrncpy(t->forbidden, forbidden, sizeof t->forbidden);
-                    strcat(t->forbidden, ",");
+                    t->forbidden = calloc(strlen(forbidden)+1, sizeof(char));
+                    DSFYstrncpy(t->forbidden, forbidden, strlen(forbidden)+1);
+                } else {
+                    t->forbidden = NULL;
                 }
             }
         }
@@ -307,6 +311,12 @@ void xml_free_track(struct track* head)
     for (struct track* t = next_track; next_track; t = next_track) {
         if (t->key)
             free(t->key);
+        
+        if(t->allowed)
+            free(t->allowed);
+
+        if(t->forbidden)
+            free(t->forbidden);
 
         xml_free_artist(t->artist);
 

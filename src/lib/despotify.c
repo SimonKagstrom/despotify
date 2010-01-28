@@ -411,15 +411,11 @@ bool despotify_is_track_restricted(struct track* track, const char* country)
     bool allowed = true;
     bool forbidden = false;
     
-    char *ccountry = calloc(strlen(country) + 2, sizeof(char));
-    strcpy(ccountry, country);
-    strcat(ccountry, ",");
+    if(track->allowed)
+        allowed = strstr(track->allowed, country) != NULL;
 
-    if(track->allowed && strlen(track->allowed) > 0)
-        allowed = strstr(track->allowed, ccountry) != NULL;
-
-    if(track->forbidden && strlen(track->allowed) > 0)
-        forbidden = strstr(track->forbidden, ccountry) != NULL;
+    if(track->forbidden)
+        forbidden = strstr(track->forbidden, country) != NULL;
     
     return !allowed || forbidden;
 }

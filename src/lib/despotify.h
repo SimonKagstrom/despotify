@@ -22,8 +22,8 @@ struct track
     unsigned char cover_id[41];
     unsigned char *key;
     
-    char allowed[STRING_LENGTH];
-    char forbidden[STRING_LENGTH];
+    char *allowed;
+    char *forbidden;
 
     char title[STRING_LENGTH];
     struct artist* artist;
