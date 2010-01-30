@@ -880,6 +880,22 @@ static bool despotify_load_tracks(struct despotify_session *ds, bool cache_do_st
                             if (ta->next)
                                 a = a->next = calloc(1, sizeof(struct artist));
                         }
+
+                        /* deep copy of georestrictions. */
+                        if(tt->allowed) {
+                            t->allowed = calloc(strlen(tt->allowed) + 1,
+                                                sizeof(char));
+                            DSFYstrncpy(t->allowed, tt->allowed, 
+                                        strlen(tt->allowed) + 1);
+                        }
+                        
+                        if(tt->forbidden) {
+                            t->forbidden = calloc(strlen(tt->forbidden) + 1,
+                                                  sizeof(char));
+                            DSFYstrncpy(t->forbidden, tt->forbidden, 
+                                        strlen(tt->forbidden) + 1);
+                        }
+
                         t->has_meta_data = true;
                         track_count++;
                         break;
