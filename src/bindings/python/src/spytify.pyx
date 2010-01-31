@@ -95,6 +95,8 @@ cdef class Spytify:
             return self.create_artist_full(despotify_get_artist(self.ds, id))
         elif type =='album':
             return self.create_album_full(despotify_get_album(self.ds, id))
+        elif type =='track':
+            return self.create_track(despotify_get_track(self.ds, id))
         else:
             raise SpytifyError('URI specifies invalid type: %s' % type)
 
