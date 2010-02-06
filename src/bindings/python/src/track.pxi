@@ -51,5 +51,13 @@ cdef class Track(SpotifyObject):
         def __get__(self):
             return self.data.popularity
 
+    def __richcmp__(Track self, Track other, int operator):
+        if not isinstance(other, Track):
+           return NotImplemented
+        if operator == 2:
+           return self.data.track_id == other.data.track_id
+        else:
+           return NotImplemented
+
     def __repr__(self):
         return '<Track: %s - %s - %s (%s)>' % (", ".join([a.name for a in self.artists]), self.title, self.album, self.track_id)
