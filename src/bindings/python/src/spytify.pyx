@@ -27,7 +27,7 @@ cdef class Spytify:
     This should be any scripts "entrypoint" into this module; any other
     class will most likely be instantiated by this class and returned.
     """
-    def __init__(self, bytes user, bytes pw, bool high_bitrate=True, object callback=None):
+    def __init__(self, bytes user, bytes pw, bool high_bitrate=True, bool use_cache=True, object callback=None):
         """Create a new Spytify instance, and connect to Spotify.
 
         Args:
@@ -38,7 +38,7 @@ cdef class Spytify:
         self.stored_playlists = None
         self.callback = callback
 
-        self.ds = despotify_init_client(callback_handler, <void*>self, high_bitrate)
+        self.ds = despotify_init_client(callback_handler, <void*>self, high_bitrate, use_cache)
         if not self.ds:
             raise SpytifyError(despotify_get_error(self.ds))
 
