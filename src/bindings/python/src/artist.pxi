@@ -62,7 +62,7 @@ cdef class Artist(SpotifyObject):
 
     cdef get_full_data(self):
         if self.full_data == None:
-            self.full_data = AlbumDataFull()
+            self.full_data = ArtistDataFull()
             self.full_data.browse = despotify_get_artist(self.ds, self.data.id())
             self.data = self.full_data
 

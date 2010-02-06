@@ -14,13 +14,13 @@ cdef class SessionStruct:
     cdef Album create_album(self, album* album, bint take_owner=False):
         cdef Album instance
 
-        if not album:
-            return None
-
         instance = NEW_ALBUM(Album)
         instance.ds = self.ds
-        instance.data = AlbumData()
-        instance.data.data = album
+        if not album:
+            instance.data = None
+        else:
+            instance.data = AlbumData()
+            instance.data.data = album
 
         instance.take_owner = take_owner
 
