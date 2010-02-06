@@ -124,6 +124,10 @@ cdef extern from "despotify.h":
 
         void (*client_callback)(int, void*)
 
+    cdef enum callback_signal:
+        DESPOTIFY_NEW_TRACK = 1
+        DESPOTIFY_TIME_TELL = 2
+        DESPOTIFY_END_OF_PLAYLIST = 3
 
     bint despotify_init()
     char * despotify_get_error(despotify_session *)
@@ -176,3 +180,4 @@ cdef extern from "despotify.h":
 
     bint despotify_play(despotify_session *, track *, bint)
     bint despotify_stop(despotify_session *)
+    void despotify_next(despotify_session *)

@@ -49,8 +49,15 @@ cdef class Spytify:
         self.thread = audio_thread.thread_init(self.ds)
 
     cdef handle(self, int signal, void* data):
+        cdef double *d
         if self.callback:
-            self.callback(self, signal)
+            if signal == DESPOTIFY_TIME_TELL:
+                d = <double*> data
+                self.callback(signal, d[0])
+            elif signal == DESPOTIFY_NEW_TRACK:
+                self.callback(signal, self.create_track(<track*>data))
+            else:
+                self.callback(signal, None)
 
     property stored_playlists:
         def __get__(self):
@@ -155,6 +162,10 @@ cdef class Spytify:
     def resume(self):
         """Resume playback."""
         audio_thread.thread_play(self.thread)
+
+    def next(self):
+        """Play next song in playlist."""
+        despotify_next(self.ds)
 
     def close(self):
         """Close the session with the server."""
