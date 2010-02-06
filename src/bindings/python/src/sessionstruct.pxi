@@ -40,13 +40,13 @@ cdef class SessionStruct:
     cdef Artist create_artist(self, artist* artist, bint take_owner=False):
         cdef Artist instance
 
-        if not artist:
-            return None
-
         instance = NEW_ARTIST(Artist)
         instance.ds = self.ds
-        instance.data = ArtistData()
-        instance.data.data = artist
+        if not artist:
+            instance.data = None
+        else:
+            instance.data = ArtistData()
+            instance.data.data = artist
 
         instance.take_owner = take_owner
 
