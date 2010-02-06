@@ -34,6 +34,7 @@ files = map(lambda f: 'src/' + f, build)
 pkg = pkgconfig('despotify')
 pkg.setdefault('extra_link_args', []).extend(extra_link_args)
 pkg.setdefault('libraries', []).extend(libraries)
+pkg.setdefault('include_dirs', []).append('../../lib/')
 
 setup(name         = 'spytify',
       version      = 'v0.1',
