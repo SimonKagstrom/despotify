@@ -27,7 +27,7 @@ bool cache_init(){
                 DSFYDEBUG("Error creating cache directory. errno = %d\n", errno);
                 return false;
             }
-            snprintf(cache_directory, PATH_MAX, "%s/despotify", cache_directory);
+            strncat(cache_directory,"/despotify",PATH_MAX-strlen(cache_directory)-1);
         }
         else{
             DSFYDEBUG("Error getting $HOME.\n");
