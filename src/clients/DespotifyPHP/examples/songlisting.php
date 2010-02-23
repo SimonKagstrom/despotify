@@ -16,8 +16,8 @@ include('../src/Despotify.php');
 
 
 // replace these with a valid Spotify premium username and password
-$username = 'niklasb';
-$password = 'xnyhdx';
+$username = 'your username';
+$password = 'your password';
 
 // specify how to connect to the gateway
 $gateway = '127.0.0.1';
