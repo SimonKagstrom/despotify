@@ -4,6 +4,7 @@ Priority: extra
 Maintainer: UNDEFINED <root@localhost>
 Build-Depends: debhelper (>= 7),
                libtool,
+               libao-dev,
                libexpat1-dev,
                libncurses5-dev,
                libpulse-dev,
@@ -11,7 +12,7 @@ Build-Depends: debhelper (>= 7),
                libvorbis-dev,
                zlib1g-dev,
 	       libncursesw5-dev
-Standards-Version: 3.7.3
+Standards-Version: 3.8.3
 Homepage: http://despotify.se
 
 Package: despotify
