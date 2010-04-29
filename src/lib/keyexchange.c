@@ -53,7 +53,7 @@ int send_client_initial_packet (SESSION * session)
 
 	len_idx = b->len;
 	buf_append_u16(b, 0); /* packet length - updated later */
-	buf_append_u32(b, 0); /* unknown */
+	buf_append_u32(b, 0x00000300); /* unknown */
 	buf_append_u32(b, 0x00030c00); /* unknown */
 	buf_append_u32(b, session->client_revision);
 	buf_append_u32(b, 0); /* unknown */
