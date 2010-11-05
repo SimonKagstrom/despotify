@@ -1,4 +1,4 @@
-<?
+<?php
 
 // define constans
 define('LOAD_FROM_XML', 0);

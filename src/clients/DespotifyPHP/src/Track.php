@@ -1,4 +1,4 @@
-<?
+<?php
 
 include_once('File.php');
 include_once('global.php');

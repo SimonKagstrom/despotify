@@ -1,4 +1,4 @@
-<?
+<?php
 
 include_once('Artist.php');
 include_once('Album.php');

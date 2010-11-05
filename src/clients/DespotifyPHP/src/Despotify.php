@@ -1,4 +1,4 @@
-<?
+<?php
 
 include_once('Connection.php');
 include_once('SearchResult.php');

@@ -1,4 +1,4 @@
-<?
+<?php
 
 /**
 * Represents a connection to the Despotify gateway
