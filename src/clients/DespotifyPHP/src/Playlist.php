@@ -57,9 +57,6 @@ class Playlist
 	
 	private function playlistFromXMLObject($xmlObject)
 	{
-		// turn the SimpleXMLElement into an array
-		$xmlArray = (array)$xmlObject;
-		
 		// read and store in member variables
 		$this->name = $xmlObject->xpath('next-change/change/ops/name');
 		$this->name = (string)$this->name[0][0];
