@@ -68,7 +68,7 @@ class Playlist
 		$this->username = (string)$this->username[0][0];
 		
 		$this->trackIds = $xmlObject->xpath('next-change/change/ops/add/items');
-		$this->trackIds = explode(',', $this->trackIds[0][0]);
+		$this->trackIds = explode(',', (string)$this->trackIds[0]);
 		
 		$this->length = $xmlObject->xpath('next-change/change/time');
 		$this->length = (string)$this->length[0];

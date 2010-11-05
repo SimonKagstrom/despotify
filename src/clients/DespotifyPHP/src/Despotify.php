@@ -195,7 +195,8 @@ class Despotify
 			
 			$xml = new SimpleXMLElement($xmlData);
 			$playListIdCommaSeparatedString = $xml->xpath("/playlist/next-change/change/ops/add/items");
-			$playListIdArray = explode(",", $playListIdCommaSeparatedString[0][0]);
+			$playListIdCommaSeparatedString = (string)$playListIdCommaSeparatedString[0];
+			$playListIdArray = explode(",", $playListIdCommaSeparatedString);
 				
 			return $playListIdArray;
 		}
