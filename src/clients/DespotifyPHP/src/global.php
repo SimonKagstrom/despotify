@@ -5,7 +5,7 @@ define('LOAD_FROM_XML', 0);
 define('LOAD_FROM_ID', 1);
 
 // do you want to run in debug mode? setting this to true will activate debug message output
-define('DEBUG_MODE', true);
+define('DEBUG_MODE', false);
 
 
 
