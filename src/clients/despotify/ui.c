@@ -249,7 +249,6 @@ void ui_show(ui_set_t show)
       }
       g_ui_elements[i].flags |= UI_FLAG_DIRTY;
       g_ui_elements[i].flags &= ~UI_FLAG_OFFSCREEN;
-      
     }
     else if (g_ui_elements[i].set != UI_SET_NONE) {
       g_ui_elements[i].flags &= ~(UI_FLAG_FOCUS | UI_FLAG_DIRTY);

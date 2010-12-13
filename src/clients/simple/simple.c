@@ -260,6 +260,7 @@ void print_help(void)
            "album [num]             List album for track [num]\n"
            "uri [string]            Display info about Spotify URI\n"
            "portrait [num]          Save artist portrait to portrait.jpg\n"
+           "cover [num]             Save album cover art to cover.jpg\n"
            "\n"
            "play [num]              Play track [num] in the last viewed list\n"
            "playalbum [num]         Play album for track [num]\n"
@@ -554,9 +555,9 @@ void command_loop(struct despotify_session* ds)
         /* portrait */
         else if (!strncmp(buf, "portrait", 8)) {
             int num = 0;
-	    
-	    if(strlen(buf) > 9)
-	    	num = atoi(buf + 9);
+
+            if(strlen(buf) > 9)
+                num = atoi(buf + 9);
 
             if (!num) {
                 wrapper_wprintf(L"usage: portrait [num]\n");
@@ -588,6 +589,48 @@ void command_loop(struct despotify_session* ds)
             else
                 wrapper_wprintf(L"Artist %s has no portrait.\n", a->name);
             despotify_free_artist_browse(a);
+        }
+
+        /* cover */
+        else if (!strncmp(buf, "cover", 5)) {
+            int num = 0;
+
+            if(strlen(buf) > 6)
+                num = atoi(buf + 6);
+
+            if (!num) {
+                wrapper_wprintf(L"usage: cover [num]\n");
+                continue;
+            }
+            if (!lastlist) {
+                wrapper_wprintf(L"No playlist\n");
+                continue;
+            }
+
+            /* find the requested album */
+            struct track* t = lastlist->tracks;
+            for (int i=1; i<num; i++)
+                t = t->next;
+
+            if (t) {
+                struct album_browse* a = despotify_get_album(ds, t->album_id);
+                if (a && a->cover_id[0]) {
+                    int len;
+                    void* cover = despotify_get_image(ds, a->cover_id, &len);
+                    if (cover && len) {
+                        wrapper_wprintf(L"Writing %d bytes into cover.jpg\n", len);
+                        FILE* f = fopen("cover.jpg", "w");
+                        if (f) {
+                          fwrite(cover, len, 1, f);
+                          fclose(f);
+                        }
+                        free(cover);
+                    }
+                }
+                else
+                    wrapper_wprintf(L"Album %s has no cover.\n", t->album);
+                despotify_free_album_browse(a);
+            }
         }
 
         /* play */

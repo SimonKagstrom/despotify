@@ -196,7 +196,6 @@ void sess_password(const char *password)
 {
   free(g_session.password);
   g_session.password = strdup(password);
-
   sess_connect();
 }
 
