@@ -27,6 +27,8 @@ void* audio_init(void)
     ao_initialize ();
     default_driver = ao_default_driver_id ();
 
+    memset (&format, 0, sizeof(ao_sample_format));
+
     format.bits = 16;
     format.rate = 44100;
     format.channels = 2;
