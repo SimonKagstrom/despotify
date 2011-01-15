@@ -190,10 +190,12 @@ int audio_exit(void *private) {
 		device->playing = 0;
 		DSFYDEBUG("Currently playing, signalling event and stopping CoreAudio\n");
 		pthread_cond_signal(&device->event);
+		pthread_mutex_unlock(&device->mutex);
 		if(AudioDeviceStop (device->adev_id, device->proc_id)) {
 			DSFYDEBUG ("audio_exit(): AudioDeviceStop() failed\n");
 			return -1;
 		}
+		pthread_mutex_lock(&device->mutex);
 	}
 	pthread_mutex_unlock(&device->mutex);
 
