@@ -455,6 +455,13 @@ bool despotify_play(struct despotify_session* ds,
 
 void despotify_next(struct despotify_session* ds)
 {
+    if (ds->fifo) {
+        snd_stop(ds);
+        ds->offset = 0;
+    }
+    else
+    	snd_init(ds);
+
     if (snd_next(ds))
         return;
 
