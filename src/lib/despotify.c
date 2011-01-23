@@ -466,9 +466,12 @@ void despotify_next(struct despotify_session* ds)
         return;
 
     /* find next playable track */
-    do {
+    while (ds->track)
+    {
         ds->track = ds->track->next;
-    } while (ds->track && !ds->track->playable);
+        if (ds->track->playable)
+            break;
+    }
 
     if (ds->track)
         despotify_play(ds, ds->track, ds->play_as_list);
