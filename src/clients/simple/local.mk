@@ -2,7 +2,7 @@ package?=despotify
 
 OBJS = simple.o
 LIBDIR = ../../lib
-LIB = $(LIBDIR)/libdespotify.la
+LIB = $(LIBDIR)/libdespotify.a
 
 CFLAGS += -I$(LIBDIR)
 
@@ -23,7 +23,7 @@ include ../depgen.mk
 
 simple: $(OBJS) $(LIB)
 	@echo LD $@
-	$(SILENT)$(LT) --mode=link $(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIB)
+	$(SILENT) $(CC) -L$(LIBDIR) -o $@ $(CFLAGS) $(LDFLAGS) $(OBJS) -ldespotify -lresolv
 
 clean:
 	$(LT) --mode=clean rm -f simple

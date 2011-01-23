@@ -1,15 +1,15 @@
 #
-# $Id$
+# $Id: local.mk 489 2010-01-20 16:09:33Z fxbhh $
 # 
 
-LIB_OBJS = aes.lo auth.lo buf.lo cache.lo channel.lo commands.lo dns.lo ezxml.lo handlers.lo keyexchange.lo packet.lo puzzle.lo session.lo shn.lo sndqueue.lo util.lo network.lo despotify.lo sha1.lo hmac.lo xml.lo 
+LIB_OBJS = aes.o auth.o buf.o cache.o channel.o commands.o dns.o ezxml.o handlers.o keyexchange.o packet.o puzzle.o session.o shn.o sndqueue.o util.o network.o despotify.o sha1.o hmac.o xml.o 
 
 LDFLAGS += -rpath /usr/lib
 LDCONFIG = ldconfig
 
 .PHONY: all clean install uninstall
 
-all: libdespotify.la
+all: libdespotify.a
 
 # Mac OS X specifics
 ifeq ($(shell uname -s),Darwin)
@@ -27,20 +27,20 @@ ifeq ($(shell uname -s),Linux)
     LDFLAGS += -lresolv -lpthread
 endif
 
-libdespotify.la: $(LIB_OBJS)
+libdespotify.a: $(LIB_OBJS)
 	@echo LD $@
-	$(SILENT)$(LT) --mode=link $(CC) -o libdespotify.la $(LDFLAGS) $(LIB_OBJS)
+	$(SILENT)ar crs $@ $(LIB_OBJS)
 
-%.lo: %.c
+%.o: %.c
 	@echo CC $<
-	$(SILENT)$(LT) --mode=compile $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
 
 ifeq (,$(filter clean, $(MAKECMDGOALS))) # don't make deps for "make clean"
-CFILES = $(LIB_OBJS:.lo=.c)
+CFILES = $(LIB_OBJS:.o=.c)
 
 Makefile.dep: $(CFILES)
 	@echo Generating dependencies
-	$(SILENT)$(CC) $(CFLAGS) -MM $(CFILES) | sed 's/^\([^ ]\+\).o:/\1.lo:/' > $@
+	$(SILENT)$(CC) $(CFLAGS) -MM $(CFILES) | sed 's/^\([^ ]\+\).o:/\1.o:/' > $@
 
 -include Makefile.dep
 endif
@@ -48,7 +48,7 @@ endif
 clean:
 	$(LT) --mode=clean rm -f $(LIB_OBJS) Makefile.dep
 
-install: libdespotify.la
+install: libdespotify.a
 	install -d $(INSTALL_PREFIX)/lib/pkgconfig
 	 
 	$(LT) --mode=install install libdespotify.la $(INSTALL_PREFIX)/lib/libdespotify.la
