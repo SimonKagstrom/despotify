@@ -6,7 +6,7 @@
 export
 
 CFLAGS = -Wall -Wextra -ggdb -std=gnu99
-LDFLAGS = -lz -lvorbisfile
+LDFLAGS = -lz
 
 LD = $(CC)
 
@@ -24,6 +24,13 @@ include Makefile.local.mk
 
 ifeq ($(DEBUG), 1)
     CFLAGS += -DDEBUG
+endif
+
+ifeq ($(USE_TREMOR), 1)
+	CFLAGS += -DUSE_TREMOR=1
+	LDFLAGS += -lvorbisidec
+else
+	LDFLAGS += -lvorbisfile
 endif
 
 # Mac OS X specifics
