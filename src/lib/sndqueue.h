@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: sndqueue.h 476 2009-12-01 13:54:42Z zagor $
  *
  */
 
@@ -7,7 +7,11 @@
 #define DESPOTIFY_SNDQUEUE_H
 
 #include <pthread.h>
-#include <vorbis/vorbisfile.h>
+#if defined(USE_TREMOR)
+# include <tremor/ivorbisfile.h>
+#else
+# include <vorbis/vorbisfile.h>
+#endif
 
 #include "despotify.h"
 

@@ -6,7 +6,13 @@
 export
 
 CFLAGS = -Wall -Wextra -ggdb -std=gnu99
-LDFLAGS = -lz -lvorbisfile
+LDFLAGS = -lz
+
+ifeq ($(USE_TREMOR), 1)
+	LDFLAGS += -livorbisfile
+else
+	LDFLAGS += -lvorbisfile
+endif
 
 LD = $(CC)
 

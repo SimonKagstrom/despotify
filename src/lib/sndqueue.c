@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: sndqueue.c 485 2010-01-14 08:33:24Z jorgenpt $
  *
  */
 
@@ -366,6 +366,7 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
                 else {
                     length = ptrsize - totlength; /* Don't overrun ptrsize */
                 }
+                DSFYDEBUG ("Got SND_CMD_DATA, copying %d bytes: %d\n", length, totlength);
 
                 memcpy (ptr + totlength, b->ptr + b->consumed, length);
 
@@ -442,6 +443,15 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
     return totlength;
 }
 
+int seek_func (void *session, ogg_int64_t offset, int whence)
+{
+	(void)session;
+	(void)offset;
+	(void)whence;
+
+	return -1;
+}
+
 int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
 {
     if (!ds || !ds->fifo || !ds->fifo->start) {
@@ -464,7 +474,7 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
         /* Initialize Vorbis struct with the appropriate callbacks */
         ov_callbacks callbacks;
         callbacks.read_func = snd_ov_read_callback;
-        callbacks.seek_func = NULL;
+        callbacks.seek_func = seek_func;
         callbacks.close_func = NULL;
         callbacks.tell_func = NULL;
         
@@ -490,8 +500,15 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
 
     while (1) {
         /* decode to pcm */
-        ssize_t r = ov_read(ds->vf, pcm->buf, sizeof(pcm->buf),
-                            SYSTEM_ENDIAN, 2, 1, NULL);
+        ssize_t r;
+
+#if defined(USE_TREMOR)
+        r = ov_read(ds->vf, pcm->buf, sizeof(pcm->buf),
+                            NULL);
+#else
+        r = ov_read(ds->vf, pcm->buf, sizeof(pcm->buf),
+        		SYSTEM_ENDIAN, 2, 1, NULL);
+#endif
 
         /* assume no valid data read. */
         pcm->len = 0;
@@ -518,7 +535,13 @@ int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
         pcm->len = r;
 
         if (ds->client_callback) {
+#if defined(USE_TREMOR)
+            ogg_int64_t int_point = ov_time_tell(ds->vf);
+            double point = ((double)int_point) / 1000.0;
+#else
             double point = ov_time_tell(ds->vf);
+#endif
+
             ds->client_callback(ds, DESPOTIFY_TIME_TELL, &point,
                                 ds->client_callback_data);
         }
