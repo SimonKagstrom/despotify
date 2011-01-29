@@ -9,7 +9,8 @@ CFLAGS = -Wall -Wextra -ggdb -std=gnu99
 LDFLAGS = -lz
 
 ifeq ($(USE_TREMOR), 1)
-	LDFLAGS += -livorbisfile
+	CFLAGS += -DUSE_TREMOR=1
+	LDFLAGS += -lvorbisidec
 else
 	LDFLAGS += -lvorbisfile
 endif
