@@ -685,7 +685,7 @@ struct search_result* despotify_search(struct despotify_session* ds,
     struct search_result* search = NULL;
 
     ds->response = buf_new();
-    ds->playlist = calloc(1, sizeof(struct playlist));
+    ds->playlist = calloc(1, sizeof(struct ds_playlist));
 
     char buf[80];
     snprintf(buf, sizeof buf, "Search: %s", searchtext);
@@ -792,7 +792,7 @@ void despotify_free_search(struct search_result *search) {
 
 static bool despotify_load_tracks(struct despotify_session *ds, bool cache_do_store)
 {
-    struct playlist* pl = ds->playlist;
+    struct ds_playlist* pl = ds->playlist;
 
     if (!pl->num_tracks)
         return true;
@@ -919,10 +919,10 @@ static bool despotify_load_tracks(struct despotify_session *ds, bool cache_do_st
     return true;
 }
 
-struct playlist* despotify_get_playlist(struct despotify_session *ds,
+struct ds_playlist* despotify_get_playlist(struct despotify_session *ds,
                                         char* playlist_id, bool cache_do_store)
 {
-    ds->playlist = calloc(1, sizeof(struct playlist));
+    ds->playlist = calloc(1, sizeof(struct ds_playlist));
 
     /* check cache */
     if (ds->use_cache && playlist_id && cache_contains(playlist_id)) {
@@ -1011,12 +1011,12 @@ struct playlist* despotify_get_playlist(struct despotify_session *ds,
     return ds->playlist;
 }
 
-void despotify_free_playlist(struct playlist* p)
+void despotify_free_playlist(struct ds_playlist* p)
 {
     xml_free_playlist(p);
 }
 
-struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
+struct ds_playlist* despotify_get_stored_playlists(struct despotify_session *ds)
 {
     /* save cache setting */
     bool old_use_cache = ds->use_cache;
@@ -1026,9 +1026,9 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
 
     /* load list of lists */
     DSFYDEBUG("Requesting meta playlist\n");
-    struct playlist* metalist = despotify_get_playlist(ds, NULL, false);
-    struct playlist* root = NULL;
-    struct playlist* prev = NULL;
+    struct ds_playlist* metalist = despotify_get_playlist(ds, NULL, false);
+    struct ds_playlist* root = NULL;
+    struct ds_playlist* prev = NULL;
 
     /* check meta playlist revision */
     DSFYDEBUG("Meta-Playlist revisions (remote: %d, local: %d)\n",
@@ -1052,9 +1052,9 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
         DSFYDEBUG("Stored playlists didn't change! use_cache = %d\n", ds->use_cache);
     }
 
-    for (struct playlist* p = metalist; p && p->playlist_id[0]; p = p->next) {
+    for (struct ds_playlist* p = metalist; p && p->playlist_id[0]; p = p->next) {
         DSFYDEBUG("Requesting playlist with ID '%s'\n", p->playlist_id);
-        struct playlist* new = despotify_get_playlist(ds, p->playlist_id, old_use_cache);
+        struct ds_playlist* new = despotify_get_playlist(ds, p->playlist_id, old_use_cache);
         if (prev)
             prev->next = new;
         else
@@ -1070,7 +1070,7 @@ struct playlist* despotify_get_stored_playlists(struct despotify_session *ds)
 }
 
 bool despotify_rename_playlist(struct despotify_session *ds,
-                               struct playlist *playlist, char *name)
+                               struct ds_playlist *playlist, char *name)
 {
     if (strcmp(playlist->author, ds->user_info->username)) {
         ds->last_error = "Not your playlist.";
@@ -1128,7 +1128,7 @@ bool despotify_rename_playlist(struct despotify_session *ds,
 }
 
 bool despotify_set_playlist_collaboration(struct despotify_session *ds,
-                                          struct playlist *playlist,
+                                          struct ds_playlist *playlist,
                                           bool collaborative)
 {
     if (strcmp(playlist->author, ds->user_info->username)) {
@@ -1547,7 +1547,7 @@ struct search_result* despotify_link_get_search(struct despotify_session* ds, st
     return despotify_search(ds, link->arg, MAX_SEARCH_RESULTS);
 }
 
-struct playlist* despotify_link_get_playlist(struct despotify_session* ds, struct link* link)
+struct ds_playlist* despotify_link_get_playlist(struct despotify_session* ds, struct link* link)
 {
     char buf[35];
 
@@ -1560,7 +1560,7 @@ struct playlist* despotify_link_get_playlist(struct despotify_session* ds, struc
     /* disable caching */
     ds->use_cache = false;
 
-    struct playlist *playlist = despotify_get_playlist(ds, buf, old_use_cache);
+    struct ds_playlist *playlist = despotify_get_playlist(ds, buf, old_use_cache);
 
     /* reset cache setting to old value */
     ds->use_cache = old_use_cache;
@@ -1602,7 +1602,7 @@ char* despotify_artist_to_uri(struct artist_browse* artist, char* dest)
     return dest;
 }
 
-char* despotify_playlist_to_uri(struct playlist* playlist, char* dest)
+char* despotify_playlist_to_uri(struct ds_playlist* playlist, char* dest)
 {
     char uri[23];
     char id[33];

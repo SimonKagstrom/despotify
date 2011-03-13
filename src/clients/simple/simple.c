@@ -110,9 +110,9 @@ static void* thread_loop(void* arg)
 
 /**************** UI (main) thread stuff: ***************/
 
-struct playlist* get_playlist(struct playlist* rootlist, int num)
+struct ds_playlist* get_playlist(struct ds_playlist* rootlist, int num)
 {
-    struct playlist* p = rootlist;
+    struct ds_playlist* p = rootlist;
 
     if (!p) {
         wrapper_wprintf(L"Stored lists not loaded. Run 'list' without parameter to load.\n");
@@ -130,14 +130,14 @@ struct playlist* get_playlist(struct playlist* rootlist, int num)
     return p;
 }
 
-void print_list_of_lists(struct playlist* rootlist)
+void print_list_of_lists(struct ds_playlist* rootlist)
 {
     if (!rootlist) {
         wrapper_wprintf(L" <no stored playlists>\n");
     }
     else {
         int count=1;
-        for (struct playlist* p = rootlist; p; p = p->next)
+        for (struct ds_playlist* p = rootlist; p; p = p->next)
             wrapper_wprintf(L"%2d: %-40s %3d %c %s\n", count++, p->name, p->num_tracks,
                    p->is_collaborative ? '*' : ' ', p->author);
     }
@@ -198,7 +198,7 @@ void print_artist(struct artist_browse* a)
         wrapper_wprintf(L" %s (%d)\n", al->name, al->year);
 }
 
-void print_playlist(struct playlist* pls)
+void print_playlist(struct ds_playlist* pls)
 {
     wrapper_wprintf(L"\nName: %s\nAuthor: %s\n",
            pls->name, pls->author);
@@ -276,9 +276,9 @@ void command_loop(struct despotify_session* ds)
 {
     bool loop = true;
     char *buf;
-    struct playlist* rootlist = NULL;
-    struct playlist* searchlist = NULL;
-    struct playlist* lastlist = NULL;
+    struct ds_playlist* rootlist = NULL;
+    struct ds_playlist* searchlist = NULL;
+    struct ds_playlist* lastlist = NULL;
     struct search_result *search = NULL;
     struct album_browse* playalbum = NULL;
 
@@ -298,7 +298,7 @@ void command_loop(struct despotify_session* ds)
 	    	num = atoi(buf + 5);
 
             if (num) {
-                struct playlist* p = get_playlist(rootlist, num);
+                struct ds_playlist* p = get_playlist(rootlist, num);
 
                 if (p) {
                     print_tracks(p->tracks);
@@ -322,7 +322,7 @@ void command_loop(struct despotify_session* ds)
             }
 
             if (num && name && name[0]) {
-                struct playlist* p = get_playlist(rootlist, num);
+                struct ds_playlist* p = get_playlist(rootlist, num);
 
                 if (p) {
                     if (despotify_rename_playlist(ds, p, name))
@@ -342,7 +342,7 @@ void command_loop(struct despotify_session* ds)
                 num = atoi(buf + 7);
 
             if (num) {
-                struct playlist* p = get_playlist(rootlist, num);
+                struct ds_playlist* p = get_playlist(rootlist, num);
 
                 if (p) {
                     if (despotify_set_playlist_collaboration(ds, p, !p->is_collaborative))
@@ -500,7 +500,7 @@ void command_loop(struct despotify_session* ds)
             struct link* link = despotify_link_from_uri(uri);
             struct album_browse* al;
             struct artist_browse* ar;
-            struct playlist* pls;
+            struct ds_playlist* pls;
             struct search_result* s;
             struct track* t;
 
@@ -768,7 +768,7 @@ int main(int argc, char** argv)
 
     audio_device = audio_init();
 
-#if 0
+#if 1
     {
         struct track* t = despotify_get_track(ds, "d1b264bb6bcd46be852ceba8ac5e6582");
         despotify_play(ds, t, false);

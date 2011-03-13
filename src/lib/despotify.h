@@ -46,10 +46,10 @@ struct search_result
     struct artist *artists;
     struct album *albums;
     struct track *tracks;
-    struct playlist *playlist;
+    struct ds_playlist *playlist;
 };
 
-struct playlist
+struct ds_playlist
 {
     char name[STRING_LENGTH];
     char author[STRING_LENGTH];
@@ -59,7 +59,7 @@ struct playlist
     unsigned int revision;
     unsigned int checksum;
     struct track *tracks;
-    struct playlist *next; /* in case of multiple playlists in the root list */
+    struct ds_playlist *next; /* in case of multiple playlists in the root list */
 };
 
 struct album
@@ -184,7 +184,7 @@ struct despotify_session
     struct album_browse* album_browse;
     struct artist_browse* artist_browse;
     struct track* track;
-    struct playlist* playlist;
+    struct ds_playlist* playlist;
     struct buf* response;
     int offset;
 
@@ -291,15 +291,15 @@ void despotify_free_search(struct search_result *search);
 
 
 /* Playlist handling. */
-struct playlist* despotify_get_playlist(struct despotify_session *ds,
+struct ds_playlist* despotify_get_playlist(struct despotify_session *ds,
                                         char* playlist_id, bool cache_do_store);
-struct playlist* despotify_get_stored_playlists(struct despotify_session *ds);
+struct ds_playlist* despotify_get_stored_playlists(struct despotify_session *ds);
 bool despotify_rename_playlist(struct despotify_session *ds,
-                               struct playlist *playlist, char *name);
+                               struct ds_playlist *playlist, char *name);
 bool despotify_set_playlist_collaboration(struct despotify_session *ds,
-                                          struct playlist *playlist,
+                                          struct ds_playlist *playlist,
                                           bool collaborative);
-void despotify_free_playlist(struct playlist* playlist);
+void despotify_free_playlist(struct ds_playlist* playlist);
 
 /* Playback control. */
 
@@ -318,7 +318,7 @@ struct link* despotify_link_from_uri(char* uri);
 
 struct album_browse* despotify_link_get_album(struct despotify_session* ds, struct link* link);
 struct artist_browse* despotify_link_get_artist(struct despotify_session* ds, struct link* link);
-struct playlist* despotify_link_get_playlist(struct despotify_session* ds, struct link* link);
+struct ds_playlist* despotify_link_get_playlist(struct despotify_session* ds, struct link* link);
 struct search_result* despotify_link_get_search(struct despotify_session* ds, struct link* link);
 struct track* despotify_link_get_track(struct despotify_session* ds, struct link* link);
 
@@ -326,7 +326,7 @@ void despotify_free_link(struct link* link);
 
 char* despotify_album_to_uri(struct album_browse* album, char* dest);
 char* despotify_artist_to_uri(struct artist_browse* album, char* dest);
-char* despotify_playlist_to_uri(struct playlist* album, char* dest);
+char* despotify_playlist_to_uri(struct ds_playlist* album, char* dest);
 char* despotify_search_to_uri(struct search_result* album, char* dest);
 char* despotify_track_to_uri(struct track* album, char* dest);
 
