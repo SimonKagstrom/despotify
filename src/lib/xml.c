@@ -435,7 +435,7 @@ int xml_parse_search(struct ds_search_result* search,
 }
 
 
-bool xml_parse_browse_artist(struct artist_browse* a,
+bool xml_parse_browse_artist(struct ds_artist_browse* a,
                              unsigned char* xml,
                              int len,
                              bool high_bitrate)
@@ -488,7 +488,7 @@ void xml_free_artist(struct ds_artist *artist) {
     }
 }
 
-void xml_free_artist_browse(struct artist_browse* artist)
+void xml_free_artist_browse(struct ds_artist_browse* artist)
 {
     if (artist->text)
         free(artist->text);

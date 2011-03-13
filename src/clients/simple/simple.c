@@ -187,7 +187,7 @@ void print_album(struct ds_album_browse* a)
     print_tracks(a->tracks);
 }
 
-void print_artist(struct artist_browse* a)
+void print_artist(struct ds_artist_browse* a)
 {
     wrapper_wprintf(L"\nName: %s\n"
            "Genres: %s\n"
@@ -411,7 +411,7 @@ void command_loop(struct despotify_session* ds)
                 t = t->next;
 
             for (struct ds_artist* aptr = t->artist; aptr; aptr = aptr->next) {
-                struct artist_browse* a = despotify_get_artist(ds, aptr->id);
+                struct ds_artist_browse* a = despotify_get_artist(ds, aptr->id);
                 print_artist(a);
                 despotify_free_artist_browse(a);
             }
@@ -499,7 +499,7 @@ void command_loop(struct despotify_session* ds)
 
             struct link* link = despotify_link_from_uri(uri);
             struct ds_album_browse* al;
-            struct artist_browse* ar;
+            struct ds_artist_browse* ar;
             struct ds_playlist* pls;
             struct ds_search_result* s;
             struct ds_track* t;
@@ -572,7 +572,7 @@ void command_loop(struct despotify_session* ds)
             struct ds_track* t = lastlist->tracks;
             for (int i=1; i<num; i++)
                 t = t->next;
-            struct artist_browse* a = despotify_get_artist(ds, t->artist->id);
+            struct ds_artist_browse* a = despotify_get_artist(ds, t->artist->id);
             if (a && a->portrait_id[0]) {
                 int len;
                 void* portrait = despotify_get_image(ds, a->portrait_id, &len);
