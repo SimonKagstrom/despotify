@@ -343,7 +343,7 @@ static void parse_artist(ezxml_t top, struct artist *a) {
     xmlatof(&a->popularity, top, "popularity", -1);
 }
 
-static void parse_browse_album(ezxml_t top, struct album_browse* a, bool high_bitrate)
+static void parse_browse_album(ezxml_t top, struct ds_album_browse* a, bool high_bitrate)
 {
     xmlstrncpy(a->name, sizeof a->name, top, "name", -1);
     xmlstrncpy(a->id, sizeof a->id, top, "id", -1);
@@ -459,8 +459,8 @@ bool xml_parse_browse_artist(struct artist_browse* a,
 
     /* traverse albums */
     x = ezxml_get(top, "albums",-1);
-    struct album_browse* prev = NULL;
-    struct album_browse* album = calloc(1, sizeof(struct album_browse));
+    struct ds_album_browse* prev = NULL;
+    struct ds_album_browse* album = calloc(1, sizeof(struct ds_album_browse));
     a->albums = album;
     int album_count = 0;
     for (ezxml_t xalb = ezxml_get(x, "album", -1); xalb; xalb = xalb->next) {
@@ -497,7 +497,7 @@ void xml_free_artist_browse(struct artist_browse* artist)
     free(artist);
 }
 
-bool xml_parse_browse_album(struct album_browse* a,
+bool xml_parse_browse_album(struct ds_album_browse* a,
                             unsigned char* xml,
                             int len,
                             bool high_bitrate)
@@ -518,10 +518,10 @@ void xml_free_album(struct ds_album* album)
     }
 }
 
-void xml_free_album_browse(struct album_browse* album)
+void xml_free_album_browse(struct ds_album_browse* album)
 {
-    struct album_browse* next_album = album;
-    for (struct album_browse* a = next_album; next_album; a = next_album) {
+    struct ds_album_browse* next_album = album;
+    for (struct ds_album_browse* a = next_album; next_album; a = next_album) {
         xml_free_track(a->tracks);
         next_album = a->next;
         free(a);

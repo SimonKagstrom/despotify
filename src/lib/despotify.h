@@ -73,7 +73,7 @@ struct ds_album
     struct ds_album* next;
 };
 
-struct album_browse
+struct ds_album_browse
 {
     char name[STRING_LENGTH];
     char id[33];
@@ -82,7 +82,7 @@ struct album_browse
     int year;
     char cover_id[41];
     float popularity;
-    struct album_browse* next; /* in case of multiple albums in an artist struct */
+    struct ds_album_browse* next; /* in case of multiple albums in an artist struct */
 };
 
 struct artist
@@ -104,7 +104,7 @@ struct artist_browse
     char years_active[STRING_LENGTH];
     float popularity;
     int num_albums;
-    struct album_browse* albums;
+    struct ds_album_browse* albums;
 };
 
 struct user_info
@@ -181,7 +181,7 @@ struct despotify_session
 
     pthread_t thread;
 
-    struct album_browse* album_browse;
+    struct ds_album_browse* album_browse;
     struct artist_browse* artist_browse;
     struct ds_track* track;
     struct ds_playlist* playlist;
@@ -267,7 +267,7 @@ const char *despotify_get_error(struct despotify_session *ds);
 /* Browse functions.  */
 struct artist_browse* despotify_get_artist(struct despotify_session* ds,
                                            char* artist_id);
-struct album_browse* despotify_get_album(struct despotify_session* ds,
+struct ds_album_browse* despotify_get_album(struct despotify_session* ds,
                                          char* album_id);
 struct ds_track* despotify_get_tracks(struct despotify_session* ds, char* track_ids[], int num_tracks);
 struct ds_track* despotify_get_track(struct despotify_session* ds, char* track_id);
@@ -275,7 +275,7 @@ void* despotify_get_image(struct despotify_session* ds,
                           char* image_id, int* len);
 
 void despotify_free_artist_browse(struct artist_browse* a);
-void despotify_free_album_browse(struct album_browse* a);
+void despotify_free_album_browse(struct ds_album_browse* a);
 void despotify_free_track(struct ds_track* t);
 
 /* We need to determine if there is any / enough info to warrant this:
@@ -316,7 +316,7 @@ int despotify_get_pcm(struct despotify_session*, struct pcm_data*);
 /* URI utils */
 struct link* despotify_link_from_uri(char* uri);
 
-struct album_browse* despotify_link_get_album(struct despotify_session* ds, struct link* link);
+struct ds_album_browse* despotify_link_get_album(struct despotify_session* ds, struct link* link);
 struct artist_browse* despotify_link_get_artist(struct despotify_session* ds, struct link* link);
 struct ds_playlist* despotify_link_get_playlist(struct despotify_session* ds, struct link* link);
 struct ds_search_result* despotify_link_get_search(struct despotify_session* ds, struct link* link);
@@ -324,7 +324,7 @@ struct ds_track* despotify_link_get_track(struct despotify_session* ds, struct l
 
 void despotify_free_link(struct link* link);
 
-char* despotify_album_to_uri(struct album_browse* album, char* dest);
+char* despotify_album_to_uri(struct ds_album_browse* album, char* dest);
 char* despotify_artist_to_uri(struct artist_browse* album, char* dest);
 char* despotify_playlist_to_uri(struct ds_playlist* album, char* dest);
 char* despotify_search_to_uri(struct ds_search_result* album, char* dest);

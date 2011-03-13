@@ -180,7 +180,7 @@ void print_track_full(struct ds_track* t)
     }
 }
 
-void print_album(struct album_browse* a)
+void print_album(struct ds_album_browse* a)
 {
     wrapper_wprintf(L"\nName: %s\nYear: %d\n",
             a->name, a->year);
@@ -194,7 +194,7 @@ void print_artist(struct artist_browse* a)
            "Years active: %s\n"
            "%d albums:\n",
            a->name, a->genres, a->years_active, a->num_albums);
-    for (struct album_browse* al = a->albums; al; al = al->next)
+    for (struct ds_album_browse* al = a->albums; al; al = al->next)
         wrapper_wprintf(L" %s (%d)\n", al->name, al->year);
 }
 
@@ -280,7 +280,7 @@ void command_loop(struct despotify_session* ds)
     struct ds_playlist* searchlist = NULL;
     struct ds_playlist* lastlist = NULL;
     struct ds_search_result *search = NULL;
-    struct album_browse* playalbum = NULL;
+    struct ds_album_browse* playalbum = NULL;
 
     print_help();
 
@@ -439,7 +439,7 @@ void command_loop(struct despotify_session* ds)
                 t = t->next;
 
             if (t) {
-                struct album_browse* a = despotify_get_album(ds, t->album_id);
+                struct ds_album_browse* a = despotify_get_album(ds, t->album_id);
                 if (a) {
                     print_album(a);
                     despotify_free_album_browse(a);
@@ -498,7 +498,7 @@ void command_loop(struct despotify_session* ds)
             }
 
             struct link* link = despotify_link_from_uri(uri);
-            struct album_browse* al;
+            struct ds_album_browse* al;
             struct artist_browse* ar;
             struct ds_playlist* pls;
             struct ds_search_result* s;
@@ -613,7 +613,7 @@ void command_loop(struct despotify_session* ds)
                 t = t->next;
 
             if (t) {
-                struct album_browse* a = despotify_get_album(ds, t->album_id);
+                struct ds_album_browse* a = despotify_get_album(ds, t->album_id);
                 if (a && a->cover_id[0]) {
                     int len;
                     void* cover = despotify_get_image(ds, a->cover_id, &len);
