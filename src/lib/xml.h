@@ -8,12 +8,12 @@
 
 #include <stdbool.h>
 
-struct playlist* xml_parse_playlist(struct playlist* pl,
+struct ds_playlist* xml_parse_playlist(struct ds_playlist* pl,
                                          unsigned char* xml,
                                          int len,
                                          bool list_of_lists);
 
-bool xml_parse_confirm(struct playlist* pl,
+bool xml_parse_confirm(struct ds_playlist* pl,
                        unsigned char* xml,
                        int len);
 
@@ -38,7 +38,7 @@ bool xml_parse_browse_album(struct album_browse* a,
                             int len,
                             bool high_bitrate);
 
-void xml_free_playlist(struct playlist* pl);
+void xml_free_playlist(struct ds_playlist* pl);
 void xml_free_track(struct track* head);
 void xml_free_artist(struct artist* artist);
 void xml_free_artist_browse(struct artist_browse* artist);

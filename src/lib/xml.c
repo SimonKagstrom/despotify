@@ -63,7 +63,7 @@ void xmlatof(float* dest, ezxml_t xml, ...)
     }
 }
 
-void xml_parse_version(struct playlist* pl, ezxml_t xml, ...)
+void xml_parse_version(struct ds_playlist* pl, ezxml_t xml, ...)
 {
     va_list ap;
     ezxml_t r;
@@ -85,7 +85,7 @@ void xml_parse_version(struct playlist* pl, ezxml_t xml, ...)
     }
 }
 
-struct playlist* xml_parse_playlist(struct playlist* pl,
+struct ds_playlist* xml_parse_playlist(struct ds_playlist* pl,
                                     unsigned char* xml,
                                     int len,
                                     bool list_of_lists)
@@ -102,13 +102,13 @@ struct playlist* xml_parse_playlist(struct playlist* pl,
 
     if (list_of_lists) {
         /* create list of playlists */
-        struct playlist* prev = NULL;
-        struct playlist* p = pl;
+        struct ds_playlist* prev = NULL;
+        struct ds_playlist* p = pl;
 
         for (char* id = strtok(items, ",\n"); id; id = strtok(NULL, ",\n"))
         {
             if (prev) {
-                p = calloc(1, sizeof(struct playlist));
+                p = calloc(1, sizeof(struct ds_playlist));
                 prev->next = p;
             }
             DSFYstrncpy(p->playlist_id, id, sizeof p->playlist_id);
@@ -147,7 +147,7 @@ struct playlist* xml_parse_playlist(struct playlist* pl,
     return pl;
 }
 
-bool xml_parse_confirm(struct playlist* pl,
+bool xml_parse_confirm(struct ds_playlist* pl,
                        unsigned char* xml,
                        int len)
 {
@@ -163,10 +163,10 @@ bool xml_parse_confirm(struct playlist* pl,
     return confirm;
 }
 
-void xml_free_playlist(struct playlist* pl)
+void xml_free_playlist(struct ds_playlist* pl)
 {
     void* next_list = pl;
-    for (struct playlist* p = next_list; next_list; p = next_list) {
+    for (struct ds_playlist* p = next_list; next_list; p = next_list) {
         xml_free_track(p->tracks);
         next_list = p->next;
         free(p);
