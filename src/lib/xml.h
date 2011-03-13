@@ -42,7 +42,7 @@ void xml_free_playlist(struct ds_playlist* pl);
 void xml_free_track(struct track* head);
 void xml_free_artist(struct artist* artist);
 void xml_free_artist_browse(struct artist_browse* artist);
-void xml_free_album(struct album* album);
+void xml_free_album(struct ds_album* album);
 void xml_free_album_browse(struct album_browse* album);
 
 void xml_parse_prodinfo(struct user_info* u, unsigned char* xml, int len);

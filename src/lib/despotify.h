@@ -44,7 +44,7 @@ struct search_result
     int total_albums;
     int total_tracks;
     struct artist *artists;
-    struct album *albums;
+    struct ds_album *albums;
     struct track *tracks;
     struct ds_playlist *playlist;
 };
@@ -62,7 +62,7 @@ struct ds_playlist
     struct ds_playlist *next; /* in case of multiple playlists in the root list */
 };
 
-struct album
+struct ds_album
 {
     char name[STRING_LENGTH];
     char id[33];
@@ -70,7 +70,7 @@ struct album
     char artist_id[33];
     char cover_id[41];
     float popularity;
-    struct album* next;
+    struct ds_album* next;
 };
 
 struct album_browse

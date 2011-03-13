@@ -16,7 +16,7 @@ VALUE cTrack;
 
 VALUE eDespotifyError;
 
-typedef struct album ds_album_t;
+typedef struct ds_album ds_album_t;
 typedef struct album_browse ds_album_browse_t;
 typedef struct artist ds_artist_t;
 typedef struct artist_browse ds_artist_browse_t;
