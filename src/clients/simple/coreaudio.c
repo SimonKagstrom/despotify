@@ -211,7 +211,7 @@ int audio_exit(void *private) {
 }
 
 
-int audio_play_pcm (void* private, struct pcm_data* pcm) {
+int audio_play_pcm (void* private, struct ds_pcm_data* pcm) {
 	CoreAudioDevice *device = (CoreAudioDevice *)private;
 	int bytes_to_copy;
 

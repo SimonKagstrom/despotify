@@ -60,7 +60,7 @@ int audio_exit (void* device)
     return 0;
 }
 
-int audio_play_pcm (void* device, struct pcm_data* pcm)
+int audio_play_pcm (void* device, struct ds_pcm_data* pcm)
 {
     if (ao_play ((ao_device*)device, pcm->buf, pcm->len) == 0) {
         DSFYDEBUG ("ao_play() failed\n");

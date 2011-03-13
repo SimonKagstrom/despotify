@@ -17,7 +17,7 @@
 static void* thread_loop(void* arg)
 {
     struct thread_state *ts = arg;
-    struct pcm_data pcm;
+    struct ds_pcm_data pcm;
     
     pthread_mutex_init(&ts->thread_mutex, NULL);
     pthread_cond_init(&ts->thread_cond, NULL);
