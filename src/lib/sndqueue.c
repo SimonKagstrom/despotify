@@ -47,7 +47,7 @@ bool snd_init(struct despotify_session *ds)
 	ds->dlstate = DL_FILLING;
 
 	/* This is the fifo that will hold fragments of compressed audio */
-        ds->fifo = calloc(1, sizeof(struct snd_fifo));
+        ds->fifo = calloc(1, sizeof(struct ds_snd_fifo));
         if (!ds->fifo)
 		return false;
         ds->fifo->maxbytes = 1024 * 1024; /* 1 MB default buffer size */
@@ -78,7 +78,7 @@ void snd_destroy (struct despotify_session* ds)
 
 		/* free buffers */
 		while (ds->fifo->start) {
-                        struct snd_buffer* b = ds->fifo->start;
+                        struct ds_snd_buffer* b = ds->fifo->start;
 			ds->fifo->start = ds->fifo->start->next;
 			free (b->ptr);
 			free (b);
@@ -152,7 +152,7 @@ int snd_stop (struct despotify_session *ds)
 
 	/* free the ogg fifo */
 	while (ds->fifo->start) {
-		struct snd_buffer* b = ds->fifo->start;
+		struct ds_snd_buffer* b = ds->fifo->start;
 		ds->fifo->start = ds->fifo->start->next;
 		free(b->ptr);
 		free(b);
@@ -175,8 +175,8 @@ int snd_next(struct despotify_session *ds)
     pthread_mutex_lock(&ds->fifo->lock);
 
     /* go through fifo and look for next track */
-    struct snd_buffer* b;
-    struct snd_buffer* next;
+    struct ds_snd_buffer* b;
+    struct ds_snd_buffer* next;
     for (b = ds->fifo->start; b; b = next) {
         if (b->cmd == SND_CMD_START)
             break;
@@ -243,7 +243,7 @@ void snd_ioctl (struct despotify_session* ds, int cmd, void *data, int length)
             return;
         }
 
-        struct snd_buffer* buff = malloc(sizeof(struct snd_buffer));
+        struct ds_snd_buffer* buff = malloc(sizeof(struct ds_snd_buffer));
 	if (!buff) {
 		perror ("malloc failed");
 		exit (-1);
@@ -326,7 +326,7 @@ size_t snd_ov_read_callback(void *ptr, size_t size, size_t nmemb, void* session)
                            " %zd items of size %zd requested. Totbytes: %d\n",
                            size, nmemb, ds->fifo->totbytes );
 
-        struct snd_buffer* b = ds->fifo->start;
+        struct ds_snd_buffer* b = ds->fifo->start;
         if (!b)
             break;
 
