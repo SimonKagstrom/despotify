@@ -497,7 +497,7 @@ void command_loop(struct despotify_session* ds)
                 continue;
             }
 
-            struct link* link = despotify_link_from_uri(uri);
+            struct ds_link* link = despotify_link_from_uri(uri);
             struct ds_album_browse* al;
             struct ds_artist_browse* ar;
             struct ds_playlist* pls;
