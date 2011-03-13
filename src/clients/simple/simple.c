@@ -219,7 +219,7 @@ void print_search(struct search_result *search)
 
     if (search->total_albums > 0) {
         wrapper_wprintf(L"\nAlbums found (%d):\n", search->total_albums);
-        for (struct album* album = search->albums; album; album = album->next)
+        for (struct ds_album* album = search->albums; album; album = album->next)
             wrapper_wprintf(L" %s\n", album->name);
     }
 
