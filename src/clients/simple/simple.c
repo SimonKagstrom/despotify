@@ -231,7 +231,7 @@ void print_search(struct ds_search_result *search)
 
 void print_info(struct despotify_session* ds)
 {
-    struct user_info* user = ds->user_info;
+    struct ds_user_info* user = ds->user_info;
     wrapper_wprintf(L"Username       : %s\n", user->username);
     wrapper_wprintf(L"Country        : %s\n", user->country);
     wrapper_wprintf(L"Account type   : %s\n", user->type);

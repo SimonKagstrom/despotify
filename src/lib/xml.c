@@ -528,7 +528,7 @@ void xml_free_album_browse(struct ds_album_browse* album)
     }
 }
 
-void xml_parse_prodinfo(struct user_info* u, unsigned char* xml, int len)
+void xml_parse_prodinfo(struct ds_user_info* u, unsigned char* xml, int len)
 {
     ezxml_t top = ezxml_parse_str(xml, len);
     xmlstrncpy(u->type, sizeof u->type, top, "product", 0, "type", -1);

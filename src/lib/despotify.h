@@ -107,7 +107,7 @@ struct ds_artist_browse
     struct ds_album_browse* albums;
 };
 
-struct user_info
+struct ds_user_info
 {
     char username[STRING_LENGTH];
     char country[4];
@@ -169,7 +169,7 @@ struct despotify_session
 {
     bool initialized;
     struct session* session;
-    struct user_info* user_info;
+    struct ds_user_info* user_info;
     const char *last_error;
 
     /* AES CTR state */
