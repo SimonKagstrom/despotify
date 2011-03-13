@@ -24,7 +24,7 @@ typedef struct ds_playlist ds_playlist_t;
 typedef struct link ds_link_t;
 typedef struct search_result ds_search_t;
 typedef struct despotify_session ds_session_t;
-typedef struct track ds_track_t;
+typedef struct ds_track ds_track_t;
 typedef struct user_info ds_user_info_t;
 
 #define BOOL2VALUE(exp) exp ? Qtrue : Qfalse

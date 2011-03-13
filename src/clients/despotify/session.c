@@ -227,7 +227,7 @@ void sess_search(const char *query)
 }
 
 // Start playback.
-void sess_play(struct track *t)
+void sess_play(struct ds_track *t)
 {
   if (g_session.state != SESS_ONLINE) {
     log_append("Not connected");
