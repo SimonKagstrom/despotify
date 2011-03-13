@@ -207,7 +207,7 @@ void sess_search(const char *query)
   }
 
   log_append("Searching for: <%s>", query);
-  struct search_result *sr = despotify_search(g_session.dsfy, (char*)query, 100);
+  struct ds_search_result *sr = despotify_search(g_session.dsfy, (char*)query, 100);
 
   if (!sr) {
     log_append(despotify_get_error(g_session.dsfy));
