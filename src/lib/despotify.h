@@ -134,17 +134,17 @@ struct ds_link
     enum ds_link_type type;
 };
 
-struct snd_buffer /* internal use */
+struct ds_snd_buffer /* internal use */
 {
     int length; /* Total length of this buffer */
     int cmd; /* command for the player... 1 == DATA, 0 == INIT */
     int consumed; /* Number of bytes consumed */
     unsigned char* ptr;
 
-    struct snd_buffer* next;
+    struct ds_snd_buffer* next;
 };
 
-struct snd_fifo /* internal use */
+struct ds_snd_fifo /* internal use */
 {
     pthread_mutex_t lock;
     pthread_cond_t cs;
@@ -153,8 +153,8 @@ struct snd_fifo /* internal use */
     int watermark; /* Low watermark */
     int lastcmd;
 
-    struct snd_buffer* start;	/* First buffer */
-    struct snd_buffer* end;	/* Last buffer */
+    struct ds_snd_buffer* start;	/* First buffer */
+    struct ds_snd_buffer* end;	/* Last buffer */
 };
 
 struct pcm_data
@@ -206,7 +206,7 @@ struct despotify_session
 
     /* internal data: */
     void* vf;
-    struct snd_fifo* fifo;
+    struct ds_snd_fifo* fifo;
     int dlstate;
     int errorcount;
     bool dlabort;
