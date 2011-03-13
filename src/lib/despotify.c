@@ -1190,10 +1190,10 @@ bool despotify_set_playlist_collaboration(struct despotify_session *ds,
  *
  */
 
-struct artist_browse* despotify_get_artist(struct despotify_session* ds,
+struct ds_artist_browse* despotify_get_artist(struct despotify_session* ds,
                                            char* artist_id)
 {
-    ds->artist_browse = calloc(1, sizeof(struct artist_browse));
+    ds->artist_browse = calloc(1, sizeof(struct ds_artist_browse));
 
     /* check cache */
     if (ds->use_cache && cache_contains(artist_id)) {
@@ -1244,7 +1244,7 @@ struct artist_browse* despotify_get_artist(struct despotify_session* ds,
     return ds->artist_browse;
 }
 
-void despotify_free_artist_browse(struct artist_browse* a)
+void despotify_free_artist_browse(struct ds_artist_browse* a)
 {
     xml_free_artist_browse(a);
 }
@@ -1533,7 +1533,7 @@ struct ds_album_browse* despotify_link_get_album(struct despotify_session* ds, s
     return despotify_get_album(ds, buf);
 }
 
-struct artist_browse* despotify_link_get_artist(struct despotify_session* ds, struct link* link)
+struct ds_artist_browse* despotify_link_get_artist(struct despotify_session* ds, struct link* link)
 {
     char buf[33];
 
@@ -1592,7 +1592,7 @@ char* despotify_album_to_uri(struct ds_album_browse* album, char* dest)
     return dest;
 }
 
-char* despotify_artist_to_uri(struct artist_browse* artist, char* dest)
+char* despotify_artist_to_uri(struct ds_artist_browse* artist, char* dest)
 {
     char uri[23];
 

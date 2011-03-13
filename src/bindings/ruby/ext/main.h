@@ -19,7 +19,7 @@ VALUE eDespotifyError;
 typedef struct ds_album ds_album_t;
 typedef struct ds_album_browse ds_album_browse_t;
 typedef struct ds_artist ds_artist_t;
-typedef struct artist_browse ds_artist_browse_t;
+typedef struct ds_artist_browse ds_artist_browse_t;
 typedef struct ds_playlist ds_playlist_t;
 typedef struct link ds_link_t;
 typedef struct ds_search_result ds_search_t;
