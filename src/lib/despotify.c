@@ -1290,10 +1290,10 @@ void* despotify_get_image(struct despotify_session* ds, char* image_id, int* len
     return image;
 }
 
-struct album_browse* despotify_get_album(struct despotify_session* ds,
+struct ds_album_browse* despotify_get_album(struct despotify_session* ds,
                                          char* album_id)
 {
-    ds->album_browse = calloc(1, sizeof(struct album_browse));
+    ds->album_browse = calloc(1, sizeof(struct ds_album_browse));
 
     /* check cache */
     if (ds->use_cache && cache_contains(album_id)) {
@@ -1344,7 +1344,7 @@ struct album_browse* despotify_get_album(struct despotify_session* ds,
     return ds->album_browse;
 }
 
-void despotify_free_album_browse(struct album_browse* a)
+void despotify_free_album_browse(struct ds_album_browse* a)
 {
     xml_free_album_browse(a);
 }
@@ -1524,7 +1524,7 @@ struct link* despotify_link_from_uri(char *uri)
     return link;
 }
 
-struct album_browse* despotify_link_get_album(struct despotify_session* ds, struct link* link)
+struct ds_album_browse* despotify_link_get_album(struct despotify_session* ds, struct link* link)
 {
     char buf[33];
 
@@ -1582,7 +1582,7 @@ void despotify_free_link(struct link* link)
     free(link);
 }
 
-char* despotify_album_to_uri(struct album_browse* album, char* dest)
+char* despotify_album_to_uri(struct ds_album_browse* album, char* dest)
 {
     char uri[23];
 
