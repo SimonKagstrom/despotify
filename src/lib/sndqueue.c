@@ -451,7 +451,7 @@ int seek_func (void *session, ogg_int64_t offset, int whence)
     return -1;
 }
 
-int snd_get_pcm(struct despotify_session* ds, struct pcm_data* pcm)
+int snd_get_pcm(struct despotify_session* ds, struct ds_pcm_data* pcm)
 {
     if (!ds || !ds->fifo || !ds->fifo->start) {
         pcm->len = 0;

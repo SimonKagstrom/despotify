@@ -157,7 +157,7 @@ struct ds_snd_fifo /* internal use */
     struct ds_snd_buffer* end;	/* Last buffer */
 };
 
-struct pcm_data
+struct ds_pcm_data
 {
     int samplerate;
     int channels;
@@ -311,7 +311,7 @@ bool despotify_stop(struct despotify_session *ds);
 
 struct ds_track* despotify_get_current_track(struct despotify_session* ds);
 
-int despotify_get_pcm(struct despotify_session*, struct pcm_data*);
+int despotify_get_pcm(struct despotify_session*, struct ds_pcm_data*);
 
 /* URI utils */
 struct ds_link* despotify_link_from_uri(char* uri);

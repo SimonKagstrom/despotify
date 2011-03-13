@@ -71,7 +71,7 @@ static void thread_exit(void)
 static void* thread_loop(void* arg)
 {
     struct despotify_session* ds = arg;
-    struct pcm_data pcm;
+    struct ds_pcm_data pcm;
     
     pthread_mutex_init(&thread_mutex, NULL);
     pthread_cond_init(&thread_cond, NULL);

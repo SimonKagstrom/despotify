@@ -10,6 +10,6 @@
 
 void* audio_init (void);
 int audio_exit (void*);
-int audio_play_pcm(void*, struct pcm_data*);
+int audio_play_pcm(void*, struct ds_pcm_data*);
 
 #endif
