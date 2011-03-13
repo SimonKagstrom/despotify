@@ -62,7 +62,7 @@ struct _AppData {
     struct ds_playlist* rootlist;
     struct ds_playlist* searchlist;
     struct ds_playlist* lastlist;
-    struct search_result *search;
+    struct ds_search_result *search;
     struct album_browse* playalbum;
 
     GtkWidget *list;

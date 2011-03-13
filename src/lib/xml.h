@@ -17,7 +17,7 @@ bool xml_parse_confirm(struct ds_playlist* pl,
                        unsigned char* xml,
                        int len);
 
-int xml_parse_search(struct search_result* search,
+int xml_parse_search(struct ds_search_result* search,
                      struct ds_track* firsttrack,
                      unsigned char* xml,
                      int len,

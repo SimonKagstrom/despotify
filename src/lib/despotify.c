@@ -679,10 +679,10 @@ bool despotify_wait_timeout(struct despotify_session* ds){
  *
  */
 
-struct search_result* despotify_search(struct despotify_session* ds,
+struct ds_search_result* despotify_search(struct despotify_session* ds,
                                        char* searchtext, int maxresults)
 {
-    struct search_result* search = NULL;
+    struct ds_search_result* search = NULL;
 
     ds->response = buf_new();
     ds->playlist = calloc(1, sizeof(struct ds_playlist));
@@ -712,7 +712,7 @@ struct search_result* despotify_search(struct despotify_session* ds,
 
     struct buf* b = despotify_inflate(ds->response->ptr, ds->response->len);
     if (b) {
-        search = calloc(1, sizeof(struct search_result));
+        search = calloc(1, sizeof(struct ds_search_result));
         DSFYstrncpy(search->query, searchtext, sizeof search->query);
         search->playlist = ds->playlist;
         search->tracks = ds->playlist->tracks;
@@ -731,8 +731,8 @@ struct search_result* despotify_search(struct despotify_session* ds,
     return search;
 }
 
-struct search_result* despotify_search_more(struct despotify_session *ds,
-                                            struct search_result *search,
+struct ds_search_result* despotify_search_more(struct despotify_session *ds,
+                                            struct ds_search_result *search,
                                             int offset, int maxresults)
 {
     if (!search || !search->tracks)
@@ -777,7 +777,7 @@ struct search_result* despotify_search_more(struct despotify_session *ds,
     return search;
 }
 
-void despotify_free_search(struct search_result *search) {
+void despotify_free_search(struct ds_search_result *search) {
     despotify_free_playlist(search->playlist);
     xml_free_album(search->albums);
     xml_free_artist(search->artists);
@@ -1542,7 +1542,7 @@ struct artist_browse* despotify_link_get_artist(struct despotify_session* ds, st
     return despotify_get_artist(ds, buf);
 }
 
-struct search_result* despotify_link_get_search(struct despotify_session* ds, struct link* link)
+struct ds_search_result* despotify_link_get_search(struct despotify_session* ds, struct link* link)
 {
     return despotify_search(ds, link->arg, MAX_SEARCH_RESULTS);
 }
@@ -1618,7 +1618,7 @@ char* despotify_playlist_to_uri(struct ds_playlist* playlist, char* dest)
 }
 
 
-char* despotify_search_to_uri(struct search_result* search, char* dest)
+char* despotify_search_to_uri(struct ds_search_result* search, char* dest)
 {
     sprintf(dest, "spotify:search:%s", search->query);
 

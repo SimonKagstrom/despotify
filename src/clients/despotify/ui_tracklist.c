@@ -17,7 +17,7 @@ static int g_pos = 0;
 static int g_availy = 10;
 
 // Current search result.
-static struct search_result *g_res = 0;
+static struct ds_search_result *g_res = 0;
 
 void tracklist_init(ui_t *ui)
 {

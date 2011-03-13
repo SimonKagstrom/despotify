@@ -15,7 +15,7 @@ typedef enum sess_state {
 } sess_state_t;
 
 typedef struct sess_search {
-  struct search_result *res;
+  struct ds_search_result *res;
   struct sess_search   *next;
 } sess_search_t;
 

@@ -205,7 +205,7 @@ void print_playlist(struct ds_playlist* pls)
     print_tracks(pls->tracks);
 }
 
-void print_search(struct search_result *search)
+void print_search(struct ds_search_result *search)
 {
     if (search->suggestion[0])
         wrapper_wprintf(L"\nDid you mean \"%s\"?\n", search->suggestion);
@@ -279,7 +279,7 @@ void command_loop(struct despotify_session* ds)
     struct ds_playlist* rootlist = NULL;
     struct ds_playlist* searchlist = NULL;
     struct ds_playlist* lastlist = NULL;
-    struct search_result *search = NULL;
+    struct ds_search_result *search = NULL;
     struct album_browse* playalbum = NULL;
 
     print_help();
@@ -501,7 +501,7 @@ void command_loop(struct despotify_session* ds)
             struct album_browse* al;
             struct artist_browse* ar;
             struct ds_playlist* pls;
-            struct search_result* s;
+            struct ds_search_result* s;
             struct ds_track* t;
 
             switch(link->type) {
