@@ -231,13 +231,13 @@ static int parse_tracks(ezxml_t xml, struct ds_track* t, bool ordered, bool high
         xmlstrncpy(t->album_id, sizeof t->album_id, track, "album-id", -1);
 
         /* create list of artists */
-        struct artist* preva = NULL;
-        struct artist* artist = calloc(1, sizeof(struct artist));
+        struct ds_artist* preva = NULL;
+        struct ds_artist* artist = calloc(1, sizeof(struct ds_artist));
         t->artist = artist;
         ezxml_t xid = ezxml_get(track, "artist-id", -1);
         for (ezxml_t xa = ezxml_get(track, "artist", -1); xa; xa = xa->next) {
             if (preva) {
-                artist = calloc(1, sizeof(struct artist));
+                artist = calloc(1, sizeof(struct ds_artist));
                 preva->next = artist;
             }
             DSFYstrncpy(artist->name, xa->txt, sizeof artist->name);
@@ -335,7 +335,7 @@ static void parse_album(ezxml_t top, struct ds_album* a) {
     xmlatof(&a->popularity, top, "popularity", -1);
 }
 
-static void parse_artist(ezxml_t top, struct artist *a) {
+static void parse_artist(ezxml_t top, struct ds_artist *a) {
     xmlstrncpy(a->name, sizeof a->name, top, "name", -1);
     xmlstrncpy(a->id, sizeof a->id, top, "id", -1);
     xmlstrncpy(a->portrait_id, sizeof a->portrait_id, top,
@@ -399,12 +399,12 @@ int xml_parse_search(struct ds_search_result* search,
     xmlatoi(&search->total_tracks, top, "total-tracks", -1);
 
     ezxml_t artists = ezxml_get(top, "artists",-1);
-    struct artist *prev = NULL;
-    struct artist *artist = calloc(1, sizeof(struct artist));
+    struct ds_artist *prev = NULL;
+    struct ds_artist *artist = calloc(1, sizeof(struct ds_artist));
     search->artists = artist;
     for (ezxml_t xa = ezxml_get(artists, "artist", -1); xa; xa = xa->next) {
         if(prev) {
-            artist = calloc(1, sizeof(struct artist));
+            artist = calloc(1, sizeof(struct ds_artist));
             prev->next = artist;
         }
 
@@ -480,9 +480,9 @@ bool xml_parse_browse_artist(struct artist_browse* a,
     return true;
 }
 
-void xml_free_artist(struct artist *artist) {
-    struct artist* next_artist = artist;
-    for (struct artist* a = next_artist; next_artist; a = next_artist) {
+void xml_free_artist(struct ds_artist *artist) {
+    struct ds_artist* next_artist = artist;
+    for (struct ds_artist* a = next_artist; next_artist; a = next_artist) {
         next_artist = a->next;
         free(a);
     }

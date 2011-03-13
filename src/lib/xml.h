@@ -40,7 +40,7 @@ bool xml_parse_browse_album(struct ds_album_browse* a,
 
 void xml_free_playlist(struct ds_playlist* pl);
 void xml_free_track(struct ds_track* head);
-void xml_free_artist(struct artist* artist);
+void xml_free_artist(struct ds_artist* artist);
 void xml_free_artist_browse(struct artist_browse* artist);
 void xml_free_album(struct ds_album* album);
 void xml_free_album_browse(struct ds_album_browse* album);

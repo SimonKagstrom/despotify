@@ -155,7 +155,7 @@ void print_tracks(struct ds_track* head)
         if (t->has_meta_data) {
             wrapper_wprintf(L"%3d: %-40s %2d:%02d ", count++, t->title,
                    t->length / 60000, t->length % 60000 / 1000);
-            for (struct artist* a = t->artist; a; a = a->next)
+            for (struct ds_artist* a = t->artist; a; a = a->next)
                 wrapper_wprintf(L"%s%s", a->name, a->next ? ", " : "");
             wrapper_wprintf(L" %s\n", t->playable ? "" : "(Unplayable)");
         }
@@ -170,7 +170,7 @@ void print_track_full(struct ds_track* t)
         wrapper_wprintf(L"\nTitle: %s\nAlbum: %s\nArtist(s): ",
                t->title, t->album);
 
-        for (struct artist* a = t->artist; a; a = a->next)
+        for (struct ds_artist* a = t->artist; a; a = a->next)
             wrapper_wprintf(L"%s%s", a->name, a->next ? ", " : "");
 
         wrapper_wprintf(L"\nYear: %d\nLength: %02d:%02d\n\n",
@@ -213,7 +213,7 @@ void print_search(struct ds_search_result *search)
     if (search->total_artists > 0) {
         wrapper_wprintf(L"\nArtists found (%d):\n", search->total_artists);
 
-        for (struct artist* artist = search->artists; artist; artist = artist->next)
+        for (struct ds_artist* artist = search->artists; artist; artist = artist->next)
             wrapper_wprintf(L" %s\n", artist->name);
     }
 
@@ -410,7 +410,7 @@ void command_loop(struct despotify_session* ds)
             for (int i=1; i<num; i++)
                 t = t->next;
 
-            for (struct artist* aptr = t->artist; aptr; aptr = aptr->next) {
+            for (struct ds_artist* aptr = t->artist; aptr; aptr = aptr->next) {
                 struct artist_browse* a = despotify_get_artist(ds, aptr->id);
                 print_artist(a);
                 despotify_free_artist_browse(a);
