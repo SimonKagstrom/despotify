@@ -47,7 +47,7 @@ void tracklist_draw(ui_t *ui)
     return;
 
   if (g_res->playlist->num_tracks) {
-    struct track *t = g_res->playlist->tracks;
+    struct ds_track *t = g_res->playlist->tracks;
 
     // Scroll offset.
     int offset = DSFY_MIN(DSFY_MAX(g_pos - (g_availy / 2), 0),
@@ -100,7 +100,7 @@ int tracklist_keypress(wint_t ch, bool code)
   if (!g_res || !g_res->playlist->num_tracks)
     return ch;
 
-  struct track *t;
+  struct ds_track *t;
 
   switch (ch) {
     case KEY_ENTER:

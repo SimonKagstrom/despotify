@@ -42,7 +42,7 @@ void sess_username(const char *username);
 void sess_password(const char *password);
 
 void sess_search(const char *query);
-void sess_play(struct track *t);
+void sess_play(struct ds_track *t);
 void sess_stop();
 void sess_pause();
 

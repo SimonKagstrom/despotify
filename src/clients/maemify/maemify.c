@@ -88,7 +88,7 @@ enum
 
 /* Forward declarations */
 static void init_list(GtkWidget *list);
-static void add_to_list(GtkWidget *list, const gchar* str1, const gchar* str2, struct track *tracks);
+static void add_to_list(GtkWidget *list, const gchar* str1, const gchar* str2, struct ds_track *tracks);
 void on_changed(GtkWidget *widget, AppData * appdata);
 void tb_close_cb(GtkToolButton * widget, AppData * view);
 void tb_find_cb(GtkToolButton * widget, AppData * view);
@@ -266,7 +266,7 @@ init_list(GtkWidget *list)
  * Adds a (track) item to a list
  */
 static void 
-add_to_list(GtkWidget *list, const gchar* col1str, const gchar* col2str, struct track *track)
+add_to_list(GtkWidget *list, const gchar* col1str, const gchar* col2str, struct ds_track *track)
 {
   GtkListStore *store;
   GtkTreeIter iter;
@@ -288,7 +288,7 @@ void on_changed(GtkWidget *widget, AppData * appdata)
   GtkTreeModel *model;
   char *artist;
   char *title;
-  struct track *track;
+  struct ds_track *track;
 
 
   if (gtk_tree_selection_get_selected(
@@ -367,8 +367,8 @@ void do_search(gchar* find_text, AppData* appdata) {
       else {
          appdata->searchlist = appdata->search->playlist;
          int i=1;
-         struct track* t = appdata->searchlist->tracks;
-         struct track* t_last;
+         struct ds_track* t = appdata->searchlist->tracks;
+         struct ds_track* t_last;
          for (; t; t = t->next) {
              printf("%2d: %s (%d:%02d), ptr: %d\n", i++, t->title,
                 t->length / 60000, t->length % 60000 / 1000, (int)t);
