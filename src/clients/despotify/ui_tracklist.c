@@ -60,7 +60,7 @@ void tracklist_draw(ui_t *ui)
       // Concat list of artists.
       wchar_t art[slen];
       int len = 0;
-      for (struct artist* a = t->artist; a && len < slen; a = a->next)
+      for (struct ds_artist* a = t->artist; a && len < slen; a = a->next)
         len += swprintf(art + len, slen - len, L"%s%s", a->name, a->next ? "/" : "");
 
       wchar_t str[ui->width];

@@ -882,13 +882,13 @@ static bool despotify_load_tracks(struct despotify_session *ds, bool cache_do_st
                         t->next = next;
 
                         /* deep copy of artist list */
-                        struct artist* a = calloc(1, sizeof(struct artist));
+                        struct ds_artist* a = calloc(1, sizeof(struct ds_artist));
                         t->artist = a;
-                        struct artist* ta;
+                        struct ds_artist* ta;
                         for (ta = tt->artist; ta; ta = ta->next) {
                             *a = *ta;
                             if (ta->next)
-                                a = a->next = calloc(1, sizeof(struct artist));
+                                a = a->next = calloc(1, sizeof(struct ds_artist));
                         }
 
                         /* deep copy of georestrictions. */

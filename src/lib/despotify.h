@@ -26,7 +26,7 @@ struct ds_track
     char *forbidden;
 
     char title[STRING_LENGTH];
-    struct artist* artist;
+    struct ds_artist* artist;
     char album[STRING_LENGTH];
     int length;
     int tracknumber;
@@ -43,7 +43,7 @@ struct ds_search_result
     int total_artists;
     int total_albums;
     int total_tracks;
-    struct artist *artists;
+    struct ds_artist *artists;
     struct ds_album *albums;
     struct ds_track *tracks;
     struct ds_playlist *playlist;
@@ -85,13 +85,13 @@ struct ds_album_browse
     struct ds_album_browse* next; /* in case of multiple albums in an artist struct */
 };
 
-struct artist
+struct ds_artist
 {
     char name[STRING_LENGTH];
     char id[33];
     char portrait_id[41];
     float popularity;
-    struct artist* next;
+    struct ds_artist* next;
 };
 
 struct artist_browse
