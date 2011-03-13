@@ -118,7 +118,7 @@ struct ds_user_info
     time_t last_ping;
 };
 
-enum link_type {
+enum ds_link_type {
     LINK_TYPE_INVALID,
     LINK_TYPE_ALBUM,
     LINK_TYPE_ARTIST,
@@ -131,7 +131,7 @@ struct link
 {
     char* uri;
     char* arg;
-    enum link_type type;
+    enum ds_link_type type;
 };
 
 struct snd_buffer /* internal use */
