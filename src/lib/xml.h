@@ -45,7 +45,7 @@ void xml_free_artist_browse(struct ds_artist_browse* artist);
 void xml_free_album(struct ds_album* album);
 void xml_free_album_browse(struct ds_album_browse* album);
 
-void xml_parse_prodinfo(struct user_info* u, unsigned char* xml, int len);
+void xml_parse_prodinfo(struct ds_user_info* u, unsigned char* xml, int len);
 
 char* xml_gen_tag(char* name, char* content);
 

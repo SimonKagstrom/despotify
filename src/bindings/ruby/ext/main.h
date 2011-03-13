@@ -25,7 +25,7 @@ typedef struct link ds_link_t;
 typedef struct ds_search_result ds_search_t;
 typedef struct despotify_session ds_session_t;
 typedef struct ds_track ds_track_t;
-typedef struct user_info ds_user_info_t;
+typedef struct ds_user_info ds_user_info_t;
 
 #define BOOL2VALUE(exp) exp ? Qtrue : Qfalse
 #define RB_DESPOTIFYERR(session) \
