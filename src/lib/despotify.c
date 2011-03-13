@@ -1467,9 +1467,9 @@ void despotify_uri2id(char* uri, char* id)
 }
 
 
-struct link* despotify_link_from_uri(char *uri)
+struct ds_link* despotify_link_from_uri(char *uri)
 {
-    struct link* link = calloc(1, sizeof(struct link));
+    struct ds_link* link = calloc(1, sizeof(struct ds_link));
 
     link->type = LINK_TYPE_INVALID;
     link->uri = uri;
@@ -1524,7 +1524,7 @@ struct link* despotify_link_from_uri(char *uri)
     return link;
 }
 
-struct ds_album_browse* despotify_link_get_album(struct despotify_session* ds, struct link* link)
+struct ds_album_browse* despotify_link_get_album(struct despotify_session* ds, struct ds_link* link)
 {
     char buf[33];
 
@@ -1533,7 +1533,7 @@ struct ds_album_browse* despotify_link_get_album(struct despotify_session* ds, s
     return despotify_get_album(ds, buf);
 }
 
-struct ds_artist_browse* despotify_link_get_artist(struct despotify_session* ds, struct link* link)
+struct ds_artist_browse* despotify_link_get_artist(struct despotify_session* ds, struct ds_link* link)
 {
     char buf[33];
 
@@ -1542,12 +1542,12 @@ struct ds_artist_browse* despotify_link_get_artist(struct despotify_session* ds,
     return despotify_get_artist(ds, buf);
 }
 
-struct ds_search_result* despotify_link_get_search(struct despotify_session* ds, struct link* link)
+struct ds_search_result* despotify_link_get_search(struct despotify_session* ds, struct ds_link* link)
 {
     return despotify_search(ds, link->arg, MAX_SEARCH_RESULTS);
 }
 
-struct ds_playlist* despotify_link_get_playlist(struct despotify_session* ds, struct link* link)
+struct ds_playlist* despotify_link_get_playlist(struct despotify_session* ds, struct ds_link* link)
 {
     char buf[35];
 
@@ -1568,7 +1568,7 @@ struct ds_playlist* despotify_link_get_playlist(struct despotify_session* ds, st
     return playlist;
 }
 
-struct ds_track* despotify_link_get_track(struct despotify_session* ds, struct link* link)
+struct ds_track* despotify_link_get_track(struct despotify_session* ds, struct ds_link* link)
 {
     char buf[33];
 
@@ -1577,7 +1577,7 @@ struct ds_track* despotify_link_get_track(struct despotify_session* ds, struct l
     return despotify_get_track(ds, buf);
 }
 
-void despotify_free_link(struct link* link)
+void despotify_free_link(struct ds_link* link)
 {
     free(link);
 }
