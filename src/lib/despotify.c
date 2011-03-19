@@ -680,7 +680,7 @@ bool despotify_wait_timeout(struct despotify_session* ds){
  */
 
 struct ds_search_result* despotify_search(struct despotify_session* ds,
-                                       char* searchtext, int maxresults)
+                                       const char* searchtext, int maxresults)
 {
     struct ds_search_result* search = NULL;
 
@@ -1419,7 +1419,7 @@ void despotify_free_track(struct ds_track* t)
  *
  */
 
-static void baseconvert(char *src, char *dest,
+static void baseconvert(const char *src, char *dest,
                       int frombase, int tobase, int padlen)
 {
     static const char alphabet[] =
@@ -1456,18 +1456,18 @@ static void baseconvert(char *src, char *dest,
     } while (newlen != 0);
 }
 
-void despotify_id2uri(char* id, char* uri)
+void despotify_id2uri(const char* id, char* uri)
 {
     baseconvert(id, uri, 16, 62, 22);
 }
 
-void despotify_uri2id(char* uri, char* id)
+void despotify_uri2id(const char* uri, char* id)
 {
     baseconvert(uri, id, 62, 16, 32);
 }
 
 
-struct ds_link* despotify_link_from_uri(char *uri)
+struct ds_link* despotify_link_from_uri(const char *uri)
 {
     struct ds_link* link = calloc(1, sizeof(struct ds_link));
 
@@ -1475,7 +1475,7 @@ struct ds_link* despotify_link_from_uri(char *uri)
     link->uri = uri;
 
     if (!strncmp(uri, "spotify:album:", 13)) {
-        char* id = uri + 14;
+        const char* id = uri + 14;
 
         if (strlen(id) != 22) /* id must be 22 chars */
             return link;
@@ -1484,7 +1484,7 @@ struct ds_link* despotify_link_from_uri(char *uri)
         link->arg = id;
 
     } else if (!strncmp(uri, "spotify:artist:", 14)) {
-        char* id = uri + 15;
+        const char* id = uri + 15;
 
         if (strlen(id) != 22) /* id must be 22 chars */
             return link;
@@ -1493,7 +1493,7 @@ struct ds_link* despotify_link_from_uri(char *uri)
         link->arg = id;
 
     } else if (!strncmp(uri, "spotify:search:", 14)) {
-        char* searcharg = uri + 15;
+        const char* searcharg = uri + 15;
 
         if (strlen(searcharg) == 0) /* must search for something */
             return link;
@@ -1503,7 +1503,7 @@ struct ds_link* despotify_link_from_uri(char *uri)
 
     } else if (!strncmp(uri, "spotify:user:", 12)) {
         int userlen = strchr(uri + 13, ':') - (uri + 13);
-        char *id = uri + userlen + 23;
+        const char *id = uri + userlen + 23;
 
         if (strlen(id) != 22) /* id must be 22 chars */
             return link;
@@ -1512,7 +1512,7 @@ struct ds_link* despotify_link_from_uri(char *uri)
         link->arg = id;
 
     } else if (!strncmp(uri, "spotify:track:", 13)) {
-        char* id = uri + 14;
+        const char* id = uri + 14;
 
         if (strlen(id) != 22) /* id must be 22 chars */
             return link;

@@ -47,7 +47,7 @@ void buf_free(struct buf* b)
     free(b);
 }
 
-void buf_append_data(struct buf* b, void* data, int len)
+void buf_append_data(struct buf* b, const void* data, int len)
 {
     buf_extend(b, len);
 

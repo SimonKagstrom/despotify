@@ -129,8 +129,8 @@ enum ds_link_type {
 
 struct ds_link
 {
-    char* uri;
-    char* arg;
+    const char* uri;
+    const char* arg;
     enum ds_link_type type;
 };
 
@@ -283,7 +283,7 @@ void despotify_free_track(struct ds_track* t);
 
 /* Search */
 struct ds_search_result* despotify_search(struct despotify_session *ds,
-                                       char *searchtext, int maxresults);
+                                       const char *searchtext, int maxresults);
 struct ds_search_result* despotify_search_more(struct despotify_session *ds,
                                             struct ds_search_result* search,
                                             int offset, int maxresults);
@@ -314,7 +314,7 @@ struct ds_track* despotify_get_current_track(struct despotify_session* ds);
 int despotify_get_pcm(struct despotify_session*, struct ds_pcm_data*);
 
 /* URI utils */
-struct ds_link* despotify_link_from_uri(char* uri);
+struct ds_link* despotify_link_from_uri(const char* uri);
 
 struct ds_album_browse* despotify_link_get_album(struct despotify_session* ds, struct ds_link* link);
 struct ds_artist_browse* despotify_link_get_artist(struct despotify_session* ds, struct ds_link* link);
@@ -330,8 +330,8 @@ char* despotify_playlist_to_uri(struct ds_playlist* album, char* dest);
 char* despotify_search_to_uri(struct ds_search_result* album, char* dest);
 char* despotify_track_to_uri(struct ds_track* album, char* dest);
 
-void despotify_id2uri(char* id, char* uri);
-void despotify_uri2id(char* uri, char* id);
+void despotify_id2uri(const char* id, char* uri);
+void despotify_uri2id(const char* uri, char* id);
 
 /* internal functions */
 int despotify_snd_read_stream(struct despotify_session* ds);

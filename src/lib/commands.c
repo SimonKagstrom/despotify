@@ -126,7 +126,7 @@ int cmd_request_image (SESSION * session, unsigned char *hash,
  * The response comes as compressed XML
  *
  */
-int cmd_search (SESSION * session, char *searchtext, unsigned int offset,
+int cmd_search (SESSION * session, const char *searchtext, unsigned int offset,
 		unsigned int limit, channel_callback callback, void *private)
 {
 	CHANNEL *ch;
