@@ -37,10 +37,10 @@ void tracklist_draw(ui_t *ui)
   g_availy = ui->height - 2;
 
   // Title/artist columns width.
-  int slen = (ui->width - 4 - 6 - 1) / 2;
+  int slen = (ui->width - 4 - 6 - 1) / 3;
 
-  mvwprintw(ui->win, 0, 0, "%3s %-*.*s %-*.*sLength", "#",
-      slen, slen, "Title", slen, slen, "Artist");
+  mvwprintw(ui->win, 0, 0, "%3s %-*.*s %-*.*s %-*.*sLength", "#",
+      slen, slen, "Title", slen, slen, "Artist", slen, slen, "Album");
   mvwchgat(ui->win, 0, 0, -1, A_BOLD, UI_STYLE_DIM, NULL);
 
   if (!g_res)
@@ -64,8 +64,8 @@ void tracklist_draw(ui_t *ui)
         len += swprintf(art + len, slen - len, L"%s%s", a->name, a->next ? "/" : "");
 
       wchar_t str[ui->width];
-      swprintf(str, sizeof(str), L"%3d %-*.*s %-*.*ls %2d:%02d",
-          i + line + 1, slen, slen, t->title, slen, slen, art,
+      swprintf(str, sizeof(str), L"%3d %-*.*s %-*.*ls %-*.*s %2d:%02d",
+          i + line + 1, slen, slen, t->title, slen, slen, art, slen, slen, t->album,
           t->length / 60000, t->length % 60000 / 1000);
       mvwaddnwstr(ui->win, line + 1, 0, str, ui->width);
 
