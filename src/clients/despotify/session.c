@@ -14,6 +14,7 @@
 #include "ui_footer.h"
 #include "ui_log.h"
 #include "ui_sidebar.h"
+#include "sort.h"
 
 session_t g_session;
 
@@ -207,13 +208,14 @@ void sess_search(const char *query)
   }
 
   log_append("Searching for: <%s>", query);
-  struct ds_search_result *sr = despotify_search(g_session.dsfy, (char*)query, 100);
+  struct ds_search_result *sr = despotify_search(g_session.dsfy, (char*)query, 1000);
 
   if (!sr) {
     log_append(despotify_get_error(g_session.dsfy));
     return;
   }
 
+  sr->playlist->tracks = tracklist_sort(sr->playlist->tracks);
   log_append("Got %d/%d tracks", sr->playlist->num_tracks, sr->total_tracks);
 
   sess_search_t *prev = g_session.search;
