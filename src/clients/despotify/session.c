@@ -216,7 +216,7 @@ void sess_search(const char *query)
   }
 
   sr->playlist->tracks = tracklist_sort(sr->playlist->tracks);
-  tracklist_dedup(sr->playlist->tracks);
+  sr->playlist->num_tracks -= tracklist_dedup(sr->playlist->tracks);
 
   log_append("Got %d/%d tracks", sr->playlist->num_tracks, sr->total_tracks);
 

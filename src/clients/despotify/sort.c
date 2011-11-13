@@ -17,8 +17,9 @@ static int track_compare(struct ds_track *t1, struct ds_track *t2)
   return rv;
 }
 
-void tracklist_dedup(struct ds_track *list)
+int tracklist_dedup(struct ds_track *list)
 {
+  int deletions = 0;
   while (list) {
     if (!track_compare(list, list->next)) {
       struct ds_track *dupe = list->next;
@@ -26,10 +27,13 @@ void tracklist_dedup(struct ds_track *list)
         list->next = dupe->next;
         dupe->next = NULL;
         despotify_free_track(dupe);
+        deletions++;
       }
     }
     list = list->next;
   }
+
+  return deletions;
 }
 
 /*
