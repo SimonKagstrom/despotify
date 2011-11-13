@@ -17,6 +17,21 @@ static int track_compare(struct ds_track *t1, struct ds_track *t2)
   return rv;
 }
 
+void tracklist_dedup(struct ds_track *list)
+{
+  while (list) {
+    if (!track_compare(list, list->next)) {
+      struct ds_track *dupe = list->next;
+      if (dupe) {
+        list->next = dupe->next;
+        dupe->next = NULL;
+        despotify_free_track(dupe);
+      }
+    }
+    list = list->next;
+  }
+}
+
 /*
  * The mergesort below originally from the following link, with minor changes
  *  http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
