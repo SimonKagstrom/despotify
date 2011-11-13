@@ -8,7 +8,7 @@ static int track_compare(struct ds_track *t1, struct ds_track *t2)
     return 0;
 
   int rv = 
-    strcmp(t1->artist->name, t1->artist->name) * 1000 +
+    strcmp(t1->artist->name, t2->artist->name) * 1000 +
     strcmp(t1->album, t2->album) * 10;
 
   if (!rv)
