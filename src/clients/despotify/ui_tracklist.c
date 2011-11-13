@@ -65,7 +65,7 @@ void tracklist_draw(ui_t *ui)
 
       wchar_t str[ui->width];
       swprintf(str, sizeof(str), L"%3d %-*.*s %-*.*ls %-*.*s %2d:%02d",
-          i + line + 1, slen, slen, t->title, slen, slen, art, slen, slen, t->album,
+          t->tracknumber, slen, slen, t->title, slen, slen, art, slen, slen, t->album,
           t->length / 60000, t->length % 60000 / 1000);
       mvwaddnwstr(ui->win, line + 1, 0, str, ui->width);
 
