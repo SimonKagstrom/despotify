@@ -23,6 +23,13 @@ typedef struct input {
   ui_elem_t    prev_focus;
 } input_t;
 
+static struct {
+  char name[STRING_LENGTH];
+  int time_elapsed;
+  int time_track;
+  bool valid;
+} now_playing;
+
 static input_t g_input = { .type = INPUT_NONE };
 static char *g_titles[INPUT_END] = { 0, "command", "search", "username", "password" };
 
@@ -45,15 +52,20 @@ void footer_draw(ui_t *ui)
   if (g_input.type == INPUT_NONE) {
     switch (g_session.state) {
       case SESS_OFFLINE:
-        mvwprintw(ui->win, 0, 0, "OFFLINE");
+        mvwprintw(ui->win, 0, 0, "[OFFLINE]");
         break;
 
       case SESS_ONLINE:
-        mvwprintw(ui->win, 0, 0, "ONLINE %s", g_session.dsfy->user_info->server_host);
+        if (now_playing.valid)
+          mvwprintw(ui->win, 0, 0, "[ONLINE %s] %s [%d:%02d/%d:%02d]", g_session.dsfy->user_info->server_host,
+              now_playing.name, now_playing.time_elapsed / 60, now_playing.time_elapsed % 60,
+              now_playing.time_track / 60, now_playing.time_track % 60);
+        else
+          mvwprintw(ui->win, 0, 0, "[ONLINE %s]", g_session.dsfy->user_info->server_host);
         break;
 
       case SESS_ERROR:
-         mvwprintw(ui->win, 0, 0, "ERROR (see log for details)");
+         mvwprintw(ui->win, 0, 0, "[ERROR (see log for details)]");
         break;
     }
   }
@@ -237,3 +249,26 @@ void footer_input(input_type_t type)
       break;
   }
 }
+
+void footer_update_track(struct ds_track *t)
+{
+  now_playing.valid = true;
+  now_playing.time_elapsed = 0;
+  now_playing.time_track = t->length / 1000;
+  snprintf(now_playing.name, STRING_LENGTH-1, "%s - %s", t->artist->name, t->title);
+
+  ui_dirty(UI_FOOTER);
+  ui_update(false);
+}
+
+void footer_update_track_time(double *time)
+{
+  if ((*time - now_playing.time_elapsed) < 0.5)
+    return;
+
+  now_playing.time_elapsed = (int)*time;
+
+  ui_dirty(UI_FOOTER);
+  ui_update(false);
+}
+

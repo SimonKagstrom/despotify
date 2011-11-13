@@ -21,5 +21,7 @@ void footer_init(ui_t *ui);
 void footer_draw(ui_t *ui);
 int  footer_keypress(wint_t ch, bool code);
 void footer_input(input_type_t type);
+void footer_update_track(struct ds_track *t);
+void footer_update_track_time(double *time);
 
 #endif

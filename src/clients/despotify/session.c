@@ -289,6 +289,10 @@ static void sess_callback(struct despotify_session* ds, int signal, void *data, 
   switch (signal) {
     case DESPOTIFY_NEW_TRACK:
       thread_play();
+      footer_update_track(data);
+      break;
+    case DESPOTIFY_TIME_TELL:
+      footer_update_track_time(data);
       break;
   }
 }
