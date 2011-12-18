@@ -30,7 +30,7 @@ ifeq ($(USE_TREMOR), 1)
 	CFLAGS += -DUSE_TREMOR=1
 	LDFLAGS += -lvorbisidec
 else
-	LDFLAGS += -lvorbisfile
+	LDFLAGS += -lvorbisfile -lmpg123
 endif
 
 # Mac OS X specifics

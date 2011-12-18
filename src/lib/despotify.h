@@ -206,6 +206,7 @@ struct despotify_session
 
     /* internal data: */
     void* vf;
+    void* mf;
     struct ds_snd_fifo* fifo;
     int dlstate;
     int errorcount;
