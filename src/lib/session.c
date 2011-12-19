@@ -8,6 +8,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <assert.h>
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#endif
 
 #include "network.h"
 
