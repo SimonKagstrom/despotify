@@ -12,8 +12,8 @@
 #include <sys/types.h>
 
 typedef struct {
-    u_int32_t state[5];
-    u_int32_t count[2];
+    uint32_t state[5];
+    uint32_t count[2];
     unsigned char buffer[64];
 } SHA1_CTX;
 
@@ -31,7 +31,7 @@ typedef struct {
 #endif /* _WIN32 */
 
 __BEGIN_DECLS
-void SHA1Transform(u_int32_t [5], const unsigned char [64]);
+void SHA1Transform(uint32_t [5], const unsigned char [64]);
 void SHA1Init(SHA1_CTX *);
 void SHA1Update(SHA1_CTX *, const unsigned char *, unsigned int);
 void SHA1Final(unsigned char [20], SHA1_CTX *);
