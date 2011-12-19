@@ -10,6 +10,9 @@
 #include "network.h"
 #ifdef __use_winsock__
 #include <windns.h>
+#ifndef DnsFreeRecordListDeep
+#define DnsFreeRecordListDeep DnsFreeRecordList
+#endif
 #elif defined __use_posix__
 #include <arpa/nameser.h>
 #include <arpa/nameser_compat.h>
@@ -17,6 +20,8 @@
 #endif
 
 #include "dns.h"
+
+
 
 static int initialized;
 
