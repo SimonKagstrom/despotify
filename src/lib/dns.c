@@ -95,7 +95,7 @@ char *dns_srv_list (char *hostname)
 		return NULL;
 
 	i = 0;
-	for (p = pRoot; pt != NULL && i < 10; p = p->pNext) {
+	for (p = pRoot; p != NULL && i < 10; p = p->pNext) {
 		if(p->wType != DNS_TYPE_SRV)
 			continue;
 
