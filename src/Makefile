@@ -28,7 +28,7 @@ endif
 
 ifeq ($(USE_TREMOR), 1)
 	CFLAGS += -DUSE_TREMOR=1
-	LDFLAGS += -lvorbisidec
+	LDFLAGS += -lvorbisidec -lmpg123
 else
 	LDFLAGS += -lvorbisfile -lmpg123
 endif

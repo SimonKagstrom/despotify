@@ -521,9 +521,15 @@ int snd_do_vorbis(struct despotify_session* ds, struct ds_pcm_data* pcm ) {
     pcm->channels = vi->channels;
 
     while (1) {
+        ssize_t r;
         /* decode to pcm */
-        ssize_t r = ov_read(ds->vf, pcm->buf, sizeof(pcm->buf),
-                            SYSTEM_ENDIAN, 2, 1, NULL);
+#if defined(USE_TREMOR)
+        r = ov_read(ds->vf, pcm->buf, sizeof(pcm->buf),
+                NULL);
+#else
+        r = ov_read(ds->vf, pcm->buf, sizeof(pcm->buf),
+                SYSTEM_ENDIAN, 2, 1, NULL);
+#endif
 
         /* assume no valid data read. */
         pcm->len = 0;
