@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <glib.h>
 
 #include "audio.h"
 #include "main.h"
@@ -98,14 +99,48 @@ static void* thread_loop(void* arg)
     return NULL;
 }
 
+static void load_config()
+{
+  // may not be necessary...
+  GMemVTable mem = { .malloc = malloc, .realloc = realloc, .free = free };
+  g_mem_set_vtable(&mem);
+
+	char *conf = g_build_filename(g_get_home_dir(), ".despotifyrc", NULL);
+  if (!conf)
+    return;
+
+  GKeyFile *kf = g_key_file_new();
+
+  if (!g_key_file_load_from_file(kf, conf, G_KEY_FILE_NONE, NULL)) {
+    log_append("Could not open configuration file");
+    goto out;
+  }
+
+  free(g_session.username);
+  free(g_session.password);
+
+  g_session.username = g_key_file_get_string(kf, "main", "username", NULL);
+  g_session.password = g_key_file_get_string(kf, "main", "password", NULL);
+
+  if (g_session.username && g_session.password)
+    sess_connect();
+  else
+    log_append("Missing username or password in config file, not auto-connecting");
+
+out:
+  g_key_file_free(kf);
+  g_free(conf);
+}
 
 void sess_init()
 {
   if (!despotify_init())
     panic("despotify_init() failed");
 
-   audio_device = audio_init();
+  audio_device = audio_init();
   log_append("Initialized audio output");
+
+  load_config();
 }
 
 void sess_cleanup()

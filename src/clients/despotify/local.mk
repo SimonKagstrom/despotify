@@ -12,6 +12,7 @@ NCURSES_INCLUDE ?= /usr/include/ncursesw
 DESPOTIFY_OBJS = commands.o event.o main.o session.o ui.o ui_footer.o ui_help.o ui_log.o ui_sidebar.o ui_splash.o ui_tracklist.o sort.o
 
 CFLAGS += -I$(LIBDIR) -I$(NCURSES_INCLUDE)
+CFLAGS += `pkg-config --cflags glib-2.0`
 ifeq ($(shell uname -s),Darwin)
     DESPOTIFY_OBJS += coreaudio.o
     # The default ncurses library on Mac OS X supports wide characters
@@ -23,6 +24,7 @@ else ifeq ($(shell uname -s),Linux)
 else
     LDFLAGS += -lncursesw
 endif
+LDFLAGS += `pkg-config --libs glib-2.0`
 
 
 .PHONY: all clean install uninstall
