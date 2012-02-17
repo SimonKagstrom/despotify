@@ -109,7 +109,7 @@ void ui_init()
   g_ui_elements[UI_PLAYER].flags           = 0;
   g_ui_elements[UI_PLAYER].set             = UI_SET_NONE;
   g_ui_elements[UI_PLAYER].fixed_width     = 0;
-  g_ui_elements[UI_PLAYER].fixed_height    = 3;
+  g_ui_elements[UI_PLAYER].fixed_height    = 1;
   g_ui_elements[UI_PLAYER].draw_cb         = player_draw;
   g_ui_elements[UI_PLAYER].keypress_cb     = 0;
 
