@@ -24,6 +24,7 @@ typedef struct session {
   struct despotify_session *dsfy;
   char *username;
   char *password;
+  bool low_bitrate;
 
   bool playing;
   bool paused;

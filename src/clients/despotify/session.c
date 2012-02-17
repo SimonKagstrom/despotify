@@ -105,7 +105,7 @@ static void load_config()
   GMemVTable mem = { .malloc = malloc, .realloc = realloc, .free = free };
   g_mem_set_vtable(&mem);
 
-	char *conf = g_build_filename(g_get_home_dir(), ".despotifyrc", NULL);
+  char *conf = g_build_filename(g_get_home_dir(), ".despotifyrc", NULL);
   if (!conf)
     return;
 
@@ -121,6 +121,12 @@ static void load_config()
 
   g_session.username = g_key_file_get_string(kf, "main", "username", NULL);
   g_session.password = g_key_file_get_string(kf, "main", "password", NULL);
+  {
+    GError *err = NULL;
+    g_session.low_bitrate = g_key_file_get_boolean(kf, "main", "low_bitrate", &err);
+    if (err != NULL)
+      g_session.low_bitrate = false;
+  }
 
   if (g_session.username && g_session.password)
     sess_connect();
@@ -172,7 +178,7 @@ void sess_connect()
 
   sess_disconnect();
 
-  if (!(g_session.dsfy = despotify_init_client(sess_callback, NULL, true, true)))
+  if (!(g_session.dsfy = despotify_init_client(sess_callback, NULL, !g_session.low_bitrate, true)))
     panic("despotify_init_client(...) failed");
 
   play_state = PAUSE;
