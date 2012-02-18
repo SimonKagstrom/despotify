@@ -19,35 +19,35 @@
 #define KEY_ESC 0x1b
 
 enum {
-  UI_STYLE_NORMAL = 0,
-  UI_STYLE_DIM,
-  UI_STYLE_NA
+    UI_STYLE_NORMAL = 0,
+    UI_STYLE_DIM,
+    UI_STYLE_NA
 };
 
 typedef enum ui_flags {
-  UI_FLAG_OFFSCREEN = 1 << 0,
-  UI_FLAG_FOCUS     = 1 << 1,
-  UI_FLAG_DIRTY     = 1 << 2
+    UI_FLAG_OFFSCREEN = 1 << 0,
+    UI_FLAG_FOCUS     = 1 << 1,
+    UI_FLAG_DIRTY     = 1 << 2
 } ui_flags_t;
 
 typedef enum ui_elem {
-  UI_SPLASH = 0,
-  UI_SIDEBAR,
-  UI_TRACKLIST,
-  UI_LOG,
-  UI_HELP,
-  UI_PLAYER,
-  UI_FOOTER,
-  UI_END
+    UI_SPLASH = 0,
+    UI_SIDEBAR,
+    UI_TRACKLIST,
+    UI_LOG,
+    UI_HELP,
+    UI_PLAYER,
+    UI_FOOTER,
+    UI_END
 } ui_elem_t;
 
 typedef enum ui_set {
-  UI_SET_NONE,
-  UI_SET_SPLASH,
-  UI_SET_BROWSER,
-  UI_SET_LOG,
-  UI_SET_HELP,
-  UI_SET_END
+    UI_SET_NONE,
+    UI_SET_SPLASH,
+    UI_SET_BROWSER,
+    UI_SET_LOG,
+    UI_SET_HELP,
+    UI_SET_END
 } ui_set_t;
 
 struct ui;
@@ -55,17 +55,17 @@ typedef void (*ui_draw_cb_t)(struct ui*);
 typedef int  (*ui_keypress_cb_t)(wint_t, bool);
 
 typedef struct ui {
-  WINDOW       *win;
-  ui_flags_t    flags;
-  ui_set_t      set;
+    WINDOW       *win;
+    ui_flags_t    flags;
+    ui_set_t      set;
 
-  unsigned int  width;
-  unsigned int  height;
-  unsigned int  fixed_width;
-  unsigned int  fixed_height;
+    unsigned int  width;
+    unsigned int  height;
+    unsigned int  fixed_width;
+    unsigned int  fixed_height;
 
-  ui_draw_cb_t  draw_cb;
-  ui_keypress_cb_t keypress_cb;
+    ui_draw_cb_t  draw_cb;
+    ui_keypress_cb_t keypress_cb;
 } ui_t;
 
 

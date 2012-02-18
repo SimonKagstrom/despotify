@@ -33,44 +33,44 @@ static int num_msgs;
 EVENT *event_register_action (EVENT * head, enum ev_flags flags,
 			      event_callback callback, void *private)
 {
-	EVENT *e;
+    EVENT *e;
 
-	if ((e = head) == NULL)
-		e = evhead;
+    if ((e = head) == NULL)
+        e = evhead;
 
-	if (e == NULL)
-		e = evhead = malloc (sizeof (EVENT));
-	else {
-		while (e->next)
-			e = e->next;
+    if (e == NULL)
+        e = evhead = malloc (sizeof (EVENT));
+    else {
+        while (e->next)
+            e = e->next;
 
-		e->next = malloc (sizeof (EVENT));
-		e = e->next;
-	}
+        e->next = malloc (sizeof (EVENT));
+        e = e->next;
+    }
 
-	if (!e)
-		return NULL;
+    if (!e)
+        return NULL;
 
-	/* The callback routine */
-	e->callback = callback;
+    /* The callback routine */
+    e->callback = callback;
 
-	/* Private variables */
-	e->private = private;
-	e->state = 0;
+    /* Private variables */
+    e->private = private;
+    e->state = 0;
 
-	/* Any posted messages are delievered in here */
-	e->msg = NULL;
-	e->msg_class_filter = 0;
+    /* Any posted messages are delievered in here */
+    e->msg = NULL;
+    e->msg_class_filter = 0;
 
-	/* Used by event_register_fd, event_fd_callbacks_run, .. */
-	e->fd = -1;
+    /* Used by event_register_fd, event_fd_callbacks_run, .. */
+    e->fd = -1;
 
-	/* For internal stuff */
-	e->flags = flags;
-	e->stack = NULL;
-	e->next = NULL;
+    /* For internal stuff */
+    e->flags = flags;
+    e->stack = NULL;
+    e->next = NULL;
 
-	return e;
+    return e;
 }
 
 /*

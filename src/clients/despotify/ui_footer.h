@@ -9,12 +9,12 @@
 #include "ui.h"
 
 typedef enum input_type {
-  INPUT_NONE,
-  INPUT_COMMAND,
-  INPUT_SEARCH,
-  INPUT_USERNAME,
-  INPUT_PASSWORD,
-  INPUT_END
+    INPUT_NONE,
+    INPUT_COMMAND,
+    INPUT_SEARCH,
+    INPUT_USERNAME,
+    INPUT_PASSWORD,
+    INPUT_END
 } input_type_t;
 
 void footer_init(ui_t *ui);
