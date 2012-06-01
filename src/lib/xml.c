@@ -260,6 +260,8 @@ static int parse_tracks(ezxml_t xml, struct ds_track* t, bool ordered, bool high
                         else
                             continue;
                     }
+                } else {
+                    continue;
                 }
                         
                 char* id = (char*)ezxml_attr(file, "id");
