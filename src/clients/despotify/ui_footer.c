@@ -28,6 +28,7 @@ static struct {
     int time_elapsed;
     int time_track;
     bool valid;
+    unsigned int bitrate;
 } now_playing;
 
 static input_t g_input = { .type = INPUT_NONE };
@@ -57,9 +58,11 @@ void footer_draw(ui_t *ui)
 
             case SESS_ONLINE:
                 if (now_playing.valid)
-                    mvwprintw(ui->win, 0, 0, "[ONLINE %s] %s [%d:%02d/%d:%02d]", g_session.dsfy->user_info->server_host,
-                            now_playing.name, now_playing.time_elapsed / 60, now_playing.time_elapsed % 60,
-                            now_playing.time_track / 60, now_playing.time_track % 60);
+                    mvwprintw(ui->win, 0, 0, "[ONLINE %s] %s [%d:%02d/%d:%02d] [%u kbps]",
+                          g_session.dsfy->user_info->server_host, now_playing.name,
+                          now_playing.time_elapsed / 60, now_playing.time_elapsed % 60,
+                          now_playing.time_track / 60, now_playing.time_track % 60,
+                          now_playing.bitrate);
                 else
                     mvwprintw(ui->win, 0, 0, "[ONLINE %s]", g_session.dsfy->user_info->server_host);
                 break;
@@ -255,6 +258,7 @@ void footer_update_track(struct ds_track *t)
     now_playing.valid = true;
     now_playing.time_elapsed = 0;
     now_playing.time_track = t->length / 1000;
+    now_playing.bitrate = t->file_bitrate / 1000;
     snprintf(now_playing.name, STRING_LENGTH-1, "%s - %s", t->artist->name, t->title);
 
     ui_dirty(UI_FOOTER);

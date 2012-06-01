@@ -109,17 +109,13 @@ int handle_aeskeyerr (unsigned char *payload) {
 
     DSFYDEBUG("Server said 0x0e (AES key error) for channel %d\n",
            ntohs (*(unsigned short *) (payload + 2)))
-		if ((ch =
-		     channel_by_id (ntohs
-				    (*(unsigned short *) (payload + 2)))) !=
-			   NULL) {
+#if 0
+		if ((ch = channel_by_id (ntohs (*(unsigned short *) (payload + 2)))) != NULL) {
 
         ds = ch->private;
         
         if(ds->client_callback)
-	       ds->client_callback(ds, DESPOTIFY_TRACK_PLAY_ERROR, 
-                               NULL, 
-                               ds->client_callback_data);
+	       ds->client_callback(ds, DESPOTIFY_TRACK_PLAY_ERROR, NULL, ds->client_callback_data);
 
 		channel_unregister (ch);
 	}
@@ -128,6 +124,7 @@ int handle_aeskeyerr (unsigned char *payload) {
 			("Command 0x0e: Failed to find channel with ID %d\n",
 			 ntohs (*(unsigned short *) (payload + 2)));
 	}
+#endif
 
     return ret;
 }
