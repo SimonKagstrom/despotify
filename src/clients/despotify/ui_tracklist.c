@@ -33,6 +33,12 @@ void tracklist_init(ui_t *ui)
 // Print tracks in search result.
 void tracklist_draw(ui_t *ui)
 {
+    // Hack to avoid segfaulting with small window sizes.
+    if (ui->width < (4 + 6 + 1))
+        return;
+    if (ui->height < 2)
+        return;
+
     int i = 0, line = 0;
     g_availy = ui->height - 2;
 
