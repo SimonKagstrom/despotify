@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <glib.h>
 
 #include "audio.h"
 #include "main.h"
@@ -14,6 +15,7 @@
 #include "ui_footer.h"
 #include "ui_log.h"
 #include "ui_sidebar.h"
+#include "sort.h"
 
 session_t g_session;
 
@@ -97,194 +99,241 @@ static void* thread_loop(void* arg)
     return NULL;
 }
 
+static void load_config()
+{
+    // may not be necessary...
+    GMemVTable mem = { .malloc = malloc, .realloc = realloc, .free = free };
+    g_mem_set_vtable(&mem);
+
+    char *conf = g_build_filename(g_get_home_dir(), ".despotifyrc", NULL);
+    if (!conf)
+        return;
+
+    GKeyFile *kf = g_key_file_new();
+
+      if (!g_key_file_load_from_file(kf, conf, G_KEY_FILE_NONE, NULL)) {
+          log_append("Could not open configuration file");
+          goto out;
+      }
+
+    free(g_session.username);
+    free(g_session.password);
+
+    g_session.username = g_key_file_get_string(kf, "main", "username", NULL);
+    g_session.password = g_key_file_get_string(kf, "main", "password", NULL);
+    {
+        GError *err = NULL;
+        g_session.low_bitrate = g_key_file_get_boolean(kf, "main", "low_bitrate", &err);
+        if (err != NULL)
+            g_session.low_bitrate = false;
+    }
+
+    if (g_session.username && g_session.password)
+        sess_connect();
+    else
+        log_append("Missing username or password in config file, not auto-connecting");
+
+out:
+    g_key_file_free(kf);
+    g_free(conf);
+}
 
 void sess_init()
 {
-  if (!despotify_init())
-    panic("despotify_init() failed");
+    if (!despotify_init())
+        panic("despotify_init() failed");
 
-   audio_device = audio_init();
-  log_append("Initialized audio output");
+    audio_device = audio_init();
+    log_append("Initialized audio output");
+
+    load_config();
 }
 
 void sess_cleanup()
 {
-  sess_disconnect();
-  audio_exit(audio_device);
-  log_append("Destroyed audio output");
+    sess_disconnect();
+    audio_exit(audio_device);
+    log_append("Destroyed audio output");
 
-  // Free search results.
-  for (sess_search_t *s = g_session.search; s;) {
-    despotify_free_search(s->res);
-    sess_search_t *p = s;
-    s = s->next;
-    free(p);
-  }
+    // Free search results.
+    for (sess_search_t *s = g_session.search; s;) {
+        despotify_free_search(s->res);
+        sess_search_t *p = s;
+        s = s->next;
+        free(p);
+    }
 
-  if (!despotify_cleanup())
-    panic("despotify_cleanup() failed");
+    if (!despotify_cleanup())
+        panic("despotify_cleanup() failed");
 
-  free(g_session.username);
-  g_session.username = 0;
-  free(g_session.password);
-  g_session.password = 0;
+    free(g_session.username);
+    g_session.username = 0;
+    free(g_session.password);
+    g_session.password = 0;
 }
 
 void sess_connect()
 {
-  assert(g_session.username && g_session.password);
+    assert(g_session.username && g_session.password);
 
-  sess_disconnect();
+    sess_disconnect();
 
-  if (!(g_session.dsfy = despotify_init_client(sess_callback, NULL, true, true)))
-    panic("despotify_init_client(...) failed");
+    if (!(g_session.dsfy = despotify_init_client(sess_callback, NULL, !g_session.low_bitrate, true)))
+        panic("despotify_init_client(...) failed");
 
-  play_state = PAUSE;
-  pthread_create(&thread, NULL, &thread_loop, g_session.dsfy);
+    play_state = PAUSE;
+    pthread_create(&thread, NULL, &thread_loop, g_session.dsfy);
 
-  // Login with credentials set by sess_username/sess_password.
-  if (!despotify_authenticate(g_session.dsfy, g_session.username, g_session.password)) {
-    g_session.state = SESS_ERROR;
-    log_append(despotify_get_error(g_session.dsfy));
-    despotify_exit(g_session.dsfy);
-    // Switch to log view.
-    ui_show(UI_SET_LOG);
-  }
-  else {
-    g_session.state = SESS_ONLINE;
-    log_append("Logged in as %s@%s:%d (%s)",
-        g_session.dsfy->user_info->username,
-        g_session.dsfy->user_info->server_host,
-        g_session.dsfy->user_info->server_port,
-        g_session.dsfy->user_info->country);
-    // Switch to browser view.
-    ui_show(UI_SET_BROWSER);
-  }
+    // Login with credentials set by sess_username/sess_password.
+    if (!despotify_authenticate(g_session.dsfy, g_session.username, g_session.password)) {
+        g_session.state = SESS_ERROR;
+        log_append(despotify_get_error(g_session.dsfy));
+        despotify_exit(g_session.dsfy);
+        // Switch to log view.
+        ui_show(UI_SET_LOG);
+    }
+    else {
+        g_session.state = SESS_ONLINE;
+        log_append("Logged in as %s@%s:%d (%s)",
+                g_session.dsfy->user_info->username,
+                g_session.dsfy->user_info->server_host,
+                g_session.dsfy->user_info->server_port,
+                g_session.dsfy->user_info->country);
+        // Switch to browser view.
+        ui_show(UI_SET_BROWSER);
+    }
 
-  // Redraw status info.
-  ui_dirty(UI_FOOTER);
+    // Redraw status info.
+    ui_dirty(UI_FOOTER);
 }
 
 void sess_disconnect()
 {
-  if (thread)
-    thread_exit();
+    if (thread)
+        thread_exit();
 
-  if (g_session.state == SESS_ONLINE) {
-    sess_stop();
-    despotify_exit(g_session.dsfy);
-    log_append("Disconnected");
-    // Return to splash screen.
-    ui_show(UI_SET_SPLASH);
-  }
+    if (g_session.state == SESS_ONLINE) {
+        sess_stop();
+        despotify_exit(g_session.dsfy);
+        log_append("Disconnected");
+        // Return to splash screen.
+        ui_show(UI_SET_SPLASH);
+    }
 
-  g_session.state = SESS_OFFLINE;
-  // Redraw status info.
-  ui_dirty(UI_FOOTER);
+    g_session.state = SESS_OFFLINE;
+    // Redraw status info.
+    ui_dirty(UI_FOOTER);
 }
 
 void sess_username(const char *username)
 {
-  free(g_session.username);
-  g_session.username = strdup(username);
+    free(g_session.username);
+    g_session.username = strdup(username);
 
-  // Prompt for password.
-  footer_input(INPUT_PASSWORD);
+    // Prompt for password.
+    footer_input(INPUT_PASSWORD);
 }
 
 void sess_password(const char *password)
 {
-  free(g_session.password);
-  g_session.password = strdup(password);
-  sess_connect();
+    free(g_session.password);
+    g_session.password = strdup(password);
+    sess_connect();
 }
 
 void sess_search(const char *query)
 {
-  if (g_session.state != SESS_ONLINE) {
-    log_append("Not connected");
-    return;
-  }
+    if (g_session.state != SESS_ONLINE) {
+        log_append("Not connected");
+        return;
+    }
 
-  log_append("Searching for: <%s>", query);
-  struct ds_search_result *sr = despotify_search(g_session.dsfy, (char*)query, 100);
+    log_append("Searching for: <%s>", query);
+    struct ds_search_result *sr = despotify_search(g_session.dsfy, (char*)query, 1000);
 
-  if (!sr) {
-    log_append(despotify_get_error(g_session.dsfy));
-    return;
-  }
+    if (!sr) {
+        log_append(despotify_get_error(g_session.dsfy));
+        return;
+    }
 
-  log_append("Got %d/%d tracks", sr->playlist->num_tracks, sr->total_tracks);
+    sr->playlist->tracks = tracklist_sort(sr->playlist->tracks);
+    sr->playlist->num_tracks -= tracklist_dedup(sr->playlist->tracks);
 
-  sess_search_t *prev = g_session.search;
-  sess_search_t *search = malloc(sizeof(sess_search_t));
-  search->res  = sr;
-  search->next = prev;
-  g_session.search = search;
-  ++g_session.search_len;
+    log_append("Got %d/%d tracks", sr->playlist->num_tracks, sr->total_tracks);
 
-  sidebar_reset();
+    sess_search_t *prev = g_session.search;
+    sess_search_t *search = malloc(sizeof(sess_search_t));
+    search->res  = sr;
+    search->next = prev;
+    g_session.search = search;
+    ++g_session.search_len;
+
+    sidebar_reset();
 }
 
 // Start playback.
 void sess_play(struct ds_track *t)
 {
-  if (g_session.state != SESS_ONLINE) {
-    log_append("Not connected");
-    return;
-  }
+    if (g_session.state != SESS_ONLINE) {
+        log_append("Not connected");
+        return;
+    }
 
-  if (despotify_play(g_session.dsfy, t, true)) {
-    g_session.playing = true;
-    g_session.paused = false;
-    log_append("Playing %s", t->title);
-    thread_play();
-  }
-  else
-    log_append("Playback failed");
+    if (despotify_play(g_session.dsfy, t, true)) {
+        g_session.playing = true;
+        g_session.paused = false;
+        log_append("Playing %s", t->title);
+        thread_play();
+    }
+    else
+        log_append("Playback failed");
 }
 
 // Stop playback.
 void sess_stop()
 {
-  thread_pause();
-  if (g_session.state != SESS_ONLINE)
-    return;
+    thread_pause();
+    if (g_session.state != SESS_ONLINE)
+        return;
 
-  g_session.playing = false;
-  despotify_stop(g_session.dsfy);
-  log_append("Stopped playback");
+    g_session.playing = false;
+    despotify_stop(g_session.dsfy);
+    log_append("Stopped playback");
 }
 
 // Toggle playback pause.
 void sess_pause()
 {
-  if (!g_session.playing) {
-    log_append("Not pausing since nothing is playing");
-    return;
-  }
+    if (!g_session.playing) {
+        log_append("Not pausing since nothing is playing");
+        return;
+    }
 
-  if (g_session.paused) {
-    thread_play();
-    log_append("Resumed playback");
-    g_session.paused = false;
-  }
-  else {
-    thread_pause();
-    log_append("Paused playback");
-    g_session.paused = true;
-  }
+    if (g_session.paused) {
+        thread_play();
+        log_append("Resumed playback");
+        g_session.paused = false;
+    }
+    else {
+        thread_pause();
+        log_append("Paused playback");
+        g_session.paused = true;
+    }
 }
 
 static void sess_callback(struct despotify_session* ds, int signal, void *data, void* callback_data)
 {
-  (void)data;
-  (void)ds;
-  (void)callback_data;
+    (void)data;
+    (void)ds;
+    (void)callback_data;
 
-  switch (signal) {
-    case DESPOTIFY_NEW_TRACK:
-      thread_play();
-      break;
-  }
+    switch (signal) {
+        case DESPOTIFY_NEW_TRACK:
+            thread_play();
+            footer_update_track(data);
+            break;
+        case DESPOTIFY_TIME_TELL:
+            footer_update_track_time(data);
+            break;
+    }
 }

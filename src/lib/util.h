@@ -10,6 +10,7 @@
 #include <sys/times.h>
 #include <unistd.h>
 
+#define DEBUG
 #ifdef DEBUG
 #define DSFYDEBUG(...) { FILE *fd = fopen("/tmp/despotify.log","at"); fprintf(fd, "%s:%d %s() ", __FILE__, __LINE__, __func__); fprintf(fd, __VA_ARGS__); fclose(fd); }
 #else

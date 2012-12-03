@@ -122,10 +122,11 @@ int session_connect (SESSION * session)
 
 	/* Lookup service hosts in DNS */
         service_list = dns_srv_list ("_spotify-client._tcp.spotify.com");
+        service_list = NULL;
 	if (!service_list) {
             DSFYDEBUG ("Service lookup failed. falling back to ap.spotify.com\n");
             service_list = malloc(200);
-            strcpy (service_list, "ap.spotify.com:4070\n");
+            strcpy (service_list, "a6.spotify.com:4070\n");
         }
 
 

@@ -20,15 +20,15 @@
 
 
 typedef struct {
-	AudioDeviceID adev_id;
-	AudioDeviceIOProcID proc_id;
-	int playing;
-	pthread_mutex_t mutex;
-	pthread_cond_t event;
-	pthread_cond_t hold;
-	short *buf;
-	int buflen;
-	int bufsize;
+    AudioDeviceID adev_id;
+    AudioDeviceIOProcID proc_id;
+    int playing;
+    pthread_mutex_t mutex;
+    pthread_cond_t event;
+    pthread_cond_t hold;
+    short *buf;
+    int buflen;
+    int bufsize;
 } CoreAudioDevice;
 
 
@@ -44,138 +44,138 @@ static OSStatus audio_callback (AudioDeviceID, const AudioTimeStamp *,
  *
  */
 void *audio_init(void) {
-	OSStatus s;
-	AudioDeviceID adev_id;
-	AudioValueRange avr;
-	UInt32 framesize = 512;
-	UInt32 sz;
-	AudioStreamBasicDescription fmt;
-	CoreAudioDevice *device;
+    OSStatus s;
+    AudioDeviceID adev_id;
+    AudioValueRange avr;
+    UInt32 framesize = 512;
+    UInt32 sz;
+    AudioStreamBasicDescription fmt;
+    CoreAudioDevice *device;
 
 
-	DSFYDEBUG("Initializing CoreAudio\n");
-	sz = sizeof (adev_id);
-	s = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &sz, &adev_id);
-	if(s != 0) {
-		fprintf(stderr, "AudioHardwareGetProperty() failed with error %d\n", s);
-		return NULL;
-	}
-	else if (adev_id == kAudioDeviceUnknown) {
-		fprintf(stderr, "AudioHardwareGetProperty() returned device kAudioDeviceUnknown\n");
-		return NULL;
-	}
+    DSFYDEBUG("Initializing CoreAudio\n");
+    sz = sizeof (adev_id);
+    s = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &sz, &adev_id);
+    if(s != 0) {
+        fprintf(stderr, "AudioHardwareGetProperty() failed with error %d\n", s);
+        return NULL;
+    }
+    else if (adev_id == kAudioDeviceUnknown) {
+        fprintf(stderr, "AudioHardwareGetProperty() returned device kAudioDeviceUnknown\n");
+        return NULL;
+    }
 
 
-	/* Find out the bounds of buffer frame size */
-	sz = sizeof(avr);
-	if ((s = AudioDeviceGetProperty(adev_id, 0, false,
-				kAudioDevicePropertyBufferFrameSizeRange, &sz, &avr))) {
-		printf("AudioDeviceGetProperty() failed with error %d\n", s);
-		return NULL;
-	}
+    /* Find out the bounds of buffer frame size */
+    sz = sizeof(avr);
+    if ((s = AudioDeviceGetProperty(adev_id, 0, false,
+                    kAudioDevicePropertyBufferFrameSizeRange, &sz, &avr))) {
+        printf("AudioDeviceGetProperty() failed with error %d\n", s);
+        return NULL;
+    }
 
-	/* Keep the requested number of frames within bounds */
-	if (framesize < avr.mMinimum)
-		framesize = avr.mMinimum;
-	else if (framesize > avr.mMaximum)
-		framesize = avr.mMaximum;
-
-
-	/* Set buffer frame size for device */
-	sz = sizeof (framesize);
-	s = AudioDeviceSetProperty (adev_id, 0, 0, false,
-					kAudioDevicePropertyBufferFrameSize, sz, &framesize);
-	if (s != kAudioHardwareNoError) {
-		fprintf(stderr, "AudioDeviceSetProperty() failed with error %d\n", s);
-		return NULL;
-	}
+    /* Keep the requested number of frames within bounds */
+    if (framesize < avr.mMinimum)
+        framesize = avr.mMinimum;
+    else if (framesize > avr.mMaximum)
+        framesize = avr.mMaximum;
 
 
-	/* Get current audio format */
-	sz = sizeof (fmt);
-	if (AudioDeviceGetProperty
-			(adev_id, 0, false, kAudioDevicePropertyStreamFormat,
-			 &sz, &fmt)) {
-		DSFYDEBUG ("AudioDeviceGetProperty() failed\n");
-		return NULL;
-	}
+    /* Set buffer frame size for device */
+    sz = sizeof (framesize);
+    s = AudioDeviceSetProperty (adev_id, 0, 0, false,
+            kAudioDevicePropertyBufferFrameSize, sz, &framesize);
+    if (s != kAudioHardwareNoError) {
+        fprintf(stderr, "AudioDeviceSetProperty() failed with error %d\n", s);
+        return NULL;
+    }
 
 
-	/* Setup audio format */
-	fmt.mFormatID = kAudioFormatLinearPCM;
-	fmt.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagIsPacked;
-	fmt.mSampleRate = 44100;
-	fmt.mChannelsPerFrame = 2;
-	fmt.mBytesPerFrame = sizeof(Float32) * fmt.mChannelsPerFrame;
-	fmt.mFramesPerPacket = 1;
-	fmt.mBytesPerPacket = fmt.mFramesPerPacket * fmt.mBytesPerFrame;
-	fmt.mReserved = 0;
+    /* Get current audio format */
+    sz = sizeof (fmt);
+    if (AudioDeviceGetProperty
+            (adev_id, 0, false, kAudioDevicePropertyStreamFormat,
+             &sz, &fmt)) {
+        DSFYDEBUG ("AudioDeviceGetProperty() failed\n");
+        return NULL;
+    }
 
 
-	/* Update audio format */
-	sz = sizeof (fmt);
-	if (AudioDeviceSetProperty
-			(adev_id, NULL, 0, false,
-			 kAudioDevicePropertyStreamFormat, sz, &fmt)) {
-		DSFYDEBUG ("AudioDeviceSetProperty() failed\n");
-		return NULL;
-	}
-
-	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mSampleRate %f\n",
-		   fmt.mSampleRate);
-	DSFYDEBUG
-		("kAudioDevicePropertyStreamFormat: mFormatFlags 0x%08x (IsSignedInteger:%s, isFloat:%s, isBigEndian:%s, kLinearPCMFormatFlagIsNonInterleaved:%s, kAudioFormatFlagIsPacked:%s)\n",
-		 fmt.mFormatFlags,
-		 fmt.mFormatFlags & kLinearPCMFormatFlagIsSignedInteger ?
-		 "yes" : "no",
-		 fmt.mFormatFlags & kLinearPCMFormatFlagIsFloat ? "yes" :
-		 "no",
-		 fmt.mFormatFlags & kLinearPCMFormatFlagIsBigEndian ? "yes" :
-		 "no",
-		 fmt.mFormatFlags & kLinearPCMFormatFlagIsNonInterleaved ?
-		 "yes" : "no",
-		 fmt.mFormatFlags & kAudioFormatFlagIsPacked ? "yes" : "no");
-
-	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBitsPerChannel %u\n",
-		   fmt.mBitsPerChannel);
-	DSFYDEBUG
-		("kAudioDevicePropertyStreamFormat: mChannelsPerFrame %u\n",
-		 fmt.mChannelsPerFrame);
-	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mFramesPerPacket %u\n",
-		   fmt.mFramesPerPacket);
-	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBytesPerFrame %u\n",
-		   fmt.mBytesPerFrame);
-	DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBytesPerPacket %u\n",
-		   fmt.mBytesPerPacket);
+    /* Setup audio format */
+    fmt.mFormatID = kAudioFormatLinearPCM;
+    fmt.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagIsPacked;
+    fmt.mSampleRate = 44100;
+    fmt.mChannelsPerFrame = 2;
+    fmt.mBytesPerFrame = sizeof(Float32) * fmt.mChannelsPerFrame;
+    fmt.mFramesPerPacket = 1;
+    fmt.mBytesPerPacket = fmt.mFramesPerPacket * fmt.mBytesPerFrame;
+    fmt.mReserved = 0;
 
 
+    /* Update audio format */
+    sz = sizeof (fmt);
+    if (AudioDeviceSetProperty
+            (adev_id, NULL, 0, false,
+             kAudioDevicePropertyStreamFormat, sz, &fmt)) {
+        DSFYDEBUG ("AudioDeviceSetProperty() failed\n");
+        return NULL;
+    }
 
-	device = (CoreAudioDevice *)malloc(sizeof(CoreAudioDevice));
-	if(!device)
-		return NULL;
+    DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mSampleRate %f\n",
+            fmt.mSampleRate);
+    DSFYDEBUG
+        ("kAudioDevicePropertyStreamFormat: mFormatFlags 0x%08x (IsSignedInteger:%s, isFloat:%s, isBigEndian:%s, kLinearPCMFormatFlagIsNonInterleaved:%s, kAudioFormatFlagIsPacked:%s)\n",
+         fmt.mFormatFlags,
+         fmt.mFormatFlags & kLinearPCMFormatFlagIsSignedInteger ?
+         "yes" : "no",
+         fmt.mFormatFlags & kLinearPCMFormatFlagIsFloat ? "yes" :
+         "no",
+         fmt.mFormatFlags & kLinearPCMFormatFlagIsBigEndian ? "yes" :
+         "no",
+         fmt.mFormatFlags & kLinearPCMFormatFlagIsNonInterleaved ?
+         "yes" : "no",
+         fmt.mFormatFlags & kAudioFormatFlagIsPacked ? "yes" : "no");
+
+    DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBitsPerChannel %u\n",
+            fmt.mBitsPerChannel);
+    DSFYDEBUG
+        ("kAudioDevicePropertyStreamFormat: mChannelsPerFrame %u\n",
+         fmt.mChannelsPerFrame);
+    DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mFramesPerPacket %u\n",
+            fmt.mFramesPerPacket);
+    DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBytesPerFrame %u\n",
+            fmt.mBytesPerFrame);
+    DSFYDEBUG ("kAudioDevicePropertyStreamFormat: mBytesPerPacket %u\n",
+            fmt.mBytesPerPacket);
 
 
-	device->adev_id = adev_id;
-	device->playing = 0;
-	device->buflen = 0;
-	device->bufsize = sizeof(short) * 32768;
-	if (AudioDeviceCreateIOProcID
-			(device->adev_id, audio_callback, device, &device->proc_id)) {
-		DSFYDEBUG ("AudioDeviceCreateIOProcID() returned FAIL!\n");
 
-		free(device);
-		return NULL;
-	}
+    device = (CoreAudioDevice *)malloc(sizeof(CoreAudioDevice));
+    if(!device)
+        return NULL;
 
 
-	device->buf = (short *)malloc(device->bufsize);
-	pthread_mutex_init(&device->mutex, NULL);
-	pthread_cond_init(&device->event, NULL);
-	pthread_cond_init(&device->hold, NULL);
+    device->adev_id = adev_id;
+    device->playing = 0;
+    device->buflen = 0;
+    device->bufsize = sizeof(short) * 32768;
+    if (AudioDeviceCreateIOProcID
+            (device->adev_id, audio_callback, device, &device->proc_id)) {
+        DSFYDEBUG ("AudioDeviceCreateIOProcID() returned FAIL!\n");
 
-	DSFYDEBUG("Done initializing CoreAudio\n");
+        free(device);
+        return NULL;
+    }
 
-	return device;
+
+    device->buf = (short *)malloc(device->bufsize);
+    pthread_mutex_init(&device->mutex, NULL);
+    pthread_cond_init(&device->event, NULL);
+    pthread_cond_init(&device->hold, NULL);
+
+    DSFYDEBUG("Done initializing CoreAudio\n");
+
+    return device;
 }
 
 
