@@ -10,6 +10,9 @@
 #include "network.h"
 #ifdef __use_winsock__
 #include <windns.h>
+#ifndef DnsFreeRecordListDeep
+#define DnsFreeRecordListDeep DnsFreeRecordList
+#endif
 #elif defined __use_posix__
 #include <arpa/nameser.h>
 #include <arpa/nameser_compat.h>
@@ -17,6 +20,8 @@
 #endif
 
 #include "dns.h"
+
+
 
 static int initialized;
 
@@ -95,7 +100,7 @@ char *dns_srv_list (char *hostname)
 		return NULL;
 
 	i = 0;
-	for (p = pRoot; pt != NULL && i < 10; p = p->pNext) {
+	for (p = pRoot; p != NULL && i < 10; p = p->pNext) {
 		if(p->wType != DNS_TYPE_SRV)
 			continue;
 

@@ -7,10 +7,12 @@
 #define DESPOTIFY_UTIL_H
 
 #include <pthread.h>
-#include <sys/times.h>
 #include <unistd.h>
 
-#define DEBUG
+#ifndef _WIN32
+#include <sys/times.h>
+#endif
+
 #ifdef DEBUG
 #define DSFYDEBUG(...) { FILE *fd = fopen("/tmp/despotify.log","at"); fprintf(fd, "%s:%d %s() ", __FILE__, __LINE__, __func__); fprintf(fd, __VA_ARGS__); fclose(fd); }
 #else
