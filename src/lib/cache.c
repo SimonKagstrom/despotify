@@ -9,7 +9,7 @@
 #include "util.h"
 #include "cache.h"
 
-#if ( defined _WIN32 || defined __WIN32__ || ! defined __CYGWIN__ )
+#if ( (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__ )
 #define mkdir(name,mode) _mkdir(name)
 #endif
 
