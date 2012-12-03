@@ -20,6 +20,7 @@ static char rcsid[] = "$OpenBSD: sha1.c,v 1.12 2003/07/21 20:37:08 millert Exp $
 
 #define SHA1HANDSOFF		/* Copies data before messing with it. */
 
+#include <stdint.h>
 #include <sys/param.h>
 #include <sys/types.h>
 
